@@ -1,0 +1,88 @@
+[
+  {
+    "video": "sorting-10472351.mp4",
+    "concept": "cardboard box",
+    "seconds": 11.6,
+    "frames_with_hits": 209,
+    "ids": 11,
+    "solid": 11,
+    "crossed": 6,
+    "crossed_ids": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ]
+  },
+  {
+    "video": "conveyor-5903898.mp4",
+    "concept": "cardboard box",
+    "seconds": 35.8,
+    "frames_with_hits": 607,
+    "ids": 16,
+    "solid": 16,
+    "crossed": 4,
+    "crossed_ids": [
+      4,
+      10,
+      11,
+      14
+    ]
+  },
+  {
+    "video": "conveyor-5903898.mp4",
+    "concept": "package",
+    "seconds": 36.1,
+    "frames_with_hits": 607,
+    "ids": 16,
+    "solid": 16,
+    "crossed": 3,
+    "crossed_ids": [
+      0,
+      1,
+      9
+    ]
+  },
+  {
+    "video": "conveyor-5903898-belt.mp4",
+    "concept": "cardboard box",
+    "seconds": 28.9,
+    "frames_with_hits": 607,
+    "ids": 15,
+    "solid": 15,
+    "crossed": 7,
+    "crossed_ids": [
+      0,
+      1,
+      4,
+      5,
+      8,
+      9,
+      12
+    ]
+  },
+  {
+    "video": "conveyor-5903898-belt.mp4",
+    "concept": "package",
+    "seconds": 30.6,
+    "frames_with_hits": 607,
+    "ids": 16,
+    "solid": 16,
+    "crossed": 11,
+    "crossed_ids": [
+      1,
+      3,
+      5,
+      6,
+      7,
+      9,
+      10,
+      11,
+      12,
+      14,
+      15
+    ]
+  }
+]
