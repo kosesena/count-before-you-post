@@ -1,7 +1,7 @@
 """Cut the Kapı mascot out of its plain background for the warehouse standee.
 
 Usage: .venv/bin/python experiments/blender/make_cutouts.py
-Writes experiments/blender/cutouts/kapi-gec.png (green) and kapi-dur.png (red).
+Writes experiments/blender/cutouts/kapi-gec.png (green), kapi-dur.png (red) and sef.png.
 """
 from pathlib import Path
 
@@ -9,7 +9,8 @@ from PIL import Image, ImageDraw
 
 REPO = Path(__file__).resolve().parents[2]
 OUT = Path(__file__).parent / "cutouts"
-SOURCES = {"kapi-gec": "assets/mascots/kapi.jpg", "kapi-dur": "assets/mascots/kapi-dur.jpg"}
+SOURCES = {"kapi-gec": "assets/mascots/kapi.jpg", "kapi-dur": "assets/mascots/kapi-dur.jpg",
+           "sef": "assets/mascots/sef.jpg"}
 MARKER = (255, 0, 255)
 
 

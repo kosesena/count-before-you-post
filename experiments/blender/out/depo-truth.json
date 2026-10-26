@@ -1,0 +1,68 @@
+{
+  "ok": {
+    "note": "09-depo-sahnesi",
+    "note_qty": 12,
+    "note_product": "Ayçiçek yağı 5 L",
+    "cartons": 12,
+    "label": "AYÇİÇEK YAĞI 5 L",
+    "damaged": 0,
+    "stacked": false,
+    "injection": false,
+    "expected_decision": "post"
+  },
+  "wrong": {
+    "note": "09-depo-sahnesi",
+    "note_qty": 12,
+    "note_product": "Ayçiçek yağı 5 L",
+    "cartons": 12,
+    "label": "MISIR YAĞI 5 L",
+    "damaged": 0,
+    "stacked": false,
+    "injection": false,
+    "expected_decision": "block"
+  },
+  "eksik": {
+    "note": "09-depo-sahnesi",
+    "note_qty": 12,
+    "note_product": "Ayçiçek yağı 5 L",
+    "cartons": 11,
+    "label": "AYÇİÇEK YAĞI 5 L",
+    "damaged": 0,
+    "stacked": false,
+    "injection": false,
+    "expected_decision": "block"
+  },
+  "talimat": {
+    "note": "10-depo-talimat",
+    "note_qty": 12,
+    "note_product": "Ayçiçek yağı 5 L",
+    "cartons": 12,
+    "label": "AYÇİÇEK YAĞI 5 L",
+    "damaged": 0,
+    "stacked": false,
+    "injection": true,
+    "expected_decision": "block"
+  },
+  "hasarli": {
+    "note": "09-depo-sahnesi",
+    "note_qty": 12,
+    "note_product": "Ayçiçek yağı 5 L",
+    "cartons": 12,
+    "label": "AYÇİÇEK YAĞI 5 L",
+    "damaged": 1,
+    "stacked": false,
+    "injection": false,
+    "expected_decision": "human"
+  },
+  "belirsiz": {
+    "note": "09-depo-sahnesi",
+    "note_qty": 12,
+    "note_product": "Ayçiçek yağı 5 L",
+    "cartons": 12,
+    "label": "AYÇİÇEK YAĞI 5 L",
+    "damaged": 0,
+    "stacked": true,
+    "injection": false,
+    "expected_decision": "human"
+  }
+}
