@@ -6,3 +6,6 @@ __pycache__/
 .DS_Store
 experiments/videos/*.mp4
 experiments/frames/
+experiments/blender/out/*.png
+experiments/mascots/*.png
+experiments/mascots/_sheet.jpg

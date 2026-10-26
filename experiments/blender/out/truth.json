@@ -1,0 +1,14 @@
+{
+  "s01-duzenli-12": {
+    "boxes_on_belt": 12,
+    "distractors": 0,
+    "layout": "row",
+    "seed": 1
+  },
+  "s02-daginik-20": {
+    "boxes_on_belt": 20,
+    "distractors": 8,
+    "layout": "clutter",
+    "seed": 2
+  }
+}

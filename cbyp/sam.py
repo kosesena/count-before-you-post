@@ -1,4 +1,5 @@
 """SAM 3.1 calls and output parsing (image and video, concept prompts)."""
+import base64
 import re
 from dataclasses import dataclass
 from pathlib import Path
@@ -41,6 +42,23 @@ def parse(text: str) -> list[Detection]:
                 float(kv["y2"]), float(kv["c"]) if "c" in kv else None,
             ))
     return out
+
+
+def segment_image(path: str | Path, concept: str) -> str:
+    """Find every instance of `concept` in an image; return raw output text."""
+    path = Path(path)
+    mime = "image/png" if path.suffix == ".png" else "image/jpeg"
+    data = base64.b64encode(path.read_bytes()).decode()
+    stream = client().responses.create(
+        model=SAM,
+        input=[{"role": "user", "content": [
+            {"type": "input_text", "text": concept},
+            {"type": "input_image", "image_url": f"data:{mime};base64,{data}"},
+        ]}],
+        metadata={"include_confidence": "true", "mask_encoding": "one_bit"},
+        stream=True,
+    )
+    return "".join(e.delta for e in stream if e.type == "response.output_text.delta")
 
 
 def upload(path: str | Path) -> str:

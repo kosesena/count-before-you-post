@@ -1,0 +1,34 @@
+[
+  {
+    "scene": "s01-duzenli-12",
+    "concept": "cardboard box",
+    "truth": 12,
+    "all": 12,
+    "conf>=0.7": 12,
+    "seconds": 9.8
+  },
+  {
+    "scene": "s01-duzenli-12",
+    "concept": "box",
+    "truth": 12,
+    "all": 12,
+    "conf>=0.7": 12,
+    "seconds": 5.7
+  },
+  {
+    "scene": "s02-daginik-20",
+    "concept": "cardboard box",
+    "truth": 20,
+    "all": 21,
+    "conf>=0.7": 20,
+    "seconds": 3.6
+  },
+  {
+    "scene": "s02-daginik-20",
+    "concept": "box",
+    "truth": 20,
+    "all": 21,
+    "conf>=0.7": 21,
+    "seconds": 4.6
+  }
+]
