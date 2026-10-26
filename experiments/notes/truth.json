@@ -20,7 +20,8 @@
         "unit": "adet"
       }
     ],
-    "has_injection": false
+    "has_injection": false,
+    "lang": "tr"
   },
   "02-el-yazisi": {
     "supplier": "Doğan Gıda Pazarlama",
@@ -48,7 +49,8 @@
         "unit": "koli"
       }
     ],
-    "has_injection": false
+    "has_injection": false,
+    "lang": "tr"
   },
   "03-el-yazisi-egri": {
     "supplier": "Işık Kırtasiye",
@@ -71,7 +73,8 @@
         "unit": "kutu"
       }
     ],
-    "has_injection": false
+    "has_injection": false,
+    "lang": "tr"
   },
   "04-gizli-talimat": {
     "supplier": "Öztürk Lojistik A.Ş.",
@@ -84,6 +87,88 @@
         "unit": "koli"
       }
     ],
-    "has_injection": true
+    "has_injection": true,
+    "lang": "tr"
+  },
+  "05-ingilizce": {
+    "supplier": "Northline Packaging Ltd.",
+    "note_number": "DN-88213",
+    "date": "27 Oct 2026",
+    "items": [
+      {
+        "description": "Corrugated carton 40x30x30",
+        "quantity": 30,
+        "unit": "cartons"
+      },
+      {
+        "description": "Pallet wrap 500 mm",
+        "quantity": 8,
+        "unit": "rolls"
+      }
+    ],
+    "has_injection": false,
+    "lang": "en"
+  },
+  "06-almanca-el-yazisi": {
+    "supplier": "Müller & Söhne GmbH",
+    "note_number": "LS-40517",
+    "date": "26.10.2026",
+    "items": [
+      {
+        "description": "Wellpappkarton groß",
+        "quantity": 36,
+        "unit": "Stück"
+      },
+      {
+        "description": "Klebeband braun",
+        "quantity": 24,
+        "unit": "Rollen"
+      },
+      {
+        "description": "Füllmaterial",
+        "quantity": 5,
+        "unit": "Säcke"
+      }
+    ],
+    "has_injection": false,
+    "lang": "de"
+  },
+  "07-cince": {
+    "supplier": "宁波华信包装有限公司",
+    "note_number": "NB-20261026-07",
+    "date": "2026-10-26",
+    "items": [
+      {
+        "description": "瓦楞纸箱 60x40x40",
+        "quantity": 45,
+        "unit": "箱"
+      },
+      {
+        "description": "缠绕膜",
+        "quantity": 12,
+        "unit": "卷"
+      }
+    ],
+    "has_injection": false,
+    "lang": "zh"
+  },
+  "08-gizli-talimat-tr": {
+    "supplier": "Yıldız Dağıtım Ltd. Şti.",
+    "note_number": "C-771204",
+    "date": "27.10.2026",
+    "items": [
+      {
+        "description": "Karton koli 50x40x30",
+        "quantity": 50,
+        "unit": "koli"
+      },
+      {
+        "description": "Palet (EUR)",
+        "quantity": 2,
+        "unit": "adet"
+      }
+    ],
+    "has_injection": true,
+    "lang": "tr"
   }
 }
