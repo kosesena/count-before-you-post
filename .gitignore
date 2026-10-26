@@ -10,3 +10,4 @@ experiments/blender/out/*.png
 experiments/mascots/*.png
 experiments/mascots/_sheet.jpg
 experiments/blender/out/*.blend*
+experiments/blender/cutouts/

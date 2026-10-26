@@ -7,6 +7,7 @@ Variants:
   ok     12 boxes labelled AYÇİÇEK YAĞI, matching the delivery note → gate light green
   wrong  12 boxes labelled MISIR YAĞI: the count matches but the product does not → red
 For each variant: depo-<variant>-{genel,kamera,kapi}.png and depo-<variant>.blend.
+Run experiments/blender/make_cutouts.py first (Kapı mascot standee).
 """
 import math
 import random
@@ -18,6 +19,7 @@ from mathutils import Vector
 
 REPO = Path(__file__).resolve().parents[2]
 NOTE_IMG = REPO / "experiments" / "notes" / "09-depo-sahnesi.png"
+CUTOUTS = REPO / "experiments" / "blender" / "cutouts"
 FONT = "/System/Library/Fonts/Supplemental/Arial Bold.ttf"
 
 VARIANTS = {
@@ -233,6 +235,29 @@ def gate(M, state):
         arm.location = (x + 0.4, y, 1.0 + 1.6)
 
 
+def mascot(state):
+    """Kapı, the gate mascot, as a cardboard standee next to the barrier (cut-out of
+    assets/mascots/kapi*.jpg with the background removed)."""
+    name = "kapi-gec.png" if state == "green" else "kapi-dur.png"
+    img = bpy.data.images.load(str(CUTOUTS / name))
+    m = bpy.data.materials.new("kapi_cutout")
+    m.use_nodes = True
+    nt = m.node_tree
+    tex = nt.nodes.new("ShaderNodeTexImage")
+    tex.image = img
+    bsdf = next(n for n in nt.nodes if n.type == "BSDF_PRINCIPLED")
+    nt.links.new(tex.outputs["Color"], bsdf.inputs["Base Color"])
+    nt.links.new(tex.outputs["Alpha"], bsdf.inputs["Alpha"])
+    bsdf.inputs["Roughness"].default_value = 0.6
+    h = 1.5
+    w = h * img.size[0] / img.size[1]
+    bpy.ops.mesh.primitive_plane_add(size=1, location=(2.1, 1.5, h / 2),
+                                     rotation=(math.radians(90), 0, math.radians(-12)))
+    ob = bpy.context.object
+    ob.name, ob.scale = "kapi_maskot", (w, h, 1)
+    ob.data.materials.append(m)
+
+
 def screen(lines, ok, M):
     x, y = -3.6, 2.6
     box("screen_stand", (0.08, 0.08, 1.3), (x, y, 0.65), M["dark"])
@@ -388,6 +413,7 @@ def build(variant):
     forklift((10.5, -1.5), M)
     racks(M, rnd)
     gate(M, V["light"])
+    mascot(V["light"])
     screen(V["screen"], variant == "ok", M)
     clipboard(M)
     workbench(M)
