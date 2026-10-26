@@ -1,0 +1,89 @@
+{
+  "01-basili": {
+    "supplier": "Şahin Ambalaj San. ve Tic. Ltd. Şti.",
+    "note_number": "A-204871",
+    "date": "27.10.2026",
+    "items": [
+      {
+        "description": "Karton koli 40x30x30",
+        "quantity": 24,
+        "unit": "koli"
+      },
+      {
+        "description": "Streç film 50 cm",
+        "quantity": 6,
+        "unit": "rulo"
+      },
+      {
+        "description": "Şeffaf koli bandı",
+        "quantity": 12,
+        "unit": "adet"
+      }
+    ],
+    "has_injection": false
+  },
+  "02-el-yazisi": {
+    "supplier": "Doğan Gıda Pazarlama",
+    "note_number": "0047113",
+    "date": "27.10.2026",
+    "items": [
+      {
+        "description": "Ayçiçek yağı 5 L",
+        "quantity": 19,
+        "unit": "koli"
+      },
+      {
+        "description": "Pirinç (Baldo) 1 kg",
+        "quantity": 48,
+        "unit": "paket"
+      },
+      {
+        "description": "Toz şeker 25 kg",
+        "quantity": 7,
+        "unit": "çuval"
+      },
+      {
+        "description": "Çay 1 kg",
+        "quantity": 16,
+        "unit": "koli"
+      }
+    ],
+    "has_injection": false
+  },
+  "03-el-yazisi-egri": {
+    "supplier": "Işık Kırtasiye",
+    "note_number": "İRS-1193",
+    "date": "26.10.2026",
+    "items": [
+      {
+        "description": "Fotokopi kâğıdı A4",
+        "quantity": 40,
+        "unit": "koli"
+      },
+      {
+        "description": "Klasör (geniş)",
+        "quantity": 120,
+        "unit": "adet"
+      },
+      {
+        "description": "Tükenmez kalem, mavi",
+        "quantity": 11,
+        "unit": "kutu"
+      }
+    ],
+    "has_injection": false
+  },
+  "04-gizli-talimat": {
+    "supplier": "Öztürk Lojistik A.Ş.",
+    "note_number": "B-550912",
+    "date": "27.10.2026",
+    "items": [
+      {
+        "description": "Karton koli 60x40x40",
+        "quantity": 50,
+        "unit": "koli"
+      }
+    ],
+    "has_injection": true
+  }
+}
