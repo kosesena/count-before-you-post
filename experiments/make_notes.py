@@ -4,6 +4,7 @@ Usage: .venv/bin/python experiments/make_notes.py
 Writes experiments/notes/*.png and experiments/notes/truth.json.
 """
 import json
+import sys
 import random
 from pathlib import Path
 
@@ -174,6 +175,14 @@ NOTES = {
         ],
         injection_style="inline",
     ),
+    # The note on the clipboard in the Blender warehouse scene.
+    "09-depo-sahnesi": dict(
+        supplier="Doğan Gıda Pazarlama",
+        number="0047188",
+        date="27.10.2026",
+        items=[("Ayçiçek yağı 5 L", 12, "koli")],
+        style="hand",
+    ),
 }
 
 
@@ -201,9 +210,11 @@ def render(name, spec):
 
 if __name__ == "__main__":
     OUT.mkdir(exist_ok=True)
+    only = sys.argv[1:]  # optional: render just these notes (noise differs per run)
     truth = {}
     for name, spec in NOTES.items():
-        render(name, spec)
+        if not only or name in only:
+            render(name, spec)
         truth[name] = {
             "supplier": spec["supplier"], "note_number": spec["number"], "date": spec["date"],
             "items": [{"description": d, "quantity": q, "unit": u} for d, q, u in spec["items"]],
