@@ -4,294 +4,542 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Count Before You Post</title>
-<meta name="description" content="An AI agent that can't write a number into an ERP until a camera has counted it. Built with Muse Spark and SAM 3.1.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<meta name="description" content="An AI agent that can't write a number into the ERP until a camera has counted it. Demo of the gate, the cast and six dock deliveries.">
 <style>
 :root {
-  --bg: #f6f7f9; --panel: #ffffff; --ink: #14171c; --muted: #5d6573; --line: #e3e6eb;
-  --post: #16a34a; --post-bg: #e8f7ee; --block: #dc2626; --block-bg: #fdecec;
-  --human: #d97706; --human-bg: #fdf3e3; --accent: #2563eb; --accent-bg: #eaf1fe;
-  --code: #f1f3f6; --shadow: 0 1px 2px rgba(16,24,40,.06), 0 1px 3px rgba(16,24,40,.08);
+  --bg: #f1f4ec; --panel: #fdfffa; --ink: #26211a; --muted: #666d5e; --line: #dde3d0;
+  --post: #15803d; --post-bg: #e2f3e7; --block: #b91c1c; --block-bg: #fbe3e3;
+  --human: #b45309; --human-bg: #fbeed3; --accent: #9a3412; --accent-bg: #fbeedf;
+  --code: #e9eee0; --bubble: #e9eee0;
+  --shadow: 0 1px 2px rgba(74, 55, 25, .08), 0 3px 10px rgba(74, 55, 25, .06);
+  --radius: 14px;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #0e1116; --panel: #161a21; --ink: #e8ebf0; --muted: #9aa3b2; --line: #262c36;
-    --post-bg: #10291b; --block-bg: #301415; --human-bg: #2e2110; --accent-bg: #142340;
-    --code: #1d222b; --shadow: none;
+    --bg: #14110c; --panel: #1f1a13; --ink: #f1e9da; --muted: #b6a996; --line: #3a3227;
+    --post: #4ade80; --post-bg: #0f2b1a; --block: #f87171; --block-bg: #331313;
+    --human: #fbbf24; --human-bg: #33230e; --accent: #fdba74; --accent-bg: #2b2113;
+    --code: #292219; --bubble: #292219; --shadow: none;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #0e1116; --panel: #161a21; --ink: #e8ebf0; --muted: #9aa3b2; --line: #262c36;
-  --post-bg: #10291b; --block-bg: #301415; --human-bg: #2e2110; --accent-bg: #142340;
-  --code: #1d222b; --shadow: none;
+  --bg: #14110c; --panel: #1f1a13; --ink: #f1e9da; --muted: #b6a996; --line: #3a3227;
+  --post: #4ade80; --post-bg: #0f2b1a; --block: #f87171; --block-bg: #331313;
+  --human: #fbbf24; --human-bg: #33230e; --accent: #fdba74; --accent-bg: #2b2113;
+  --code: #292219; --bubble: #292219; --shadow: none;
 }
 * { box-sizing: border-box; }
-body { margin: 0; background: var(--bg); color: var(--ink);
-  font: 15px/1.55 Inter, system-ui, -apple-system, sans-serif; }
-code, .mono { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 12.5px; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font: 16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+.mono, code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .82em; }
 a { color: var(--accent); }
-.wrap { max-width: 1180px; margin: 0 auto; padding: 0 16px; }
-header { padding: 48px 0 24px; }
-h1 { font-size: clamp(30px, 5vw, 44px); line-height: 1.1; margin: 0 0 12px; letter-spacing: -.02em; }
-.lede { font-size: 18px; color: var(--muted); max-width: 760px; margin: 0; }
-.tools { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 6px; }
-.chip { font-size: 12px; padding: 3px 9px; border: 1px solid var(--line); border-radius: 99px;
-  background: var(--panel); color: var(--muted); }
-.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 24px 0 8px; }
-.stat { background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
-  padding: 16px 18px; box-shadow: var(--shadow); }
-.stat b { display: block; font-size: 28px; letter-spacing: -.02em; }
+img { max-width: 100%; }
+.wrap { max-width: 1120px; margin: 0 auto; padding: 0 16px 12px; }
+#theme {
+  position: fixed; top: 10px; right: 10px; z-index: 10;
+  border: 1px solid var(--line); background: var(--panel); color: var(--ink);
+  border-radius: 99px; padding: 6px 12px; font: inherit; font-size: 13px; cursor: pointer;
+}
+#theme:focus-visible, button:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.hero { padding: 44px 0 8px; }
+.kicker {
+  display: inline-block; font-size: 12.5px; font-weight: 700; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--accent); background: var(--accent-bg);
+  border: 1px solid var(--line); border-radius: 99px; padding: 3px 12px; margin: 0 0 12px;
+}
+h1 { font-size: clamp(32px, 5.4vw, 52px); line-height: 1.05; letter-spacing: -.02em; margin: 0 0 10px; }
+.lede { font-size: 18px; color: var(--muted); max-width: 44rem; margin: 0 0 20px; }
+.lede b { color: var(--ink); }
+.castshot { margin: 0 0 20px; }
+.castshot img {
+  display: block; width: 100%; height: auto; border-radius: 18px;
+  border: 1px solid var(--line); box-shadow: var(--shadow);
+}
+.castshot figcaption { color: var(--muted); font-size: 13px; margin-top: 8px; }
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 0 0 8px; }
+.stat {
+  background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 14px 16px; box-shadow: var(--shadow);
+}
+.sdot { width: 11px; height: 11px; border-radius: 50%; display: inline-block; margin-right: 8px; }
+.sdot.bad { background: var(--block); }
+.sdot.good { background: var(--post); }
+.sdot.mid { background: var(--human); }
+.stat b { display: block; font-size: 30px; letter-spacing: -.02em; line-height: 1.1; }
 .stat span { color: var(--muted); font-size: 13px; }
-h2 { font-size: 22px; margin: 40px 0 6px; letter-spacing: -.01em; }
-.sub { color: var(--muted); margin: 0 0 16px; }
-.tabs { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; }
-.tab { flex: 0 0 auto; border: 1px solid var(--line); background: var(--panel); color: var(--ink);
-  padding: 8px 12px; border-radius: 10px; cursor: pointer; font: inherit; font-size: 14px;
-  display: flex; align-items: center; gap: 8px; }
-.tab[aria-selected="true"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
-.dot { width: 8px; height: 8px; border-radius: 50%; }
-.post { color: var(--post); } .block { color: var(--block); } .human { color: var(--human); }
-.bg-post { background: var(--post); } .bg-block { background: var(--block); } .bg-human { background: var(--human); }
-.case { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 16px; margin-top: 14px; }
-.card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px;
-  box-shadow: var(--shadow); min-width: 0; }
-.card h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted);
-  margin: 0 0 10px; font-weight: 600; }
-.what { font-size: 16px; font-weight: 500; margin: 0 0 12px; }
-.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 9px; overflow: hidden; margin-bottom: 10px; }
-.seg button { border: 0; background: transparent; color: var(--muted); padding: 6px 10px; font: inherit;
-  font-size: 13px; cursor: pointer; }
-.seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
-.shot { width: 100%; border-radius: 10px; display: block; background: #888; aspect-ratio: 16/9; object-fit: cover; }
-.legend { font-size: 12.5px; color: var(--muted); margin: 8px 0 0; min-height: 2.6em; }
-.note-img { width: 100%; max-height: 300px; object-fit: contain; border-radius: 10px; background: var(--code); }
-.readings { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.reading { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
-.reading .who { font-size: 12px; color: var(--muted); font-weight: 600; }
-.reading .val { font-size: 15px; font-weight: 600; margin-top: 2px; }
-.reading .det { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
-.flag { color: var(--block); font-weight: 600; }
-.decision { display: flex; gap: 12px; align-items: center; border-radius: 12px; padding: 14px; margin-bottom: 12px; }
-.decision.post { background: var(--post-bg); } .decision.block { background: var(--block-bg); } .decision.human { background: var(--human-bg); }
-.badge { font-weight: 700; font-size: 13px; letter-spacing: .05em; padding: 6px 10px; border-radius: 8px; color: #fff; white-space: nowrap; }
-.decision p { margin: 0; color: var(--ink); }
+h2 { font-size: 24px; letter-spacing: -.01em; margin: 42px 0 4px; }
+.sub { color: var(--muted); margin: 0 0 16px; max-width: 46rem; }
+.how { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 10px; margin-bottom: 6px; }
+.how div {
+  background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+  padding: 10px 12px; font-size: 13.5px; color: var(--muted);
+}
+.how div b { color: var(--ink); }
+.crew { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px; }
+.member {
+  background: var(--panel); border: 1px solid var(--line);
+  border-radius: 16px; overflow: hidden; box-shadow: var(--shadow);
+  display: flex; flex-direction: column; min-width: 0;
+}
+.cdot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; margin-right: 8px; background: var(--c); }
+.member img.portrait { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; background: var(--code); }
+.member .body { padding: 12px 14px 16px; }
+.member .name { font-size: 19px; font-weight: 800; margin: 0; letter-spacing: -.01em; }
+.member .model { font-size: 12.5px; color: var(--muted); margin: 0 0 8px; }
+.pill {
+  display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .05em;
+  text-transform: uppercase; border-radius: 99px; padding: 2px 9px; margin-bottom: 8px;
+  border: 1px solid var(--line);
+}
+.pill.on { color: var(--post); border-color: var(--post); }
+.pill.done { color: var(--accent); border-color: var(--accent); }
+.pill.coming { color: var(--muted); border-style: dashed; }
+.bubble {
+  position: relative; background: var(--bubble); border-radius: 12px;
+  padding: 10px 12px; font-size: 13.5px; margin: 10px 0 0;
+}
+.bubble::before {
+  content: ""; position: absolute; top: -7px; left: 20px; border: 7px solid transparent;
+  border-top: 0; border-bottom-color: var(--bubble);
+}
+.roles { font-size: 13px; color: var(--muted); margin: 14px 0 0; max-width: 46rem; }
+.tabs { display: flex; gap: 8px; overflow-x: auto; padding: 2px 2px 8px; }
+.tab {
+  flex: 0 0 auto; display: inline-flex; align-items: center; gap: 8px;
+  border: 1px solid var(--line); background: var(--panel);
+  color: var(--ink); padding: 8px 12px; border-radius: 10px; cursor: pointer; font: inherit; font-size: 14px;
+}
+.tab .dot { width: 10px; height: 10px; border-radius: 50%; flex: 0 0 auto; }
+.tab.t-post .dot { background: var(--post); }
+.tab.t-block .dot { background: var(--block); }
+.tab.t-human .dot { background: var(--human); }
+.tab[aria-selected="true"] { outline: 2px solid var(--ink); outline-offset: -2px; font-weight: 700; }
+.dock { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 16px; margin-top: 12px; }
+.card {
+  background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 16px; box-shadow: var(--shadow); min-width: 0;
+}
+.card h3 { font-size: 12.5px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin: 0 0 10px; }
+.card h3 + h3 { margin-top: 18px; }
+.what { font-size: 17px; font-weight: 600; margin: 0 0 12px; }
+.seg { display: inline-flex; flex-wrap: wrap; gap: 0; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; margin-bottom: 10px; }
+.seg button {
+  border: 0; border-right: 1px solid var(--line); background: transparent; color: var(--muted);
+  padding: 7px 12px; font: inherit; font-size: 13px; cursor: pointer;
+}
+.seg button:last-child { border-right: 0; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); font-weight: 700; }
+.shot {
+  width: 100%; height: auto; border-radius: 10px; display: block;
+  border: 1px solid var(--line); background: var(--code);
+}
+.legend { font-size: 12.5px; color: var(--muted); margin: 8px 0 0; }
+.note-img {
+  width: 100%; max-height: 320px; object-fit: contain; border-radius: 10px;
+  border: 1px solid var(--line); background: var(--code); display: block;
+}
+.readings { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; }
+.reading { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; min-width: 0; }
+.reading .who { font-size: 12px; color: var(--muted); font-weight: 700; }
+.reading .val { font-size: 15px; font-weight: 700; margin-top: 3px; overflow-wrap: anywhere; }
+.reading .det { font-size: 12.5px; color: var(--muted); margin-top: 2px; overflow-wrap: anywhere; }
+.flag { color: var(--block); font-weight: 700; }
+.av {
+  width: 26px; height: 26px; border-radius: 50%; object-fit: cover; vertical-align: -7px;
+  margin-right: 6px; border: 2px solid var(--c, var(--line)); background: var(--code);
+}
+.who { display: flex; align-items: center; flex-wrap: wrap; }
+.decision { display: flex; gap: 12px; align-items: flex-start; border-radius: 12px; padding: 14px; margin-bottom: 10px; }
+.decision.post { background: var(--post-bg); }
+.decision.block { background: var(--block-bg); }
+.decision.human { background: var(--human-bg); }
+.badge {
+  font-weight: 800; font-size: 12.5px; letter-spacing: .05em; padding: 6px 10px;
+  border-radius: 8px; color: #fff; white-space: nowrap;
+}
+.badge.post { background: var(--post); }
+.badge.block { background: var(--block); }
+.badge.human { background: var(--human); }
+.decision p { margin: 0; overflow-wrap: anywhere; }
+.decision .qty { display: block; margin-top: 6px; font-size: 13px; }
 .rules { list-style: none; margin: 0; padding: 0; counter-reset: r; }
-.rules li { counter-increment: r; display: grid; grid-template-columns: 22px 1fr auto; gap: 8px;
-  padding: 6px 8px; border-radius: 8px; font-size: 13.5px; align-items: center; }
+.rules li {
+  counter-increment: r; display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 8px;
+  padding: 6px 8px; border-radius: 8px; font-size: 13.5px; align-items: baseline;
+}
 .rules li::before { content: counter(r); font-size: 11px; color: var(--muted); text-align: center; }
 .rules li.passed { color: var(--muted); }
-.rules li.fired { background: var(--code); font-weight: 600; }
-.rules li.later { opacity: .38; }
-.rules .res { font-size: 12px; }
-.agent { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr); gap: 16px; margin-top: 16px; }
-.timeline { list-style: none; margin: 0; padding: 0; border-left: 2px solid var(--line); }
-.timeline li { position: relative; padding: 0 0 12px 16px; font-size: 13.5px; }
-.timeline li::before { content: ""; position: absolute; left: -6px; top: 6px; width: 10px; height: 10px;
-  border-radius: 50%; background: var(--panel); border: 2px solid var(--muted); }
-.timeline li.think { color: var(--muted); font-style: italic; }
-.timeline li.think::before { border-color: var(--line); }
-.timeline li.refused::before { border-color: var(--block); background: var(--block); }
-.timeline li.posted::before { border-color: var(--post); background: var(--post); }
-.timeline li.cross::before { border-color: var(--accent); background: var(--accent); }
-.timeline .tool { font-weight: 600; }
-.timeline .out { display: block; color: var(--muted); font-size: 12px; word-break: break-word; }
-.answer { background: var(--code); border-radius: 10px; padding: 10px 12px; font-size: 13.5px; margin-top: 8px; }
-.voice { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-audio { width: 100%; height: 36px; margin: 6px 0; }
-.cast img { width: 100%; border-radius: 14px; display: block; }
-footer { color: var(--muted); font-size: 13px; padding: 40px 0 56px; }
-.theme { position: absolute; top: 12px; right: 12px; border: 1px solid var(--line); background: var(--panel);
-  color: var(--ink); border-radius: 99px; padding: 6px 10px; font: inherit; font-size: 13px; cursor: pointer; }
-@media (max-width: 860px) {
-  .case, .agent { grid-template-columns: 1fr; }
-  .stats { grid-template-columns: 1fr; }
-  .voice { grid-template-columns: 1fr; }
+.rules li.fired { background: var(--code); font-weight: 700; }
+.rules li.later { opacity: .45; }
+.rules .res { font-size: 12px; white-space: nowrap; }
+.duo { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 16px; margin-top: 16px; }
+.duo .verdict { font-size: 15px; overflow-wrap: anywhere; }
+.answer { background: var(--code); border-radius: 10px; padding: 10px 12px; font-size: 13.5px; margin-top: 10px; overflow-wrap: anywhere; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.chip {
+  font-size: 12px; font-weight: 700; border-radius: 99px; padding: 2px 10px;
+  border: 1px solid var(--line); overflow-wrap: anywhere;
 }
-@media (max-width: 480px) { .readings { grid-template-columns: 1fr; } }
+.chip.no { color: var(--block); border-color: var(--block); }
+.chip.yes { color: var(--post); border-color: var(--post); }
+.timeline { list-style: decimal; margin: 10px 0 0; padding: 0 0 0 22px; font-size: 13.5px; }
+.timeline li { padding: 0 0 12px 4px; min-width: 0; }
+.timeline li::marker { color: var(--muted); font-size: 12px; }
+.timeline li.think { color: var(--muted); font-style: italic; }
+.timeline .tool { font-weight: 700; }
+.timeline .args, .timeline .out { display: block; overflow-wrap: anywhere; word-break: break-word; }
+.timeline .out { color: var(--muted); font-size: 12.5px; }
+.timeline .mark { font-weight: 800; font-size: 12px; }
+.timeline .mark.no { color: var(--block); }
+.timeline .mark.yes { color: var(--post); }
+.voicegrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; }
+audio { width: 100%; height: 36px; margin: 8px 0 4px; }
+.quote { font-size: 14px; overflow-wrap: anywhere; }
+.vmeta { font-size: 13px; color: var(--muted); margin: 8px 0 0; overflow-wrap: anywhere; }
+.vmeta b { color: var(--ink); }
+.sure { color: var(--post); font-weight: 700; }
+.unsure { color: var(--human); font-weight: 700; }
+footer { color: var(--muted); font-size: 13px; padding: 40px 0 56px; }
+footer p { margin: 4px 0; }
+@media (max-width: 900px) {
+  .dock, .duo { grid-template-columns: minmax(0, 1fr); }
+  .stats { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 480px) {
+  .readings { grid-template-columns: minmax(0, 1fr); }
+  body { font-size: 15px; }
+}
 </style>
 </head>
 <body>
-<button class="theme" id="theme" aria-label="Toggle theme">◐</button>
+<button id="theme" type="button" aria-label="Toggle colour theme">Dark</button>
 <div class="wrap">
-  <header>
+  <header class="hero">
+    <p class="kicker">Live demo &middot; recorded runs, no API calls from this page</p>
     <h1>Count Before You Post</h1>
-    <p class="lede">AI agents are getting write access to real systems, and they trust the document.
-      This one can't write a number into the ERP until a camera has counted it.</p>
-    <div class="tools">
-      <span class="chip">Muse Spark: reads the note, looks, runs the agent</span>
-      <span class="chip">SAM 3.1: counts and outlines every carton</span>
-      <span class="chip">Muse Voice Transcribe: the receiver's count</span>
-      <span class="chip">Muse Code: wrote the ERPNext client</span>
-      <span class="chip">Muse Image: drew the cast</span>
-    </div>
+    <p class="lede">Count Before You Post is <b>an AI agent that can't write a number into the ERP until a camera has counted it</b>.
+      Muse Spark reads the delivery note, SAM 3.1 counts what actually arrived, and a gate in plain code
+      blocks the goods receipt when the two disagree.</p>
+    <figure class="castshot">
+      <img id="castImg" alt="Group picture of the project characters">
+      <figcaption id="castCap">The whole crew at the dock.</figcaption>
+    </figure>
     <div class="stats" id="stats"></div>
   </header>
 
-  <section>
-    <h2>Six deliveries at the dock</h2>
-    <p class="sub">A receiving dock rendered in Blender. Pick a delivery to see what each model read,
-      which rule of the gate decided, and what the Spark agent did. Every number here comes from a
-      recorded run against the real Meta Model API and a real ERPNext.</p>
-    <div class="tabs" role="tablist" id="tabs"></div>
-    <div id="case"></div>
-  </section>
+  <main>
+    <section aria-labelledby="h-cast">
+      <h2 id="h-cast">Meet the cast</h2>
+      <p class="sub">Every worker in this project has a character. Here they are, in their own words.</p>
+      <div class="how" id="how"></div>
+      <div class="crew" id="crew"></div>
+      <p class="roles" id="roles"></p>
+    </section>
 
-  <section>
-    <h2>The receiver's own count</h2>
-    <p class="sub">Muse Voice Transcribe writes down what the receiver says; Spark pulls out the
-      number and whether they were sure. An unsure receiver, or a number the camera doesn't
-      confirm, goes to a human. (Synthetic Turkish voice; real recordings are next.)</p>
-    <div class="voice" id="voice"></div>
-  </section>
+    <section aria-labelledby="h-dock">
+      <h2 id="h-dock">Deliveries at the dock</h2>
+      <p class="sub" id="dockSub">Pick a delivery to see what each model read, which gate rule decided, and what the Spark agent did with and without the gate.</p>
+      <div class="tabs" role="tablist" id="tabs" aria-label="Deliveries"></div>
+      <div id="case"></div>
+    </section>
 
-  <section class="cast">
-    <h2>The cast</h2>
-    <p class="sub">Characters: Sena's concepts, drawn with Muse Image. Fan-made, not official Meta mascots.</p>
-    <img id="cast" alt="Spark, Sam, Glimmer, Voice, Kapı, Şef, Muse and Muse Code">
-  </section>
+    <section aria-labelledby="h-voice">
+      <h2 id="h-voice">The receiver's own count</h2>
+      <p class="sub">Voice writes down what the receiver says at the dock, and notices when they are not sure.
+        An unsure receiver sends the delivery to the supervisor. These are synthetic Turkish voice clips.</p>
+      <div class="voicegrid" id="voice"></div>
+    </section>
+  </main>
 
   <footer>
-    Built during the Meta Global AI Developer Hackathon, 26 Oct – 4 Nov 2026, by Sena Köse.
-    Code and build journal: <a href="https://github.com/kosesena/count-before-you-post">github.com/kosesena/count-before-you-post</a>.
+    <p>Built during the Meta Global AI Developer Hackathon, 26 Oct &ndash; 4 Nov 2026, by Sena K&ouml;se.</p>
+    <p><a href="https://github.com/kosesena/count-before-you-post">https://github.com/kosesena/count-before-you-post</a></p>
+    <p>Characters: Sena's concepts, drawn with Muse Image. Fan-made, not official Meta mascots.</p>
+    <p>This page was written by Muse Code.</p>
   </footer>
 </div>
-
 <script>
-const RULE_TEXT = {
-  instruction: "Note tries to instruct software → block",
-  unreadable: "Note has no single legible line → human",
-  wrong_product: "Label product ≠ note product → block",
-  hidden: "Cartons stacked or hidden → human",
-  damaged: "Damaged cartons → human, partial receipt",
-  disagree: "SAM and Spark disagree, carton by carton → human",
-  receiver: "Receiver unsure or says another number → human",
-  match: "Both models agree and match the note → post",
-  mismatch: "Both agree but differ from the note → block",
+"use strict";
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c =>
+  ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c]));
+const RULE_LABEL = {
+  instruction: "Hidden instruction in the note",
+  unreadable: "Note has no legible line",
+  wrong_product: "Label product differs from the note",
+  hidden: "Cartons stacked or hidden",
+  damaged: "Damaged cartons",
+  disagree: "The counts disagree",
+  receiver: "Receiver unsure or says another number",
+  match: "Camera and note agree",
+  mismatch: "Count confirmed, differs from the note"
 };
-const ACTION = { post: "POST TO ERP", block: "BLOCK", human: "ASK SUPERVISOR" };
+const RULE_ARROW = { instruction: "block", unreadable: "human", wrong_product: "block",
+  hidden: "human", damaged: "human", disagree: "human", receiver: "human",
+  match: "post", mismatch: "block" };
+const ACTION = { post: "POST", block: "BLOCK", human: "ASK THE SUPERVISOR" };
+const EXPECTED_TEXT = { post: "post to the ERP", block: "block (no receipt)", human: "ask the supervisor" };
 const VIEWS = {
-  camera: ["Camera", "The ceiling camera at the receiving dock."],
-  masks: ["SAM masks", "Every carton SAM 3.1 finds, as a pixel mask. Green: sure (≥ 0.88). Amber: doubtful."],
-  cross: ["SAM × Spark", "Spark puts a point on each carton; each point goes back to SAM as a point prompt. Green: both models found the same carton. Amber: only SAM. Red point: only Spark."],
+  camera: ["Camera", "The ceiling camera above the dock."],
+  masks: ["SAM masks", "Every carton SAM 3.1 outlined. Green: sure (0.88 and up). Amber: doubtful."],
+  cross: ["SAM \u00d7 Spark", "Spark's points sent back to SAM. Green: both models found the same carton. Amber: only SAM. Red point: only Spark."]
 };
-const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-let DATA, view = "masks";
+const STATUS_TEXT = { "on duty": "On duty", done: "Built this project", coming: "Coming soon" };
+const STATUS_CLASS = { "on duty": "on", done: "done", coming: "coming" };
+let DATA = null, view = "camera";
+const byId = id => (DATA.characters || []).find(c => c.id === id);
+const av = (id, extra) => {
+  const m = byId(id);
+  return m ? `<img class="av" style="--c:${esc(m.colour)}" src="${esc(m.avatar)}" alt="${esc(m.name)}"${extra || ""}>` : "";
+};
 
-function stats(s) {
-  document.getElementById("stats").innerHTML = `
-    <div class="stat"><b class="block">${s.wrong_without_gate}/${s.cases}</b><span>wrong receipts reach the ERP when the agent posts what the note says</span></div>
-    <div class="stat"><b class="post">${s.wrong_with_gate}/${s.cases}</b><span>wrong receipts reach the ERP behind the gate</span></div>
-    <div class="stat"><b>${s.gate_right}/${s.cases}</b><span>deliveries where the gate made the right call</span></div>`;
+const themeBtn = $("theme");
+function paintTheme() {
+  const dark = document.documentElement.dataset.theme === "dark" ||
+    (!document.documentElement.dataset.theme && matchMedia("(prefers-color-scheme: dark)").matches);
+  themeBtn.textContent = dark ? "Light" : "Dark";
 }
-
-function tabs() {
-  const el = document.getElementById("tabs");
-  el.innerHTML = DATA.cases.map(c => `<button class="tab" role="tab" data-id="${c.id}">
-    <span class="dot bg-${c.gate.action}"></span>${esc(c.title)}</button>`).join("");
-  el.onclick = e => { const b = e.target.closest(".tab"); if (b) show(b.dataset.id); };
-}
-
-function readings(c) {
-  const item = c.note.items[0] || {};
-  const inj = c.note.embedded_instructions || [];
-  const sp = c.spark, x = c.cross;
-  return `<div class="readings">
-    <div class="reading"><div class="who">Delivery note · Spark</div>
-      <div class="val">${item.quantity} × ${esc(item.description)}</div>
-      <div class="det">${inj.length ? `<span class="flag">Hidden instruction:</span> “${esc(inj[0])}”` : "No instructions to software"}</div></div>
-    <div class="reading"><div class="who">Count · SAM 3.1</div>
-      <div class="val">${c.sam.sure} sure · ${c.sam.doubtful} doubtful</div>
-      <div class="det">"cardboard box", confidence bands 0.88 / 0.70</div></div>
-    <div class="reading"><div class="who">Look · Spark</div>
-      <div class="val">${sp.cartons_visible} × ${esc(sp.product_on_labels)}</div>
-      <div class="det">${sp.damaged_cartons ? `<span class="flag">${sp.damaged_cartons} damaged</span>` : "no damage"} ·
-        ${sp.stacked || !sp.all_cartons_visible ? `<span class="flag">stacked, not all visible</span>` : "all visible"}</div></div>
-    <div class="reading"><div class="who">Carton by carton · SAM × Spark</div>
-      <div class="val">${x ? `${x.agreed} agreed` : "—"}</div>
-      <div class="det">${x ? `${x.sam_only} only SAM · ${x.spark_only} only Spark${x.doubled ? ` · ${x.doubled} doubled` : ""}` : ""}</div></div>
-  </div>`;
-}
-
-function gate(c) {
-  const fired = DATA.rules.indexOf(c.gate.rule);
-  return `<div class="decision ${c.gate.action}"><span class="badge bg-${c.gate.action}">${ACTION[c.gate.action]}</span>
-      <p>${esc(c.gate.reason)}</p></div>
-    <ol class="rules">${DATA.rules.map((r, i) => `<li class="${i < fired ? "passed" : i === fired ? "fired" : "later"}">
-      <span>${RULE_TEXT[r]}</span><span class="res ${i === fired ? c.gate.action : ""}">${i < fired ? "passed" : i === fired ? "decided" : ""}</span></li>`).join("")}</ol>`;
-}
-
-function step(s) {
-  if (s.kind === "thinking") return `<li class="think">${esc(s.text)}</li>`;
-  if (s.kind === "cross") return `<li class="cross"><span class="tool">gate: carton-by-carton check</span>
-    <span class="out">${s.data.agreed} agreed · ${s.data.sam_only} only SAM · ${s.data.spark_only} only Spark</span></li>`;
-  let args = ""; try { const a = JSON.parse(s.args || "{}"); args = Object.values(a).map(v => typeof v === "string" ? `"${v}"` : v).join(", "); } catch {}
-  const cls = s.refused ? "refused" : s.posted ? "posted" : "";
-  return `<li class="${cls}"><span class="tool mono">${esc(s.tool)}(${esc(args)})</span>
-    <span class="out">${s.refused ? "<b class='block'>refused by the gate</b> · " : ""}${esc(s.result)}</span></li>`;
-}
-
-function agent(c) {
-  const w = c.without_gate, a = c.agent;
-  const wtext = !w ? "—" : w.posted.length ? `<b class="${c.expected === "post" ? "post" : "block"}">Posted ${w.posted.join(", ")} to the ERP</b>` : `<b>Asked the supervisor</b>`;
-  return `<div class="agent">
-    <div class="card"><h3>Same agent, no gate</h3><p>${wtext}${w && w.posted.length && c.expected !== "post"
-        ? `<br><span class="det">Should have been: ${ACTION[c.expected].toLowerCase()}</span>` : ""}</p>
-      <div class="answer">${esc(w?.answer)}</div></div>
-    <div class="card"><h3>Spark agent behind the gate${a ? ` · ${Math.round(a.seconds)} s` : ""}</h3>
-      ${a ? `<ol class="timeline">${a.steps.map(step).join("")}</ol><div class="answer">${esc(a.answer)}</div>` : "—"}</div>
-  </div>`;
-}
-
-function show(id) {
-  const c = DATA.cases.find(c => c.id === id);
-  document.querySelectorAll(".tab").forEach(t => t.setAttribute("aria-selected", t.dataset.id === id));
-  document.getElementById("case").innerHTML = `
-    <div class="case">
-      <div class="card">
-        <p class="what">${esc(c.what)}</p>
-        <div class="seg" id="seg">${Object.entries(VIEWS).map(([k, [label]]) =>
-          `<button data-v="${k}" aria-pressed="${k === view}">${label}</button>`).join("")}</div>
-        <img class="shot" id="shot" src="${c.images[view]}" alt="${esc(c.title)}: ${VIEWS[view][0]}">
-        <p class="legend" id="legend">${VIEWS[view][1]}</p>
-        <h3 style="margin-top:14px">Delivery note</h3>
-        <img class="note-img" src="${c.images.note}" alt="Delivery note for ${esc(c.title)}">
-      </div>
-      <div class="card"><h3>What each model read</h3>${readings(c)}
-        <h3 style="margin-top:16px">The gate</h3>${gate(c)}</div>
-    </div>
-    ${agent(c)}`;
-  document.getElementById("seg").onclick = e => {
-    const b = e.target.closest("button"); if (!b) return;
-    view = b.dataset.v;
-    document.querySelectorAll("#seg button").forEach(x => x.setAttribute("aria-pressed", x === b));
-    document.getElementById("shot").src = c.images[view];
-    document.getElementById("legend").textContent = VIEWS[view][1];
-  };
-  try { history.replaceState(null, "", "#" + id); } catch {}
-}
-
-function voice(clips) {
-  document.getElementById("voice").innerHTML = clips.map(v => `<div class="card">
-    <audio controls preload="none" src="${v.audio}"></audio>
-    <div class="mono">“${esc(v.transcript)}”</div>
-    <p style="margin:8px 0 0"><b>${v.quantity ?? "—"}</b> ${v.supplier ? `from ${esc(v.supplier)}` : ""}
-      · ${v.certain ? '<span class="post">sure</span>' : '<span class="human">not sure → supervisor</span>'}</p></div>`).join("");
-}
-
-const themeBtn = document.getElementById("theme");
-themeBtn.onclick = () => {
-  const dark = matchMedia("(prefers-color-scheme: dark)").matches;
-  const cur = document.documentElement.dataset.theme || (dark ? "dark" : "light");
+themeBtn.addEventListener("click", () => {
+  const cur = document.documentElement.dataset.theme ||
+    (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
   document.documentElement.dataset.theme = cur === "dark" ? "light" : "dark";
-};
+  paintTheme();
+});
+paintTheme();
 
-fetch("data.json").then(r => r.json()).then(d => {
-  DATA = d;
-  stats(d.summary); tabs(); voice(d.voice);
-  document.getElementById("cast").src = d.cast;
-  const start = location.hash.slice(1);
-  show(d.cases.some(c => c.id === start) ? start : "talimat");
+function renderStats(s) {
+  $("stats").innerHTML =
+    `<div class="stat"><b><span class="sdot bad"></span>${esc(s.wrong_without_gate)}/${esc(s.cases)}</b>` +
+    `<span>wrong receipts reach the ERP when the agent posts what the note says</span></div>` +
+    `<div class="stat"><b><span class="sdot good"></span>${esc(s.wrong_with_gate)}/${esc(s.cases)}</b>` +
+    `<span>wrong receipts reach the ERP behind the gate</span></div>` +
+    `<div class="stat"><b><span class="sdot mid"></span>${esc(s.gate_right)}/${esc(s.cases)}</b>` +
+    `<span>deliveries where the gate made the right call</span></div>`;
+}
+
+function renderHow() {
+  const n = (DATA.rules || []).length;
+  const steps = [
+    ["spark", "<b>Spark reads the note</b> into strict JSON, and sets aside any line that instructs software."],
+    ["sam", "<b>Sam counts the dock camera</b>: every \u201ccardboard box\u201d, sure or doubtful."],
+    ["spark", "<b>Spark looks at the pallet</b>: labels, count, damage, stacking."],
+    ["kapi", `<b>Kap\u0131 decides</b>: ${n} plain-code rules in order. Unsure means the supervisor.`]
+  ];
+  $("how").innerHTML = steps.map(([id, text]) =>
+    `<div><span class="who">${av(id)}${text}</span></div>`).join("");
+}
+
+function renderCrew(list) {
+  $("crew").innerHTML = list.map(m =>
+    `<article class="member" style="--c:${esc(m.colour)}">` +
+    `<img class="portrait" src="${esc(m.portrait)}" alt="${esc(m.name)} portrait" loading="lazy">` +
+    `<div class="body"><p class="name"><span class="cdot"></span>${esc(m.name)}</p>` +
+    `<p class="model">${esc(m.model)}</p>` +
+    `<span class="pill ${STATUS_CLASS[m.status] || ""}">${esc(STATUS_TEXT[m.status] || m.status)}</span>` +
+    `<p class="bubble">${esc(m.line)}</p></div></article>`).join("");
+  $("roles").textContent =
+    "On duty = working at the dock. Built this project = made part of it. " +
+    "Coming soon = not working yet: Glimmer only starts its second reading of the note later.";
+}
+
+function renderVoice(clips) {
+  $("voice").innerHTML = clips.map(v => {
+    const qty = `<b>${esc(v.quantity)}</b>`;
+    const sup = v.supplier ? ` from ${esc(v.supplier)}` : " \u00b7 supplier not named";
+    const conf = v.certain ? `<span class="sure">sure</span>`
+      : `<span class="unsure">not sure \u2192 the supervisor decides</span>`;
+    return `<div class="card"><div class="who">${av("voice")}Voice heard</div>` +
+      `<audio controls preload="none" src="${esc(v.audio)}"></audio>` +
+      `<div class="quote">\u201c${esc(v.transcript)}\u201d</div>` +
+      `<p class="vmeta">Heard quantity: ${qty}${sup} \u00b7 ${conf}</p></div>`;
+  }).join("");
+}
+function noteReading(c) {
+  const items = (c.note.items || []).map(it =>
+    `${esc(it.quantity)} \u00d7 ${esc(it.unit)} \u2014 ${esc(it.description)}${it.legible ? "" : " (not legible)"}`
+  ).join("<br>");
+  const inj = (c.note.embedded_instructions || []).map(t =>
+    `<div class="det"><span class="flag">Hidden instruction:</span> \u201c${esc(t)}\u201d</div>`).join("");
+  return `<div class="reading"><div class="who">${av("spark")}Delivery note \u00b7 Spark</div>` +
+    `<div class="val">${items || "no items"}</div>${inj || `<div class="det">No instructions to software</div>`}</div>`;
+}
+
+function samReading(c) {
+  return `<div class="reading"><div class="who">${av("sam")}Count \u00b7 SAM 3.1</div>` +
+    `<div class="val">${esc(c.sam.sure)} sure \u00b7 ${esc(c.sam.doubtful)} doubtful</div>` +
+    `<div class="det">\u201ccardboard box\u201d, sure means 0.88 and up</div></div>`;
+}
+
+function sparkReading(c) {
+  const sp = c.spark;
+  const dmg = sp.damaged_cartons
+    ? `<span class="flag">${esc(sp.damaged_cartons)} damaged</span>` : "no damage";
+  const vis = (sp.stacked || !sp.all_cartons_visible)
+    ? `<span class="flag">not all visible (stacked or hidden)</span>` : "all visible";
+  return `<div class="reading"><div class="who">${av("spark")}Look \u00b7 Spark</div>` +
+    `<div class="val">${esc(sp.cartons_visible)} \u00d7 ${esc(sp.product_on_labels)}</div>` +
+    `<div class="det">${dmg} \u00b7 ${vis}</div></div>`;
+}
+
+function crossReading(c) {
+  const x = c.cross;
+  if (!x) return `<div class="reading"><div class="who">Carton by carton</div><div class="val">\u2014</div></div>`;
+  const total = `${esc(x.agreed)} agreed of ${esc(x.cartons)} cartons \u00b7 ${esc(x.spark_points)} Spark points`;
+  const rest = `${esc(x.sam_only)} only SAM \u00b7 ${esc(x.spark_only)} only Spark` +
+    (x.doubled ? ` \u00b7 ${esc(x.doubled)} doubled` : "") +
+    (x.count === null || x.count === undefined ? " \u00b7 no single agreed count" : "");
+  return `<div class="reading"><div class="who">${av("sam")}${av("spark")}Carton by carton \u00b7 SAM \u00d7 Spark</div>` +
+    `<div class="val">${total}</div><div class="det">${rest}</div></div>`;
+}
+
+function gateBlock(c) {
+  const g = c.gate;
+  const fired = (DATA.rules || []).indexOf(g.rule);
+  const sef = g.action === "human"
+    ? `<br><span class="who" style="margin-top:6px">${av("sef")}\u015eef decides</span>` : "";
+  const qty = (g.quantity === null || g.quantity === undefined) ? ""
+    : `<span class="qty">Quantity in this decision: <b>${esc(g.quantity)}</b></span>`;
+  const rules = (DATA.rules || []).map((r, i) => {
+    const cls = i < fired ? "passed" : (i === fired ? "fired" : "later");
+    const res = i < fired ? "passed" : (i === fired ? "decided" : "not reached");
+    return `<li class="${cls}"><span>${esc(RULE_LABEL[r] || r)} \u2192 ${esc(RULE_ARROW[r] || g.action)}</span>` +
+      `<span class="res">${res}</span></li>`;
+  }).join("");
+  return `<div class="decision ${esc(g.action)}">` +
+    `<span class="badge ${esc(g.action)}">${esc(ACTION[g.action] || g.action)}</span>` +
+    `<p>${esc(g.reason)}${sef}${qty}</p></div><ol class="rules">${rules}</ol>`;
+}
+
+function stepRow(s) {
+  if (s.kind === "thinking") return `<li class="think">Reasoning: ${esc(s.text)}</li>`;
+  if (s.kind === "cross") {
+    const d = s.data || {};
+    const dbl = d.doubled ? ` \u00b7 ${esc(d.doubled)} doubled` : "";
+    return `<li><span class="tool">Gate carton check</span>` +
+      `<span class="out">${esc(d.agreed)} agreed \u00b7 ${esc(d.sam_only)} only SAM \u00b7 ${esc(d.spark_only)} only Spark${dbl}</span></li>`;
+  }
+  const mark = s.refused ? ` <span class="mark no">\u2014 refused by the gate</span>`
+    : (s.posted ? ` <span class="mark yes">\u2014 posted</span>` : "");
+  return `<li><span class="tool mono">${esc(s.tool)}</span>${mark}` +
+    `<span class="args mono">${esc(s.args)}</span>` +
+    `<span class="out mono">${esc(s.result)}</span></li>`;
+}
+
+function noGateBlock(c) {
+  const w = c.without_gate;
+  if (!w) return `<p class="verdict">\u2014</p>`;
+  let verdict;
+  if ((w.posted || []).length) {
+    verdict = `Posted <b>${esc(w.posted.join(", "))}</b> to the ERP.`;
+    if (c.expected !== "post") {
+      verdict += `<br><span class="flag">Should have been: ${esc(EXPECTED_TEXT[c.expected] || c.expected)}.</span>`;
+    }
+  } else {
+    verdict = w.supervisor ? "Asked the supervisor; posted nothing." : "Posted nothing.";
+  }
+  return `<p class="verdict">${verdict}</p><div class="answer">${esc(w.answer)}</div>`;
+}
+
+function behindGateBlock(c) {
+  const a = c.agent;
+  if (!a) return `<p class="verdict">\u2014</p>`;
+  const chips = []
+    .concat((a.posted || []).map(p => Array.isArray(p)
+      ? `<span class="chip yes">Posted ${esc(p[0])} (${esc(p[1])})</span>`
+      : `<span class="chip yes">Posted ${esc(p)}</span>`))
+    .concat((a.refused || []).map(r => Array.isArray(r)
+      ? `<span class="chip no">Tried ${esc(r[0])} \u2014 refused</span>`
+      : `<span class="chip no">Refused: ${esc(r)}</span>`))
+    .concat(a.supervisor ? [`<span class="chip">Supervisor notified</span>`] : []);
+  const secs = (a.seconds === null || a.seconds === undefined) ? "" : ` \u00b7 ${Math.round(a.seconds)} s`;
+  return `<ol class="timeline">${(a.steps || []).map(stepRow).join("")}</ol>` +
+    (chips.length ? `<div class="chips">${chips.join("")}</div>` : "") +
+    `<div class="answer">${esc(a.answer)}${secs ? `<br><span class="mono">${esc(secs.trim())} recorded</span>` : ""}</div>`;
+}
+
+function renderTabs() {
+  const el = $("tabs");
+  el.innerHTML = DATA.cases.map(c =>
+    `<button type="button" class="tab t-${esc(c.gate.action)}" role="tab" data-id="${esc(c.id)}" aria-selected="false">` +
+    `<span class="dot"></span>${esc(c.title)}</button>`).join("");
+  el.addEventListener("click", e => {
+    const b = e.target.closest(".tab");
+    if (b) show(b.dataset.id, true);
+  });
+}
+
+function shotAlt(c) {
+  return `${c.title}: ${VIEWS[view][0]}`;
+}
+
+function show(id, push) {
+  const c = DATA.cases.find(x => x.id === id) || DATA.cases[0];
+  if (!c) return;
+  document.querySelectorAll(".tab").forEach(t =>
+    t.setAttribute("aria-selected", String(t.dataset.id === c.id)));
+  $("case").innerHTML =
+    `<div class="dock"><div class="card">` +
+    `<p class="what">${esc(c.what)}</p>` +
+    `<div class="seg" role="group" aria-label="Camera view">${Object.keys(VIEWS).map(k =>
+      `<button type="button" data-v="${k}" aria-pressed="${String(k === view)}">${esc(VIEWS[k][0])}</button>`).join("")}</div>` +
+    `<img class="shot" id="shot" src="${esc(c.images[view])}" alt="${esc(shotAlt(c))}">` +
+    `<p class="legend" id="shotLegend">${esc(VIEWS[view][1])}</p>` +
+    `<h3>Delivery note</h3>` +
+    `<img class="note-img" src="${esc(c.images.note)}" alt="Delivery note for ${esc(c.title)}" loading="lazy">` +
+    `</div><div class="card"><h3>What each model read</h3>` +
+    `<div class="readings">${noteReading(c)}${samReading(c)}${sparkReading(c)}${crossReading(c)}</div>` +
+    `<h3>${av("kapi")}The gate \u00b7 Kap\u0131</h3>${gateBlock(c)}</div></div>` +
+    `<div class="duo"><div class="card"><h3>Same agent, no gate</h3>${noGateBlock(c)}</div>` +
+    `<div class="card"><h3>${av("spark")}Spark agent behind the gate</h3>${behindGateBlock(c)}</div></div>`;
+  $("case").querySelector(".seg").addEventListener("click", e => {
+    const b = e.target.closest("button");
+    if (!b) return;
+    view = b.dataset.v;
+    $("case").querySelectorAll(".seg button").forEach(x =>
+      x.setAttribute("aria-pressed", String(x === b)));
+    const shot = $("shot");
+    shot.src = c.images[view];
+    shot.alt = shotAlt(c);
+    $("shotLegend").textContent = VIEWS[view][1];
+  });
+  if (push !== false) {
+    try { history.replaceState(null, "", "#" + c.id); } catch (e) { /* ignore */ }
+  }
+}
+
+function start(data) {
+  DATA = data;
+  renderStats(data.summary);
+  renderHow();
+  renderCrew(data.characters || []);
+  renderTabs();
+  renderVoice(data.voice || []);
+  const n = (data.cases || []).length;
+  $("dockSub").textContent =
+    `${n} recorded dock cases. Pick a delivery to see what each model read, ` +
+    `which gate rule decided, and what the Spark agent did with and without the gate. ` +
+    `Green posts, red blocks, amber asks the supervisor.`;
+  $("castImg").src = data.cast;
+  $("castImg").alt = "Group picture: " + (data.characters || []).map(m => m.name).join(", ");
+  const startId = location.hash.slice(1);
+  show((data.cases || []).some(c => c.id === startId) ? startId : "talimat", false);
+  try { history.replaceState(null, "", "#" + ((data.cases || []).some(c => c.id === startId) ? startId : "talimat")); } catch (e) { /* ignore */ }
+}
+
+window.addEventListener("hashchange", () => {
+  if (!DATA) return;
+  const id = location.hash.slice(1);
+  if ((DATA.cases || []).some(c => c.id === id)) show(id, false);
+});
+
+fetch("data.json").then(r => {
+  if (!r.ok) throw new Error("data.json not found");
+  return r.json();
+}).then(start).catch(err => {
+  $("case").innerHTML = `<div class="card"><p class="what">Could not load the demo data.</p>` +
+    `<p class="sub">${esc(err.message)}. Serve this folder over HTTP so <span class="mono">fetch("data.json")</span> works.</p></div>`;
 });
 </script>
 </body>
