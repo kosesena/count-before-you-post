@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Count Before You Post</title>
+<meta name="description" content="An AI agent that can't write a number into an ERP until a camera has counted it. Built with Muse Spark and SAM 3.1.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f6f7f9; --panel: #ffffff; --ink: #14171c; --muted: #5d6573; --line: #e3e6eb;
+  --post: #16a34a; --post-bg: #e8f7ee; --block: #dc2626; --block-bg: #fdecec;
+  --human: #d97706; --human-bg: #fdf3e3; --accent: #2563eb; --accent-bg: #eaf1fe;
+  --code: #f1f3f6; --shadow: 0 1px 2px rgba(16,24,40,.06), 0 1px 3px rgba(16,24,40,.08);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1116; --panel: #161a21; --ink: #e8ebf0; --muted: #9aa3b2; --line: #262c36;
+    --post-bg: #10291b; --block-bg: #301415; --human-bg: #2e2110; --accent-bg: #142340;
+    --code: #1d222b; --shadow: none;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1116; --panel: #161a21; --ink: #e8ebf0; --muted: #9aa3b2; --line: #262c36;
+  --post-bg: #10291b; --block-bg: #301415; --human-bg: #2e2110; --accent-bg: #142340;
+  --code: #1d222b; --shadow: none;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink);
+  font: 15px/1.55 Inter, system-ui, -apple-system, sans-serif; }
+code, .mono { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 12.5px; }
+a { color: var(--accent); }
+.wrap { max-width: 1180px; margin: 0 auto; padding: 0 16px; }
+header { padding: 48px 0 24px; }
+h1 { font-size: clamp(30px, 5vw, 44px); line-height: 1.1; margin: 0 0 12px; letter-spacing: -.02em; }
+.lede { font-size: 18px; color: var(--muted); max-width: 760px; margin: 0; }
+.tools { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font-size: 12px; padding: 3px 9px; border: 1px solid var(--line); border-radius: 99px;
+  background: var(--panel); color: var(--muted); }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 24px 0 8px; }
+.stat { background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+  padding: 16px 18px; box-shadow: var(--shadow); }
+.stat b { display: block; font-size: 28px; letter-spacing: -.02em; }
+.stat span { color: var(--muted); font-size: 13px; }
+h2 { font-size: 22px; margin: 40px 0 6px; letter-spacing: -.01em; }
+.sub { color: var(--muted); margin: 0 0 16px; }
+.tabs { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; }
+.tab { flex: 0 0 auto; border: 1px solid var(--line); background: var(--panel); color: var(--ink);
+  padding: 8px 12px; border-radius: 10px; cursor: pointer; font: inherit; font-size: 14px;
+  display: flex; align-items: center; gap: 8px; }
+.tab[aria-selected="true"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.dot { width: 8px; height: 8px; border-radius: 50%; }
+.post { color: var(--post); } .block { color: var(--block); } .human { color: var(--human); }
+.bg-post { background: var(--post); } .bg-block { background: var(--block); } .bg-human { background: var(--human); }
+.case { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 16px; margin-top: 14px; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px;
+  box-shadow: var(--shadow); min-width: 0; }
+.card h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted);
+  margin: 0 0 10px; font-weight: 600; }
+.what { font-size: 16px; font-weight: 500; margin: 0 0 12px; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 9px; overflow: hidden; margin-bottom: 10px; }
+.seg button { border: 0; background: transparent; color: var(--muted); padding: 6px 10px; font: inherit;
+  font-size: 13px; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+.shot { width: 100%; border-radius: 10px; display: block; background: #888; aspect-ratio: 16/9; object-fit: cover; }
+.legend { font-size: 12.5px; color: var(--muted); margin: 8px 0 0; min-height: 2.6em; }
+.note-img { width: 100%; max-height: 300px; object-fit: contain; border-radius: 10px; background: var(--code); }
+.readings { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.reading { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
+.reading .who { font-size: 12px; color: var(--muted); font-weight: 600; }
+.reading .val { font-size: 15px; font-weight: 600; margin-top: 2px; }
+.reading .det { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+.flag { color: var(--block); font-weight: 600; }
+.decision { display: flex; gap: 12px; align-items: center; border-radius: 12px; padding: 14px; margin-bottom: 12px; }
+.decision.post { background: var(--post-bg); } .decision.block { background: var(--block-bg); } .decision.human { background: var(--human-bg); }
+.badge { font-weight: 700; font-size: 13px; letter-spacing: .05em; padding: 6px 10px; border-radius: 8px; color: #fff; white-space: nowrap; }
+.decision p { margin: 0; color: var(--ink); }
+.rules { list-style: none; margin: 0; padding: 0; counter-reset: r; }
+.rules li { counter-increment: r; display: grid; grid-template-columns: 22px 1fr auto; gap: 8px;
+  padding: 6px 8px; border-radius: 8px; font-size: 13.5px; align-items: center; }
+.rules li::before { content: counter(r); font-size: 11px; color: var(--muted); text-align: center; }
+.rules li.passed { color: var(--muted); }
+.rules li.fired { background: var(--code); font-weight: 600; }
+.rules li.later { opacity: .38; }
+.rules .res { font-size: 12px; }
+.agent { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr); gap: 16px; margin-top: 16px; }
+.timeline { list-style: none; margin: 0; padding: 0; border-left: 2px solid var(--line); }
+.timeline li { position: relative; padding: 0 0 12px 16px; font-size: 13.5px; }
+.timeline li::before { content: ""; position: absolute; left: -6px; top: 6px; width: 10px; height: 10px;
+  border-radius: 50%; background: var(--panel); border: 2px solid var(--muted); }
+.timeline li.think { color: var(--muted); font-style: italic; }
+.timeline li.think::before { border-color: var(--line); }
+.timeline li.refused::before { border-color: var(--block); background: var(--block); }
+.timeline li.posted::before { border-color: var(--post); background: var(--post); }
+.timeline li.cross::before { border-color: var(--accent); background: var(--accent); }
+.timeline .tool { font-weight: 600; }
+.timeline .out { display: block; color: var(--muted); font-size: 12px; word-break: break-word; }
+.answer { background: var(--code); border-radius: 10px; padding: 10px 12px; font-size: 13.5px; margin-top: 8px; }
+.voice { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+audio { width: 100%; height: 36px; margin: 6px 0; }
+.cast img { width: 100%; border-radius: 14px; display: block; }
+footer { color: var(--muted); font-size: 13px; padding: 40px 0 56px; }
+.theme { position: absolute; top: 12px; right: 12px; border: 1px solid var(--line); background: var(--panel);
+  color: var(--ink); border-radius: 99px; padding: 6px 10px; font: inherit; font-size: 13px; cursor: pointer; }
+@media (max-width: 860px) {
+  .case, .agent { grid-template-columns: 1fr; }
+  .stats { grid-template-columns: 1fr; }
+  .voice { grid-template-columns: 1fr; }
+}
+@media (max-width: 480px) { .readings { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<button class="theme" id="theme" aria-label="Toggle theme">◐</button>
+<div class="wrap">
+  <header>
+    <h1>Count Before You Post</h1>
+    <p class="lede">AI agents are getting write access to real systems, and they trust the document.
+      This one can't write a number into the ERP until a camera has counted it.</p>
+    <div class="tools">
+      <span class="chip">Muse Spark: reads the note, looks, runs the agent</span>
+      <span class="chip">SAM 3.1: counts and outlines every carton</span>
+      <span class="chip">Muse Voice Transcribe: the receiver's count</span>
+      <span class="chip">Muse Code: wrote the ERPNext client</span>
+      <span class="chip">Muse Image: drew the cast</span>
+    </div>
+    <div class="stats" id="stats"></div>
+  </header>
+
+  <section>
+    <h2>Six deliveries at the dock</h2>
+    <p class="sub">A receiving dock rendered in Blender. Pick a delivery to see what each model read,
+      which rule of the gate decided, and what the Spark agent did. Every number here comes from a
+      recorded run against the real Meta Model API and a real ERPNext.</p>
+    <div class="tabs" role="tablist" id="tabs"></div>
+    <div id="case"></div>
+  </section>
+
+  <section>
+    <h2>The receiver's own count</h2>
+    <p class="sub">Muse Voice Transcribe writes down what the receiver says; Spark pulls out the
+      number and whether they were sure. An unsure receiver, or a number the camera doesn't
+      confirm, goes to a human. (Synthetic Turkish voice; real recordings are next.)</p>
+    <div class="voice" id="voice"></div>
+  </section>
+
+  <section class="cast">
+    <h2>The cast</h2>
+    <p class="sub">Characters: Sena's concepts, drawn with Muse Image. Fan-made, not official Meta mascots.</p>
+    <img id="cast" alt="Spark, Sam, Glimmer, Voice, Kapı, Şef, Muse and Muse Code">
+  </section>
+
+  <footer>
+    Built during the Meta Global AI Developer Hackathon, 26 Oct – 4 Nov 2026, by Sena Köse.
+    Code and build journal: <a href="https://github.com/kosesena/count-before-you-post">github.com/kosesena/count-before-you-post</a>.
+  </footer>
+</div>
+
+<script>
+const RULE_TEXT = {
+  instruction: "Note tries to instruct software → block",
+  unreadable: "Note has no single legible line → human",
+  wrong_product: "Label product ≠ note product → block",
+  hidden: "Cartons stacked or hidden → human",
+  damaged: "Damaged cartons → human, partial receipt",
+  disagree: "SAM and Spark disagree, carton by carton → human",
+  receiver: "Receiver unsure or says another number → human",
+  match: "Both models agree and match the note → post",
+  mismatch: "Both agree but differ from the note → block",
+};
+const ACTION = { post: "POST TO ERP", block: "BLOCK", human: "ASK SUPERVISOR" };
+const VIEWS = {
+  camera: ["Camera", "The ceiling camera at the receiving dock."],
+  masks: ["SAM masks", "Every carton SAM 3.1 finds, as a pixel mask. Green: sure (≥ 0.88). Amber: doubtful."],
+  cross: ["SAM × Spark", "Spark puts a point on each carton; each point goes back to SAM as a point prompt. Green: both models found the same carton. Amber: only SAM. Red point: only Spark."],
+};
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let DATA, view = "masks";
+
+function stats(s) {
+  document.getElementById("stats").innerHTML = `
+    <div class="stat"><b class="block">${s.wrong_without_gate}/${s.cases}</b><span>wrong receipts reach the ERP when the agent posts what the note says</span></div>
+    <div class="stat"><b class="post">${s.wrong_with_gate}/${s.cases}</b><span>wrong receipts reach the ERP behind the gate</span></div>
+    <div class="stat"><b>${s.gate_right}/${s.cases}</b><span>deliveries where the gate made the right call</span></div>`;
+}
+
+function tabs() {
+  const el = document.getElementById("tabs");
+  el.innerHTML = DATA.cases.map(c => `<button class="tab" role="tab" data-id="${c.id}">
+    <span class="dot bg-${c.gate.action}"></span>${esc(c.title)}</button>`).join("");
+  el.onclick = e => { const b = e.target.closest(".tab"); if (b) show(b.dataset.id); };
+}
+
+function readings(c) {
+  const item = c.note.items[0] || {};
+  const inj = c.note.embedded_instructions || [];
+  const sp = c.spark, x = c.cross;
+  return `<div class="readings">
+    <div class="reading"><div class="who">Delivery note · Spark</div>
+      <div class="val">${item.quantity} × ${esc(item.description)}</div>
+      <div class="det">${inj.length ? `<span class="flag">Hidden instruction:</span> “${esc(inj[0])}”` : "No instructions to software"}</div></div>
+    <div class="reading"><div class="who">Count · SAM 3.1</div>
+      <div class="val">${c.sam.sure} sure · ${c.sam.doubtful} doubtful</div>
+      <div class="det">"cardboard box", confidence bands 0.88 / 0.70</div></div>
+    <div class="reading"><div class="who">Look · Spark</div>
+      <div class="val">${sp.cartons_visible} × ${esc(sp.product_on_labels)}</div>
+      <div class="det">${sp.damaged_cartons ? `<span class="flag">${sp.damaged_cartons} damaged</span>` : "no damage"} ·
+        ${sp.stacked || !sp.all_cartons_visible ? `<span class="flag">stacked, not all visible</span>` : "all visible"}</div></div>
+    <div class="reading"><div class="who">Carton by carton · SAM × Spark</div>
+      <div class="val">${x ? `${x.agreed} agreed` : "—"}</div>
+      <div class="det">${x ? `${x.sam_only} only SAM · ${x.spark_only} only Spark${x.doubled ? ` · ${x.doubled} doubled` : ""}` : ""}</div></div>
+  </div>`;
+}
+
+function gate(c) {
+  const fired = DATA.rules.indexOf(c.gate.rule);
+  return `<div class="decision ${c.gate.action}"><span class="badge bg-${c.gate.action}">${ACTION[c.gate.action]}</span>
+      <p>${esc(c.gate.reason)}</p></div>
+    <ol class="rules">${DATA.rules.map((r, i) => `<li class="${i < fired ? "passed" : i === fired ? "fired" : "later"}">
+      <span>${RULE_TEXT[r]}</span><span class="res ${i === fired ? c.gate.action : ""}">${i < fired ? "passed" : i === fired ? "decided" : ""}</span></li>`).join("")}</ol>`;
+}
+
+function step(s) {
+  if (s.kind === "thinking") return `<li class="think">${esc(s.text)}</li>`;
+  if (s.kind === "cross") return `<li class="cross"><span class="tool">gate: carton-by-carton check</span>
+    <span class="out">${s.data.agreed} agreed · ${s.data.sam_only} only SAM · ${s.data.spark_only} only Spark</span></li>`;
+  let args = ""; try { const a = JSON.parse(s.args || "{}"); args = Object.values(a).map(v => typeof v === "string" ? `"${v}"` : v).join(", "); } catch {}
+  const cls = s.refused ? "refused" : s.posted ? "posted" : "";
+  return `<li class="${cls}"><span class="tool mono">${esc(s.tool)}(${esc(args)})</span>
+    <span class="out">${s.refused ? "<b class='block'>refused by the gate</b> · " : ""}${esc(s.result)}</span></li>`;
+}
+
+function agent(c) {
+  const w = c.without_gate, a = c.agent;
+  const wtext = !w ? "—" : w.posted.length ? `<b class="${c.expected === "post" ? "post" : "block"}">Posted ${w.posted.join(", ")} to the ERP</b>` : `<b>Asked the supervisor</b>`;
+  return `<div class="agent">
+    <div class="card"><h3>Same agent, no gate</h3><p>${wtext}${w && w.posted.length && c.expected !== "post"
+        ? `<br><span class="det">Should have been: ${ACTION[c.expected].toLowerCase()}</span>` : ""}</p>
+      <div class="answer">${esc(w?.answer)}</div></div>
+    <div class="card"><h3>Spark agent behind the gate${a ? ` · ${Math.round(a.seconds)} s` : ""}</h3>
+      ${a ? `<ol class="timeline">${a.steps.map(step).join("")}</ol><div class="answer">${esc(a.answer)}</div>` : "—"}</div>
+  </div>`;
+}
+
+function show(id) {
+  const c = DATA.cases.find(c => c.id === id);
+  document.querySelectorAll(".tab").forEach(t => t.setAttribute("aria-selected", t.dataset.id === id));
+  document.getElementById("case").innerHTML = `
+    <div class="case">
+      <div class="card">
+        <p class="what">${esc(c.what)}</p>
+        <div class="seg" id="seg">${Object.entries(VIEWS).map(([k, [label]]) =>
+          `<button data-v="${k}" aria-pressed="${k === view}">${label}</button>`).join("")}</div>
+        <img class="shot" id="shot" src="${c.images[view]}" alt="${esc(c.title)}: ${VIEWS[view][0]}">
+        <p class="legend" id="legend">${VIEWS[view][1]}</p>
+        <h3 style="margin-top:14px">Delivery note</h3>
+        <img class="note-img" src="${c.images.note}" alt="Delivery note for ${esc(c.title)}">
+      </div>
+      <div class="card"><h3>What each model read</h3>${readings(c)}
+        <h3 style="margin-top:16px">The gate</h3>${gate(c)}</div>
+    </div>
+    ${agent(c)}`;
+  document.getElementById("seg").onclick = e => {
+    const b = e.target.closest("button"); if (!b) return;
+    view = b.dataset.v;
+    document.querySelectorAll("#seg button").forEach(x => x.setAttribute("aria-pressed", x === b));
+    document.getElementById("shot").src = c.images[view];
+    document.getElementById("legend").textContent = VIEWS[view][1];
+  };
+  try { history.replaceState(null, "", "#" + id); } catch {}
+}
+
+function voice(clips) {
+  document.getElementById("voice").innerHTML = clips.map(v => `<div class="card">
+    <audio controls preload="none" src="${v.audio}"></audio>
+    <div class="mono">“${esc(v.transcript)}”</div>
+    <p style="margin:8px 0 0"><b>${v.quantity ?? "—"}</b> ${v.supplier ? `from ${esc(v.supplier)}` : ""}
+      · ${v.certain ? '<span class="post">sure</span>' : '<span class="human">not sure → supervisor</span>'}</p></div>`).join("");
+}
+
+const themeBtn = document.getElementById("theme");
+themeBtn.onclick = () => {
+  const dark = matchMedia("(prefers-color-scheme: dark)").matches;
+  const cur = document.documentElement.dataset.theme || (dark ? "dark" : "light");
+  document.documentElement.dataset.theme = cur === "dark" ? "light" : "dark";
+};
+
+fetch("data.json").then(r => r.json()).then(d => {
+  DATA = d;
+  stats(d.summary); tabs(); voice(d.voice);
+  document.getElementById("cast").src = d.cast;
+  const start = location.hash.slice(1);
+  show(d.cases.some(c => c.id === start) ? start : "talimat");
+});
+</script>
+</body>
+</html>

@@ -55,6 +55,12 @@ class Decision:
     quantity: int | None             # what would be written (post) or proposed (human)
     reasons: list[str] = field(default_factory=list)
     evidence: dict = field(default_factory=dict)
+    rule: str = ""                   # which rule decided, one of RULES
+
+
+# The rules in the order they run; Decision.rule names the one that fired.
+RULES = ("instruction", "unreadable", "wrong_product", "hidden", "damaged", "disagree",
+         "receiver", "match", "mismatch")
 
 
 def sam_bands(confs: list[float]) -> tuple[int, int]:
@@ -94,46 +100,46 @@ def decide(note: dict, sam_confs: list[float], look: dict, cross=None,
                 "sam_sure": sure, "sam_doubtful": doubtful,
                 "spark_count": look["cartons_visible"], "label": look["product_on_labels"]}
 
-    def out(action, reason, qty=None):
-        return Decision(action, qty, [reason], evidence)
+    def out(rule, action, reason, qty=None):
+        return Decision(action, qty, [reason], evidence, rule)
 
     if note.get("embedded_instructions"):
-        return out(BLOCK, "The note contains instructions to software; not followed. "
+        return out("instruction", BLOCK, "The note contains instructions to software; not followed. "
                    "Supervisor notified: " + " | ".join(note["embedded_instructions"]))
     if len(items) != 1 or not items[0].get("legible", False):
-        return out(HUMAN, "Delivery note has no single legible line item.")
+        return out("unreadable", HUMAN, "Delivery note has no single legible line item.")
     item = items[0]
     if not same_product(look["product_on_labels"], item["description"]):
-        return out(BLOCK, f"Wrong product: labels say '{look['product_on_labels']}', "
+        return out("wrong_product", BLOCK, f"Wrong product: labels say '{look['product_on_labels']}', "
                    f"note says '{item['description']}'.")
     if look["stacked"] or not look["all_cartons_visible"]:
-        return out(HUMAN, "Cartons are stacked or hidden; the count cannot be verified "
+        return out("hidden", HUMAN, "Cartons are stacked or hidden; the count cannot be verified "
                    "from the camera.")
     if look["damaged_cartons"] > 0:
         intact = look["cartons_visible"] - look["damaged_cartons"]
-        return out(HUMAN, f"{look['damaged_cartons']} damaged carton(s); propose partial "
+        return out("damaged", HUMAN, f"{look['damaged_cartons']} damaged carton(s); propose partial "
                    f"receipt of {intact}.", intact)
     if cross is not None:
         evidence["cross"] = {"agreed": len(cross.agreed), "sam_only": len(cross.sam_only),
                              "spark_only": len(cross.spark_only), "doubled": len(cross.doubled)}
         count = cross_count(cross)
         if count is None:
-            return out(HUMAN, "SAM and Spark disagree on which objects are cartons: "
+            return out("disagree", HUMAN, "SAM and Spark disagree on which objects are cartons: "
                        f"{len(cross.agreed)} agreed, {len(cross.sam_only)} only SAM, "
                        f"{len(cross.spark_only)} only Spark.")
     else:
         count = agreed_count(sam_confs, look["cartons_visible"])
         if count is None:
-            return out(HUMAN, f"SAM ({sure} sure, {doubtful} doubtful) and Spark "
+            return out("disagree", HUMAN, f"SAM ({sure} sure, {doubtful} doubtful) and Spark "
                        f"({look['cartons_visible']}) disagree on the count.")
     if spoken is not None:
         evidence["spoken"] = spoken
         if not spoken.get("certain", False) or spoken.get("quantity") is None:
-            return out(HUMAN, "The receiver was not sure of the count.", count)
+            return out("receiver", HUMAN, "The receiver was not sure of the count.", count)
         if spoken["quantity"] != count:
-            return out(HUMAN, f"The receiver said {spoken['quantity']}, the camera "
+            return out("receiver", HUMAN, f"The receiver said {spoken['quantity']}, the camera "
                        f"counted {count}.", count)
     if count == item["quantity"]:
-        return out(POST, f"Note, SAM and Spark agree on {count}.", count)
-    return out(BLOCK, f"Counted {count}, note says {item['quantity']}; draft a "
+        return out("match", POST, f"Note, SAM and Spark agree on {count}.", count)
+    return out("mismatch", BLOCK, f"Counted {count}, note says {item['quantity']}; draft a "
                f"discrepancy for the supplier.", count)

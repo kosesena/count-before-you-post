@@ -6,6 +6,8 @@ AI agents are getting write access to real systems, and they trust the document.
 
 Built during the Meta Global AI Developer Hackathon (26 Oct – 4 Nov 2026). Everything in this repository was written during the event.
 
+**Live demo: [count-before-you-post.vercel.app](https://count-before-you-post.vercel.app)**: the gate's decision on each of the six dock cases, the SAM masks, the carton-by-carton cross-check and the agent's step-by-step trace, with and without the gate. The page replays recorded runs (real Meta API, real ERPNext); it makes no API calls.
+
 > Work in progress.
 
 ## The cast
@@ -160,6 +162,7 @@ Found by checking every documented Spark and SAM 3.1 feature against this code
 | `docs/muse-code/` | Tasks given to Muse Code, verbatim |
 | `experiments/results/` | Raw JSON from every run |
 | `assets/mascots/` | The cast, drawn with Muse Image |
+| `site/`, `experiments/build_site.py` | The live demo page; `build_site.py` collects the recorded runs into `site/data.json` |
 
 ## Setup
 
@@ -173,6 +176,7 @@ cp .env.example .env   # add your META_API_KEY
 
 ```bash
 .venv/bin/python -m unittest discover tests            # gate rules, offline
+.venv/bin/python experiments/build_site.py              # rebuild the demo page's data from results/
 .venv/bin/python experiments/check_warehouse.py         # Spark + SAM on the six dock cases
 .venv/bin/python experiments/run_gate.py                # the gate on those readings
 .venv/bin/python experiments/run_agent.py              # the Spark agent behind the gate

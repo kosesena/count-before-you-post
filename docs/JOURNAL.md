@@ -315,6 +315,18 @@ quantity, unit, supplier, product and `certain`. Four clips made with macOS `say
 an unsure receiver, or a spoken number different from the camera's, goes to a human.
 Limit: a synthetic voice in silence, not a person at a noisy dock.
 
+## 27 Oct: live demo page
+
+`site/` is a static page at https://count-before-you-post.vercel.app. For each of the six
+dock cases it shows the camera frame, the SAM masks and the SAM × Spark cross-check, the
+delivery note, the four readings, the gate's rule list with the rule that decided, and the
+agent twice: the ungated run's outcome next to the gated run's trace (reasoning summaries,
+the words it tried, the cross-check, refused writes). The four Voice clips play in the page.
+
+Nothing is called live: an agent run takes 86–575 s, too slow for a demo. `experiments/build_site.py`
+collects the recorded runs from `experiments/results/` into `site/data.json`. To make the page
+name the deciding rule, every return in `cbyp/gate.py` now carries a rule tag (`Decision.rule`).
+
 ---
 
 ## Open
