@@ -391,6 +391,29 @@ The group picture was edited in place each time (the previous picture as the ref
 change per edit), so the other characters stay identical. The commit authorship for Muse
 Code's work still reads "Muse Code": that is the tool, Ada is its character.
 
+## 27 Oct: Wonder writes the paperwork
+
+The dock screen in the Blender scenes always said "supplier dispute drafted" or "damage report
+ready", but nothing wrote them. Now Muse Wonder (`muse-wonder-1.0`) does, in `cbyp/wonder.py`:
+
+- The gate decides; the rule that fired picks the document in code: wrong product or short
+  delivery → dispute to the supplier, damage → damage report, anything else refused → note to
+  the supervisor. A posted receipt needs no paperwork and makes no call (tested offline).
+- Wonder gets only the gate's decision, the note and the evidence, writes in the delivery
+  note's language, may not invent names, prices, dates or references, reports an injected
+  instruction without following it, and ends every document as a draft for Şef.
+- Its `json_schema` output mixed fields up (a whole body in the title, debris like
+  `function"}` in the body), so it answers in a fixed TITLE / TO / text form that is parsed and
+  checked, with two retries.
+
+On the six Turkish cases: five drafts, one posted case with no call, 8–17 s each; every number
+in them matches the evidence (12 vs 11 cartons, corn oil, one crushed carton, partial receipt of
+11). English and German drafts came out the same way, in their own language.
+
+Wonder joins the cast as the ninth character (a clerk with a fountain pen and a sealed letter,
+Sena's concept, drawn with Muse Image), on duty. Muse Code then added the drafts to the demo
+page, the language selector and a Muse Wonder tile (`docs/muse-code/demo-site-languages.md`).
+
 ---
 
 ## Open

@@ -61,7 +61,7 @@ def understand(transcript: str) -> dict:
         response_format={"type": "json_schema",
                          "json_schema": {"name": "spoken", "strict": True, "schema": SPOKEN}},
         messages=[{"role": "user", "content": (
-            "A warehouse receiver said this about a delivery (it may be Turkish, numbers may "
+            "A warehouse receiver said this about a delivery (in any language, numbers may "
             "be written as words). Extract the number of cartons/units received, the unit, "
             "the supplier and the product. Use empty strings for anything not said. If the "
             "speaker corrects themself, use the corrected number.\n\n"

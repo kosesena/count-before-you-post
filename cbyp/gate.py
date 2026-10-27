@@ -46,7 +46,10 @@ def normalize(text: str) -> str:
 
 def same_product(a: str, b: str) -> bool:
     a, b = normalize(a), normalize(b)
-    return bool(a and b) and (a == b or a in b or b in a)
+    # Labels break words where notes don't ("SONNEN-BLUMENÖL", "葵花籽油 5 升"): compare
+    # without spaces too.
+    ca, cb = a.replace(" ", ""), b.replace(" ", "")
+    return bool(a and b) and (a == b or a in b or b in a or ca == cb or ca in cb or cb in ca)
 
 
 @dataclass

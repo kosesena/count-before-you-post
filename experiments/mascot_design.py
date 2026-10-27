@@ -153,6 +153,14 @@ HELLO = {
             "green code and a check mark. A few glowing pastel panels float around her: a code "
             "bracket, a terminal prompt, a checklist with ticks. A tiny cute robot buddy sits at "
             "her feet."),
+    # Wonder (Muse Wonder 1.0): writes the supplier dispute and the damage report (27 Oct).
+    "wonder": (OUT / "design-hello-iris-1.png", "warm golden",
+               "Wonder: a new character, a friendly clerk and letter-writer, as cute as the "
+               "others: neat wavy auburn hair, a fountain pen tucked behind one ear, a "
+               "golden-yellow blazer over a cream shirt with a small blue infinity pin, brown "
+               "trousers. She waves with one hand and holds a clipboard with a neatly written "
+               "letter and a red wax seal in the other. A few sheets of paper with tidy lines "
+               "of writing and a small envelope float softly around her."),
 }
 for _name, (_ref, _colour, _who) in HELLO.items():
     REFS[f"hello-{_name}"] = [_ref, CAST]

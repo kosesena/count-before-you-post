@@ -19,7 +19,8 @@ from cbyp.delivery_note import read_note  # noqa: E402
 from cbyp.perception import look, sam_confs  # noqa: E402
 
 HERE = Path(__file__).parent
-OUT = HERE / "blender" / "out"
+sys.path.insert(0, str(HERE))
+from paths import OUT, RAW, RES  # noqa: E402
 def sam_fields(cam):
     out = {}
     for concept in ("cardboard box", "damaged cardboard box"):
@@ -30,8 +31,12 @@ def sam_fields(cam):
 
 def main(variants):
     truth = json.loads((OUT / "depo-truth.json").read_text())
-    rows = []
+    path = RES / "check_warehouse.json"
+    # Saved after every case, so a timeout doesn't lose the finished ones; a rerun resumes.
+    done = {r["variant"]: r for r in json.loads(path.read_text())} if path.exists() else {}
     for v in variants or list(truth):
+        if v in done and not variants:
+            continue
         cam, note = OUT / f"depo-{v}-kamera.png", OUT / f"depo-{v}-irsaliye.png"
         claim = read_note(note)["claim"]
         row = {
@@ -41,16 +46,17 @@ def main(variants):
             "sam": sam_fields(cam),
             "spark": look(cam),
         }
-        rows.append(row)
-        print(json.dumps({k: row[k] for k in ("variant", "sam", "spark")}, ensure_ascii=False))
+        done[v] = row
+        print(json.dumps({k: row[k] for k in ("variant", "sam", "spark")}, ensure_ascii=False),
+              flush=True)
         print("   note:", [(i["quantity"], i["description"]) for i in claim["items"]],
-              claim["embedded_instructions"])
-    (HERE / "results" / "check_warehouse.json").write_text(
-        json.dumps(rows, ensure_ascii=False, indent=2))
+              claim["embedded_instructions"], flush=True)
+        rows = [done[k] for k in truth if k in done]
+        path.write_text(json.dumps(rows, ensure_ascii=False, indent=2))
 
 
 def refresh_sam(variants):
-    path = HERE / "results" / "check_warehouse.json"
+    path = RES / "check_warehouse.json"
     rows = json.loads(path.read_text())
     for row in rows:
         if not variants or row["variant"] in variants:

@@ -15,8 +15,8 @@ from cbyp.gate import MIN_CONF, SURE  # noqa: E402
 from cbyp.sam import segment_image, segments  # noqa: E402
 
 HERE = Path(__file__).parent
-OUT = HERE / "blender" / "out"
-RAW = HERE / "results" / "sam_raw"
+sys.path.insert(0, str(HERE))
+from paths import OUT, RAW, RES  # noqa: E402
 ANN = OUT / "annotated"
 SURE_RGB, DOUBT_RGB = (46, 204, 113), (243, 156, 18)
 
@@ -56,6 +56,7 @@ def paint(variant):
 
 def main(variants):
     truth = json.loads((OUT / "depo-truth.json").read_text())
+    (OUT / "annotated").mkdir(exist_ok=True)
     tiles = []
     for v in variants or list(truth):
         img, sure, doubtful = paint(v)

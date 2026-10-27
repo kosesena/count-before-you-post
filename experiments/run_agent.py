@@ -15,8 +15,9 @@ from cbyp.agent import Session, run  # noqa: E402
 from cbyp.erpnext import Client  # noqa: E402
 
 HERE = Path(__file__).parent
-OUT = HERE / "blender" / "out"
-RESULTS = HERE / "results" / "agent_warehouse_cross.json"  # with the cross-check and reasoning summaries
+sys.path.insert(0, str(HERE))
+from paths import LANG, OUT, RAW, RES  # noqa: E402
+RESULTS = RES / "agent_warehouse_cross.json"  # with the cross-check and reasoning summaries
 
 
 def erp_writer(variant):
@@ -25,7 +26,8 @@ def erp_writer(variant):
 
     def write(decision, quantity, reason):
         return erp.post_receipt(decision, supplier=ids["supplier"], item_code=ids["item_code"],
-                                warehouse=ids["warehouse"], note_number=f"AGENT-{variant}")
+                                warehouse=ids["warehouse"],
+                                note_number=f"AGENT-{variant}" if LANG == "tr" else f"AGENT-{LANG}-{variant}")
     return write
 
 
@@ -35,10 +37,18 @@ def main(args):
     truth = json.loads((OUT / "depo-truth.json").read_text())
     rows = json.loads(RESULTS.read_text()) if RESULTS.exists() else []
     for v in variants or list(truth):
-        s = Session(OUT / f"depo-{v}-irsaliye.png", OUT / f"depo-{v}-kamera.png", gate=gate,
-                    writer=erp_writer(v) if gate else None)
-        start = time.perf_counter()
-        answer = run(s)
+        for attempt in range(3):
+            s = Session(OUT / f"depo-{v}-irsaliye.png", OUT / f"depo-{v}-kamera.png", gate=gate,
+                        writer=erp_writer(v) if gate else None)
+            start = time.perf_counter()
+            try:
+                answer = run(s)
+                break
+            except Exception as e:  # e.g. the previous response expired on a slow link
+                print(f"{v}: attempt {attempt + 1} failed: {e}", flush=True)
+                # Never retry after a real receipt was written: that would post it twice.
+                if s.posted or attempt == 2:
+                    raise
         row = {"variant": v, "gate": gate, "expected": truth[v]["expected_decision"],
                "posted": s.posted, "refused": s.refused, "escalated": s.escalated,
                "tools": [t["tool"] for t in s.trace if "tool" in t],

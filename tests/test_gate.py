@@ -28,6 +28,13 @@ class Gate(unittest.TestCase):
         self.assertTrue(same_product("İRS AYÇİÇEK", "irs ayçiçek"))
         self.assertFalse(same_product("MISIR YAĞI 5 L", "Ayçiçek yağı 5 L"))
 
+    def test_other_languages_match_across_word_breaks(self):
+        self.assertTrue(same_product("SUNFLOWER OIL 5 L", "Sunflower oil 5 L"))
+        self.assertTrue(same_product("SONNENBLUMEN-ÖL 5 L", "Sonnenblumenöl 5 L"))
+        self.assertTrue(same_product("葵花籽油 5 升", "葵花籽油5升"))
+        self.assertFalse(same_product("MAISÖL 5 L", "Sonnenblumenöl 5 L"))
+        self.assertFalse(same_product("玉米油 5 升", "葵花籽油 5 升"))
+
     def test_wrong_product_blocks(self):
         self.assertEqual(decide(NOTE, SURE12, look(product_on_labels="MISIR YAĞI 5 L")).action,
                          BLOCK)

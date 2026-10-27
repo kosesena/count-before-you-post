@@ -18,8 +18,8 @@ from cbyp.perception import point_cartons  # noqa: E402
 from cbyp.sam import segment_points, segments  # noqa: E402
 
 HERE = Path(__file__).parent
-OUT = HERE / "blender" / "out"
-RAW = HERE / "results" / "sam_raw"
+sys.path.insert(0, str(HERE))
+from paths import OUT, RAW, RES  # noqa: E402
 GREEN, RED, AMBER = (46, 204, 113), (231, 76, 60), (243, 156, 18)
 
 
@@ -62,6 +62,7 @@ def check(v):
 
 def main(variants):
     truth = json.loads((OUT / "depo-truth.json").read_text())
+    (OUT / "annotated").mkdir(exist_ok=True)
     rows, tiles = [], []
     for v in variants or list(truth):
         r, n_points, img = check(v)
@@ -71,7 +72,7 @@ def main(variants):
                      "count": r.count})
         tiles.append(img.resize((800, int(800 * img.height / img.width))))
         print(rows[-1])
-    (HERE / "results" / "cross_check.json").write_text(json.dumps(rows, indent=2))
+    (RES / "cross_check.json").write_text(json.dumps(rows, indent=2))
     w, h = tiles[0].size
     grid = Image.new("RGB", (w * 3, h * ((len(tiles) + 2) // 3)), "white")
     for i, t in enumerate(tiles):

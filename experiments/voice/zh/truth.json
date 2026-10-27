@@ -1,0 +1,23 @@
+{
+ "01-basit": {
+  "quantity": 12,
+  "supplier": "海港食品",
+  "text": "到了十二箱，是海港食品送来的。"
+ },
+ "02-sayi-sonda": {
+  "quantity": 11,
+  "supplier": "海港食品",
+  "text": "海港食品的葵花籽油到了，一共十一箱。"
+ },
+ "03-duzeltme": {
+  "quantity": 22,
+  "supplier": "",
+  "text": "我刚才说二十四箱，但是数错了，其实是二十二箱。"
+ },
+ "04-belirsiz": {
+  "quantity": 12,
+  "supplier": "",
+  "text": "有些箱子摞在一起，我没数清楚，好像是十二箱。",
+  "uncertain": true
+ }
+}

@@ -49,13 +49,14 @@ img { max-width: 100%; }
 .muse-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; margin: 0 0 12px; }
 .muse-head b { font-size: 22px; letter-spacing: -.01em; }
 .muse-head span { font-size: 13.5px; opacity: .9; }
-.muse-tools { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; margin: 0; padding: 0; list-style: none; }
+.muse-tools { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; margin: 0; padding: 0; list-style: none; }
 .muse-tools li { display: flex; gap: 10px; align-items: center; background: rgba(255,255,255,.14);
   border: 1px solid rgba(255,255,255,.28); border-radius: 12px; padding: 8px 10px; min-width: 0; }
 .muse-tools img { width: 38px; height: 38px; border-radius: 50%; flex: 0 0 auto; box-shadow: 0 0 0 2px rgba(255,255,255,.85); }
 .muse-tools b { display: block; font-size: 14px; line-height: 1.2; }
 .muse-tools small { display: block; font-size: 12px; line-height: 1.3; opacity: .9; }
-@media (max-width: 1000px) { .muse-tools { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 1100px) { .muse-tools { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 700px) { .muse-tools { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 420px) { .muse-tools { grid-template-columns: 1fr; } .muse-head b { font-size: 19px; } }
 .kicker {
   display: inline-block; font-size: 12.5px; font-weight: 700; letter-spacing: .08em;
@@ -118,6 +119,27 @@ h2 { font-size: 24px; letter-spacing: -.01em; margin: 42px 0 4px; }
   border-top: 0; border-bottom-color: var(--bubble);
 }
 .roles { font-size: 13px; color: var(--muted); margin: 14px 0 0; max-width: 46rem; }
+.langrow { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: 0 0 4px; }
+.langrow label { font-size: 13.5px; font-weight: 700; }
+.langrow select {
+  font: inherit; font-size: 14px; color: var(--ink); background: var(--panel);
+  border: 1px solid var(--line); border-radius: 10px; padding: 7px 10px; max-width: 100%;
+}
+.langnote { font-size: 13px; color: var(--muted); margin: 0 0 12px; max-width: 46rem; }
+.draft {
+  border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; margin-top: 10px;
+  min-width: 0; overflow-wrap: anywhere;
+}
+.draft .doc { font-size: 12px; font-weight: 700; color: var(--muted); }
+.draft .doctitle { font-size: 15px; font-weight: 700; margin: 2px 0; overflow-wrap: anywhere; }
+.draft .docto { font-size: 12.5px; color: var(--muted); margin: 0 0 6px; overflow-wrap: anywhere; }
+.draft .docbody { font-size: 13.5px; margin: 0; overflow-wrap: anywhere; word-break: break-word; }
+.draft .docstat {
+  display: inline-block; font-size: 12px; font-weight: 700; border-radius: 99px;
+  padding: 2px 10px; margin-top: 8px; border: 1px solid var(--human); color: var(--human);
+}
+.quiet { font-size: 13px; color: var(--muted); margin: 10px 0 0; }
+.misheard { color: var(--block); font-weight: 700; }
 .tabs { display: flex; gap: 8px; overflow-x: auto; padding: 2px 2px 8px; }
 .tab {
   flex: 0 0 auto; display: inline-flex; align-items: center; gap: 8px;
@@ -246,6 +268,7 @@ footer p { margin: 4px 0; }
         <li><img src="img/av-voice.jpg" alt=""><span><b>Muse Voice</b><small>writes down the receiver's spoken count</small></span></li>
         <li><img src="img/av-iris.jpg" alt=""><span><b>Muse Image</b><small>drew every character on this page</small></span></li>
         <li><img src="img/av-ada.jpg" alt=""><span><b>Muse Code</b><small>wrote the ERPNext client and this page</small></span></li>
+        <li><img src="img/av-wonder.jpg" alt=""><span><b>Muse Wonder</b><small>writes the dispute, the damage report or the note to Şef</small></span></li>
       </ul>
     </section>
     <figure class="castshot">
@@ -267,14 +290,16 @@ footer p { margin: 4px 0; }
     <section aria-labelledby="h-dock">
       <h2 id="h-dock">Deliveries at the dock</h2>
       <p class="sub" id="dockSub">Pick a delivery to see what each model read, which gate rule decided, and what the Spark agent did with and without the gate.</p>
+      <div class="langrow"><label for="langSel">Language of the delivery</label><select id="langSel"></select></div>
+      <p class="langnote">Each language is a separate recorded run, not a translation of the Turkish results.</p>
       <div class="tabs" role="tablist" id="tabs" aria-label="Deliveries"></div>
       <div id="case"></div>
     </section>
 
     <section aria-labelledby="h-voice">
       <h2 id="h-voice">The receiver's own count</h2>
-      <p class="sub">Voice writes down what the receiver says at the dock, and notices when they are not sure.
-        An unsure receiver sends the delivery to the supervisor. These are synthetic Turkish voice clips.</p>
+      <p class="sub" id="voiceSub">Voice writes down what the receiver says at the dock, and notices when they are not sure.
+        An unsure receiver sends the delivery to the supervisor.</p>
       <div class="voicegrid" id="voice"></div>
     </section>
   </main>
@@ -314,7 +339,11 @@ const VIEWS = {
 };
 const STATUS_TEXT = { "on duty": "On duty", done: "Built part of it", coming: "Coming soon" };
 const STATUS_CLASS = { "on duty": "on", done: "done", coming: "coming" };
-let DATA = null, view = "camera";
+const DOC_LABEL = { supplier_dispute: "Dispute to the supplier", damage_report: "Damage report", supervisor_note: "Note to \u015eef" };
+let DATA = null, LANG_DATA = null, LANGS = [], BASE_LANG = "tr", CUR_LANG = "tr", CASE = "talimat", view = "camera";
+const langCache = {};
+const langKnown = code => LANGS.some(l => l.code === code);
+const langFile = code => (LANGS.find(l => l.code === code) || {}).file;
 const byId = id => (DATA.characters || []).find(c => c.id === id);
 const av = (id, extra) => {
   const m = byId(id);
@@ -372,16 +401,24 @@ function renderCrew(list) {
     "Coming soon = not working yet: Glimmer only starts its second reading of the note later.";
 }
 
-function renderVoice(clips) {
-  $("voice").innerHTML = clips.map(v => {
-    const qty = `<b>${esc(v.quantity)}</b>`;
+function renderVoice(clips, source) {
+  $("voiceSub").textContent =
+    "Voice writes down what the receiver says at the dock, and notices when they are not sure. " +
+    "An unsure receiver sends the delivery to the supervisor." +
+    (source ? ` Voice clips in this run: ${source}.` : "");
+  $("voice").innerHTML = (clips || []).map(v => {
     const sup = v.supplier ? ` from ${esc(v.supplier)}` : " \u00b7 supplier not named";
     const conf = v.certain ? `<span class="sure">sure</span>`
       : `<span class="unsure">not sure \u2192 the supervisor decides</span>`;
+    const counts = v.ok === false
+      ? `<span class="misheard">misheard: said ${esc(v.said)}, heard ${esc(v.quantity)}</span>`
+      : `said ${esc(v.said)}, heard ${esc(v.quantity)}`;
+    const gate = v.ok === false
+      ? ` \u00b7 the gate would send it to \u015eef because the spoken number does not match the camera` : "";
     return `<div class="card"><div class="who">${av("voice")}Voice heard</div>` +
       `<audio controls preload="none" src="${esc(v.audio)}"></audio>` +
       `<div class="quote">\u201c${esc(v.transcript)}\u201d</div>` +
-      `<p class="vmeta">Heard quantity: ${qty}${sup} \u00b7 ${conf}</p></div>`;
+      `<p class="vmeta">${counts}${sup} \u00b7 ${conf}${gate}</p></div>`;
   }).join("");
 }
 function noteReading(c) {
@@ -422,14 +459,25 @@ function crossReading(c) {
     `<div class="val">${total}</div><div class="det">${rest}</div></div>`;
 }
 
+function draftBlock(c) {
+  if (!c.draft) return `<p class="quiet">No paperwork needed.</p>`;
+  const d = c.draft;
+  return `<div class="draft"><div class="who">${av("wonder")}Wonder\u2019s paperwork</div>` +
+    `<div class="doc">${esc(DOC_LABEL[d.document] || d.document)}</div>` +
+    `<div class="doctitle">${esc(d.title)}</div>` +
+    `<div class="docto">To: ${esc(d.to)}</div>` +
+    `<p class="docbody">${esc(d.body).replace(/\n/g, "<br>")}</p>` +
+    `<span class="docstat">Draft, waiting for \u015eef</span></div>`;
+}
+
 function gateBlock(c) {
   const g = c.gate;
-  const fired = (DATA.rules || []).indexOf(g.rule);
+  const fired = (LANG_DATA.rules || []).indexOf(g.rule);
   const sef = g.action === "human"
     ? `<br><span class="who" style="margin-top:6px">${av("sef")}\u015eef decides</span>` : "";
   const qty = (g.quantity === null || g.quantity === undefined) ? ""
     : `<span class="qty">Quantity in this decision: <b>${esc(g.quantity)}</b></span>`;
-  const rules = (DATA.rules || []).map((r, i) => {
+  const rules = (LANG_DATA.rules || []).map((r, i) => {
     const cls = i < fired ? "passed" : (i === fired ? "fired" : "later");
     const res = i < fired ? "passed" : (i === fired ? "decided" : "not reached");
     return `<li class="${cls}"><span>${esc(RULE_LABEL[r] || r)} \u2192 ${esc(RULE_ARROW[r] || g.action)}</span>` +
@@ -489,13 +537,13 @@ function behindGateBlock(c) {
 
 function renderTabs() {
   const el = $("tabs");
-  el.innerHTML = DATA.cases.map(c =>
+  el.innerHTML = LANG_DATA.cases.map(c =>
     `<button type="button" class="tab t-${esc(c.gate.action)}" role="tab" data-id="${esc(c.id)}" aria-selected="false">` +
     `<span class="dot"></span>${esc(c.title)}</button>`).join("");
-  el.addEventListener("click", e => {
+  el.onclick = e => {
     const b = e.target.closest(".tab");
     if (b) show(b.dataset.id, true);
-  });
+  };
 }
 
 function shotAlt(c) {
@@ -503,8 +551,9 @@ function shotAlt(c) {
 }
 
 function show(id, push) {
-  const c = DATA.cases.find(x => x.id === id) || DATA.cases[0];
+  const c = LANG_DATA.cases.find(x => x.id === id) || LANG_DATA.cases[0];
   if (!c) return;
+  CASE = c.id;
   document.querySelectorAll(".tab").forEach(t =>
     t.setAttribute("aria-selected", String(t.dataset.id === c.id)));
   $("case").innerHTML =
@@ -518,7 +567,7 @@ function show(id, push) {
     `<img class="note-img" src="${esc(c.images.note)}" alt="Delivery note for ${esc(c.title)}" loading="lazy">` +
     `</div><div class="card"><h3>What each model read</h3>` +
     `<div class="readings">${noteReading(c)}${samReading(c)}${sparkReading(c)}${crossReading(c)}</div>` +
-    `<h3>${av("kapi")}The gate \u00b7 Kap\u0131</h3>${gateBlock(c)}</div></div>` +
+    `<h3>${av("kapi")}The gate \u00b7 Kap\u0131</h3>${gateBlock(c)}${draftBlock(c)}</div></div>` +
     `<div class="duo"><div class="card"><h3>Same agent, no gate</h3>${noGateBlock(c)}</div>` +
     `<div class="card"><h3>${av("spark")}Spark agent behind the gate</h3>${behindGateBlock(c)}</div></div>`;
   $("case").querySelector(".seg").addEventListener("click", e => {
@@ -533,33 +582,81 @@ function show(id, push) {
     $("shotLegend").textContent = VIEWS[view][1];
   });
   if (push !== false) {
-    try { history.replaceState(null, "", "#" + c.id); } catch (e) { /* ignore */ }
+    try { history.replaceState(null, "", hashFor(CUR_LANG, c.id)); } catch (e) { /* ignore */ }
   }
 }
 
-function start(data) {
-  DATA = data;
-  renderStats(data.summary);
-  renderHow();
-  renderCrew(data.characters || []);
+function hashFor(lang, id) {
+  return lang === BASE_LANG ? "#" + id : "#" + lang + "/" + id;
+}
+
+function parseHash() {
+  const h = location.hash.replace(/^#/, "");
+  const m = h.match(/^([^/]+)\/(.+)$/);
+  if (m && langKnown(m[1])) return { lang: m[1], kase: m[2] };
+  if (h && langKnown(h)) return { lang: h, kase: "talimat" };
+  return { lang: BASE_LANG, kase: h || "talimat" };
+}
+
+function renderLangSel() {
+  $("langSel").innerHTML = LANGS.map(l =>
+    `<option value="${esc(l.code)}"${l.code === CUR_LANG ? " selected" : ""}>${esc(l.label)}</option>`).join("");
+}
+
+function loadLang(code) {
+  if (langCache[code]) return Promise.resolve(langCache[code]);
+  return fetch(langFile(code)).then(r => {
+    if (!r.ok) throw new Error(langFile(code) + " not found");
+    return r.json();
+  }).then(d => (langCache[code] = d));
+}
+
+function renderDock(kase) {
+  const d = LANG_DATA;
+  renderStats(d.summary);
   renderTabs();
-  renderVoice(data.voice || []);
-  const n = (data.cases || []).length;
+  renderVoice(d.voice || [], d.voice_source);
+  const n = (d.cases || []).length;
   $("dockSub").textContent =
     `${n} recorded dock cases. Pick a delivery to see what each model read, ` +
     `which gate rule decided, and what the Spark agent did with and without the gate. ` +
     `Green posts, red blocks, amber asks the supervisor.`;
+  const ids = (d.cases || []).map(c => c.id);
+  show(ids.includes(kase) ? kase : (ids.includes("talimat") ? "talimat" : ids[0]), true);
+}
+
+function switchLang(code, kase) {
+  CUR_LANG = langKnown(code) ? code : BASE_LANG;
+  renderLangSel();
+  return loadLang(CUR_LANG).then(d => {
+    LANG_DATA = d;
+    renderDock(kase);
+  }).catch(err => {
+    $("case").innerHTML = `<div class="card"><p class="what">Could not load the demo data.</p>` +
+      `<p class="sub">${esc(err.message)}. Serve this folder over HTTP so <span class="mono">fetch</span> works.</p></div>`;
+  });
+}
+
+function start(data) {
+  DATA = data;
+  LANGS = data.languages || [{ code: data.lang, label: data.lang, file: "data.json" }];
+  BASE_LANG = data.lang || LANGS[0].code;
+  CUR_LANG = BASE_LANG;
+  langCache[BASE_LANG] = data;
+  renderHow();
+  renderCrew(data.characters || []);
   $("castImg").src = data.cast;
   $("castImg").alt = "Group picture: " + (data.characters || []).map(m => m.name).join(", ");
-  const startId = location.hash.slice(1);
-  show((data.cases || []).some(c => c.id === startId) ? startId : "talimat", false);
-  try { history.replaceState(null, "", "#" + ((data.cases || []).some(c => c.id === startId) ? startId : "talimat")); } catch (e) { /* ignore */ }
+  $("langSel").addEventListener("change", e => switchLang(e.target.value, CASE));
+  const p = parseHash();
+  switchLang(p.lang, p.kase);
 }
 
 window.addEventListener("hashchange", () => {
   if (!DATA) return;
-  const id = location.hash.slice(1);
-  if ((DATA.cases || []).some(c => c.id === id)) show(id, false);
+  const p = parseHash();
+  if (p.lang !== CUR_LANG) switchLang(p.lang, p.kase);
+  else if ((LANG_DATA.cases || []).some(c => c.id === p.kase)) show(p.kase, false);
 });
 
 fetch("data.json").then(r => {

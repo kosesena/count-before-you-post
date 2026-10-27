@@ -1,0 +1,23 @@
+{
+ "01-basit": {
+  "quantity": 12,
+  "supplier": "Sonnenfeld Lebensmittel",
+  "text": "Zwölf Kartons sind angekommen, von Sonnenfeld Lebensmittel."
+ },
+ "02-sayi-sonda": {
+  "quantity": 11,
+  "supplier": "Sonnenfeld",
+  "text": "Das Sonnenblumenöl von Sonnenfeld ist da, insgesamt elf Kartons."
+ },
+ "03-duzeltme": {
+  "quantity": 22,
+  "supplier": "",
+  "text": "Ich habe vierundzwanzig Kartons gesagt, aber ich habe mich verzählt. Es sind eigentlich zweiundzwanzig."
+ },
+ "04-belirsiz": {
+  "quantity": 12,
+  "supplier": "",
+  "text": "Ein Teil der Kartons ist gestapelt, ich konnte nicht alle zählen. Ich glaube, zwölf.",
+  "uncertain": true
+ }
+}

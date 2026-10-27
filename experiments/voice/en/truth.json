@@ -1,0 +1,23 @@
+{
+ "01-basit": {
+  "quantity": 12,
+  "supplier": "Harbor Foods",
+  "text": "Twelve cartons came in, from Harbor Foods."
+ },
+ "02-sayi-sonda": {
+  "quantity": 11,
+  "supplier": "Harbor Foods",
+  "text": "Harbor Foods' sunflower oil is here, eleven cartons in total."
+ },
+ "03-duzeltme": {
+  "quantity": 22,
+  "supplier": "",
+  "text": "I said twenty-four cartons, but I miscounted. It's actually twenty-two."
+ },
+ "04-belirsiz": {
+  "quantity": 12,
+  "supplier": "",
+  "text": "Some of the cartons are stacked, I couldn't count them all. Twelve, I think.",
+  "uncertain": true
+ }
+}

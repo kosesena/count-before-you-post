@@ -49,6 +49,10 @@ CAST = [
     ("sef", "Şef", "the human supervisor", "#1d4ed8", "on duty",
      "I'm Şef, the human in the loop. A crushed carton, a stacked load, a number nobody "
      "can confirm: when Kapı isn't sure, the decision comes to me."),
+    ("wonder", "Wonder", "Muse Wonder", "#ca8a04", "on duty",
+     "I'm Wonder, the clerk. When Kapı stops a delivery I write the paperwork: the dispute to "
+     "the supplier, the damage report, or a note to Şef. Only facts from the evidence, and "
+     "nothing is sent until Şef approves."),
     ("ada", "Ada", "Muse Code", "#0f766e", "done",
      "I'm Ada, named after Ada Lovelace. With Muse Code I wrote the ERPNext client that turns "
      "Kapı's yes into a Purchase Receipt, its tests, and this page."),
@@ -105,6 +109,8 @@ def build(lang):
     # in agent_warehouse_cross.json.
     ungated_file = RES / ("agent_warehouse.json" if lang == "tr" else "agent_warehouse_cross.json")
     ungated = {r["variant"]: r for r in json.loads(ungated_file.read_text()) if not r["gate"]}
+    dfile = RES / "wonder_drafts.json"
+    drafts = {r["variant"]: r for r in json.loads(dfile.read_text())} if dfile.exists() else {}
     gated = {r["variant"]: r
              for r in json.loads((RES / "agent_warehouse_cross.json").read_text())
              if r["gate"] and "note" not in r}
@@ -127,6 +133,8 @@ def build(lang):
             "cross": cross.get(v),
             "gate": {"action": d.action, "rule": d.rule, "reason": d.reasons[0],
                      "quantity": d.quantity},
+            # Muse Wonder's paperwork for a refused or escalated case (None when posted).
+            "draft": drafts.get(v, {}).get("draft"),
             "without_gate": u and {"posted": [q for q, _ in u["posted"]],
                                    "supervisor": bool(u["escalated"]), "answer": u["answer"]},
             "agent": g and {"posted": g["posted"], "refused": g["refused"],
@@ -155,9 +163,13 @@ def build(lang):
                     SITE / "audio" / pre / f"{row['clip']}.wav")
         clips.append({"clip": row["clip"], "audio": f"audio/{pre}{row['clip']}.wav",
                       "transcript": row["transcript"].strip(), "quantity": row["quantity"],
-                      "supplier": row["supplier"], "certain": row["certain"], "ok": row["ok"]})
+                      "supplier": row["supplier"], "certain": row["certain"], "ok": row["ok"],
+                      "said": row["truth"]["quantity"]})
 
-    data = {"lang": lang, "rules": list(RULES), "cases": cases, "voice": clips, "characters": cast,
+    data = {"lang": lang,
+            "voice_source": "synthetic voice, macOS 'say'" if lang == "tr"
+            else "synthetic voice, ElevenLabs",
+            "rules": list(RULES), "cases": cases, "voice": clips, "characters": cast,
             "cast": jpg(ROOT / "assets" / "mascots" / "cast.jpg", "cast.jpg", 1600),
             "summary": {"cases": len(cases),
                         # A system that posts whatever the note says.
@@ -173,10 +185,31 @@ def build(lang):
     print(f"{lang}: {len(cases)} cases, {len(clips)} clips -> site/{name}")
 
 
+def complete(lang):
+    """A language goes on the page once all six cases have both agent runs."""
+    f = results(lang) / "agent_warehouse_cross.json"
+    if not f.exists():
+        return False
+    rows = json.loads(f.read_text())
+    if lang == "tr":
+        return True
+    variants = {r["variant"] for r in json.loads((results(lang) / "check_warehouse.json").read_text())}
+    return all({r["variant"] for r in rows if r["gate"] == g} >= variants for g in (True, False))
+
+
+LABEL = {"tr": "Türkçe", "en": "English", "de": "Deutsch", "zh": "中文"}
+
+
 def main():
-    for lang in LANGS:
-        if (results(lang) / "agent_warehouse_cross.json").exists():
-            build(lang)
+    built = [lang for lang in LANGS if complete(lang)]
+    for lang in built:
+        build(lang)
+    # The page reads this list from data.json to offer the languages that have results.
+    data = json.loads((SITE / "data.json").read_text())
+    data["languages"] = [{"code": lang, "label": LABEL[lang],
+                          "file": "data.json" if lang == "tr" else f"data-{lang}.json"}
+                         for lang in built]
+    (SITE / "data.json").write_text(json.dumps(data, ensure_ascii=False, indent=1))
 
 
 if __name__ == "__main__":
