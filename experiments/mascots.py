@@ -1,7 +1,7 @@
 """Draft the mascot cast with Muse Image (fan-made characters, not official Meta mascots).
 
 Usage: .venv/bin/python experiments/mascots.py [character ...]   (default: all)
-Writes experiments/mascots/<character>-<n>.png
+Writes experiments/mascots/v2-<character>-<n>.png (v1, the vinyl-toy cast, is in git history)
 """
 import base64
 import sys
@@ -14,28 +14,42 @@ OUT = Path(__file__).parent / "mascots"
 DRAFTS = 3
 
 STYLE = (
-    "Friendly mascot character, glossy 3D vinyl-toy style, soft rounded shapes, cheerful, "
-    "cool blue and violet palette with small warm accents, full body, three-quarter view, "
-    "standing on a plain light grey background, soft studio light. No text, no letters, "
-    "no logos."
+    "Collectible plastic toy minifigure, glossy injection-moulded plastic, cylindrical head "
+    "with a simple printed friendly face, blocky body and C-shaped hands, full body, dynamic "
+    "three-quarter pose, standing on a small square toy-brick base, cinematic warm studio "
+    "light with soft glow and bokeh, high detail product photo. No text, no letters, no "
+    "logos, no brand marks on clothing."
 )
 
+# Each character wears its own symbol instead of any company logo.
 CAST = {
-    "spark": "Spark, the reader: a small bright character with round glasses and hair made "
-             "of little electric sparks, holding a clipboard with a delivery note, looking "
-             "closely at it, one eyebrow raised as if spotting a suspicious line.",
-    "sam": "SAM, the counter: a compact robot-like character whose single big eye is a "
-           "camera lens, drawing glowing coloured outlines around three small cardboard boxes "
-           "with a pointer finger, focused and precise.",
-    "kapi": "Kapi, the gatekeeper: a sturdy character made from a brown cardboard shipping "
-            "box with packing tape, wearing a little guard cap, one arm is a striped red and "
-            "white barrier boom, a small traffic light on its chest glowing green.",
-    "glimmer": "Glimmer, the second reader: a tiny glowing firefly-like character, apprentice "
-               "of a reader, carrying a small magnifying glass, shimmering softly.",
-    "voice": "Voice, the listener: a round character wearing big over-ear headphones, a "
-             "speech bubble with sound waves floating next to it, attentive and kind.",
-    "sef": "The warehouse supervisor: a calm human character in a high-visibility vest and "
-           "hard hat, simple stylised face, holding a tablet, giving a thumbs up.",
+    "spark": "Spark, the reader: energetic minifigure with spiky glossy orange hair, orange "
+             "hoodie over a white shirt printed with a small yellow lightning bolt, black "
+             "trousers, orange and white sneakers. Holds a paper delivery note in one hand and "
+             "points at a line on it with the other, one eyebrow raised as if spotting a "
+             "suspicious line. Orange and amber palette, small glowing sparks around.",
+    "sam": "SAM, the counter: focused minifigure with dark curly hair, royal blue hoodie "
+           "printed with a small white camera-lens circle, beige trousers. Points at three "
+           "small cardboard boxes, each outlined by a glowing blue rectangle, a tiny floating "
+           "number tag over each box. Blue palette.",
+    "kapi": "Kapi, the gatekeeper: friendly minifigure with a classic yellow cylindrical head, "
+            "rosy cheeks and a smile, a royal blue guard cap with a black visor and a gold "
+            "button. Torso, arms and legs look like a brown cardboard shipping box covered in "
+            "packing tape, with a small 'this side up' arrows symbol. A small traffic light "
+            "is mounted on the chest, its green lamp glowing. Holds a red and white striped "
+            "barrier pole in one blue hand. Blue shoes.",
+    "glimmer": "Glimmer, the second reader: gentle minifigure with long glossy lavender hair, "
+               "lilac sweater printed with a small magnifying-glass symbol, holding a big "
+               "magnifying glass over a delivery note, soft violet glow. Purple palette.",
+    "voice": "Voice, the listener: calm minifigure with a black beanie and blue-tipped dark "
+             "hair, black hoodie printed with a small sound-wave symbol, big silver over-ear "
+             "headphones, a glowing speech bubble with sound waves floating nearby. Black and "
+             "electric blue palette.",
+    "sef": "The warehouse supervisor: friendly minifigure with a classic yellow cylindrical "
+           "head and a smile, royal blue hard hat, royal blue work jacket and trousers with a "
+           "yellow and silver reflective safety vest, a small walkie-talkie on the belt. "
+           "Gives a thumbs up with one hand and holds a tablet showing a checklist with "
+           "ticks in the other. Black shoes.",
 }
 
 
@@ -47,7 +61,7 @@ def main(names):
             size="1024x1024", response_format="b64_json", output_format="png",
         )
         for k, item in enumerate(resp.data, 1):
-            (OUT / f"{name}-{k}.png").write_bytes(base64.b64decode(item.b64_json))
+            (OUT / f"v2-{name}-{k}.png").write_bytes(base64.b64decode(item.b64_json))
         print(name, len(resp.data))
 
 
