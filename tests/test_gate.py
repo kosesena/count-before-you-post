@@ -4,6 +4,7 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from cbyp.crosscheck import CrossCheck  # noqa: E402
 from cbyp.gate import BLOCK, HUMAN, POST, agreed_count, decide, same_product  # noqa: E402
 
 NOTE = {"items": [{"description": "Ayçiçek yağı 5 L", "quantity": 12, "unit": "koli",
@@ -55,6 +56,27 @@ class Gate(unittest.TestCase):
         self.assertEqual(decide(NOTE, [0.91] * 11, look(stacked=True,
                                                         all_cartons_visible=False)).action,
                          HUMAN)
+
+    def test_cross_check_all_agree_posts(self):
+        cross = CrossCheck(agreed=[(k, (k, 0)) for k in range(12)])
+        self.assertEqual(decide(NOTE, SURE12, look(), cross).action, POST)
+
+    def test_cross_check_doubtful_extra_explains_short_delivery(self):
+        cross = CrossCheck(agreed=[(k, (k, 0)) for k in range(11)], sam_only=[11],
+                           sam_only_conf=[0.81])
+        d = decide(NOTE, [0.91] * 11 + [0.81], look(cartons_visible=11), cross)
+        self.assertEqual((d.action, d.quantity), (BLOCK, 11))
+
+    def test_cross_check_sure_extra_goes_to_human(self):
+        cross = CrossCheck(agreed=[(k, (k, 0)) for k in range(11)], sam_only=[11],
+                           sam_only_conf=[0.92])
+        self.assertEqual(decide(NOTE, SURE12, look(cartons_visible=11), cross).action, HUMAN)
+
+    def test_cross_check_overrides_matching_totals(self):
+        # Totals agree (12 and 12) but the models picked different objects.
+        cross = CrossCheck(agreed=[(k, (k, 0)) for k in range(10)], sam_only=[10, 11],
+                           sam_only_conf=[0.92, 0.92], spark_only=[(1, 1), (2, 2)])
+        self.assertEqual(decide(NOTE, SURE12, look(), cross).action, HUMAN)
 
     def test_illegible_note_goes_to_human(self):
         note = {"items": [NOTE["items"][0] | {"legible": False}], "embedded_instructions": []}

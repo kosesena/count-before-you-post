@@ -50,6 +50,7 @@ def same_object(probe: Segment, carton: Segment) -> bool:
 class CrossCheck:
     agreed: list = field(default_factory=list)      # (concept index, point)
     sam_only: list = field(default_factory=list)    # concept indexes no Spark point confirms
+    sam_only_conf: list = field(default_factory=list)  # SAM's confidence in each of those
     spark_only: list = field(default_factory=list)  # points on no SAM carton
     doubled: list = field(default_factory=list)     # concept indexes with 2+ Spark points
 
@@ -78,6 +79,7 @@ def cross_check(concept: list[Segment], points: list[tuple[int, int]],
         pts = hits.get(k, [])
         if not pts:
             out.sam_only.append(k)
+            out.sam_only_conf.append(cartons[k].conf or 0)
         elif len(pts) > 1:
             out.doubled.append(k)
         else:

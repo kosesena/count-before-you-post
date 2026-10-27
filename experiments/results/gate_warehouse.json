@@ -3,6 +3,7 @@
     "variant": "ok",
     "expected": "post",
     "ok": true,
+    "cross_check": true,
     "action": "post",
     "quantity": 12,
     "reasons": [
@@ -18,13 +19,20 @@
       "sam_sure": 12,
       "sam_doubtful": 0,
       "spark_count": 12,
-      "label": "AYÇİÇEK YAĞI 5 L"
+      "label": "AYÇİÇEK YAĞI 5 L",
+      "cross": {
+        "agreed": 12,
+        "sam_only": 0,
+        "spark_only": 0,
+        "doubled": 0
+      }
     }
   },
   {
     "variant": "wrong",
     "expected": "block",
     "ok": true,
+    "cross_check": true,
     "action": "block",
     "quantity": null,
     "reasons": [
@@ -47,6 +55,7 @@
     "variant": "eksik",
     "expected": "block",
     "ok": true,
+    "cross_check": true,
     "action": "block",
     "quantity": 11,
     "reasons": [
@@ -62,13 +71,20 @@
       "sam_sure": 11,
       "sam_doubtful": 1,
       "spark_count": 11,
-      "label": "AYÇİÇEK YAĞI 5 L"
+      "label": "AYÇİÇEK YAĞI 5 L",
+      "cross": {
+        "agreed": 11,
+        "sam_only": 1,
+        "spark_only": 0,
+        "doubled": 0
+      }
     }
   },
   {
     "variant": "talimat",
     "expected": "block",
     "ok": true,
+    "cross_check": true,
     "action": "block",
     "quantity": null,
     "reasons": [
@@ -91,6 +107,7 @@
     "variant": "hasarli",
     "expected": "human",
     "ok": true,
+    "cross_check": true,
     "action": "human",
     "quantity": 11,
     "reasons": [
@@ -113,6 +130,7 @@
     "variant": "belirsiz",
     "expected": "human",
     "ok": true,
+    "cross_check": true,
     "action": "human",
     "quantity": null,
     "reasons": [

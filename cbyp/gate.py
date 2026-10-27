@@ -13,7 +13,7 @@ change a rule. Rules run in order and the first one that fires decides.
   label product != note product  -> block
   stacked / cartons hidden       -> human   (count cannot be verified)
   damaged cartons                -> human   (propose partial receipt of the intact ones)
-  SAM and Spark disagree         -> human
+  SAM and Spark disagree         -> human   (carton by carton when a cross-check is given)
   agreed count == note           -> post
   agreed count != note           -> block   (draft a discrepancy for the supplier)
 """
@@ -72,7 +72,19 @@ def agreed_count(sam_confs: list[float], spark_count: int) -> int | None:
     return spark_count if sure <= spark_count <= sure + doubtful else None
 
 
-def decide(note: dict, sam_confs: list[float], look: dict) -> Decision:
+def cross_count(cross) -> int | None:
+    """The count a carton-by-carton cross-check supports, or None.
+
+    Every carton must be found by both models. A carton only SAM sees is tolerated when SAM
+    was doubtful about it (the gap in the short delivery, at 0.81); one SAM is sure of is not.
+    """
+    if cross.spark_only or cross.doubled or any(c >= SURE for c in cross.sam_only_conf):
+        return None
+    return len(cross.agreed)
+
+
+def decide(note: dict, sam_confs: list[float], look: dict, cross=None) -> Decision:
+    """cross: an optional crosscheck.CrossCheck; when given it replaces the count bands."""
     items = note.get("items") or []
     sure, doubtful = sam_bands(sam_confs)
     evidence = {"note": [(i["quantity"], i["description"]) for i in items],
@@ -98,10 +110,19 @@ def decide(note: dict, sam_confs: list[float], look: dict) -> Decision:
         intact = look["cartons_visible"] - look["damaged_cartons"]
         return out(HUMAN, f"{look['damaged_cartons']} damaged carton(s); propose partial "
                    f"receipt of {intact}.", intact)
-    count = agreed_count(sam_confs, look["cartons_visible"])
-    if count is None:
-        return out(HUMAN, f"SAM ({sure} sure, {doubtful} doubtful) and Spark "
-                   f"({look['cartons_visible']}) disagree on the count.")
+    if cross is not None:
+        evidence["cross"] = {"agreed": len(cross.agreed), "sam_only": len(cross.sam_only),
+                             "spark_only": len(cross.spark_only), "doubled": len(cross.doubled)}
+        count = cross_count(cross)
+        if count is None:
+            return out(HUMAN, "SAM and Spark disagree on which objects are cartons: "
+                       f"{len(cross.agreed)} agreed, {len(cross.sam_only)} only SAM, "
+                       f"{len(cross.spark_only)} only Spark.")
+    else:
+        count = agreed_count(sam_confs, look["cartons_visible"])
+        if count is None:
+            return out(HUMAN, f"SAM ({sure} sure, {doubtful} doubtful) and Spark "
+                       f"({look['cartons_visible']}) disagree on the count.")
     if count == item["quantity"]:
         return out(POST, f"Note, SAM and Spark agree on {count}.", count)
     return out(BLOCK, f"Counted {count}, note says {item['quantity']}; draft a "
