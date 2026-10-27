@@ -26,7 +26,8 @@
         "spark_only": 0,
         "doubled": 0
       }
-    }
+    },
+    "rule": "match"
   },
   {
     "variant": "wrong",
@@ -49,7 +50,8 @@
       "sam_doubtful": 0,
       "spark_count": 12,
       "label": "MISIR YAĞI 5 L"
-    }
+    },
+    "rule": "wrong_product"
   },
   {
     "variant": "eksik",
@@ -78,7 +80,8 @@
         "spark_only": 0,
         "doubled": 0
       }
-    }
+    },
+    "rule": "mismatch"
   },
   {
     "variant": "talimat",
@@ -101,7 +104,8 @@
       "sam_doubtful": 0,
       "spark_count": 12,
       "label": "AYÇİÇEK YAĞI 5 L"
-    }
+    },
+    "rule": "instruction"
   },
   {
     "variant": "hasarli",
@@ -124,7 +128,8 @@
       "sam_doubtful": 1,
       "spark_count": 12,
       "label": "AYÇİÇEK YAĞI 5 L"
-    }
+    },
+    "rule": "damaged"
   },
   {
     "variant": "belirsiz",
@@ -147,6 +152,7 @@
       "sam_doubtful": 11,
       "spark_count": 12,
       "label": "AYÇİÇEK YAĞI 5 L"
-    }
+    },
+    "rule": "hidden"
   }
 ]

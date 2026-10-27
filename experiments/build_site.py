@@ -13,7 +13,7 @@ from PIL import Image
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
-from cbyp.gate import RULES, SURE, decide  # noqa: E402
+from cbyp.gate import MIN_CONF, RULES, SURE, decide  # noqa: E402
 from experiments.run_gate import cached_cross  # noqa: E402
 
 HERE = ROOT / "experiments"
@@ -115,7 +115,7 @@ def main():
                        "note": jpg(OUT / f"depo-{v}-irsaliye.png", f"{v}-note.jpg", 900)},
             "note": p["note"],
             "sam": {"sure": sum(c >= SURE for c in confs),
-                    "doubtful": sum(c < SURE for c in confs), "confs": confs},
+                    "doubtful": sum(MIN_CONF <= c < SURE for c in confs), "confs": confs},
             "spark": p["spark"],
             "cross": cross.get(v),
             "gate": {"action": d.action, "rule": d.rule, "reason": d.reasons[0],
@@ -151,7 +151,11 @@ def main():
     data = {"rules": list(RULES), "cases": cases, "voice": clips, "characters": cast,
             "cast": jpg(ROOT / "assets" / "mascots" / "cast.jpg", "cast.jpg", 1600),
             "summary": {"cases": len(cases),
+                        # A system that posts whatever the note says.
                         "wrong_without_gate": sum(c["expected"] != "post" for c in cases),
+                        # The recorded Spark agent run without the gate.
+                        "wrong_agent_no_gate": sum(bool(c["without_gate"] and c["without_gate"]["posted"])
+                                                   and c["expected"] != "post" for c in cases),
                         "wrong_with_gate": sum(c["gate"]["action"] == "post"
                                                and c["expected"] != "post" for c in cases),
                         "gate_right": sum(c["gate"]["action"] == c["expected"] for c in cases)}}

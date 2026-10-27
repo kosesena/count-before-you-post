@@ -1044,6 +1044,7 @@
  "summary": {
   "cases": 6,
   "wrong_without_gate": 5,
+  "wrong_agent_no_gate": 1,
   "wrong_with_gate": 0,
   "gate_right": 6
  }

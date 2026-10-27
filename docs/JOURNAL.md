@@ -345,7 +345,7 @@ The first page was correct but plain. Two changes:
   It touched only `site/index.html` and took every number from `data.json`.
 
 Checked at 1280 px and 375 px, light and dark: no broken images, no horizontal scroll, no
-console errors. Fixed by hand afterwards (three small edits):
+console errors. Fixed by hand afterwards (three small fixes, then one addition):
 1. the status label "Built this project" for Muse and Muse Code overclaimed; now
    "Built part of it",
 2. the theme button was `position: fixed` and covered headings while scrolling on a phone;
@@ -355,6 +355,24 @@ console errors. Fixed by hand afterwards (three small edits):
 4. Sena wanted Muse to be visible at first glance: a "Built with Muse" band under the title,
    one tile per Meta tool with its character and what it does (Muse Spark, SAM 3.1, Muse
    Voice, Muse Image, Muse Code). Names only, no Meta logo, so it doesn't read as official.
+
+## 27 Oct: Muse Code checks the page against the repository
+
+Read-only task (`docs/muse-code/site-audit.md`), answer saved verbatim
+(`docs/muse-code/site-audit-answer.md`). Its verdict: every dock case, rule, mask, cross-check,
+both agent runs, the voice clips and the cast are on the page and their numbers match the
+sources; the multilingual note-reading test and the conveyor/video counting are left out,
+which is fine for a demo page. Each finding was checked by hand:
+
+| Finding | Checked | Done |
+|---|---|---|
+| The headline "5/6 wrong" is a note-trusting baseline, but the ungated Spark agent shown below it was wrong in 1/6 | true, and the most important | the page now shows both: 5/6 for the baseline, 1/6 for Spark alone, 0/6 behind the gate |
+| README agent table is from the first run; the page shows the later cross-check run (`belirsiz` differs) | true | table updated, both result files named |
+| README gate table misses the receiver rule and the carton-by-carton rule | true | rows added |
+| Roadmap still lists the cross-check rule and reasoning summaries as future | true | marked done |
+| `build_site.py` counts doubtful as `< 0.88`, the gate as `0.70–0.88` | true, same result on current data | aligned with the gate |
+| Journal says three hand edits and lists four | true | wording fixed |
+| "13/13 tests" is stale | no: it describes the tests at delivery time, which is what the sentence says | kept |
 
 ---
 
