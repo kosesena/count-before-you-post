@@ -283,6 +283,21 @@ The agent's post also runs the carton-by-carton cross-check, and Spark's reasoni
 summaries (`reasoning.summary: "auto"`) go into the trace, e.g. "Resolving carton count
 mismatch by using SAM tool to verify actual cartons on the pallet."
 
+### The agent behind the full gate, six cases — `experiments/results/agent_warehouse_cross.json`
+
+| Case | Agent | Gate's cross-check | Outcome |
+|---|---|---|---|
+| ok | posted 12 | 12 agreed | MAT-PRE-2026-00003 in ERPNext |
+| wrong | asked supervisor | — | right |
+| eksik | tried 11 | 11 agreed, 1 only SAM (the gap) | refused, supervisor |
+| talimat | tried 12 | 12 agreed | refused (instruction on the note), supervisor |
+| hasarli | asked supervisor | — | right |
+| belirsiz | asked supervisor | — | right |
+
+6/6. In every case the agent tried "carton" first, which SAM is never sure about on these
+renders; the gate kept the "cardboard box" reading each time. Runs took 86–575 s: the agent
+tries up to four words and the cross-check adds a Spark call and a SAM call.
+
 ### Voice — `cbyp/voice.py`, `experiments/voice_check.py`
 `POST /v1/asr/transcribe` (multipart: a JSON `request` part with `model`, `audioEncoding`,
 `languageBias: ["Turkish"]`, optional `keywords`; a WAV `audio` part), then Spark extracts
