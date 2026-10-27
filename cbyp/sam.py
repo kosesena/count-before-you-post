@@ -47,7 +47,7 @@ def parse(text: str) -> list[Detection]:
 def segment_image(path: str | Path, concept: str) -> str:
     """Find every instance of `concept` in an image; return raw output text."""
     path = Path(path)
-    mime = "image/png" if path.suffix == ".png" else "image/jpeg"
+    mime = "image/png" if path.suffix.lower() == ".png" else "image/jpeg"
     data = base64.b64encode(path.read_bytes()).decode()
     stream = client().responses.create(
         model=SAM,
@@ -58,7 +58,14 @@ def segment_image(path: str | Path, concept: str) -> str:
         metadata={"include_confidence": "true", "mask_encoding": "one_bit"},
         stream=True,
     )
-    return "".join(e.delta for e in stream if e.type == "response.output_text.delta")
+    parts = []
+    for event in stream:
+        if event.type == "response.output_text.delta":
+            parts.append(event.delta)
+        elif event.type in ("response.failed", "error"):
+            # A failed stream must not read as "no boxes found".
+            raise RuntimeError(f"SAM image failed: {event}")
+    return "".join(parts)
 
 
 def upload(path: str | Path) -> str:
@@ -85,3 +92,51 @@ def segment_video(file_id: str, concept: str) -> str:
             raise RuntimeError(f"SAM video failed: {event}")
     # Each delta is one frame line.
     return "\n".join(parts)
+
+
+@dataclass
+class Segment:
+    """One object with its pixel mask, from Meta's own parser (meta-sam-parser)."""
+    obj: str
+    conf: float | None
+    left: int
+    top: int
+    right: int
+    bottom: int
+    raster: bytes        # row-major 0/1, (bottom - top) rows x (right - left) columns
+
+    def contains(self, x: float, y: float) -> bool:
+        """True if pixel (x, y) of the source image is inside this object's mask."""
+        if not (self.left <= x < self.right and self.top <= y < self.bottom):
+            return False
+        w = self.right - self.left
+        return bool(self.raster[int(y - self.top) * w + int(x - self.left)])
+
+
+def segments(text: str) -> list[Segment]:
+    """Decode every mask in an image response. Masks come back cropped to their bounds."""
+    import meta_sam_parser as msp
+
+    parser = msp.image_segmentation_format().create_parser()
+    parser.push(text)
+    result = parser.finish(msp.CompletedOutcome()).result
+    out = []
+    for rec in result.records:
+        if isinstance(rec, msp.SegmentationMaskRecord):
+            b = rec.bounds
+            out.append(Segment(rec.object_id, rec.confidence, b.left, b.top, b.right, b.bottom,
+                               msp.decode_mask_to_raster(rec.mask)))
+    return out
+
+
+def segment_points(path: str | Path, points: list[tuple[int, int]]) -> str:
+    """Ask SAM what object sits under each point (one object per point, at most 16)."""
+    import meta_sam_parser as msp
+    from PIL import Image
+
+    path = Path(path)
+    w, h = Image.open(path).size
+    prompt = msp.build_object_prompt(size=(w, h), objects=[
+        msp.PromptObject(id=i + 1, prompts=[msp.FramePrompt(points=[msp.PromptPoint(x, y)])])
+        for i, (x, y) in enumerate(points[:16])])
+    return segment_image(path, prompt)
