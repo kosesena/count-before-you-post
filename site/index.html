@@ -38,7 +38,7 @@ a { color: var(--accent); }
 img { max-width: 100%; }
 .wrap { max-width: 1120px; margin: 0 auto; padding: 0 16px 12px; }
 #theme {
-  position: fixed; top: 10px; right: 10px; z-index: 10;
+  position: absolute; top: 10px; right: 10px; z-index: 10;
   border: 1px solid var(--line); background: var(--panel); color: var(--ink);
   border-radius: 99px; padding: 6px 12px; font: inherit; font-size: 13px; cursor: pointer;
 }
@@ -151,6 +151,8 @@ h2 { font-size: 24px; letter-spacing: -.01em; margin: 42px 0 4px; }
   margin-right: 6px; border: 2px solid var(--c, var(--line)); background: var(--code);
 }
 .who { display: flex; align-items: center; flex-wrap: wrap; }
+.how-step { display: flex; align-items: flex-start; gap: 2px; }
+.how-step .av { flex: 0 0 auto; margin-top: 1px; }
 .decision { display: flex; gap: 12px; align-items: flex-start; border-radius: 12px; padding: 14px; margin-bottom: 10px; }
 .decision.post { background: var(--post-bg); }
 .decision.block { background: var(--block-bg); }
@@ -286,7 +288,7 @@ const VIEWS = {
   masks: ["SAM masks", "Every carton SAM 3.1 outlined. Green: sure (0.88 and up). Amber: doubtful."],
   cross: ["SAM \u00d7 Spark", "Spark's points sent back to SAM. Green: both models found the same carton. Amber: only SAM. Red point: only Spark."]
 };
-const STATUS_TEXT = { "on duty": "On duty", done: "Built this project", coming: "Coming soon" };
+const STATUS_TEXT = { "on duty": "On duty", done: "Built part of it", coming: "Coming soon" };
 const STATUS_CLASS = { "on duty": "on", done: "done", coming: "coming" };
 let DATA = null, view = "camera";
 const byId = id => (DATA.characters || []).find(c => c.id === id);
@@ -328,7 +330,7 @@ function renderHow() {
     ["kapi", `<b>Kap\u0131 decides</b>: ${n} plain-code rules in order. Unsure means the supervisor.`]
   ];
   $("how").innerHTML = steps.map(([id, text]) =>
-    `<div><span class="who">${av(id)}${text}</span></div>`).join("");
+    `<div class="how-step">${av(id)}<span>${text}</span></div>`).join("");
 }
 
 function renderCrew(list) {
@@ -340,7 +342,7 @@ function renderCrew(list) {
     `<span class="pill ${STATUS_CLASS[m.status] || ""}">${esc(STATUS_TEXT[m.status] || m.status)}</span>` +
     `<p class="bubble">${esc(m.line)}</p></div></article>`).join("");
   $("roles").textContent =
-    "On duty = working at the dock. Built this project = made part of it. " +
+    "On duty = working at the dock. Built part of it = made part of this project. " +
     "Coming soon = not working yet: Glimmer only starts its second reading of the note later.";
 }
 
