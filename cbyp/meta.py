@@ -7,6 +7,7 @@ from openai import OpenAI
 BASE_URL = "https://api.meta.ai/v1"
 SPARK = "muse-spark-1.3"
 SAM = "sam-3.1"
+TIMEOUT = 180  # seconds
 
 
 def _load_env() -> None:
@@ -25,4 +26,5 @@ def client() -> OpenAI:
     if not key:
         raise RuntimeError("META_API_KEY is not set (see .env.example)")
     # The OpenAI SDK does not read META_API_KEY on its own, so pass it explicitly.
-    return OpenAI(base_url=BASE_URL, api_key=key)
+    # A SAM stream once hung for 11 minutes: no call may wait longer than TIMEOUT.
+    return OpenAI(base_url=BASE_URL, api_key=key, timeout=TIMEOUT, max_retries=2)

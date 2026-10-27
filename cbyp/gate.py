@@ -27,6 +27,11 @@ POST, BLOCK, HUMAN = "post", "block", "human"
 SURE = 0.88
 MIN_CONF = 0.7
 
+# Words the agent may ask SAM to look for. "fruit crate" returned 0 on a photo full of fruit
+# crates, so the agent can retry with another word, but only from this list: "box" alone also
+# picks up plastic crates.
+CONCEPTS = ("cardboard box", "carton", "shipping box", "package")
+
 _TR = str.maketrans({"İ": "i", "I": "ı"})
 
 
