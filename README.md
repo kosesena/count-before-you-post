@@ -14,7 +14,7 @@ Built during the Meta Global AI Developer Hackathon (26 Oct – 4 Nov 2026). Eve
 
 Spark (Muse Spark) reads the delivery note, SAM (SAM 3.1) counts what arrived, Kapı (the gate) compares them and decides whether the ERP may be written, Glimmer (Muse Glimmer) gives an independent second reading, Voice (Muse Voice Transcribe) listens to the receiver, and the supervisor approves when the gate is unsure.
 
-*Characters: Sena's concepts, drawn with Muse Image (`experiments/mascots_from_ref.py`). Fan-made, not official Meta mascots. Character sheets: [Sam](assets/mascots/sheets/sam.jpg), [Glimmer](assets/mascots/sheets/glimmer.jpg), [Voice](assets/mascots/sheets/voice.jpg), [all four](assets/mascots/sheets/sheets.jpg), [at work](assets/mascots/sheets/states.jpg).*
+*Characters: Sena's concepts, drawn with Muse Image (`experiments/mascots_from_ref.py`). Fan-made, not official Meta mascots. Character sheets: [Sam](assets/mascots/sheets/sam.jpg), [Glimmer](assets/mascots/sheets/glimmer.jpg), [Voice](assets/mascots/sheets/voice.jpg), [all four](assets/mascots/sheets/sheets.jpg), [at work](assets/mascots/sheets/states.jpg), [Kapı and the supervisor](assets/mascots/sheets/kapi-sef.jpg).*
 
 ## How the gate decides
 

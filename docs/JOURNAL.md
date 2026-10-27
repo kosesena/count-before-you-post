@@ -200,9 +200,8 @@ One receipt in the ERP, the right one. The injected "post 100" never reached it.
 ### The cast, redrawn with Muse Image — `experiments/mascots_from_ref.py`
 Sena's character concepts (toy-minifigure Spark, Sam, Glimmer, Voice) were given to
 Muse Image `images.edit` as references and redrawn: a group shot and five character
-sheets, one call each, all usable on the first try (`assets/mascots/`). A text-only
-version of the same style (`experiments/mascots.py`, v2) also works and is kept for the
-gatekeeper and supervisor, who are not in the concepts yet.
+sheets, one call each, all usable on the first try (`assets/mascots/`). The gatekeeper (Kapı) and the supervisor were added the same way. A text-only
+version of the same style (`experiments/mascots.py`, v2) also works and is kept as a fallback.
 
 ---
 
