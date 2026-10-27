@@ -6,7 +6,7 @@ AI agents are getting write access to real systems, and they trust the document.
 
 Built during the Meta Global AI Developer Hackathon (26 Oct – 4 Nov 2026). Everything in this repository was written during the event.
 
-**Live demo: [count-before-you-post.vercel.app](https://count-before-you-post.vercel.app)**: the gate's decision on each of the six dock cases, the SAM masks, the carton-by-carton cross-check and the agent's step-by-step trace, with and without the gate. The page replays recorded runs (real Meta API, real ERPNext); it makes no API calls.
+**Live demo: [count-before-you-post.vercel.app](https://count-before-you-post.vercel.app)**: the gate's decision on each of the six dock cases, the SAM masks, the carton-by-carton cross-check and the agent's step-by-step trace, with and without the gate. The page replays recorded runs (real Meta API, real ERPNext); it makes no API calls. The page itself was written by Muse Code from [this task](docs/muse-code/demo-site.md), with three small fixes by hand listed in the journal; each character introduces itself there, in portraits drawn with Muse Image.
 
 > Work in progress.
 
@@ -16,7 +16,7 @@ Built during the Meta Global AI Developer Hackathon (26 Oct – 4 Nov 2026). Eve
 
 Spark (Muse Spark) reads the delivery note, looks at the pallet and runs the receiving agent; SAM (SAM 3.1) counts and outlines every carton; Kapı (the gate) decides whether the ERP may be written; the supervisor approves when the gate is unsure. Muse Image drew the cast and Muse Code wrote the ERPNext client. Voice (Muse Voice Transcribe) turns the receiver's spoken count into a third reading. Glimmer (a second, open-weight reading of the note) is planned: see the roadmap.
 
-*Characters: Sena's concepts, drawn with Muse Image (`experiments/mascots_from_ref.py`). Fan-made, not official Meta mascots. Character sheets: [Spark](assets/mascots/sheets/spark.jpg), [Sam](assets/mascots/sheets/sam.jpg), [Glimmer](assets/mascots/sheets/glimmer.jpg), [Voice](assets/mascots/sheets/voice.jpg), [all four](assets/mascots/sheets/sheets.jpg), [at work](assets/mascots/sheets/states.jpg), [Kapı and the supervisor](assets/mascots/sheets/kapi-sef.jpg), [Muse](assets/mascots/sheets/muse.jpg), [Muse Code](assets/mascots/sheets/muse-code.jpg) (designed by Muse Image itself, `experiments/mascot_design.py`).*
+*Characters: Sena's concepts, drawn with Muse Image (`experiments/mascots_from_ref.py`). Fan-made, not official Meta mascots. Character sheets: [Spark](assets/mascots/sheets/spark.jpg), [Sam](assets/mascots/sheets/sam.jpg), [Glimmer](assets/mascots/sheets/glimmer.jpg), [Voice](assets/mascots/sheets/voice.jpg), [all four](assets/mascots/sheets/sheets.jpg), [at work](assets/mascots/sheets/states.jpg), [Kapı and the supervisor](assets/mascots/sheets/kapi-sef.jpg), [Muse](assets/mascots/sheets/muse.jpg), [Muse Code](assets/mascots/sheets/muse-code.jpg) (designed by Muse Image itself, `experiments/mascot_design.py`). Each one saying hello: `assets/mascots/hello/`.*
 
 ## How the gate decides
 
@@ -162,7 +162,7 @@ Found by checking every documented Spark and SAM 3.1 feature against this code
 | `docs/muse-code/` | Tasks given to Muse Code, verbatim |
 | `experiments/results/` | Raw JSON from every run |
 | `assets/mascots/` | The cast, drawn with Muse Image |
-| `site/`, `experiments/build_site.py` | The live demo page; `build_site.py` collects the recorded runs into `site/data.json` |
+| `site/`, `experiments/build_site.py` | The live demo page (written by Muse Code); `build_site.py` collects the recorded runs into `site/data.json` |
 
 ## Setup
 

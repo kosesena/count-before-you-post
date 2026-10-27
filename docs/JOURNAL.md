@@ -327,6 +327,32 @@ Nothing is called live: an agent run takes 86–575 s, too slow for a demo. `exp
 collects the recorded runs from `experiments/results/` into `site/data.json`. To make the page
 name the deciding rule, every return in `cbyp/gate.py` now carries a rule tag (`Decision.rule`).
 
+## 27 Oct: the cast introduces itself, and Muse Code rewrites the demo page
+
+The first page was correct but plain. Two changes:
+
+- **Portraits.** The old single portraits were the first purple drafts and no longer matched
+  the cast. Muse Image drew all eight again, each alone and saying hello while doing its job
+  (Spark holds a delivery note, Sam a tablet of outlined cartons, Kapı the barrier, Şef a
+  checklist...). References: each character's Muse-drawn sheet plus the cast picture
+  (`experiments/mascot_design.py hello-<id>`). Two calls failed once (an upload timeout, an
+  HTTP 500) and worked on retry. Saved in `assets/mascots/hello/`; `build_site.py` adds each
+  character's first-person introduction and a head-crop avatar to `site/data.json`.
+- **The page.** Muse Code (`muse exec`, `muse-spark-1.3`) rewrote `site/index.html` from the
+  task in `docs/muse-code/demo-site.md`: hero, a how-it-works strip, one card per character
+  with a speech bubble, the case explorer with avatars next to every reading, the gate's
+  rule list, the two agent runs, the voice clips. 29 model calls, about 29k output tokens.
+  It touched only `site/index.html` and took every number from `data.json`.
+
+Checked at 1280 px and 375 px, light and dark: no broken images, no horizontal scroll, no
+console errors. Fixed by hand afterwards (three small edits):
+1. the status label "Built this project" for Muse and Muse Code overclaimed; now
+   "Built part of it",
+2. the theme button was `position: fixed` and covered headings while scrolling on a phone;
+   now `absolute`,
+3. in the how-it-works strip the text after each bold title wrapped onto its own line on a
+   phone; the avatar and text are now separate flex items.
+
 ---
 
 ## Open

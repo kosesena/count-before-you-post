@@ -29,6 +29,34 @@ WHAT = {
     "hasarli": "One carton is crushed.",
     "belirsiz": "The cartons are stacked; some cannot be seen.",
 }
+# The cast, each introducing themself. Portraits: assets/mascots/hello/<id>.jpg, drawn with
+# Muse Image (experiments/mascot_design.py hello-<id>). Avatars are the head crop.
+CAST = [
+    ("spark", "Spark", "Muse Spark", "#f97316", "on duty",
+     "Hi, I'm Spark. I read the delivery note into strict JSON, look at the pallet and run "
+     "the receiving agent. I'm quick to post, which is exactly why Kapı is here."),
+    ("sam", "Sam", "SAM 3.1", "#3b82f6", "on duty",
+     "I'm Sam. I find every carton on the dock camera and outline it, pixel by pixel. I also "
+     "say how sure I am: 0.88 and up is sure, below that is doubtful."),
+    ("voice", "Voice", "Muse Voice Transcribe", "#1e3a8a", "on duty",
+     "I'm Voice. I write down what the receiver says at the dock, \u201con iki koli geldi\u201d, "
+     "so the gate gets a third count, and I notice when they aren't sure."),
+    ("kapi", "Kapı", "the gate, plain code", "#a16207", "on duty",
+     "I'm Kapı, Turkish for gate. I'm not a model, I'm nine rules in plain code. Nothing "
+     "written on a note can talk me into posting. No agreement, no receipt."),
+    ("sef", "Şef", "the human supervisor", "#1d4ed8", "on duty",
+     "I'm Şef, the human in the loop. A crushed carton, a stacked load, a number nobody "
+     "can confirm: when Kapı isn't sure, the decision comes to me."),
+    ("muse-code", "Muse Code", "Muse Code CLI", "#0f766e", "done",
+     "I'm Muse Code. I wrote the ERPNext client that turns Kapı's yes into a Purchase "
+     "Receipt, and the tests that check it."),
+    ("muse", "Muse", "Muse Image", "#db2777", "done",
+     "I'm Muse. I drew everyone on this page from Sena's concepts, myself included."),
+    ("glimmer", "Glimmer", "open-weight second reader", "#8b5cf6", "coming",
+     "I'm Glimmer, a second, independent reading of the note on open weights. Not on duty "
+     "yet: I start when the Baseten credits arrive."),
+]
+
 TITLE = {"ok": "Matching delivery", "wrong": "Wrong product", "eksik": "Short delivery",
          "talimat": "Injected note", "hasarli": "Damaged carton", "belirsiz": "Stacked load"}
 
@@ -99,6 +127,17 @@ def main():
                             "seconds": g["seconds"], "steps": agent_steps(g["trace"])},
         })
 
+    cast = []
+    for cid, name, model, colour, status, line in CAST:
+        src = ROOT / "assets" / "mascots" / "hello" / f"{cid}.jpg"
+        im = Image.open(src).convert("RGB")
+        w, h = im.size
+        im.crop((round(w * .26), round(h * .04), round(w * .74), round(h * .52))).resize(
+            (160, 160)).save(SITE / "img" / f"av-{cid}.jpg", quality=85)
+        cast.append({"id": cid, "name": name, "model": model, "colour": colour,
+                     "status": status, "line": line,
+                     "portrait": jpg(src, f"hello-{cid}.jpg", 640), "avatar": f"img/av-{cid}.jpg"})
+
     voice = json.loads((RES / "voice_check.json").read_text())
     clips = []
     for row in voice:
@@ -109,7 +148,7 @@ def main():
                       "transcript": row["transcript"].strip(), "quantity": row["quantity"],
                       "supplier": row["supplier"], "certain": row["certain"], "ok": row["ok"]})
 
-    data = {"rules": list(RULES), "cases": cases, "voice": clips,
+    data = {"rules": list(RULES), "cases": cases, "voice": clips, "characters": cast,
             "cast": jpg(ROOT / "assets" / "mascots" / "cast.jpg", "cast.jpg", 1600),
             "summary": {"cases": len(cases),
                         "wrong_without_gate": sum(c["expected"] != "post" for c in cases),

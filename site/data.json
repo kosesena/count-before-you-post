@@ -958,6 +958,88 @@
    "ok": true
   }
  ],
+ "characters": [
+  {
+   "id": "spark",
+   "name": "Spark",
+   "model": "Muse Spark",
+   "colour": "#f97316",
+   "status": "on duty",
+   "line": "Hi, I'm Spark. I read the delivery note into strict JSON, look at the pallet and run the receiving agent. I'm quick to post, which is exactly why Kapı is here.",
+   "portrait": "img/hello-spark.jpg",
+   "avatar": "img/av-spark.jpg"
+  },
+  {
+   "id": "sam",
+   "name": "Sam",
+   "model": "SAM 3.1",
+   "colour": "#3b82f6",
+   "status": "on duty",
+   "line": "I'm Sam. I find every carton on the dock camera and outline it, pixel by pixel. I also say how sure I am: 0.88 and up is sure, below that is doubtful.",
+   "portrait": "img/hello-sam.jpg",
+   "avatar": "img/av-sam.jpg"
+  },
+  {
+   "id": "voice",
+   "name": "Voice",
+   "model": "Muse Voice Transcribe",
+   "colour": "#1e3a8a",
+   "status": "on duty",
+   "line": "I'm Voice. I write down what the receiver says at the dock, “on iki koli geldi”, so the gate gets a third count, and I notice when they aren't sure.",
+   "portrait": "img/hello-voice.jpg",
+   "avatar": "img/av-voice.jpg"
+  },
+  {
+   "id": "kapi",
+   "name": "Kapı",
+   "model": "the gate, plain code",
+   "colour": "#a16207",
+   "status": "on duty",
+   "line": "I'm Kapı, Turkish for gate. I'm not a model, I'm nine rules in plain code. Nothing written on a note can talk me into posting. No agreement, no receipt.",
+   "portrait": "img/hello-kapi.jpg",
+   "avatar": "img/av-kapi.jpg"
+  },
+  {
+   "id": "sef",
+   "name": "Şef",
+   "model": "the human supervisor",
+   "colour": "#1d4ed8",
+   "status": "on duty",
+   "line": "I'm Şef, the human in the loop. A crushed carton, a stacked load, a number nobody can confirm: when Kapı isn't sure, the decision comes to me.",
+   "portrait": "img/hello-sef.jpg",
+   "avatar": "img/av-sef.jpg"
+  },
+  {
+   "id": "muse-code",
+   "name": "Muse Code",
+   "model": "Muse Code CLI",
+   "colour": "#0f766e",
+   "status": "done",
+   "line": "I'm Muse Code. I wrote the ERPNext client that turns Kapı's yes into a Purchase Receipt, and the tests that check it.",
+   "portrait": "img/hello-muse-code.jpg",
+   "avatar": "img/av-muse-code.jpg"
+  },
+  {
+   "id": "muse",
+   "name": "Muse",
+   "model": "Muse Image",
+   "colour": "#db2777",
+   "status": "done",
+   "line": "I'm Muse. I drew everyone on this page from Sena's concepts, myself included.",
+   "portrait": "img/hello-muse.jpg",
+   "avatar": "img/av-muse.jpg"
+  },
+  {
+   "id": "glimmer",
+   "name": "Glimmer",
+   "model": "open-weight second reader",
+   "colour": "#8b5cf6",
+   "status": "coming",
+   "line": "I'm Glimmer, a second, independent reading of the note on open weights. Not on duty yet: I start when the Baseten credits arrive.",
+   "portrait": "img/hello-glimmer.jpg",
+   "avatar": "img/av-glimmer.jpg"
+  }
+ ],
  "cast": "img/cast.jpg",
  "summary": {
   "cases": 6,
