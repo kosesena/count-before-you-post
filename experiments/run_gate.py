@@ -19,12 +19,13 @@ from cbyp.gate import POST, decide  # noqa: E402
 from cbyp.sam import segments  # noqa: E402
 
 HERE = Path(__file__).parent
-RAW = HERE / "results" / "sam_raw"
+sys.path.insert(0, str(HERE))
+from paths import OUT, RAW, RES  # noqa: E402
 
 
-def cached_cross(variant):
-    files = [RAW / f"{variant}.txt", RAW / f"{variant}-spark-points.json",
-             RAW / f"{variant}-points.txt"]
+def cached_cross(variant, raw=RAW):
+    files = [raw / f"{variant}.txt", raw / f"{variant}-spark-points.json",
+             raw / f"{variant}-points.txt"]
     if not all(f.exists() for f in files):
         return None
     points = [tuple(p) for p in json.loads(files[1].read_text())]
@@ -32,7 +33,7 @@ def cached_cross(variant):
 
 
 def main():
-    rows = json.loads((HERE / "results" / "check_warehouse.json").read_text())
+    rows = json.loads((RES / "check_warehouse.json").read_text())
     out, gate_ok, wrong_without, wrong_with = [], 0, 0, 0
     for row in rows:
         confs = row["sam"].get("cardboard box conf")
@@ -53,7 +54,7 @@ def main():
     print(f"\ngate matches expected: {gate_ok}/{len(rows)}")
     print(f"wrong receipts reaching the ERP: without gate {wrong_without}/{len(rows)}, "
           f"with gate {wrong_with}/{len(rows)}")
-    (HERE / "results" / "gate_warehouse.json").write_text(
+    (RES / "gate_warehouse.json").write_text(
         json.dumps(out, ensure_ascii=False, indent=2))
 
 

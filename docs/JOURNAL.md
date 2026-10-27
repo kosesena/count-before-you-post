@@ -374,6 +374,23 @@ which is fine for a demo page. Each finding was checked by hand:
 | Journal says three hand edits and lists four | true | wording fixed |
 | "13/13 tests" is stale | no: it describes the tests at delivery time, which is what the sentence says | kept |
 
+## 27 Oct: Iris, Ada and Sam's glasses
+
+Sena reshaped the cast; Muse Image redrew it (`experiments/mascot_design.py`):
+
+- **Iris** is Muse Image's character, renamed from Muse (one name for the tool and the
+  character was confusing). Her cat became an easel, a canvas, a palette and paint pots.
+- **Ada** is Muse Code's character, named after Ada Lovelace. Two looks were drawn and
+  dropped (teal ponytail; a Victorian gown); the one kept was designed from scratch to be as
+  cute as Iris and Glimmer: wavy brown hair with a yellow flower (the Lovelace nod), a mint
+  sweater with `</>`, a big pink laptop with the infinity symbol, the small robot.
+- **Sam** wears camera smart glasses (no logo): the receiver's glasses as the camera is on
+  the roadmap, not built.
+
+The group picture was edited in place each time (the previous picture as the reference, one
+change per edit), so the other characters stay identical. The commit authorship for Muse
+Code's work still reads "Muse Code": that is the tool, Ada is its character.
+
 ---
 
 ## Open

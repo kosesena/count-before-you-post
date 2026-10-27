@@ -20,8 +20,8 @@ plain code on purpose.
 | **Muse Spark** (`muse-spark-1.3`) | Spark | Reads the delivery note into strict JSON, looks at the pallet, puts a point on every carton, and runs the receiving agent | `cbyp/delivery_note.py`, `cbyp/perception.py`, `cbyp/agent.py` |
 | **SAM 3.1** | Sam | Finds and outlines every carton, with a confidence for each | `cbyp/sam.py`, `cbyp/crosscheck.py` |
 | **Muse Voice Transcribe** | Voice | Writes down the receiver's spoken count (Turkish) | `cbyp/voice.py` |
-| **Muse Image** | Muse | Drew every character in this repository and on the demo page | `experiments/mascots_from_ref.py`, `experiments/mascot_design.py`, `assets/mascots/` |
-| **Muse Code** (CLI) | Muse Code | Wrote the ERPNext client and its tests, and the demo page | `cbyp/erpnext.py`, `tests/test_erpnext.py`, `site/index.html` |
+| **Muse Image** | Iris | Drew every character in this repository and on the demo page | `experiments/mascots_from_ref.py`, `experiments/mascot_design.py`, `assets/mascots/` |
+| **Muse Code** (CLI) | Ada | Wrote the ERPNext client and its tests, and the demo page | `cbyp/erpnext.py`, `tests/test_erpnext.py`, `site/index.html` |
 
 Muse Code's work is committed under its own name, so the commit history shows exactly what it
 wrote: the ERPNext client (committed unchanged, 13/13 tests passing as delivered) and the
@@ -30,11 +30,11 @@ fixes). The tasks it was given are in [`docs/muse-code/`](docs/muse-code/), verb
 
 ## The cast
 
-![Spark, Sam, Glimmer, Voice, Kapı, Şef, Muse and Muse Code](assets/mascots/cast.jpg)
+![Spark, Sam, Glimmer, Voice, Kapı, Şef, Iris and Ada](assets/mascots/cast.jpg)
 
-Spark (Muse Spark) reads the delivery note, looks at the pallet and runs the receiving agent; SAM (SAM 3.1) counts and outlines every carton; Kapı (the gate) decides whether the ERP may be written; the supervisor approves when the gate is unsure. Muse Image drew the cast and Muse Code wrote the ERPNext client. Voice (Muse Voice Transcribe) turns the receiver's spoken count into a third reading. Glimmer (a second, open-weight reading of the note) is planned: see the roadmap.
+Spark (Muse Spark) reads the delivery note, looks at the pallet and runs the receiving agent; SAM (SAM 3.1) counts and outlines every carton; Kapı (the gate) decides whether the ERP may be written; the supervisor approves when the gate is unsure. Iris (Muse Image) drew the cast and Ada (Muse Code) wrote the ERPNext client and the demo page. Voice (Muse Voice Transcribe) turns the receiver's spoken count into a third reading. Glimmer (a second, open-weight reading of the note) is planned: see the roadmap.
 
-*Characters: Sena's concepts, drawn with Muse Image (`experiments/mascots_from_ref.py`). Fan-made, not official Meta mascots. Character sheets: [Spark](assets/mascots/sheets/spark.jpg), [Sam](assets/mascots/sheets/sam.jpg), [Glimmer](assets/mascots/sheets/glimmer.jpg), [Voice](assets/mascots/sheets/voice.jpg), [all four](assets/mascots/sheets/sheets.jpg), [at work](assets/mascots/sheets/states.jpg), [Kapı and the supervisor](assets/mascots/sheets/kapi-sef.jpg), [Muse](assets/mascots/sheets/muse.jpg), [Muse Code](assets/mascots/sheets/muse-code.jpg) (designed by Muse Image itself, `experiments/mascot_design.py`). Each one saying hello: `assets/mascots/hello/`.*
+*Characters: Sena's concepts, drawn with Muse Image (`experiments/mascots_from_ref.py`). Fan-made, not official Meta mascots. Character sheets: [Spark](assets/mascots/sheets/spark.jpg), [Sam](assets/mascots/sheets/sam.jpg), [Glimmer](assets/mascots/sheets/glimmer.jpg), [Voice](assets/mascots/sheets/voice.jpg), [all four](assets/mascots/sheets/sheets.jpg), [at work](assets/mascots/sheets/states.jpg), [Kapı and the supervisor](assets/mascots/sheets/kapi-sef.jpg), [Iris](assets/mascots/sheets/muse.jpg) (drawn when she was still called Muse, with a cat), [Ada](assets/mascots/sheets/muse-code.jpg) (before she became Ada; designed by Muse Image itself, `experiments/mascot_design.py`). Each one saying hello: `assets/mascots/hello/`.*
 
 ## How the gate decides
 
@@ -158,6 +158,9 @@ Found by checking every documented Spark and SAM 3.1 feature against this code
 - ~~Cross-check inside the gate~~: done, the carton-by-carton check is a gate rule.
 - ~~Spark's reasoning summary in the agent trace~~: done, shown on the demo page.
 - Real photos and real handwriting, and scenes the rules have not seen.
+- **The receiver's glasses as the camera**: smart glasses with a camera instead of the ceiling
+  camera, hands-free at the dock. Not built or tested yet; Sam wears them in the cast as a
+  reminder.
 
 ## Repository map
 

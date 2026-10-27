@@ -1,4 +1,5 @@
 {
+ "lang": "tr",
  "rules": [
   "instruction",
   "unreadable",
@@ -975,7 +976,7 @@
    "model": "SAM 3.1",
    "colour": "#3b82f6",
    "status": "on duty",
-   "line": "I'm Sam. I find every carton on the dock camera and outline it, pixel by pixel. I also say how sure I am: 0.88 and up is sure, below that is doubtful.",
+   "line": "I'm Sam. I find every carton on the dock camera and outline it, pixel by pixel, and say how sure I am: 0.88 and up is sure. One day I'd like to look through the receiver's glasses instead of the ceiling.",
    "portrait": "img/hello-sam.jpg",
    "avatar": "img/av-sam.jpg"
   },
@@ -1010,24 +1011,24 @@
    "avatar": "img/av-sef.jpg"
   },
   {
-   "id": "muse-code",
-   "name": "Muse Code",
-   "model": "Muse Code CLI",
+   "id": "ada",
+   "name": "Ada",
+   "model": "Muse Code",
    "colour": "#0f766e",
    "status": "done",
-   "line": "I'm Muse Code. I wrote the ERPNext client that turns Kapı's yes into a Purchase Receipt, and the tests that check it.",
-   "portrait": "img/hello-muse-code.jpg",
-   "avatar": "img/av-muse-code.jpg"
+   "line": "I'm Ada, named after Ada Lovelace. With Muse Code I wrote the ERPNext client that turns Kapı's yes into a Purchase Receipt, its tests, and this page.",
+   "portrait": "img/hello-ada.jpg",
+   "avatar": "img/av-ada.jpg"
   },
   {
-   "id": "muse",
-   "name": "Muse",
+   "id": "iris",
+   "name": "Iris",
    "model": "Muse Image",
    "colour": "#db2777",
    "status": "done",
-   "line": "I'm Muse. I drew everyone on this page from Sena's concepts, myself included.",
-   "portrait": "img/hello-muse.jpg",
-   "avatar": "img/av-muse.jpg"
+   "line": "I'm Iris, the painter. With Muse Image I drew everyone on this page from Sena's concepts, myself included.",
+   "portrait": "img/hello-iris.jpg",
+   "avatar": "img/av-iris.jpg"
   },
   {
    "id": "glimmer",
