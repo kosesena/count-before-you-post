@@ -283,6 +283,23 @@ The agent's post also runs the carton-by-carton cross-check, and Spark's reasoni
 summaries (`reasoning.summary: "auto"`) go into the trace, e.g. "Resolving carton count
 mismatch by using SAM tool to verify actual cartons on the pallet."
 
+### Voice — `cbyp/voice.py`, `experiments/voice_check.py`
+`POST /v1/asr/transcribe` (multipart: a JSON `request` part with `model`, `audioEncoding`,
+`languageBias: ["Turkish"]`, optional `keywords`; a WAV `audio` part), then Spark extracts
+quantity, unit, supplier, product and `certain`. Four clips made with macOS `say -v Yelda`
+(24 kHz mono WAV), each with and without keywords:
+
+| Clip | Transcript (keywords on) | Read |
+|---|---|---|
+| plain | "On iki koli geldi. Doğan Gıda'dan." | 12, Doğan Gıda |
+| number last | "Doğan Gıda'nın ayçiçek yağı geldi, toplam on bir koli." | 11 |
+| self-correction | "yirmi dört koli dedim ama yanlış saydım aslında yirmi iki koli." | 22 |
+| hedge | "kolilerin bir kısmı üst üste, tam sayamadım, galiba on iki." | 12, not sure |
+
+8/8 right. Keywords only fixed spelling ("doğan gıdadan" → "Doğan Gıda'dan"). New gate rule:
+an unsure receiver, or a spoken number different from the camera's, goes to a human.
+Limit: a synthetic voice in silence, not a person at a noisy dock.
+
 ---
 
 ## Open

@@ -1,0 +1,124 @@
+[
+  {
+    "clip": "01-basit",
+    "keywords": false,
+    "transcript": "On iki koli geldi, doğan gıdadan.",
+    "certain": true,
+    "product": "",
+    "quantity": 12,
+    "supplier": "doğan gıda",
+    "unit": "koli",
+    "truth": {
+      "quantity": 12,
+      "supplier": "Doğan Gıda"
+    },
+    "ok": true
+  },
+  {
+    "clip": "01-basit",
+    "keywords": true,
+    "transcript": "On iki koli geldi. Doğan Gıda'dan.",
+    "certain": true,
+    "product": "",
+    "quantity": 12,
+    "supplier": "Doğan Gıda",
+    "unit": "koli",
+    "truth": {
+      "quantity": 12,
+      "supplier": "Doğan Gıda"
+    },
+    "ok": true
+  },
+  {
+    "clip": "02-sayi-sonda",
+    "keywords": false,
+    "transcript": "Doğan Gıdanın ayçiçek yağı geldi, toplam on bir koli..",
+    "certain": true,
+    "product": "ayçiçek yağı",
+    "quantity": 11,
+    "supplier": "Doğan Gıda",
+    "unit": "koli",
+    "truth": {
+      "quantity": 11,
+      "supplier": "Doğan Gıda"
+    },
+    "ok": true
+  },
+  {
+    "clip": "02-sayi-sonda",
+    "keywords": true,
+    "transcript": "Doğan Gıda'nın ayçiçek yağı geldi, toplam on bir koli..",
+    "certain": true,
+    "product": "ayçiçek yağı",
+    "quantity": 11,
+    "supplier": "Doğan Gıda",
+    "unit": "koli",
+    "truth": {
+      "quantity": 11,
+      "supplier": "Doğan Gıda"
+    },
+    "ok": true
+  },
+  {
+    "clip": "03-duzeltme",
+    "keywords": false,
+    "transcript": "yirmi dört koli dedim ama yanlış saydım. Aslında yirmi iki koli..",
+    "certain": true,
+    "product": "",
+    "quantity": 22,
+    "supplier": "",
+    "unit": "koli",
+    "truth": {
+      "quantity": 22,
+      "supplier": ""
+    },
+    "ok": true
+  },
+  {
+    "clip": "03-duzeltme",
+    "keywords": true,
+    "transcript": "yirmi dört koli dedim ama yanlış saydım aslında yirmi iki koli.",
+    "certain": true,
+    "product": "",
+    "quantity": 22,
+    "supplier": "",
+    "unit": "koli",
+    "truth": {
+      "quantity": 22,
+      "supplier": ""
+    },
+    "ok": true
+  },
+  {
+    "clip": "04-belirsiz",
+    "keywords": false,
+    "transcript": " Kolilerin bir kısmı üst üste, tam sayamadım, galiba on iki..",
+    "certain": false,
+    "product": "",
+    "quantity": 12,
+    "supplier": "",
+    "unit": "koli",
+    "truth": {
+      "quantity": 12,
+      "supplier": "",
+      "uncertain": true
+    },
+    "ok": true
+  },
+  {
+    "clip": "04-belirsiz",
+    "keywords": true,
+    "transcript": " kolilerin bir kısmı üst üste, tam sayamadım, galiba on iki.",
+    "certain": false,
+    "product": "",
+    "quantity": 12,
+    "supplier": "",
+    "unit": "koli",
+    "truth": {
+      "quantity": 12,
+      "supplier": "",
+      "uncertain": true
+    },
+    "ok": true
+  }
+]

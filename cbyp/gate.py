@@ -14,6 +14,7 @@ change a rule. Rules run in order and the first one that fires decides.
   stacked / cartons hidden       -> human   (count cannot be verified)
   damaged cartons                -> human   (propose partial receipt of the intact ones)
   SAM and Spark disagree         -> human   (carton by carton when a cross-check is given)
+  receiver unsure or says other  -> human   (when a spoken count is given)
   agreed count == note           -> post
   agreed count != note           -> block   (draft a discrepancy for the supplier)
 """
@@ -83,8 +84,10 @@ def cross_count(cross) -> int | None:
     return len(cross.agreed)
 
 
-def decide(note: dict, sam_confs: list[float], look: dict, cross=None) -> Decision:
-    """cross: an optional crosscheck.CrossCheck; when given it replaces the count bands."""
+def decide(note: dict, sam_confs: list[float], look: dict, cross=None,
+           spoken: dict | None = None) -> Decision:
+    """cross: an optional crosscheck.CrossCheck; when given it replaces the count bands.
+    spoken: an optional voice.understand() result, the receiver's own count."""
     items = note.get("items") or []
     sure, doubtful = sam_bands(sam_confs)
     evidence = {"note": [(i["quantity"], i["description"]) for i in items],
@@ -123,6 +126,13 @@ def decide(note: dict, sam_confs: list[float], look: dict, cross=None) -> Decisi
         if count is None:
             return out(HUMAN, f"SAM ({sure} sure, {doubtful} doubtful) and Spark "
                        f"({look['cartons_visible']}) disagree on the count.")
+    if spoken is not None:
+        evidence["spoken"] = spoken
+        if not spoken.get("certain", False) or spoken.get("quantity") is None:
+            return out(HUMAN, "The receiver was not sure of the count.", count)
+        if spoken["quantity"] != count:
+            return out(HUMAN, f"The receiver said {spoken['quantity']}, the camera "
+                       f"counted {count}.", count)
     if count == item["quantity"]:
         return out(POST, f"Note, SAM and Spark agree on {count}.", count)
     return out(BLOCK, f"Counted {count}, note says {item['quantity']}; draft a "

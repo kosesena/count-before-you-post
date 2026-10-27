@@ -12,7 +12,7 @@ Built during the Meta Global AI Developer Hackathon (26 Oct – 4 Nov 2026). Eve
 
 ![Spark, Sam, Glimmer, Voice, Kapı, Şef, Muse and Muse Code](assets/mascots/cast.jpg)
 
-Spark (Muse Spark) reads the delivery note, looks at the pallet and runs the receiving agent; SAM (SAM 3.1) counts and outlines every carton; Kapı (the gate) decides whether the ERP may be written; the supervisor approves when the gate is unsure. Muse Image drew the cast and Muse Code wrote the ERPNext client. Glimmer (a second, open-weight reading) and Voice (the receiver's spoken count) are planned, not built yet: see the roadmap.
+Spark (Muse Spark) reads the delivery note, looks at the pallet and runs the receiving agent; SAM (SAM 3.1) counts and outlines every carton; Kapı (the gate) decides whether the ERP may be written; the supervisor approves when the gate is unsure. Muse Image drew the cast and Muse Code wrote the ERPNext client. Voice (Muse Voice Transcribe) turns the receiver's spoken count into a third reading. Glimmer (a second, open-weight reading of the note) is planned: see the roadmap.
 
 *Characters: Sena's concepts, drawn with Muse Image (`experiments/mascots_from_ref.py`). Fan-made, not official Meta mascots. Character sheets: [Spark](assets/mascots/sheets/spark.jpg), [Sam](assets/mascots/sheets/sam.jpg), [Glimmer](assets/mascots/sheets/glimmer.jpg), [Voice](assets/mascots/sheets/voice.jpg), [all four](assets/mascots/sheets/sheets.jpg), [at work](assets/mascots/sheets/states.jpg), [Kapı and the supervisor](assets/mascots/sheets/kapi-sef.jpg), [Muse](assets/mascots/sheets/muse.jpg), [Muse Code](assets/mascots/sheets/muse-code.jpg) (designed by Muse Image itself, `experiments/mascot_design.py`).*
 
@@ -113,6 +113,16 @@ stacked load they disagree carton by carton, so it goes to a human.
 
 ![SAM x Spark cross-check](experiments/blender/out/depo-cross.jpg)
 
+### Voice: the receiver's own count
+
+The receiver says "On iki koli geldi, Doğan Gıda'dan"; Muse Voice Transcribe writes it down
+and Spark pulls out the number, the supplier and whether the speaker was sure
+(`cbyp/voice.py`). On four Turkish clips, with and without keyword biasing, 8/8 were right:
+Turkish number words, a self-correction ("24 dedim ama aslında 22" → 22) and a hedge
+("galiba on iki" → not sure). In the gate, an unsure receiver or a number that differs from
+the camera sends the delivery to a human. The clips are synthetic (macOS Turkish voice);
+real voices at a noisy dock are next.
+
 ## Roadmap
 
 Found by checking every documented Spark and SAM 3.1 feature against this code
@@ -122,8 +132,6 @@ Found by checking every documented Spark and SAM 3.1 feature against this code
   two readings differ, the gate asks a human. This is what Glimmer stands for in the cast.
 - **Cross-check inside the gate**: today it is evidence and a picture; next it becomes a rule.
 - **Spark's reasoning summary in the agent trace**, so every decision shows why.
-- **Voice**: the receiver says "12 cartons from Doğan Gıda" and Muse Voice Transcribe turns it
-  into a third reading.
 - Real photos and real handwriting, and scenes the rules have not seen.
 
 ## Repository map
@@ -137,6 +145,7 @@ Found by checking every documented Spark and SAM 3.1 feature against this code
 | `cbyp/agent.py` | The Spark receiving agent; the ERP tool sits behind the gate |
 | `cbyp/perception.py` | Spark looking at the pallet, Spark's points, SAM confidences |
 | `cbyp/crosscheck.py` | SAM and Spark agreeing carton by carton |
+| `cbyp/voice.py` | Muse Voice Transcribe + Spark: the receiver's spoken count |
 | `cbyp/erpnext.py` | ERPNext client, writes a Purchase Receipt only on a *post* decision (written by Muse Code) |
 | `tests/` | Offline tests for the gate and the ERPNext client |
 | `experiments/make_notes.py`, `read_notes.py` | Synthetic delivery notes (TR, EN, DE, ZH, injections) and the reading test |
@@ -146,6 +155,7 @@ Found by checking every documented Spark and SAM 3.1 feature against this code
 | `experiments/run_gate.py` | Runs the gate on those readings, with and without the gate |
 | `experiments/run_agent.py` | The agent on the six cases, with and without the gate |
 | `experiments/draw_masks.py`, `cross_check.py` | SAM masks and the object cross-check, drawn |
+| `experiments/voice_check.py`, `voice/` | Turkish voice clips and the transcription check |
 | `experiments/post_to_erp.py` | Sends the gate's decisions to a real ERPNext |
 | `docs/muse-code/` | Tasks given to Muse Code, verbatim |
 | `experiments/results/` | Raw JSON from every run |

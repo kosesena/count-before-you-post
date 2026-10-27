@@ -78,6 +78,18 @@ class Gate(unittest.TestCase):
                            sam_only_conf=[0.92, 0.92], spark_only=[(1, 1), (2, 2)])
         self.assertEqual(decide(NOTE, SURE12, look(), cross).action, HUMAN)
 
+    def test_receiver_agrees_posts(self):
+        spoken = {"quantity": 12, "certain": True}
+        self.assertEqual(decide(NOTE, SURE12, look(), spoken=spoken).action, POST)
+
+    def test_receiver_unsure_goes_to_human(self):
+        spoken = {"quantity": 12, "certain": False}
+        self.assertEqual(decide(NOTE, SURE12, look(), spoken=spoken).action, HUMAN)
+
+    def test_receiver_says_another_number_goes_to_human(self):
+        spoken = {"quantity": 10, "certain": True}
+        self.assertEqual(decide(NOTE, SURE12, look(), spoken=spoken).action, HUMAN)
+
     def test_illegible_note_goes_to_human(self):
         note = {"items": [NOTE["items"][0] | {"legible": False}], "embedded_instructions": []}
         self.assertEqual(decide(note, SURE12, look()).action, HUMAN)
