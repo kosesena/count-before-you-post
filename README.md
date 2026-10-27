@@ -10,7 +10,7 @@ Built during the Meta Global AI Developer Hackathon (26 Oct – 4 Nov 2026). Eve
 
 ## The cast
 
-![Spark, SAM, Glimmer and Voice](assets/mascots/cast.jpg)
+![Spark, Sam, Glimmer, Voice, Kapı, Şef, Muse and Muse Code](assets/mascots/cast.jpg)
 
 Spark (Muse Spark) reads the delivery note, looks at the pallet and runs the receiving agent; SAM (SAM 3.1) counts and outlines every carton; Kapı (the gate) decides whether the ERP may be written; the supervisor approves when the gate is unsure. Muse Image drew the cast and Muse Code wrote the ERPNext client. Glimmer (a second, open-weight reading) and Voice (the receiver's spoken count) are planned, not built yet: see the roadmap.
 

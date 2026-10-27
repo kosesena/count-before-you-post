@@ -15,8 +15,12 @@ from cbyp.meta import BASE_URL, TIMEOUT, _load_env  # noqa: E402
 
 HERE = Path(__file__).parent
 OUT = HERE / "mascots"
-# Both references were drawn by Muse Image (mascots_from_ref.py).
+# Every reference here was itself drawn by Muse Image.
 STYLE_REFS = [OUT / "ref-cast-1.png", OUT / "ref-muse-1.png"]
+REFS = {
+    "cast-8": [OUT / "ref-cast-1.png", OUT / "ref-kapi-sef-1.png", OUT / "ref-muse-1.png",
+               OUT / "design-muse-code-2.png"],
+}
 
 DESIGNS = {
     "muse-code": (
@@ -30,6 +34,20 @@ DESIGNS = {
         "small toy robot buddy sits next to the laptop. Full body, centred, the label "
         "'Muse Code' in a clean dark sans-serif font under the figure. No company logos."
     ),
+    "cast-8": (
+        "Group shot of the whole cast, all eight characters exactly as they look in the "
+        "reference images, same glossy plastic toy minifigure style and soft studio lighting "
+        "as the first image. Left to right on a long table, each on its own coloured toy-brick "
+        "pedestal with its name and a short tagline printed on the front: "
+        "Spark (orange, 'READS THE NOTE'), Sam (blue, 'COUNTS THE CARTONS'), "
+        "Glimmer (lavender, 'SECOND READING'), Voice (navy, 'HEARS THE RECEIVER'), "
+        "Kapı (brown cardboard body, guard cap, traffic light, barrier pole, 'GUARDS THE ERP'), "
+        "Şef (yellow head, blue hard hat, safety vest, tablet, 'APPROVES'), "
+        "Muse (brown curly hair, cream sweater, pen and tablet, with the cat, 'DRAWS THE CAST'), "
+        "Muse Code (teal hair, glasses, green hoodie, laptop, small robot, 'WRITES THE CODE'). "
+        "Keep the Turkish letters in 'Kapı' and 'Şef' exactly. Wide cinematic composition, "
+        "warm-to-cool gradient background, every name clearly legible."
+    ),
 }
 
 
@@ -38,8 +56,9 @@ def main(name, n=1):
     # form sends them under a key the API rejects.
     _load_env()
     images = [{"image_url": "data:image/png;base64," + base64.b64encode(p.read_bytes()).decode()}
-              for p in STYLE_REFS]
+              for p in REFS.get(name, STYLE_REFS)]
     body = {"model": "muse-image-1.0", "prompt": DESIGNS[name], "images": images, "n": n,
+            "size": "1792x1024",
             "output_format": "png", "response_format": "b64_json"}
     req = urllib.request.Request(
         BASE_URL + "/images/edits", data=json.dumps(body).encode(), method="POST",

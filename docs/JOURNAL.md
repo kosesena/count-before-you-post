@@ -254,6 +254,18 @@ Designed by Muse Image from text, with only Muse-drawn images as style reference
 multipart upload sends several images as `image[]`, which the API rejects (`image[N]`
 expected); the JSON form with an `images` array works.
 
+### The cross-check becomes a gate rule — `gate.decide(..., cross=)`
+With a cross-check the count step changes: every carton must be found by both models; a
+carton only SAM sees is tolerated only if SAM was doubtful about it (the gap, 0.81), and any
+carton only Spark sees, or two Spark points on one carton, sends the delivery to a human.
+On the cached six cases (`experiments/run_gate.py`, no API calls): still 6/6, and the short
+delivery is now explained object by object (11 agreed + the doubtful gap). 34 offline tests.
+
+### The whole cast in one picture
+Muse Image drew all eight characters together from Muse-drawn references, with each
+pedestal naming the character's real job ("READS THE NOTE", "GUARDS THE ERP"...). Of two
+drafts one merged Voice into Kapı (seven characters); the other is in the README.
+
 ---
 
 ## Open
