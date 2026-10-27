@@ -1,6 +1,7 @@
 """Run the perception side of the gate on every rendered warehouse variant.
 
-Usage: .venv/bin/python experiments/check_warehouse.py [variant ...]
+Usage: .venv/bin/python experiments/check_warehouse.py [--sam-only] [variant ...]
+--sam-only refreshes only the SAM fields of an existing results file (no Spark calls).
 Reads experiments/blender/out/depo-<variant>-{kamera,irsaliye}.png and depo-truth.json,
 writes experiments/results/check_warehouse.json.
 
@@ -56,8 +57,18 @@ def look(path):
     return json.loads(r.choices[0].message.content)
 
 
-def sam_count(path, concept):
-    return sum((d.conf or 0) >= MIN_CONF for d in parse(segment_image(path, concept)))
+def sam_confs(path, concept):
+    """Confidences of every detection at or above MIN_CONF, highest first."""
+    confs = [d.conf or 0 for d in parse(segment_image(path, concept))]
+    return sorted((round(c, 3) for c in confs if c >= MIN_CONF), reverse=True)
+
+
+def sam_fields(cam):
+    out = {}
+    for concept in ("cardboard box", "damaged cardboard box"):
+        confs = sam_confs(cam, concept)
+        out[concept], out[concept + " conf"] = len(confs), confs
+    return out
 
 
 def main(variants):
@@ -70,8 +81,7 @@ def main(variants):
             "variant": v, "truth": truth[v],
             "note": {"items": claim["items"], "embedded_instructions":
                      claim["embedded_instructions"]},
-            "sam": {"cardboard box": sam_count(cam, "cardboard box"),
-                    "damaged cardboard box": sam_count(cam, "damaged cardboard box")},
+            "sam": sam_fields(cam),
             "spark": look(cam),
         }
         rows.append(row)
@@ -82,5 +92,19 @@ def main(variants):
         json.dumps(rows, ensure_ascii=False, indent=2))
 
 
+def refresh_sam(variants):
+    path = HERE / "results" / "check_warehouse.json"
+    rows = json.loads(path.read_text())
+    for row in rows:
+        if not variants or row["variant"] in variants:
+            row["sam"] = sam_fields(OUT / f"depo-{row['variant']}-kamera.png")
+            print(row["variant"], row["sam"])
+    path.write_text(json.dumps(rows, ensure_ascii=False, indent=2))
+
+
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    args = sys.argv[1:]
+    if args[:1] == ["--sam-only"]:
+        refresh_sam(args[1:])
+    else:
+        main(args)

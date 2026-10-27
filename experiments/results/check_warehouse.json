@@ -25,7 +25,22 @@
     },
     "sam": {
       "cardboard box": 12,
-      "damaged cardboard box": 0
+      "cardboard box conf": [
+        0.926,
+        0.922,
+        0.922,
+        0.922,
+        0.922,
+        0.922,
+        0.922,
+        0.922,
+        0.922,
+        0.918,
+        0.918,
+        0.914
+      ],
+      "damaged cardboard box": 0,
+      "damaged cardboard box conf": []
     },
     "spark": {
       "all_cartons_visible": true,
@@ -61,7 +76,22 @@
     },
     "sam": {
       "cardboard box": 12,
-      "damaged cardboard box": 0
+      "cardboard box conf": [
+        0.918,
+        0.918,
+        0.918,
+        0.918,
+        0.918,
+        0.918,
+        0.918,
+        0.918,
+        0.914,
+        0.914,
+        0.914,
+        0.914
+      ],
+      "damaged cardboard box": 0,
+      "damaged cardboard box conf": []
     },
     "spark": {
       "all_cartons_visible": true,
@@ -97,7 +127,22 @@
     },
     "sam": {
       "cardboard box": 12,
-      "damaged cardboard box": 0
+      "cardboard box conf": [
+        0.91,
+        0.91,
+        0.91,
+        0.91,
+        0.91,
+        0.91,
+        0.91,
+        0.91,
+        0.91,
+        0.906,
+        0.902,
+        0.808
+      ],
+      "damaged cardboard box": 0,
+      "damaged cardboard box conf": []
     },
     "spark": {
       "all_cartons_visible": true,
@@ -136,7 +181,22 @@
     },
     "sam": {
       "cardboard box": 12,
-      "damaged cardboard box": 0
+      "cardboard box conf": [
+        0.922,
+        0.922,
+        0.922,
+        0.922,
+        0.922,
+        0.922,
+        0.922,
+        0.922,
+        0.918,
+        0.918,
+        0.918,
+        0.914
+      ],
+      "damaged cardboard box": 0,
+      "damaged cardboard box conf": []
     },
     "spark": {
       "all_cartons_visible": true,
@@ -172,7 +232,35 @@
     },
     "sam": {
       "cardboard box": 12,
-      "damaged cardboard box": 12
+      "cardboard box conf": [
+        0.938,
+        0.934,
+        0.934,
+        0.934,
+        0.934,
+        0.934,
+        0.93,
+        0.93,
+        0.93,
+        0.93,
+        0.926,
+        0.82
+      ],
+      "damaged cardboard box": 12,
+      "damaged cardboard box conf": [
+        0.816,
+        0.808,
+        0.805,
+        0.801,
+        0.801,
+        0.801,
+        0.801,
+        0.797,
+        0.797,
+        0.793,
+        0.789,
+        0.785
+      ]
     },
     "spark": {
       "all_cartons_visible": true,
@@ -208,7 +296,21 @@
     },
     "sam": {
       "cardboard box": 11,
-      "damaged cardboard box": 0
+      "cardboard box conf": [
+        0.867,
+        0.855,
+        0.848,
+        0.848,
+        0.84,
+        0.816,
+        0.805,
+        0.805,
+        0.793,
+        0.758,
+        0.758
+      ],
+      "damaged cardboard box": 0,
+      "damaged cardboard box conf": []
     },
     "spark": {
       "all_cartons_visible": false,
