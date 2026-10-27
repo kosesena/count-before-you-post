@@ -6,7 +6,7 @@ AI agents are getting write access to real systems, and they trust the document.
 
 Built during the Meta Global AI Developer Hackathon (26 Oct – 4 Nov 2026). Everything in this repository was written during the event.
 
-**Live demo: [count-before-you-post.vercel.app](https://count-before-you-post.vercel.app)**: the gate's decision on each of the six dock cases, the SAM masks, the carton-by-carton cross-check and the agent's step-by-step trace, with and without the gate. The page replays recorded runs (real Meta API, real ERPNext); it makes no API calls. The page itself was written by Muse Code from [this task](docs/muse-code/demo-site.md), with three small fixes by hand listed in the journal; each character introduces itself there, in portraits drawn with Muse Image.
+**Live demo: [count-before-you-post.vercel.app](https://count-before-you-post.vercel.app)**: the gate's decision on each of the six dock cases, the SAM masks, the carton-by-carton cross-check and the agent's step-by-step trace, with and without the gate. The page replays recorded runs (real Meta API, real ERPNext); it makes no API calls. The page itself was written by Muse Code from [this task](docs/muse-code/demo-site.md), with small edits by hand listed in the journal (including the "Built with Muse" band); each character introduces itself there, in portraits drawn with Muse Image.
 
 > Work in progress.
 

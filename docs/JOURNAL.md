@@ -352,6 +352,9 @@ console errors. Fixed by hand afterwards (three small edits):
    now `absolute`,
 3. in the how-it-works strip the text after each bold title wrapped onto its own line on a
    phone; the avatar and text are now separate flex items.
+4. Sena wanted Muse to be visible at first glance: a "Built with Muse" band under the title,
+   one tile per Meta tool with its character and what it does (Muse Spark, SAM 3.1, Muse
+   Voice, Muse Image, Muse Code). Names only, no Meta logo, so it doesn't read as official.
 
 ---
 
