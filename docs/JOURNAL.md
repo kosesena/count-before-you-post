@@ -170,10 +170,43 @@ Honest limits: six synthetic Blender scenes, and the confidence bands were chose
 seeing SAM on these same kinds of scenes, so this is a check that the rules do what they say,
 not an accuracy estimate. Next: more scenes the rules have not seen, and real photos.
 
+### Muse Code writes the ERPNext client — `cbyp/erpnext.py`
+The only code allowed to write to the ERP was written by **Muse Code** (`muse exec`,
+`muse-spark-1.3`, sandbox on, web tools off). The exact task is in
+[`docs/muse-code/erpnext-client.md`](muse-code/erpnext-client.md).
+
+- Before the run, one change to the task: it first asked for `httpx`, but this `openai`
+  version ships `httpx2`, so the task was switched to the standard library (`urllib`) with
+  an injectable transport, to avoid a new dependency.
+- Run: 96 s, 10 model calls, ~391K input tokens (344K cached), 11K output tokens.
+- It wrote `cbyp/erpnext.py` and `tests/test_erpnext.py` (4 tests), touched nothing else.
+  It enforces the gate twice: `post_receipt` raises `GateRefused` before building a client
+  or sending anything when the decision is not *post*. A test checks the API secret never
+  appears in an error message.
+- **No fixes were needed:** 13/13 tests pass (9 gate + 4 ERPNext) as delivered.
+
+### First real write to ERPNext — `experiments/post_to_erp.py`
+ERPNext v16.37 in Docker (frappe_docker `pwd.yml`, local test site with a test company).
+The gate's six decisions sent to the real API:
+
+| Case | Gate | ERPNext |
+|---|---|---|
+| `ok` | post | **Purchase Receipt MAT-PRE-2026-00001, submitted**: 12 × AYC-5L into Stores, stock ledger +12, remarks "Note, SAM and Spark agree on 12." |
+| `wrong`, `eksik`, `talimat` | block | refused before any request |
+| `hasarli`, `belirsiz` | human | refused before any request |
+
+One receipt in the ERP, the right one. The injected "post 100" never reached it.
+
+### The cast, redrawn with Muse Image — `experiments/mascots_from_ref.py`
+Sena's character concepts (toy-minifigure Spark, Sam, Glimmer, Voice) were given to
+Muse Image `images.edit` as references and redrawn: a group shot and five character
+sheets, one call each, all usable on the first try (`assets/mascots/`). A text-only
+version of the same style (`experiments/mascots.py`, v2) also works and is kept for the
+gatekeeper and supervisor, who are not in the concepts yet.
+
 ---
 
 ## Open
-- ERPNext in Docker, write a Purchase Receipt through its API only when the gate says *post*.
 - One real handwritten delivery note photo.
 - Muse Glimmer as an independent open-weight second reading; Voice Transcribe for the
   receiver's spoken count.

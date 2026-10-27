@@ -10,11 +10,11 @@ Built during the Meta Global AI Developer Hackathon (26 Oct – 4 Nov 2026). Eve
 
 ## The cast
 
-![Spark, SAM, Kapı, Glimmer, Voice and the supervisor](assets/mascots/cast.jpg)
+![Spark, SAM, Glimmer and Voice](assets/mascots/cast.jpg)
 
 Spark (Muse Spark) reads the delivery note, SAM (SAM 3.1) counts what arrived, Kapı (the gate) compares them and decides whether the ERP may be written, Glimmer (Muse Glimmer) gives an independent second reading, Voice (Muse Voice Transcribe) listens to the receiver, and the supervisor approves when the gate is unsure.
 
-*The characters are fan-made for this project with Muse Image. They are not official Meta mascots.*
+*Characters: Sena's concepts, drawn with Muse Image (`experiments/mascots_from_ref.py`). Fan-made, not official Meta mascots. Character sheets: [Sam](assets/mascots/sheets/sam.jpg), [Glimmer](assets/mascots/sheets/glimmer.jpg), [Voice](assets/mascots/sheets/voice.jpg), [all four](assets/mascots/sheets/sheets.jpg), [at work](assets/mascots/sheets/states.jpg).*
 
 ## How the gate decides
 
@@ -66,7 +66,12 @@ carton, a crushed carton, a stacked load, the delivery note close-up and the who
 
 Honest limits: six synthetic Blender scenes, and the confidence bands were chosen after
 seeing SAM on these same kinds of scenes, so this is a check that the rules do what they say,
-not an accuracy estimate. Next: more scenes the rules have not seen, and real photos.
+not an accuracy estimate.
+
+Sent to a real ERPNext (v16, Docker), the six decisions produced exactly one submitted
+Purchase Receipt (12 cartons, the `ok` case); the five others were refused before any
+request. The ERPNext client itself was written by **Muse Code** from
+[this task](docs/muse-code/erpnext-client.md) and passed its tests without changes. Next: more scenes the rules have not seen, and real photos.
 
 Every experiment, with its numbers and its failures, is in **[docs/JOURNAL.md](docs/JOURNAL.md)**.
 
@@ -78,12 +83,15 @@ Every experiment, with its numbers and its failures, is in **[docs/JOURNAL.md](d
 | `cbyp/delivery_note.py` | Muse Spark delivery-note reader, strict JSON schema |
 | `cbyp/sam.py` | SAM 3.1 image and video calls, output parser |
 | `cbyp/gate.py` | The gate rules |
-| `tests/test_gate.py` | Offline tests for the gate |
+| `cbyp/erpnext.py` | ERPNext client, writes a Purchase Receipt only on a *post* decision (written by Muse Code) |
+| `tests/` | Offline tests for the gate and the ERPNext client |
 | `experiments/make_notes.py`, `read_notes.py` | Synthetic delivery notes (TR, EN, DE, ZH, injections) and the reading test |
 | `experiments/count_images.py`, `count_video.py` | SAM counting on stills and video (line crossing) |
 | `experiments/blender/` | Headless Blender scenes: conveyor belts and the six-case receiving dock |
 | `experiments/check_warehouse.py` | Runs Spark and SAM on the six dock cases |
 | `experiments/run_gate.py` | Runs the gate on those readings, with and without the gate |
+| `experiments/post_to_erp.py` | Sends the gate's decisions to a real ERPNext |
+| `docs/muse-code/` | Tasks given to Muse Code, verbatim |
 | `experiments/results/` | Raw JSON from every run |
 | `assets/mascots/` | The cast, drawn with Muse Image |
 
@@ -101,6 +109,7 @@ cp .env.example .env   # add your META_API_KEY
 .venv/bin/python -m unittest discover tests            # gate rules, offline
 .venv/bin/python experiments/check_warehouse.py         # Spark + SAM on the six dock cases
 .venv/bin/python experiments/run_gate.py                # the gate on those readings
+.venv/bin/python experiments/post_to_erp.py             # decisions to ERPNext (needs ERPNEXT_* in .env)
 ```
 
 The Blender scenes render headless (`blender -b --factory-startup -P experiments/blender/warehouse.py`);
