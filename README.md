@@ -10,6 +10,24 @@ Built during the Meta Global AI Developer Hackathon (26 Oct – 4 Nov 2026). Eve
 
 > Work in progress.
 
+## Built with Muse
+
+Every step that needs AI runs on Meta's models through the Meta Model API. The gate itself is
+plain code on purpose.
+
+| Meta tool | Character | What it does here | Where |
+|---|---|---|---|
+| **Muse Spark** (`muse-spark-1.3`) | Spark | Reads the delivery note into strict JSON, looks at the pallet, puts a point on every carton, and runs the receiving agent | `cbyp/delivery_note.py`, `cbyp/perception.py`, `cbyp/agent.py` |
+| **SAM 3.1** | Sam | Finds and outlines every carton, with a confidence for each | `cbyp/sam.py`, `cbyp/crosscheck.py` |
+| **Muse Voice Transcribe** | Voice | Writes down the receiver's spoken count (Turkish) | `cbyp/voice.py` |
+| **Muse Image** | Muse | Drew every character in this repository and on the demo page | `experiments/mascots_from_ref.py`, `experiments/mascot_design.py`, `assets/mascots/` |
+| **Muse Code** (CLI) | Muse Code | Wrote the ERPNext client and its tests, and the demo page | `cbyp/erpnext.py`, `tests/test_erpnext.py`, `site/index.html` |
+
+Muse Code's work is committed under its own name, so the commit history shows exactly what it
+wrote: the ERPNext client (committed unchanged, 13/13 tests passing as delivered) and the
+demo page (committed as delivered, followed by a separate commit with three small hand
+fixes). The tasks it was given are in [`docs/muse-code/`](docs/muse-code/), verbatim.
+
 ## The cast
 
 ![Spark, Sam, Glimmer, Voice, Kapı, Şef, Muse and Muse Code](assets/mascots/cast.jpg)
