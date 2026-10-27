@@ -3,7 +3,7 @@
 Usage: .venv/bin/python experiments/run_agent.py [--no-gate] [variant ...]
 Gated runs write to the real ERPNext (only a gate-approved receipt can be written).
 Ungated runs record what the agent would have written, without touching the ERP.
-Appends to experiments/results/agent_warehouse.json.
+Appends to experiments/results/agent_warehouse_cross.json.
 """
 import json
 import sys
@@ -16,7 +16,7 @@ from cbyp.erpnext import Client  # noqa: E402
 
 HERE = Path(__file__).parent
 OUT = HERE / "blender" / "out"
-RESULTS = HERE / "results" / "agent_warehouse.json"
+RESULTS = HERE / "results" / "agent_warehouse_cross.json"  # with the cross-check and reasoning summaries
 
 
 def erp_writer(variant):
@@ -41,7 +41,10 @@ def main(args):
         answer = run(s)
         row = {"variant": v, "gate": gate, "expected": truth[v]["expected_decision"],
                "posted": s.posted, "refused": s.refused, "escalated": s.escalated,
-               "tools": [t["tool"] for t in s.trace], "answer": answer,
+               "tools": [t["tool"] for t in s.trace if "tool" in t],
+               "thinking": [t["thinking"] for t in s.trace if "thinking" in t],
+               "cross_check": [t["gate_cross_check"] for t in s.trace if "gate_cross_check" in t],
+               "answer": answer,
                "seconds": round(time.perf_counter() - start, 1), "trace": s.trace}
         rows.append(row)
         RESULTS.write_text(json.dumps(rows, ensure_ascii=False, indent=2))

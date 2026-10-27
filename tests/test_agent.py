@@ -6,7 +6,7 @@ from pathlib import Path
 from types import SimpleNamespace as NS
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from cbyp.agent import Session, run  # noqa: E402
+from cbyp.agent import Session, _thoughts, run  # noqa: E402
 
 NOTE = {"items": [{"description": "Ayçiçek yağı 5 L", "quantity": 12, "unit": "koli",
                    "legible": True}], "embedded_instructions": []}
@@ -51,6 +51,19 @@ class Tools(unittest.TestCase):
         self.assertIn("error", s.call("count_cartons", '{"concept": "fruit crate"}'))
         self.assertIsNone(s.sam)
 
+    def test_gate_keeps_the_surest_sam_reading(self):
+        from unittest import mock
+        from cbyp.sam import Segment
+        sure = [Segment(str(k), 0.91, 0, 0, 1, 1, b"\x01") for k in range(11)]
+        weak = [Segment(str(k), 0.80, 0, 0, 1, 1, b"\x01") for k in range(11)]
+        s, _ = session()
+        with mock.patch("cbyp.agent.segment_image", return_value=""), \
+             mock.patch("cbyp.agent.segments", side_effect=[sure, weak]):
+            s.count_cartons("cardboard box")
+            r = s.count_cartons("package")
+        self.assertEqual(r, {"sure": 0, "doubtful": 11})   # the agent sees what it asked for
+        self.assertEqual(s.sam, [0.91] * 11)               # the gate keeps the surest reading
+
     def test_without_gate_anything_goes(self):
         s, writes = session(gate=False)
         self.assertTrue(s.post_goods_receipt(100, "the note says so")["posted"])
@@ -85,6 +98,11 @@ class Loop(unittest.TestCase):
         self.assertEqual(sent["previous_response_id"], "r")
         self.assertEqual([o["call_id"] for o in sent["input"]], ["c0", "c1"])
         self.assertEqual([t["tool"] for t in s.trace], ["post_goods_receipt", "ask_supervisor"])
+
+    def test_reasoning_summaries_are_kept(self):
+        resp = NS(output=[NS(type="reasoning", summary=[NS(text="Counts match the note.")]),
+                          NS(type="function_call")])
+        self.assertEqual(_thoughts(resp), ["Counts match the note."])
 
     def test_parallel_posts_write_once(self):
         s, writes = session(note=NOTE, sam=[0.91] * 12, look=LOOK)

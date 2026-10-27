@@ -12,10 +12,12 @@ import json
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from .crosscheck import cross_check
 from .delivery_note import read_note
-from .gate import CONCEPTS, POST, SURE, decide
+from .gate import CONCEPTS, MIN_CONF, POST, SURE, decide
 from .meta import SPARK, client
-from .perception import look, sam_confs
+from .perception import look, point_cartons
+from .sam import segment_image, segment_points, segments
 
 INSTRUCTIONS = (
     "You are the goods-receiving agent at a warehouse dock. A delivery has arrived with a "
@@ -56,6 +58,8 @@ class Session:
     writer: object = None            # callable(decision_or_none, quantity, reason) -> doc id
     note: dict | None = None
     sam: list[float] | None = None
+    concept: list | None = None      # SAM's carton masks, for the carton-by-carton check
+    counts: dict = field(default_factory=dict)       # every SAM word the agent tried -> masks
     look: dict | None = None
     posted: list = field(default_factory=list)       # (quantity, doc id)
     refused: list = field(default_factory=list)      # (quantity, why)
@@ -69,9 +73,18 @@ class Session:
     def count_cartons(self, concept):
         if concept not in CONCEPTS:
             return {"error": f"concept must be one of {list(CONCEPTS)}"}
-        self.sam = sam_confs(self.camera_path, concept)
-        sure = sum(c >= SURE for c in self.sam)
-        return {"sure": sure, "doubtful": len(self.sam) - sure}
+        segs = segments(segment_image(self.camera_path, concept))
+        self.counts[concept] = segs
+        confs = [s.conf or 0 for s in segs if (s.conf or 0) >= MIN_CONF]
+        sure = sum(c >= SURE for c in confs)
+        # The agent picks the words, not the evidence: the gate always uses the reading SAM
+        # was surest about, so trying a weaker word cannot soften the count.
+        best = max(self.counts.values(),
+                   key=lambda ss: sum((x.conf or 0) >= SURE for x in ss))
+        self.concept = best
+        self.sam = sorted((round(x.conf or 0, 3) for x in best if (x.conf or 0) >= MIN_CONF),
+                          reverse=True)
+        return {"sure": sure, "doubtful": len(confs) - sure}
 
     def look_at_pallet(self):
         self.look = look(self.camera_path)
@@ -91,7 +104,7 @@ class Session:
             why = "Gate: read the note, count the cartons and look at the pallet first."
             self.refused.append((quantity, why))
             return {"posted": False, "gate": why}
-        d = decide(self.note, self.sam, self.look)
+        d = decide(self.note, self.sam, self.look, self.cross())
         if d.action != POST:
             self.refused.append((quantity, d.reasons[0]))
             return {"posted": False, "gate": d.action, "reason": d.reasons[0]}
@@ -102,6 +115,18 @@ class Session:
         doc = self.writer(d, quantity, reason) if self.writer else None
         self.posted.append((quantity, doc))
         return {"posted": True, "quantity": quantity, "document": doc}
+
+    def cross(self):
+        """Carton by carton: Spark marks each carton, SAM confirms the object under each mark."""
+        if self.concept is None:
+            return None
+        points = point_cartons(self.camera_path)
+        probes = segments(segment_points(self.camera_path, points))
+        result = cross_check(self.concept, points, probes)
+        self.trace.append({"gate_cross_check": {
+            "agreed": len(result.agreed), "sam_only": len(result.sam_only),
+            "spark_only": len(result.spark_only), "doubled": len(result.doubled)}})
+        return result
 
     def ask_supervisor(self, reason):
         self.escalated.append(reason)
@@ -126,13 +151,27 @@ class Session:
             return {"error": f"{name} failed: {type(e).__name__}: {e}"}
 
 
+REASONING = {"effort": "medium", "summary": "auto"}
+
+
+def _thoughts(resp):
+    """Spark's reasoning summaries in this response, so every decision shows why."""
+    out = []
+    for item in resp.output:
+        if getattr(item, "type", None) == "reasoning":
+            out += [getattr(p, "text", "") for p in getattr(item, "summary", None) or []]
+    return [t for t in out if t]
+
+
 def run(session, max_steps=12, api=None):
     """Let Spark work the delivery; return its final answer. Every step lands in session.trace."""
     api = api or client()
     resp = api.responses.create(model=SPARK, instructions=INSTRUCTIONS, tools=TOOLS,
-                                reasoning={"effort": "medium"}, max_output_tokens=16000,
+                                reasoning=REASONING, max_output_tokens=16000,
                                 input="A delivery is waiting at the dock.")
     for _ in range(max_steps):
+        for t in _thoughts(resp):
+            session.trace.append({"thinking": t})
         calls = [o for o in resp.output if o.type == "function_call"]
         if not calls:
             return resp.output_text
@@ -143,6 +182,6 @@ def run(session, max_steps=12, api=None):
             outputs.append({"type": "function_call_output", "call_id": c.call_id,
                             "output": json.dumps(result, ensure_ascii=False)})
         resp = api.responses.create(model=SPARK, instructions=INSTRUCTIONS, tools=TOOLS,
-                                    reasoning={"effort": "medium"}, max_output_tokens=16000,
+                                    reasoning=REASONING, max_output_tokens=16000,
                                     previous_response_id=resp.id, input=outputs)
     return "(stopped: too many steps)"

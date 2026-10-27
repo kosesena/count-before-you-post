@@ -266,9 +266,27 @@ Muse Image drew all eight characters together from Muse-drawn references, with e
 pedestal naming the character's real job ("READS THE NOTE", "GUARDS THE ERP"...). Of two
 drafts one merged Voice into Kapı (seven characters); the other is in the README.
 
+### The agent can choose SAM's word, but not the gate's evidence
+On the short delivery the agent tried four words on the same pallet:
+
+| Word | Sure | Doubtful |
+|---|---|---|
+| cardboard box | 11 | 1 |
+| carton | 0 | 11 |
+| shipping box | 0 | 0 |
+| package | 0 | 11 |
+
+The gate used whichever count came last, so the agent could swap the gate's evidence for a
+weaker reading just by trying another word. Now every reading is kept and the gate decides
+on the one SAM was surest about; the agent still sees the result of the word it asked for.
+The agent's post also runs the carton-by-carton cross-check, and Spark's reasoning
+summaries (`reasoning.summary: "auto"`) go into the trace, e.g. "Resolving carton count
+mismatch by using SAM tool to verify actual cartons on the pallet."
+
 ---
 
 ## Open
+- Spark Open (open weights) as a second reader: Baseten credits requested on 27 Oct, waiting for the email.
 - One real handwritten delivery note photo.
 - Muse Glimmer as an independent open-weight second reading; Voice Transcribe for the
   receiver's spoken count.
