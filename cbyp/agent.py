@@ -72,6 +72,11 @@ class Session:
     # The supervisor's answer once they have looked: {"approve": bool, "quantity": int | None,
     # "notes": str}. It can turn a "human" decision into a receipt, never a "block".
     signoff: dict | None = None
+    # Second opinions on the note, asked only when the gate is about to post:
+    # second_reader(note_path) -> claim (Spark Open), auditor(note_path, claim) -> audit (Wonder).
+    second_reader: object = None
+    auditor: object = None
+    opinions: dict = field(default_factory=dict)
 
     def read_delivery_note(self):
         self.note = read_note(self.note_path)["claim"]
@@ -111,7 +116,10 @@ class Session:
             why = "Gate: read the note, count the cartons and look at the pallet first."
             self.refused.append((quantity, why))
             return {"posted": False, "gate": why}
-        d = decide(self.note, self.sam, self.look, self.cross())
+        cross = self.cross()
+        d = decide(self.note, self.sam, self.look, cross)
+        if d.action == POST and (self.second_reader or self.auditor):
+            d = decide(self.note, self.sam, self.look, cross, **self._opinions())
         if d.action == HUMAN and self.signoff is not None:
             d = self._signed_off(d, quantity)
             if isinstance(d, dict):
@@ -126,6 +134,15 @@ class Session:
         doc = self.writer(d, quantity, reason) if self.writer else None
         self.posted.append((quantity, doc))
         return {"posted": True, "quantity": quantity, "document": doc}
+
+    def _opinions(self):
+        """Spark Open's reading and Wonder's audit of the note, once per delivery."""
+        if "second" not in self.opinions and self.second_reader:
+            self.opinions["second"] = self.second_reader(self.note_path)
+        if "audit" not in self.opinions and self.auditor:
+            self.opinions["audit"] = self.auditor(self.note_path, self.note)
+        self.trace.append({"second_opinions": self.opinions})
+        return self.opinions
 
     def _signed_off(self, d, quantity):
         """The gate sent this delivery to a person, and the person has answered. Approved:

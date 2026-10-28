@@ -72,6 +72,13 @@ h1 { font-size: clamp(32px, 5.4vw, 52px); line-height: 1.05; letter-spacing: -.0
   border: 1px solid var(--line); box-shadow: var(--shadow);
 }
 .castshot figcaption { color: var(--muted); font-size: 13px; margin-top: 8px; }
+.dockshots { display: grid; grid-template-columns: 2fr 1fr; gap: 12px; margin: 4px 0 18px; }
+.dockshots figure { margin: 0; }
+.dockshots figure:first-child { grid-row: span 2; }
+.dockshots img { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: 14px;
+  border: 1px solid var(--line); }
+.dockshots figcaption { color: var(--muted); font-size: 12.5px; margin-top: 4px; }
+@media (max-width: 640px) { .dockshots { grid-template-columns: 1fr; } .dockshots figure:first-child { grid-row: auto; } }
 .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 0 0 8px; }
 .stat {
   background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
@@ -261,14 +268,15 @@ footer p { margin: 4px 0; }
       Muse Spark reads the delivery note, SAM 3.1 counts what actually arrived, and a gate in plain code
       blocks the goods receipt when the two disagree.</p>
     <section class="muse" aria-label="Built with Muse">
-      <p class="muse-head"><b>Built with Muse</b><span>Meta's models on the Meta Model API do every step that needs AI.</span></p>
+      <p class="muse-head"><b>Built with Muse</b><span>Meta's models, on the Meta Model API and on open weights, do every step that needs AI.</span></p>
       <ul class="muse-tools">
         <li><img src="img/av-spark.jpg" alt=""><span><b>Muse Spark</b><small>reads the note, looks at the pallet, runs the agent</small></span></li>
         <li><img src="img/av-sam.jpg" alt=""><span><b>SAM 3.1</b><small>finds and outlines every carton</small></span></li>
         <li><img src="img/av-voice.jpg" alt=""><span><b>Muse Voice</b><small>writes down the receiver's spoken count</small></span></li>
         <li><img src="img/av-iris.jpg" alt=""><span><b>Muse Image</b><small>drew every character on this page</small></span></li>
         <li><img src="img/av-ada.jpg" alt=""><span><b>Muse Code</b><small>wrote the ERPNext client and this page</small></span></li>
-        <li><img src="img/av-wonder.jpg" alt=""><span><b>Muse Wonder</b><small>writes the dispute, the damage report or the note to Şef</small></span></li>
+        <li><img src="img/av-wonder.jpg" alt=""><span><b>Muse Wonder</b><small>checks Spark's reading against the note; writes the dispute, the damage report or the note to Şef</small></span></li>
+        <li><img src="img/av-spark-open.jpg" alt=""><span><b>Muse Spark Open</b><small>reads the note a second time on open weights before any receipt</small></span></li>
       </ul>
     </section>
     <figure class="castshot">
@@ -292,6 +300,7 @@ footer p { margin: 4px 0; }
       <p class="sub" id="dockSub">Pick a delivery to see what each model read, which gate rule decided, and what the Spark agent did with and without the gate.</p>
       <div class="langrow"><label for="langSel">Language of the delivery</label><select id="langSel"></select></div>
       <p class="langnote">Each language is a separate recorded run, not a translation of the Turkish results.</p>
+      <div class="dockshots" id="dockShots"></div>
       <div class="tabs" role="tablist" id="tabs" aria-label="Deliveries"></div>
       <div id="case"></div>
     </section>
@@ -617,6 +626,9 @@ function loadLang(code) {
 function renderDock(kase) {
   const d = LANG_DATA;
   renderStats(d.summary);
+  $("dockShots").innerHTML = (d.dock || []).map(s =>
+    `<figure><img src="${esc(s.src)}" alt="${esc(s.caption)}" loading="lazy">` +
+    `<figcaption>${esc(s.caption)}</figcaption></figure>`).join("");
   renderTabs();
   renderVoice(d.voice || [], d.voice_source);
   const n = (d.cases || []).length;

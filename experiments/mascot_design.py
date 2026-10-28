@@ -172,6 +172,33 @@ for _name, (_ref, _colour, _who) in HELLO.items():
         f"No text, no letters, no labels, no name plate.")
 # Ada was redesigned from scratch to match the cutest of the cast, not the old Muse Code figure.
 REFS["hello-ada"] = [OUT / "design-hello-iris-1.png", OUT / "design-hello-glimmer-1.png", CAST]
+# Spark Open (open weights, the second reader of the note; 28 Oct): three concepts for Sena to
+# choose from, related to Spark and as cute as Glimmer.
+SPARK_OPEN = {
+    "twin": "Spark Open: Spark's twin, same spiky hair but in a lighter sunny orange with a "
+            "teal streak, an orange hoodie worn wide open over a white T-shirt with a small "
+            "blue infinity symbol, teal sneakers. Waves with one hand and holds up, in the "
+            "other, a small transparent box with glowing gears and circuits visible inside, "
+            "as if showing what is inside a model.",
+    "lock": "Spark Open: a new cast member related to Spark, spiky teal-and-orange hair, a teal "
+            "hoodie with an orange zip and a small blue infinity pin. Waves with one hand and "
+            "holds a big shiny golden padlock that is open, its shackle swung loose, in the "
+            "other; a few tiny sparkles around the open lock.",
+    "traveler": "Spark Open: a new cast member related to Spark, spiky orange hair under a "
+                "teal beanie, an orange puffer vest over a teal hoodie with a small blue "
+                "infinity symbol. Waves with one hand and holds a paper delivery note in the "
+                "other; on the back a small cute backpack shaped like a server rack with tiny "
+                "blinking lights, a little travel tag hanging from it.",
+}
+for _name, _who in SPARK_OPEN.items():
+    REFS[f"hello-spark-open-{_name}"] = [OUT / "design-hello-spark-1.png",
+                                         OUT / "design-hello-glimmer-1.png", CAST]
+    DESIGNS[f"hello-spark-open-{_name}"] = (
+        f"Solo portrait of a new character for the cast in the reference images, in exactly "
+        f"the same glossy plastic toy minifigure style, as cute as the lavender-haired one. "
+        f"{_who} Standing alone, full body, centred, facing the viewer with a warm smile as if "
+        f"introducing themself. Plain soft warm-orange studio background with a gentle "
+        f"gradient. Only this one character. No text, no letters, no labels, no name plate.")
 
 
 def jpeg(path, width=1600):

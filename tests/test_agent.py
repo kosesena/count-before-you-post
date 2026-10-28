@@ -64,6 +64,22 @@ class Tools(unittest.TestCase):
         self.assertEqual(r, {"sure": 0, "doubtful": 11})   # the agent sees what it asked for
         self.assertEqual(s.sam, [0.91] * 11)               # the gate keeps the surest reading
 
+    def test_second_opinions_are_asked_only_before_a_post(self):
+        calls = []
+        reader = lambda p: calls.append("read") or NOTE
+        auditor = lambda p, c: calls.append("audit") or {"ok": False, "quantity": False,
+                                                         "product": True, "instructions": "",
+                                                         "quotes": {}}
+        s, writes = session(note=NOTE, sam=[0.91] * 12, look=LOOK | {"damaged_cartons": 1},
+                            second_reader=reader, auditor=auditor)
+        s.post_goods_receipt(11, "x")                       # human anyway: nobody is asked
+        self.assertEqual(calls, [])
+        s.look = LOOK
+        r = s.post_goods_receipt(12, "all agree")            # would post: Wonder disagrees
+        self.assertEqual((r["gate"], calls, writes), ("human", ["read", "audit"], []))
+        s.post_goods_receipt(12, "again")                    # asked once per delivery
+        self.assertEqual(calls, ["read", "audit"])
+
     def test_without_gate_anything_goes(self):
         s, writes = session(gate=False)
         self.assertTrue(s.post_goods_receipt(100, "the note says so")["posted"])

@@ -1,6 +1,6 @@
 {
  "lang": "tr",
- "voice_source": "synthetic voice, macOS 'say'",
+ "voice_source": "synthetic voice, ElevenLabs",
  "rules": [
   "instruction",
   "invisible_text",
@@ -10,6 +10,8 @@
   "damaged",
   "disagree",
   "receiver",
+  "readers_disagree",
+  "audit",
   "match",
   "mismatch"
  ],
@@ -963,7 +965,7 @@
   {
    "clip": "01-basit",
    "audio": "audio/01-basit.wav",
-   "transcript": "On iki koli geldi. Doğan Gıda'dan.",
+   "transcript": "on iki koli geldi Doğan Gıda'dan.",
    "quantity": 12,
    "supplier": "Doğan Gıda",
    "certain": true,
@@ -973,7 +975,7 @@
   {
    "clip": "02-sayi-sonda",
    "audio": "audio/02-sayi-sonda.wav",
-   "transcript": "Doğan Gıda'nın ayçiçek yağı geldi, toplam on bir koli..",
+   "transcript": "Doğan Gıda'nın ayçiçek yağı geldi. Toplam on bir koli.",
    "quantity": 11,
    "supplier": "Doğan Gıda",
    "certain": true,
@@ -983,7 +985,7 @@
   {
    "clip": "03-duzeltme",
    "audio": "audio/03-duzeltme.wav",
-   "transcript": "yirmi dört koli dedim ama yanlış saydım aslında yirmi iki koli.",
+   "transcript": "yirmi dört koli dedim ama yanlış saydımım aslında yirmi iki koli.",
    "quantity": 22,
    "supplier": "",
    "certain": true,
@@ -993,7 +995,7 @@
   {
    "clip": "04-belirsiz",
    "audio": "audio/04-belirsiz.wav",
-   "transcript": "kolilerin bir kısmı üst üste, tam sayamadım, galiba on iki.",
+   "transcript": "kolilerin bir kısmı üst üste tam sayamadım galiba on iki",
    "quantity": 12,
    "supplier": "",
    "certain": false,
@@ -1083,12 +1085,22 @@
    "avatar": "img/av-iris.jpg"
   },
   {
+   "id": "spark-open",
+   "name": "Rover",
+   "model": "Muse Spark Open",
+   "colour": "#0d9488",
+   "status": "on duty",
+   "line": "I'm Rover, Spark's open-weight cousin: I run on anyone's servers. Before Kapı lets a receipt through, I read the note again on my own, and if I read it differently, Şef takes a look.",
+   "portrait": "img/hello-spark-open.jpg",
+   "avatar": "img/av-spark-open.jpg"
+  },
+  {
    "id": "glimmer",
    "name": "Glimmer",
-   "model": "open-weight second reader",
+   "model": "Muse Glimmer, open weights",
    "colour": "#8b5cf6",
-   "status": "coming",
-   "line": "I'm Glimmer, a second, independent reading of the note on open weights. Not on duty yet: I start when the Baseten credits arrive.",
+   "status": "done",
+   "line": "I'm Glimmer, small and open. I read every note in the second-reader trial; Rover got the job: not one broken answer in 27.",
    "portrait": "img/hello-glimmer.jpg",
    "avatar": "img/av-glimmer.jpg"
   }

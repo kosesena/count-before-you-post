@@ -60,9 +60,13 @@ CAST = [
     ("iris", "Iris", "Muse Image", "#db2777", "done",
      "I'm Iris, the painter. With Muse Image I drew everyone on this page from Sena's "
      "concepts, myself included."),
-    ("glimmer", "Glimmer", "open-weight second reader", "#8b5cf6", "coming",
-     "I'm Glimmer, a second, independent reading of the note on open weights. Not on duty "
-     "yet: I start when the Baseten credits arrive."),
+    ("spark-open", "Rover", "Muse Spark Open", "#0d9488", "on duty",
+     "I'm Rover, Spark's open-weight cousin: I run on anyone's servers. Before Kapı lets a "
+     "receipt through, I read the note again on my own, and if I read it differently, Şef "
+     "takes a look."),
+    ("glimmer", "Glimmer", "Muse Glimmer, open weights", "#8b5cf6", "done",
+     "I'm Glimmer, small and open. I read every note in the second-reader trial; Rover got the "
+     "job: not one broken answer in 27."),
 ]
 
 TITLE = {"ok": "Matching delivery", "wrong": "Wrong product", "eksik": "Short delivery",
@@ -167,7 +171,18 @@ def build(lang):
                       "supplier": row["supplier"], "certain": row["certain"], "ok": row["ok"],
                       "said": row["truth"]["quantity"]})
 
-    data = {"lang": lang,
+    # The dressed-up dock (warehouse.py with CBYP_POLISH=1), in this language's signs.
+    shots = OUT / "polish" if lang == "tr" else OUT.parent / "polish" / lang
+    dock = [{"src": jpg(shots / f"depo-ok-{cam}.png", f"{pre}dock-{cam}.jpg", width),
+             "caption": caption}
+            for cam, width, caption in (
+                ("teslimat", 1400, "The receiving zone: 12 cartons on the pallet, the gate light "
+                                   "green, the trailer open behind the dock door."),
+                ("genel", 900, "The warehouse, with the cast at their posts."),
+                ("disari", 900, "Outside: the truck backed up to the dock."))
+            if (shots / f"depo-ok-{cam}.png").exists()]
+
+    data = {"lang": lang, "dock": dock,
             "voice_source": "synthetic voice, ElevenLabs",
             "rules": list(RULES), "cases": cases, "voice": clips, "characters": cast,
             "cast": jpg(ROOT / "assets" / "mascots" / "cast.jpg", "cast.jpg", 1600),

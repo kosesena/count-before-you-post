@@ -10,6 +10,8 @@
   "damaged",
   "disagree",
   "receiver",
+  "readers_disagree",
+  "audit",
   "match",
   "mismatch"
  ],
@@ -1094,12 +1096,22 @@
    "avatar": "img/av-iris.jpg"
   },
   {
+   "id": "spark-open",
+   "name": "Rover",
+   "model": "Muse Spark Open",
+   "colour": "#0d9488",
+   "status": "on duty",
+   "line": "I'm Rover, Spark's open-weight cousin: I run on anyone's servers. Before Kapı lets a receipt through, I read the note again on my own, and if I read it differently, Şef takes a look.",
+   "portrait": "img/hello-spark-open.jpg",
+   "avatar": "img/av-spark-open.jpg"
+  },
+  {
    "id": "glimmer",
    "name": "Glimmer",
-   "model": "open-weight second reader",
+   "model": "Muse Glimmer, open weights",
    "colour": "#8b5cf6",
-   "status": "coming",
-   "line": "I'm Glimmer, a second, independent reading of the note on open weights. Not on duty yet: I start when the Baseten credits arrive.",
+   "status": "done",
+   "line": "I'm Glimmer, small and open. I read every note in the second-reader trial; Rover got the job: not one broken answer in 27.",
    "portrait": "img/hello-glimmer.jpg",
    "avatar": "img/av-glimmer.jpg"
   }

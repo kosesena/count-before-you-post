@@ -1,0 +1,80 @@
+[
+  {
+    "photo": "IMG_5214.jpg",
+    "truth": 18,
+    "spark": {
+      "all_cartons_visible": false,
+      "cartons_visible": 9,
+      "damaged_cartons": 1,
+      "product_on_labels": "dogus",
+      "stacked": true
+    },
+    "sam": {
+      "cardboard box": {
+        "sure": 0,
+        "doubtful": 1
+      },
+      "flattened cardboard": {
+        "sure": 0,
+        "doubtful": 9
+      }
+    },
+    "gate": [
+      "human",
+      "hidden"
+    ],
+    "reason": "Cartons are stacked or hidden; the count cannot be verified from the camera."
+  },
+  {
+    "photo": "IMG_5215.jpg",
+    "truth": 18,
+    "spark": {
+      "all_cartons_visible": false,
+      "cartons_visible": 0,
+      "damaged_cartons": 0,
+      "product_on_labels": "",
+      "stacked": true
+    },
+    "sam": {
+      "cardboard box": {
+        "sure": 0,
+        "doubtful": 0
+      },
+      "flattened cardboard": {
+        "sure": 0,
+        "doubtful": 0
+      }
+    },
+    "gate": [
+      "human",
+      "hidden"
+    ],
+    "reason": "Cartons are stacked or hidden; the count cannot be verified from the camera."
+  },
+  {
+    "photo": "IMG_5216.jpg",
+    "truth": 18,
+    "spark": {
+      "all_cartons_visible": false,
+      "cartons_visible": 0,
+      "damaged_cartons": 0,
+      "product_on_labels": "",
+      "stacked": true
+    },
+    "sam": {
+      "cardboard box": {
+        "sure": 0,
+        "doubtful": 0
+      },
+      "flattened cardboard": {
+        "sure": 0,
+        "doubtful": 0
+      }
+    },
+    "gate": [
+      "human",
+      "hidden"
+    ],
+    "reason": "Cartons are stacked or hidden; the count cannot be verified from the camera."
+  }
+]
