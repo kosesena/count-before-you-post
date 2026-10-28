@@ -597,7 +597,8 @@ function parseHash() {
   const m = h.match(/^([^/]+)\/(.+)$/);
   if (m && langKnown(m[1])) return { lang: m[1], kase: m[2] };
   if (h && langKnown(h)) return { lang: h, kase: "talimat" };
-  return { lang: BASE_LANG, kase: h || "talimat" };
+  // A bare address opens in English (the judges' language); "#case" links stay in the base language.
+  return { lang: h ? BASE_LANG : (langKnown("en") ? "en" : BASE_LANG), kase: h || "talimat" };
 }
 
 function renderLangSel() {

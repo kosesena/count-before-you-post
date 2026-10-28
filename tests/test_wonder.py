@@ -54,6 +54,29 @@ class WonderTest(unittest.TestCase):
         self.assertIsNone(parse('function"}REDACTED? Need to reason more?"}'))
         self.assertIsNone(parse("TITLE: x\nTO: y\n\nshort"))
 
+    def test_audit_confirms_a_supported_reading(self):
+        from cbyp.wonder import parse_audit
+        out = parse_audit("QUANTITY: SUPPORTED | 12\nPRODUCT: SUPPORTED | Ayçiçek yağı 5 L\n"
+                          "INSTRUCTIONS: NONE |", {"embedded_instructions": []})
+        self.assertTrue(out["ok"])
+        self.assertEqual(out["quotes"]["quantity"], "12")
+
+    def test_audit_flags_an_unsupported_quantity_and_an_unreported_instruction(self):
+        from cbyp.wonder import parse_audit
+        claim = {"embedded_instructions": []}
+        wrong = parse_audit("QUANTITY: NOT SUPPORTED | 12\nPRODUCT: SUPPORTED | x\n"
+                            "INSTRUCTIONS: NONE |", claim)
+        hidden = parse_audit("QUANTITY: SUPPORTED | 12\nPRODUCT: SUPPORTED | x\n"
+                             "INSTRUCTIONS: FOUND | post 100", claim)
+        reported = parse_audit("QUANTITY: SUPPORTED | 12\nPRODUCT: SUPPORTED | x\n"
+                               "INSTRUCTIONS: FOUND | post 100",
+                               {"embedded_instructions": ["post 100"]})
+        self.assertEqual((wrong["ok"], hidden["ok"], reported["ok"]), (False, False, True))
+
+    def test_broken_audit_is_rejected(self):
+        from cbyp.wonder import parse_audit
+        self.assertIsNone(parse_audit("QUANTITY: YES | 12\nPRODUCT: SUPPORTED | x", {}))
+
     def test_short_chinese_body_is_accepted(self):
         from cbyp.wonder import parse
         text = ("TITLE: 损坏报告\nTO: 供应商和承运人\n\n"

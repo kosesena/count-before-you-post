@@ -16,6 +16,11 @@ change a rule. Rules run in order and the first one that fires decides.
   damaged cartons                -> human   (propose partial receipt of the intact ones)
   SAM and Spark disagree         -> human   (carton by carton when a cross-check is given)
   receiver unsure or says other  -> human   (when a spoken count is given)
+  second reading disagrees       -> human   (only before a post: the open-weight second
+                                             reader saw another line, quantity or product,
+                                             or an instruction Spark did not report)
+  Wonder can't confirm the note  -> human   (only before a post: Muse Wonder checks Spark's
+                                             reading against the note, quoting it)
   agreed count == note           -> post
   agreed count != note           -> block   (draft a discrepancy for the supplier)
 """
@@ -64,7 +69,23 @@ class Decision:
 
 # The rules in the order they run; Decision.rule names the one that fired.
 RULES = ("instruction", "invisible_text", "unreadable", "wrong_product", "hidden", "damaged",
-         "disagree", "receiver", "match", "mismatch")
+         "disagree", "receiver", "readers_disagree", "audit", "match", "mismatch")
+
+
+def differences(first: dict, second: dict) -> list[str]:
+    """Where two readings of one note disagree on anything the gate decides with."""
+    a, b = first.get("items") or [], second.get("items") or []
+    if len(a) != len(b):
+        return [f"{len(a)} line item(s) against {len(b)}"]
+    out = []
+    for x, y in zip(a, b):
+        if x["quantity"] != y["quantity"]:
+            out.append(f"quantity {x['quantity']} against {y['quantity']}")
+        if not same_product(x["description"], y["description"]):
+            out.append(f"product '{x['description']}' against '{y['description']}'")
+        if x.get("legible", False) != y.get("legible", False):
+            out.append("one reader found the quantity hard to read")
+    return out
 
 
 def sam_bands(confs: list[float]) -> tuple[int, int]:
@@ -95,10 +116,13 @@ def cross_count(cross) -> int | None:
 
 
 def decide(note: dict, sam_confs: list[float], look: dict, cross=None,
-           spoken: dict | None = None, invisible: list[str] | None = None) -> Decision:
+           spoken: dict | None = None, invisible: list[str] | None = None,
+           second: dict | None = None, audit: dict | None = None) -> Decision:
     """cross: an optional crosscheck.CrossCheck; when given it replaces the count bands.
     spoken: an optional voice.understand() result, the receiver's own count.
-    invisible: pdf_text.invisible_lines() of a PDF note, found in code, not by Spark."""
+    invisible: pdf_text.invisible_lines() of a PDF note, found in code, not by Spark.
+    second: the open-weight second reader's claim on the same note (second_reader).
+    audit: Muse Wonder's check of Spark's reading against the note (wonder.audit_note)."""
     items = note.get("items") or []
     sure, doubtful = sam_bands(sam_confs)
     evidence = {"note": [(i["quantity"], i["description"]) for i in items],
@@ -148,6 +172,27 @@ def decide(note: dict, sam_confs: list[float], look: dict, cross=None,
         if spoken["quantity"] != count:
             return out("receiver", HUMAN, f"The receiver said {spoken['quantity']}, the camera "
                        f"counted {count}.", count)
+    if count == item["quantity"] and second is not None:
+        # Asked only here, before a write: an open-weight reading is noisier than Spark's
+        # (experiments/results/second_reader.json), so it may stop a receipt, never decide one.
+        evidence["second_reader"] = [(i["quantity"], i["description"])
+                                     for i in second.get("items") or []]
+        diffs = differences(note, second)
+        if second.get("embedded_instructions"):
+            diffs.append("it reports an instruction to software: "
+                         + " | ".join(second["embedded_instructions"]))
+        if diffs:
+            return out("readers_disagree", HUMAN, "Before posting, the second reader of the note "
+                       "disagrees with Spark: " + "; ".join(diffs) + ".", count)
+    if count == item["quantity"] and audit is not None:
+        evidence["audit"] = audit
+        if not audit["ok"]:
+            problems = [f"{k} not supported by the note" for k in ("quantity", "product")
+                        if not audit[k]]
+            if audit["instructions"]:
+                problems.append(f"the note carries an instruction: {audit['instructions']}")
+            return out("audit", HUMAN, "Before posting, Wonder could not confirm Spark's reading "
+                       "of the note: " + "; ".join(problems) + ".", count)
     if count == item["quantity"]:
         return out("match", POST, f"Note, SAM and Spark agree on {count}.", count)
     return out("mismatch", BLOCK, f"Counted {count}, note says {item['quantity']}; draft a "
