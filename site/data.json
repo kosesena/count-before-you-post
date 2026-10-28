@@ -1105,6 +1105,11 @@
    "code": "tr",
    "label": "Türkçe",
    "file": "data.json"
+  },
+  {
+   "code": "de",
+   "label": "Deutsch",
+   "file": "data-de.json"
   }
  ]
 }

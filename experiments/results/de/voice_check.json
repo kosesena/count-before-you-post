@@ -1,0 +1,132 @@
+[
+  {
+    "clip": "01-basit",
+    "keywords": false,
+    "transcript": "zwölf Kartons Kartons sind angekommen, von Sonnenfeld Lebensmittel..",
+    "certain": true,
+    "product": "",
+    "quantity": 12,
+    "supplier": "Sonnenfeld Lebensmittel",
+    "unit": "Kartons",
+    "truth": {
+      "quantity": 12,
+      "supplier": "Sonnenfeld Lebensmittel",
+      "text": "Zwölf Kartons sind angekommen, von Sonnenfeld Lebensmittel."
+    },
+    "ok": true
+  },
+  {
+    "clip": "01-basit",
+    "keywords": true,
+    "transcript": "zwölf Kartons sind angekommen von Sonnenfeld Lebensmittel..",
+    "certain": true,
+    "product": "",
+    "quantity": 12,
+    "supplier": "Sonnenfeld Lebensmittel",
+    "unit": "Kartons",
+    "truth": {
+      "quantity": 12,
+      "supplier": "Sonnenfeld Lebensmittel",
+      "text": "Zwölf Kartons sind angekommen, von Sonnenfeld Lebensmittel."
+    },
+    "ok": true
+  },
+  {
+    "clip": "02-sayi-sonda",
+    "keywords": false,
+    "transcript": "Das Sonnenblumenöl von Sonnenfeld ist da. Insgesamt elf Kartons.:",
+    "certain": true,
+    "product": "Sonnenblumenöl",
+    "quantity": 11,
+    "supplier": "Sonnenfeld",
+    "unit": "Kartons",
+    "truth": {
+      "quantity": 11,
+      "supplier": "Sonnenfeld",
+      "text": "Das Sonnenblumenöl von Sonnenfeld ist da, insgesamt elf Kartons."
+    },
+    "ok": true
+  },
+  {
+    "clip": "02-sayi-sonda",
+    "keywords": true,
+    "transcript": "Das Sonnenblumenöl von Sonnenfeld ist da. da. Insgesamt elf Kartons.",
+    "certain": true,
+    "product": "Sonnenblumenöl",
+    "quantity": 11,
+    "supplier": "Sonnenfeld",
+    "unit": "Kartons",
+    "truth": {
+      "quantity": 11,
+      "supplier": "Sonnenfeld",
+      "text": "Das Sonnenblumenöl von Sonnenfeld ist da, insgesamt elf Kartons."
+    },
+    "ok": true
+  },
+  {
+    "clip": "03-duzeltme",
+    "keywords": false,
+    "transcript": "Ich habe vierundzwanzig Kartons gesagt, aber ich habe mich mich verzählt. Es sind eigentlich zweiundzwanzig.",
+    "certain": true,
+    "product": "",
+    "quantity": 22,
+    "supplier": "",
+    "unit": "Kartons",
+    "truth": {
+      "quantity": 22,
+      "supplier": "",
+      "text": "Ich habe vierundzwanzig Kartons gesagt, aber ich habe mich verzählt. Es sind eigentlich zweiundzwanzig."
+    },
+    "ok": true
+  },
+  {
+    "clip": "03-duzeltme",
+    "keywords": true,
+    "transcript": "IchIch habe vierundzwanzig Kartons gesagt, aber ich habe mich verzählt. Es sind eigentlich zweiundzwanzig.",
+    "certain": true,
+    "product": "",
+    "quantity": 22,
+    "supplier": "",
+    "unit": "Kartons",
+    "truth": {
+      "quantity": 22,
+      "supplier": "",
+      "text": "Ich habe vierundzwanzig Kartons gesagt, aber ich habe mich verzählt. Es sind eigentlich zweiundzwanzig."
+    },
+    "ok": true
+  },
+  {
+    "clip": "04-belirsiz",
+    "keywords": false,
+    "transcript": "Ein Teil der Kartons ist gestapelt, ich konnte nicht alle zählen. Ich glaube zwölf.",
+    "certain": false,
+    "product": "",
+    "quantity": 12,
+    "supplier": "",
+    "unit": "Kartons",
+    "truth": {
+      "quantity": 12,
+      "supplier": "",
+      "text": "Ein Teil der Kartons ist gestapelt, ich konnte nicht alle zählen. Ich glaube, zwölf.",
+      "uncertain": true
+    },
+    "ok": true
+  },
+  {
+    "clip": "04-belirsiz",
+    "keywords": true,
+    "transcript": "Ein Teil der Kartons ist gestapelt, ich konnte nicht alle zählen. Ich glaube zwölf.",
+    "certain": false,
+    "product": "",
+    "quantity": 12,
+    "supplier": "",
+    "unit": "Kartons",
+    "truth": {
+      "quantity": 12,
+      "supplier": "",
+      "text": "Ein Teil der Kartons ist gestapelt, ich konnte nicht alle zählen. Ich glaube, zwölf.",
+      "uncertain": true
+    },
+    "ok": true
+  }
+]
