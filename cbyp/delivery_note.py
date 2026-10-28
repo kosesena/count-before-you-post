@@ -1,7 +1,5 @@
-"""Read a delivery note (irsaliye) image into a schema-constrained claim with Muse Spark."""
-import base64
+"""Read a delivery note (irsaliye), photo or PDF, into a schema-constrained claim with Muse Spark."""
 import json
-import mimetypes
 import time
 from pathlib import Path
 
@@ -51,23 +49,32 @@ PROMPT = (
 )
 
 
-def _data_url(path: Path) -> str:
-    mime = mimetypes.guess_type(path.name)[0] or "image/png"
-    return f"data:{mime};base64," + base64.b64encode(path.read_bytes()).decode()
+_UPLOADED: dict[tuple, str] = {}
 
 
-def _note_part(path: Path) -> dict:
-    """An image goes in as image_url; a PDF as a file (Spark gets its text layer and page images)."""
-    if path.suffix.lower() == ".pdf":
-        return {"type": "file", "file": {"filename": path.name, "file_data": _data_url(path)}}
-    return {"type": "image_url", "image_url": {"url": _data_url(path)}}
+def upload(path: Path, api) -> str:
+    """Put a note in the Files API once per run (the way Meta's workshop reads documents);
+    the same file, unchanged, is referenced again by its id. Kept for a day."""
+    key = (str(path.resolve()), path.stat().st_mtime_ns)
+    if key not in _UPLOADED:
+        with path.open("rb") as f:
+            _UPLOADED[key] = api.files.create(
+                file=f, purpose="user_data",
+                expires_after={"anchor": "created_at", "seconds": 86400}).id
+    return _UPLOADED[key]
+
+
+def _note_part(path: Path, api) -> dict:
+    """The note as an uploaded file: a photo, or a PDF (Spark gets its text and page images)."""
+    return {"type": "file", "file": {"file_id": upload(path, api)}}
 
 
 def read_note(path: str | Path, effort: str = "medium") -> dict:
     """Return {"claim": <schema dict>, "seconds": float, "usage": {...}}."""
     path = Path(path)
     start = time.perf_counter()
-    resp = client().chat.completions.create(
+    api = client()
+    resp = api.chat.completions.create(
         model=SPARK,
         reasoning_effort=effort,
         max_tokens=16000,
@@ -80,7 +87,7 @@ def read_note(path: str | Path, effort: str = "medium") -> dict:
                 "role": "user",
                 "content": [
                     {"type": "text", "text": PROMPT},
-                    _note_part(path),
+                    _note_part(path, api),
                 ],
             }
         ],

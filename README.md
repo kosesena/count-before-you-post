@@ -4,6 +4,8 @@
 
 AI agents are getting write access to real systems, and they trust the document. Count Before You Post puts physical evidence between the agent and the ERP: Muse Spark reads the delivery note, SAM 3.1 counts what actually arrived, and a verification gate in code blocks the goods receipt in ERPNext when the two disagree, asking a human instead.
 
+The gate is the pattern Meta teaches in its own hackathon workshop ([legal-agent-workshop](https://github.com/meta-models/legal-agent-workshop), "Make the agent trustworthy"): a **verification layer outside the agent's control**, at the one tool call the agent cannot skip; **escalation** to a person when the evidence can't settle it; the run **stops** until that person answers, and their **sign-off** is the only thing that can release what the gate held. Here it guards a goods receipt instead of a legal memo.
+
 Built during the Meta Global AI Developer Hackathon (26 Oct – 4 Nov 2026). Everything in this repository was written during the event.
 
 **Live demo: [count-before-you-post.vercel.app](https://count-before-you-post.vercel.app)**: the gate's decision on each of the six dock cases, the SAM masks, the carton-by-carton cross-check and the agent's step-by-step trace, with and without the gate. The page replays recorded runs (real Meta API, real ERPNext); it makes no API calls. The page itself was written by Muse Code from [this task](docs/muse-code/demo-site.md), with small edits by hand listed in the journal (including the "Built with Muse" band); each character introduces itself there, in portraits drawn with Muse Image.
@@ -17,7 +19,7 @@ plain code on purpose.
 
 | Meta tool | Character | What it does here | Where |
 |---|---|---|---|
-| **Muse Spark** (`muse-spark-1.3`) | Spark | Reads the delivery note into strict JSON, looks at the pallet, puts a point on every carton, and runs the receiving agent | `cbyp/delivery_note.py`, `cbyp/perception.py`, `cbyp/agent.py` |
+| **Muse Spark** (`muse-spark-1.3`) | Spark | Reads the delivery note (a photo or a PDF, uploaded through the Files API) into strict JSON, looks at the pallet, puts a point on every carton, and runs the receiving agent | `cbyp/delivery_note.py`, `cbyp/perception.py`, `cbyp/agent.py` |
 | **SAM 3.1** | Sam | Finds and outlines every carton, with a confidence for each | `cbyp/sam.py`, `cbyp/crosscheck.py` |
 | **Muse Voice Transcribe** | Voice | Writes down the receiver's spoken count (Turkish) | `cbyp/voice.py` |
 | **Muse Wonder** (`muse-wonder-1.0`) | Wonder | Writes the paperwork when the gate stops a delivery: the dispute to the supplier, the damage report, or a note to the supervisor, in the delivery note's language, as a draft for the supervisor | `cbyp/wonder.py`, `experiments/wonder_drafts.py` |
@@ -189,6 +191,26 @@ The white lines sit in the PDF's text layer, where any importer would read them,
 never saw them, even when asked for "very small or invisible text". Without the new check the
 gate would have posted that note as clean. `cbyp/pdf_text.py` reads every character's colour
 and size instead of asking a model: one more reading that doesn't depend on Spark.
+
+### Sign-off: the run stops for Şef, and only Şef's answer releases it
+
+When the gate says *human*, the agent's run now stops at `ask_supervisor` and makes no model
+call until the supervisor answers (`run(wait=True)`). `resume()` brings the answer back; the
+gate checks the evidence again, and a sign-off can release a *human* decision for exactly the
+quantity the supervisor approved, never a *block* (an injected note, a wrong product or a short
+delivery stays out of the ERP whatever anyone says). The resumed run is a fresh request with the
+evidence still on record, not `previous_response_id`: a person can take hours, and stored
+responses expired on us after minutes. The supervisor's notes go on the ERPNext receipt.
+
+Live, against ERPNext (`experiments/run_signoff.py`, `experiments/results/signoff.json`):
+
+| Case | Agent before sign-off | Şef's answer | After sign-off |
+|---|---|---|---|
+| `hasarli` (crushed carton) | tried to post 11 → refused, asked Şef, **stopped** | "crushed one to quarantine, receive the 11 intact ones" | posted **11**, MAT-PRE-2026-00008 (40 s) |
+| `belirsiz` (stacked) | tried to post 12 → refused, asked Şef, **stopped** | "unstacked and counted by hand: 12" | re-read the evidence, posted **12**, MAT-PRE-2026-00009 (93 s) |
+
+Delivery notes, photos and PDFs alike, now go to Spark through the Files API (uploaded once,
+referenced by `file_id`, kept for a day), the way Meta's workshop reads its documents.
 
 ## Roadmap
 

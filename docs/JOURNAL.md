@@ -472,6 +472,27 @@ labels unreadable" (truth 12, some hidden). The ceiling photo had 12 and "not al
 Worse than the photo, and confidently wrong: not used by the gate. The labels are too small at
 this distance; a closer path and more measurement come first.
 
+## 28 Oct: sign-off, Files API, and Meta's own workshop
+
+Meta's first hackathon workshop (Agents 101, a legal agent built with Muse Code;
+github.com/meta-models/legal-agent-workshop) ends with the agent's memo marked "unverified" and
+a second session on a verification layer outside the agent's control: escalation to a person,
+the run stopping until they answer, attorney sign-off. The gate already was that layer; two
+pieces were missing and are now in:
+
+- **Sign-off and resume** (`cbyp/agent.py`): `run(wait=True)` stops at `ask_supervisor` with no
+  further model call; `resume()` brings the supervisor's answer back as a fresh request (stored
+  responses expire, a person may take hours). A sign-off releases a *human* decision for exactly
+  the approved quantity and never a *block*; a rejection posts nothing. Live on ERPNext:
+  `hasarli` → Şef approves 11 → MAT-PRE-2026-00008; `belirsiz` → Şef counts 12 by hand →
+  MAT-PRE-2026-00009. In both, the agent first tried to post on its own and the gate refused.
+  Each result row is saved the moment a receipt is written (the fix promised above).
+- **Files API** (`cbyp/delivery_note.py`): notes go up once and are referenced by `file_id`
+  (Chat Completions `file` part; `image_url` takes only http or data URLs). Re-read on the
+  injected photo and PDF: same 12 and both instruction lines.
+
+57 tests pass.
+
 ---
 
 ## Open

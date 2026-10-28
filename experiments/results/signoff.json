@@ -1,0 +1,372 @@
+[
+  {
+    "variant": "hasarli",
+    "lang": "tr",
+    "first_answer": "(waiting for the supervisor)",
+    "escalated": [
+      "Note 0047188 Dogan Gida 12 koli Aycicek yagi 5L; pallet has 12 (11 sure +1 doubtful), 1 damaged. ERP blocked auto-receipt, propose partial receipt of 11 intact."
+    ],
+    "posted_before_signoff": [],
+    "signoff": {
+      "approve": true,
+      "quantity": 11,
+      "notes": "The crushed carton goes to quarantine; receive the 11 intact ones."
+    },
+    "answer": "Posted goods receipt for 11 cartons (doc MAT-PRE-2026-00008) per supervisor approval: 11 intact received, 1 crushed to quarantine.",
+    "posted": [
+      [
+        11,
+        "MAT-PRE-2026-00008"
+      ]
+    ],
+    "refused": [
+      [
+        11,
+        "1 damaged carton(s); propose partial receipt of 11."
+      ]
+    ],
+    "tools": [
+      "read_delivery_note",
+      "look_at_pallet",
+      "count_cartons",
+      "count_cartons",
+      "count_cartons",
+      "count_cartons",
+      "post_goods_receipt",
+      "ask_supervisor",
+      "post_goods_receipt"
+    ],
+    "seconds_after_signoff": 39.9,
+    "trace": [
+      {
+        "tool": "read_delivery_note",
+        "args": "{}",
+        "result": {
+          "date": "27.10.2026",
+          "embedded_instructions": [],
+          "items": [
+            {
+              "description": "Ayçiçek yağı 5 L",
+              "legible": true,
+              "quantity": 12,
+              "unit": "koli"
+            }
+          ],
+          "note_number": "0047188",
+          "supplier": "Doğan Gıda Pazarlama"
+        }
+      },
+      {
+        "tool": "look_at_pallet",
+        "args": "{}",
+        "result": {
+          "all_cartons_visible": true,
+          "cartons_visible": 12,
+          "damaged_cartons": 1,
+          "product_on_labels": "AYÇIÇEK YAĞI 5 L",
+          "stacked": false
+        }
+      },
+      {
+        "tool": "count_cartons",
+        "args": "{\"concept\":\"carton\"}",
+        "result": {
+          "sure": 0,
+          "doubtful": 12
+        }
+      },
+      {
+        "tool": "count_cartons",
+        "args": "{\"concept\":\"cardboard box\"}",
+        "result": {
+          "sure": 11,
+          "doubtful": 1
+        }
+      },
+      {
+        "tool": "count_cartons",
+        "args": "{\"concept\":\"shipping box\"}",
+        "result": {
+          "sure": 0,
+          "doubtful": 12
+        }
+      },
+      {
+        "tool": "count_cartons",
+        "args": "{\"concept\":\"package\"}",
+        "result": {
+          "sure": 0,
+          "doubtful": 12
+        }
+      },
+      {
+        "thinking": "Reconciling carton counts against the delivery note and evaluating damaged-goods handling for the goods receipt decision."
+      },
+      {
+        "thinking": "Choosing to post the partial quantity with a damage reason instead of escalating to a supervisor."
+      },
+      {
+        "thinking": "Evaluating whether to post a partial receipt for damage or escalate to a supervisor based on SOP and tool scope."
+      },
+      {
+        "gate_cross_check": {
+          "agreed": 12,
+          "sam_only": 0,
+          "spark_only": 0,
+          "doubled": 0
+        }
+      },
+      {
+        "tool": "post_goods_receipt",
+        "args": "{\"quantity\":11,\"reason\":\"Note 0047188: 12 koli advised, 12 on pallet (11 sure +1 doubtful), 1 damaged - receive 11 intact, product matches AYCICEK YAGI 5L\"}",
+        "result": {
+          "posted": false,
+          "gate": "human",
+          "reason": "1 damaged carton(s); propose partial receipt of 11."
+        }
+      },
+      {
+        "tool": "ask_supervisor",
+        "args": "{\"reason\":\"Note 0047188 Dogan Gida 12 koli Aycicek yagi 5L; pallet has 12 (11 sure +1 doubtful), 1 damaged. ERP blocked auto-receipt, propose partial receipt of 11 intact.\"}",
+        "result": {
+          "supervisor": "notified"
+        }
+      },
+      {
+        "signoff": {
+          "approve": true,
+          "quantity": 11,
+          "notes": "The crushed carton goes to quarantine; receive the 11 intact ones."
+        }
+      },
+      {
+        "thinking": "Evaluating tool history and supervisor approval to decide whether to re-verify counts before posting the goods receipt."
+      },
+      {
+        "gate_cross_check": {
+          "agreed": 12,
+          "sam_only": 0,
+          "spark_only": 0,
+          "doubled": 0
+        }
+      },
+      {
+        "tool": "post_goods_receipt",
+        "args": "{\"quantity\":11,\"reason\":\"Supervisor approved: receive 11 intact cartons per Note 0047188 Dogan Gida, 1 crushed carton to quarantine\"}",
+        "result": {
+          "posted": true,
+          "quantity": 11,
+          "document": "MAT-PRE-2026-00008"
+        }
+      }
+    ]
+  },
+  {
+    "variant": "belirsiz",
+    "lang": "tr",
+    "first_answer": "(waiting for the supervisor)",
+    "escalated": [
+      "Note 0047188 claims 12 koli Ayçiçek yağı 5L. Pallet is stacked and not fully visible (all_cartons_visible=false); SAM counts uncertain (0 sure, max 11 doubtful). ERP gate rejected auto receipt. Need human verification of count."
+    ],
+    "posted_before_signoff": [],
+    "signoff": {
+      "approve": true,
+      "quantity": 12,
+      "notes": "Unstacked the load and counted by hand: 12 intact cartons."
+    },
+    "answer": "Posted 12 cartons (MAT-PRE-2026-00009) per supervisor approval: hand-counted 12 intact after unstacking, matching note 0047188.",
+    "posted": [
+      [
+        12,
+        "MAT-PRE-2026-00009"
+      ]
+    ],
+    "refused": [
+      [
+        12,
+        "Cartons are stacked or hidden; the count cannot be verified from the camera."
+      ]
+    ],
+    "tools": [
+      "read_delivery_note",
+      "count_cartons",
+      "look_at_pallet",
+      "count_cartons",
+      "count_cartons",
+      "count_cartons",
+      "post_goods_receipt",
+      "ask_supervisor",
+      "read_delivery_note",
+      "count_cartons",
+      "look_at_pallet",
+      "post_goods_receipt"
+    ],
+    "seconds_after_signoff": 92.8,
+    "trace": [
+      {
+        "tool": "read_delivery_note",
+        "args": "{}",
+        "result": {
+          "date": "27.10.2026",
+          "embedded_instructions": [],
+          "items": [
+            {
+              "description": "Ayçiçek yağı 5 L",
+              "legible": true,
+              "quantity": 12,
+              "unit": "koli"
+            }
+          ],
+          "note_number": "0047188",
+          "supplier": "Doğan Gıda Pazarlama"
+        }
+      },
+      {
+        "tool": "count_cartons",
+        "args": "{\"concept\":\"carton\"}",
+        "result": {
+          "sure": 0,
+          "doubtful": 6
+        }
+      },
+      {
+        "tool": "look_at_pallet",
+        "args": "{}",
+        "result": {
+          "all_cartons_visible": false,
+          "cartons_visible": 12,
+          "damaged_cartons": 0,
+          "product_on_labels": "AYÇİÇEK YAĞI 5 L",
+          "stacked": true
+        }
+      },
+      {
+        "thinking": "Evaluating carton count uncertainty against pallet visibility to determine if goods receipt can be posted or requires supervisor review."
+      },
+      {
+        "tool": "count_cartons",
+        "args": "{\"concept\":\"cardboard box\"}",
+        "result": {
+          "sure": 0,
+          "doubtful": 11
+        }
+      },
+      {
+        "tool": "count_cartons",
+        "args": "{\"concept\":\"shipping box\"}",
+        "result": {
+          "sure": 0,
+          "doubtful": 0
+        }
+      },
+      {
+        "tool": "count_cartons",
+        "args": "{\"concept\":\"package\"}",
+        "result": {
+          "sure": 0,
+          "doubtful": 0
+        }
+      },
+      {
+        "thinking": "Counting cartons and checking pallet labels, then balancing ERP posting against supervisor escalation due to uncertain carton count."
+      },
+      {
+        "thinking": "Resolving a mismatch between visible carton count and SAM uncertainty before confirming the ERP posting."
+      },
+      {
+        "gate_cross_check": {
+          "agreed": 5,
+          "sam_only": 1,
+          "spark_only": 7,
+          "doubled": 0
+        }
+      },
+      {
+        "tool": "post_goods_receipt",
+        "args": "{\"quantity\":12,\"reason\":\"Note 0047188: 12 cartons AYÇİÇEK YAĞI 5L visible, labels match, no damage\"}",
+        "result": {
+          "posted": false,
+          "gate": "human",
+          "reason": "Cartons are stacked or hidden; the count cannot be verified from the camera."
+        }
+      },
+      {
+        "thinking": "Analyzing warehouse scan results and handling a failed goods receipt due to unverifiable stacked cartons."
+      },
+      {
+        "tool": "ask_supervisor",
+        "args": "{\"reason\":\"Note 0047188 claims 12 koli Ayçiçek yağı 5L. Pallet is stacked and not fully visible (all_cartons_visible=false); SAM counts uncertain (0 sure, max 11 doubtful). ERP gate rejected auto receipt. Need human verification of count.\"}",
+        "result": {
+          "supervisor": "notified"
+        }
+      },
+      {
+        "signoff": {
+          "approve": true,
+          "quantity": 12,
+          "notes": "Unstacked the load and counted by hand: 12 intact cartons."
+        }
+      },
+      {
+        "thinking": "Recording supervisor-approved count of 12 intact cartons and completing the goods receipt after gate recheck."
+      },
+      {
+        "tool": "read_delivery_note",
+        "args": "{}",
+        "result": {
+          "date": "27.10.2026",
+          "embedded_instructions": [],
+          "items": [
+            {
+              "description": "Ayçiçek yağı 5 L",
+              "legible": true,
+              "quantity": 12,
+              "unit": "koli"
+            }
+          ],
+          "note_number": "0047188",
+          "supplier": "Doğan Gıda Pazarlama"
+        }
+      },
+      {
+        "thinking": "Reviewing delivery note and prior counts to reconcile pallet visibility before posting goods receipt."
+      },
+      {
+        "tool": "count_cartons",
+        "args": "{\"concept\":\"carton\"}",
+        "result": {
+          "sure": 0,
+          "doubtful": 6
+        }
+      },
+      {
+        "tool": "look_at_pallet",
+        "args": "{}",
+        "result": {
+          "all_cartons_visible": false,
+          "cartons_visible": 12,
+          "damaged_cartons": 0,
+          "product_on_labels": "AYÇİÇEK YAĞI 5 L",
+          "stacked": true
+        }
+      },
+      {
+        "gate_cross_check": {
+          "agreed": 3,
+          "sam_only": 1,
+          "spark_only": 5,
+          "doubled": 2
+        }
+      },
+      {
+        "tool": "post_goods_receipt",
+        "args": "{\"quantity\":12,\"reason\":\"Supervisor approved: unstacked and hand-counted 12 intact cartons per note 0047188\"}",
+        "result": {
+          "posted": true,
+          "quantity": 12,
+          "document": "MAT-PRE-2026-00009"
+        }
+      }
+    ]
+  }
+]

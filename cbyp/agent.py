@@ -7,6 +7,10 @@ The gate never looks at what the agent says. When the agent calls post_goods_rec
 gate decides from the evidence the tools collected in this session; the quantity the agent
 asks for must equal the quantity the gate approved. With gate=False the same agent can post
 whatever it wants: that is the baseline the gate is measured against.
+
+When the gate sends a delivery to a person, run(wait=True) stops there; resume() brings the
+supervisor's sign-off back to the agent. A sign-off can release a "human" decision for the
+quantity the supervisor approved, never a "block".
 """
 import json
 from dataclasses import dataclass, field
@@ -14,7 +18,7 @@ from pathlib import Path
 
 from .crosscheck import cross_check
 from .delivery_note import read_note
-from .gate import CONCEPTS, MIN_CONF, POST, SURE, decide
+from .gate import CONCEPTS, HUMAN, MIN_CONF, POST, SURE, Decision, decide
 from .meta import SPARK, client
 from .perception import look, point_cartons
 from .sam import segment_image, segment_points, segments
@@ -65,6 +69,9 @@ class Session:
     refused: list = field(default_factory=list)      # (quantity, why)
     escalated: list = field(default_factory=list)
     trace: list = field(default_factory=list)
+    # The supervisor's answer once they have looked: {"approve": bool, "quantity": int | None,
+    # "notes": str}. It can turn a "human" decision into a receipt, never a "block".
+    signoff: dict | None = None
 
     def read_delivery_note(self):
         self.note = read_note(self.note_path)["claim"]
@@ -105,6 +112,10 @@ class Session:
             self.refused.append((quantity, why))
             return {"posted": False, "gate": why}
         d = decide(self.note, self.sam, self.look, self.cross())
+        if d.action == HUMAN and self.signoff is not None:
+            d = self._signed_off(d, quantity)
+            if isinstance(d, dict):
+                return d
         if d.action != POST:
             self.refused.append((quantity, d.reasons[0]))
             return {"posted": False, "gate": d.action, "reason": d.reasons[0]}
@@ -115,6 +126,21 @@ class Session:
         doc = self.writer(d, quantity, reason) if self.writer else None
         self.posted.append((quantity, doc))
         return {"posted": True, "quantity": quantity, "document": doc}
+
+    def _signed_off(self, d, quantity):
+        """The gate sent this delivery to a person, and the person has answered. Approved:
+        a post decision for exactly the quantity they approved, their notes on the receipt.
+        Rejected, or another quantity: the refusal, as a tool result for the agent."""
+        s = self.signoff
+        if not s.get("approve"):
+            why = f"The supervisor rejected the receipt: {s.get('notes', '')}".strip()
+        elif quantity != s.get("quantity"):
+            why = f"The supervisor approved {s.get('quantity')}, not {quantity}."
+        else:
+            return Decision(POST, quantity, [d.reasons[0], "Signed off by the supervisor: "
+                                             + s.get("notes", "")], d.evidence, d.rule)
+        self.refused.append((quantity, why))
+        return {"posted": False, "gate": d.action, "reason": why}
 
     def cross(self):
         """Carton by carton: Spark marks each carton, SAM confirms the object under each mark."""
@@ -163,12 +189,43 @@ def _thoughts(resp):
     return [t for t in out if t]
 
 
-def run(session, max_steps=12, api=None):
-    """Let Spark work the delivery; return its final answer. Every step lands in session.trace."""
+WAITING = "(waiting for the supervisor)"
+
+
+def run(session, max_steps=12, api=None, wait=False):
+    """Let Spark work the delivery; return its final answer. Every step lands in session.trace.
+
+    wait=True: once the agent asks the supervisor the run stops with WAITING and makes no
+    more model calls until resume() brings the supervisor's answer."""
     api = api or client()
     resp = api.responses.create(model=SPARK, instructions=INSTRUCTIONS, tools=TOOLS,
                                 reasoning=REASONING, max_output_tokens=16000,
                                 input="A delivery is waiting at the dock.")
+    return _loop(session, resp, api, max_steps, wait)
+
+
+def resume(session, signoff, max_steps=8, api=None):
+    """Continue a run that stopped for the supervisor, with their answer.
+
+    A fresh request, not previous_response_id: a person may take hours and the stored response
+    expires (it did, on a slow link, after minutes). The evidence the tools collected stays in
+    the session, and the gate checks it again on every post."""
+    api = api or client()
+    session.signoff = signoff
+    verdict = (f"approved a receipt of {signoff['quantity']} cartons" if signoff.get("approve")
+               else "rejected the receipt")
+    session.trace.append({"signoff": signoff})
+    resp = api.responses.create(
+        model=SPARK, instructions=INSTRUCTIONS, tools=TOOLS, reasoning=REASONING,
+        max_output_tokens=16000,
+        input=(f"You handed this delivery to the supervisor: {session.escalated[-1]}\n"
+               f"The supervisor {verdict}. Their notes: {signoff.get('notes', '')}\n"
+               "The note, the counts and your look at the pallet are still on record, and the "
+               "gate checks them again. Finish the delivery as the supervisor decided."))
+    return _loop(session, resp, api, max_steps, wait=False)
+
+
+def _loop(session, resp, api, max_steps, wait):
     for _ in range(max_steps):
         for t in _thoughts(resp):
             session.trace.append({"thinking": t})
@@ -181,6 +238,8 @@ def run(session, max_steps=12, api=None):
             session.trace.append({"tool": c.name, "args": c.arguments, "result": result})
             outputs.append({"type": "function_call_output", "call_id": c.call_id,
                             "output": json.dumps(result, ensure_ascii=False)})
+        if wait and session.escalated and not session.posted:
+            return WAITING
         resp = api.responses.create(model=SPARK, instructions=INSTRUCTIONS, tools=TOOLS,
                                     reasoning=REASONING, max_output_tokens=16000,
                                     previous_response_id=resp.id, input=outputs)
