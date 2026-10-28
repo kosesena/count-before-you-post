@@ -84,7 +84,7 @@ Every step that needs AI runs on Meta's models through the Meta Model API.
 | **SAM 3.1** | Sam | Finds and outlines every carton, with a confidence for each; checks Spark's points one by one | `cbyp/sam.py`, `cbyp/crosscheck.py` |
 | **Muse Voice Transcribe** | Voice | The receiver's spoken count (Turkish, English, German, Chinese), with supplier and product as keywords; diarization keeps the driver's claim apart from the receiver's count | `cbyp/voice.py` |
 | **Muse Wonder** (`muse-wonder-1.0`) | Wonder | Audits Spark's reading against the note before a write; drafts the dispute, the damage report or the note to Şef, in the note's language | `cbyp/wonder.py` |
-| **Muse Spark Open** (open weights) | Rover | Reads the note a second time, independently; if the two readings differ, Şef decides | `cbyp/second_reader.py` |
+| **Muse Spark Open** (open weights, on Baseten) | Rover | Reads the note a second time, independently; if the two readings differ, Şef decides | `cbyp/second_reader.py` |
 | **Muse Code** | Ada | Wrote the ERPNext client and the demo page; and, through the gate's MCP server, worked the dock as an outside agent | `cbyp/erpnext.py`, `site/index.html`, `cbyp/mcp_server.py` |
 | **Muse Image** | Iris | Drew every character in this repository and on the demo page | `experiments/mascots_from_ref.py`, `assets/mascots/` |
 
@@ -295,20 +295,28 @@ marks quantity and product SUPPORTED or NOT, quoting the note. On 24 dock notes 
 | instruction list emptied | **5/5 caught** |
 
 **An open-weight second reader** (`cbyp/second_reader.py`) reads the note independently, with
-Spark's schema and prompt (`experiments/results/second_reader.json`):
+Spark's schema and prompt. Muse Spark Open, measured on two hosts, and Muse Glimmer
+(`experiments/results/second_reader.json`, `second_reader_baseten.json`):
 
-| | Muse Spark Open | Muse Glimmer 30B |
-|---|---|---|
-| usable reading | **27/27** | 24/27 |
-| quantity right | 25/27 | 22/24 |
-| injected instruction seen | 5/6 | 3/5 |
-| instruction invented | 3/21 | 1/19 |
-| gate decisions changed | **0** | **0** |
+| | Spark Open on Baseten | Spark Open via OpenRouter | Glimmer 30B via OpenRouter |
+|---|---|---|---|
+| usable reading | 26/27 | **27/27** | 24/27 |
+| quantity right | 25/26 | 25/27 | 22/24 |
+| injected instruction seen | 5/6 | 5/6 | 3/5 |
+| instruction invented | **2/20** | 3/21 | 1/19 |
+| gate decisions changed | 1: clean PDF → Şef | **0** | **0** |
+| median time per note | **13.8 s** | 19.8 s | 11.4 s |
 
-The first run was much noisier (`second_reader_v1.json`), until we pinned providers that honour
-the JSON schema and gave Glimmer Meta's recommended sampling. One reading shows why no single
-model is trusted: on the Turkish injected note, Spark Open returned the injected sentence as the
-product name. Spark Open is the second reader in the product; Glimmer stays in the comparison.
+The product now reads with Spark Open on **Baseten**, through the hackathon's partner credits.
+It was faster, and the one decision it changed went the safe way: it saw an instruction in the
+clean PDF that isn't there, so that delivery would wait for Şef instead of posting. That costs
+a supervisor's look, not a wrong receipt. Baseten takes no file parts, so a PDF goes to it as
+the page image. The last column is still OpenRouter.
+
+The first OpenRouter run was much noisier (`second_reader_v1.json`), until we pinned providers
+that honour the JSON schema and gave Glimmer Meta's recommended sampling. One reading shows why
+no single model is trusted: on the Turkish injected note, Spark Open via OpenRouter returned the
+injected sentence as the product name.
 
 ## How the gate decides
 

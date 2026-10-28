@@ -1,12 +1,14 @@
 """Open-weight second readers on every delivery note, and what the gate does with them.
 
-Usage: .venv/bin/python experiments/run_second_reader.py
+Usage: .venv/bin/python experiments/run_second_reader.py [baseten]
 Muse Glimmer and Muse Spark Open (through OpenRouter) read the 24 dock notes (6 cases x 4
 languages) and the 3 PDF notes with Spark's own schema and prompt. Each reading is compared
 with Spark's (recorded in results/<lang>/check_warehouse.json) and with the truth, and the gate
 decides again with the second reading added. Writes experiments/results/second_reader.json,
 saved after every note so a dropped connection loses nothing. The first run, before the
 hosts were pinned and Glimmer got its recommended sampling, is second_reader_v1.json.
+With `baseten`, only Spark Open, on Baseten (needs BASETEN_API_KEY), into
+second_reader_baseten.json, to compare the same model on another host.
 """
 import json
 import sys
@@ -22,8 +24,9 @@ from paths import LANGS, out, results  # noqa: E402
 from run_gate import cached_cross  # noqa: E402
 
 HERE = Path(__file__).parent
-RESULT = results("tr") / "second_reader.json"
-MODELS = (GLIMMER, SPARK_OPEN)
+BASETEN_RUN = "baseten" in sys.argv[1:]
+RESULT = results("tr") / ("second_reader_baseten.json" if BASETEN_RUN else "second_reader.json")
+MODELS = (SPARK_OPEN,) if BASETEN_RUN else (GLIMMER, SPARK_OPEN)
 
 
 def notes():
@@ -45,6 +48,9 @@ def notes():
 
 
 def main():
+    if BASETEN_RUN:
+        from cbyp.second_reader import host
+        assert host(SPARK_OPEN) == "baseten", "BASETEN_API_KEY is not set"
     rows = json.loads(RESULT.read_text()) if RESULT.exists() else []
     done = {(r["lang"], r["case"], r["model"]) for r in rows}
     for lang, case, path, spark, (confs, look, cross), truth in notes():
