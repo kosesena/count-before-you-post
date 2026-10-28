@@ -19,7 +19,7 @@ plus depo-truth.json. Run experiments/blender/make_cutouts.py first (mascot stan
 CBYP_POLISH=1 builds a dressed-up scene instead: a recognisable semi-truck, an
 obviously open dock door with daylight, life-size character standees, full racking and
 props, panelled walls and an epoxy floor, warm high-bay lighting. Only the overview
-cameras (genel, kapi, irsaliye, disari) are rendered and depo-truth.json is left
+cameras (genel, kapi, irsaliye, disari, teslimat) are rendered and depo-truth.json is left
 untouched.
 Without CBYP_POLISH the scene is built exactly as before, object for object.
 """
@@ -702,9 +702,13 @@ def p_shell(P):
         box(f"p_col_l{y}", (0.28, 0.28, 7.0), (-14.66, y, 3.5), P["column"])
         box(f"p_colg_l{y}", (0.44, 0.44, 0.5), (-14.66, y, 0.25), P["yellow"])
     # Roof: purlins between the existing beams, plus a ceiling plane.
+    # Roof and left wall end at the back wall (y = 10): beyond it is the yard, open to the sky.
     for k, x in enumerate(-13.5 + k * 3.0 for k in range(10)):
-        box(f"p_purlin{k}", (0.15, 26, 0.18), (x, 2, 7.28), P["roof_steel"])
-    box("p_ceiling", (30, 26, 0.1), (0, 2, 7.5), P["ceil"])
+        box(f"p_purlin{k}", (0.15, 21, 0.18), (x, -0.5, 7.28), P["roof_steel"])
+    box("p_ceiling", (30, 21, 0.1), (0, -0.5, 7.5), P["ceil"])
+    box("p_roof", (30.6, 21.4, 0.25), (0, -0.5, 7.7), P["roof_steel"])
+    wl = bpy.data.objects["wall_left"]
+    wl.scale.y, wl.location.y = 21 / 26, -0.5
     # Tyre scuffs on the floor (thin translucent strips).
     for k, (x, y, yaw, ln) in enumerate(
             [(-1.2, 0.5, 8, 5.0), (-0.4, 0.7, 8, 5.0),
@@ -882,9 +886,6 @@ def p_truck(P, rnd):
         box(f"p_cab_ind{sgn}", (0.12, 0.06, 0.12), (sgn * 1.05, 22.49, 1.35),
             mat("p_marker", (1.0, 0.55, 0.05), emit=2.5))
     box("p_cab_plate", (0.44, 0.03, 0.11), (-0.5, 22.59, 0.72), P["paper"])
-    defl = box("p_cab_deflector", (2.2, 0.07, 1.25), (0, 20.95, 3.85), cab,
-               bevel=0.01)
-    defl.rotation_euler = (math.radians(38), 0, 0)
     for k, x in enumerate((-0.4, 0, 0.4)):
         box(f"p_cab_marker{k}", (0.09, 0.05, 0.07), (x, 20.52, 3.25),
             mat("p_marker", (1.0, 0.55, 0.05), emit=2.5))
@@ -1225,9 +1226,20 @@ def p_office(P):
 
 def p_quality():
     """Warmer ambient plus the best EEVEE offers (all version-guarded)."""
-    bg = bpy.context.scene.world.node_tree.nodes["Background"]
+    nt = bpy.context.scene.world.node_tree
+    bg = nt.nodes["Background"]
     bg.inputs["Color"].default_value = (0.32, 0.32, 0.33, 1)
     bg.inputs["Strength"].default_value = 0.5
+    # The camera sees a daylight sky outside; everything else keeps the soft grey ambient.
+    out = next(n for n in nt.nodes if n.type == "OUTPUT_WORLD")
+    sky = nt.nodes.new("ShaderNodeBackground")
+    sky.inputs["Color"].default_value = (0.52, 0.72, 0.98, 1)
+    sky.inputs["Strength"].default_value = 1.2
+    path, mix = nt.nodes.new("ShaderNodeLightPath"), nt.nodes.new("ShaderNodeMixShader")
+    nt.links.new(path.outputs["Is Camera Ray"], mix.inputs[0])
+    nt.links.new(bg.outputs[0], mix.inputs[1])
+    nt.links.new(sky.outputs[0], mix.inputs[2])
+    nt.links.new(mix.outputs[0], out.inputs["Surface"])
     ee = bpy.context.scene.eevee
     for key, val in (("use_raytracing", True), ("use_soft_shadows", True),
                      ("taa_render_samples", 64), ("taa_samples", 4),
@@ -1256,6 +1268,11 @@ def polish(cams, V):
     cams["disari"] = bpy.context.object
     cams["disari"].data.lens = 24
     aim(cams["disari"], (0, 16.5, 1.3))
+    # Close shot of the receiving zone: pallet, gate, barrier, clipboard, Kapı and Şef.
+    bpy.ops.object.camera_add(location=(4.4, 0.0, 5.4))
+    cams["teslimat"] = bpy.context.object
+    cams["teslimat"].data.lens = 24
+    aim(cams["teslimat"], (0.0, 5.3, 0.4))
     p_standees(P, V["light"], g.location)
     p_racks(P, rnd)
     p_props(P, rnd)
@@ -1344,7 +1361,7 @@ if __name__ == "__main__":
         cams, cartons = build(variant)
         if POLISH:
             cams = {k: c for k, c in cams.items()
-                    if k in ("genel", "kapi", "irsaliye", "disari")}
+                    if k in ("genel", "kapi", "irsaliye", "disari", "teslimat")}
         render(cams, out, variant)
         if POLISH:
             print("rendered", variant, "(polish, no truth)")
