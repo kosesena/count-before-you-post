@@ -93,6 +93,32 @@ The ERPNext client was committed unchanged, 13/13 tests passing as delivered. Th
 committed as delivered, with three small fixes by hand in a separate commit. Every task it
 was given is in [`docs/muse-code/`](docs/muse-code/), verbatim.
 
+## Meet the cast
+
+Every Meta model in this project has a character, and so do the two that are not models: the
+gate and the supervisor.
+
+<table>
+<tr>
+<td align="center" valign="top" width="20%"><img src="assets/mascots/portraits/spark.png" alt="Spark" width="170"><br><b>Spark</b><br><sub>Muse Spark</sub><br><br>Reads the delivery note, looks at the pallet, puts a point on every carton, and runs the receiving agent.</td>
+<td align="center" valign="top" width="20%"><img src="assets/mascots/portraits/sam.png" alt="Sam" width="170"><br><b>Sam</b><br><sub>SAM 3.1</sub><br><br>Finds and outlines every carton, sure or doubtful. His glasses are a reminder: one day the camera is on the receiver's face.</td>
+<td align="center" valign="top" width="20%"><img src="assets/mascots/portraits/voice.png" alt="Voice" width="170"><br><b>Voice</b><br><sub>Muse Voice Transcribe</sub><br><br>Listens to the dock, and tells the driver's claim from what the receiver actually counted.</td>
+<td align="center" valign="top" width="20%"><img src="assets/mascots/portraits/kapi.png" alt="Kapı" width="170"><br><b>Kapı</b><br><sub>the gate, plain code</sub><br><br>Holds the barrier at the one write the agent can't skip. Green: post. Red: block. Amber: ask Şef.</td>
+<td align="center" valign="top" width="20%"><img src="assets/mascots/portraits/sef.png" alt="Şef" width="170"><br><b>Şef</b><br><sub>the supervisor, a person</sub><br><br>Decides when the evidence can't. Only Şef's sign-off releases a held delivery, and never a blocked one.</td>
+</tr>
+<tr>
+<td align="center" valign="top" width="20%"><img src="assets/mascots/portraits/wonder.png" alt="Wonder" width="170"><br><b>Wonder</b><br><sub>Muse Wonder</sub><br><br>Checks Spark's reading against the note before a write, and drafts the dispute or the damage report.</td>
+<td align="center" valign="top" width="20%"><img src="assets/mascots/portraits/rover.png" alt="Rover" width="170"><br><b>Rover</b><br><sub>Muse Spark Open</sub><br><br>Reads the note a second time, on his own, with open weights. If he reads it differently, Şef decides.</td>
+<td align="center" valign="top" width="20%"><img src="assets/mascots/portraits/glimmer.png" alt="Glimmer" width="170"><br><b>Glimmer</b><br><sub>Muse Glimmer</sub><br><br>The other open-weight reader we measured. Kept in the comparison.</td>
+<td align="center" valign="top" width="20%"><img src="assets/mascots/portraits/iris.png" alt="Iris" width="170"><br><b>Iris</b><br><sub>Muse Image</sub><br><br>Drew everyone on this page, and the whole cast on the demo site.</td>
+<td align="center" valign="top" width="20%"><img src="assets/mascots/portraits/ada.png" alt="Ada" width="170"><br><b>Ada</b><br><sub>Muse Code</sub><br><br>Wrote the ERPNext client and the demo page, then worked the dock herself through the gate's MCP server.</td>
+</tr>
+</table>
+
+*Sena's concepts, drawn with Muse Image and cut out of their backgrounds by SAM 3.1
+(`experiments/mascot_portraits.py`). Each is a full-HD transparent PNG (1080×1920) in
+[`assets/mascots/portraits/`](assets/mascots/portraits/). Fan-made, not official Meta mascots.*
+
 ## The evidence
 
 A receiving dock built in Blender (headless, `experiments/blender/warehouse.py`): the truck at
@@ -314,18 +340,6 @@ The first rule that fires decides (`cbyp/gate.py`, offline tests in `tests/`):
 - Muse Code ran against the gate in dry-run mode; its run wrote nothing to ERPNext.
 
 Every experiment, with its numbers and its failures, is in **[docs/JOURNAL.md](docs/JOURNAL.md)**.
-
-## The cast
-
-![Spark, Sam, Glimmer, Voice, Kapı, Şef, Iris and Ada](assets/mascots/cast.jpg)
-
-Spark reads and runs the agent, Sam counts, Kapı is the gate, Şef signs off, Voice listens to
-the receiver, Wonder audits and writes the paperwork, Rover (Spark Open) reads the note a
-second time, Glimmer is the open-weight reader we compared, Iris drew everyone and Ada wrote
-the code she was given. Wonder and Rover joined after the group picture; each character says
-hello in [`assets/mascots/hello/`](assets/mascots/hello/).
-
-*Sena's concepts, drawn with Muse Image. Fan-made, not official Meta mascots.*
 
 ## Next
 
