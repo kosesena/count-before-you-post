@@ -15,6 +15,13 @@ Variants (the note on the clipboard always says 12 cartons of sunflower oil):
   belirsiz  12 cartons stacked in two layers, some hidden        → amber, supervisor counts
 For each variant: depo-<variant>-{genel,kamera,kapi,irsaliye}.png and depo-<variant>.blend,
 plus depo-truth.json. Run experiments/blender/make_cutouts.py first (mascot standees).
+
+CBYP_POLISH=1 builds a dressed-up scene instead: a recognisable semi-truck, an
+obviously open dock door with daylight, life-size character standees, full racking and
+props, panelled walls and an epoxy floor, warm high-bay lighting. Only the overview
+cameras (genel, kapi, irsaliye, disari) are rendered and depo-truth.json is left
+untouched.
+Without CBYP_POLISH the scene is built exactly as before, object for object.
 """
 import json
 import math
@@ -30,6 +37,7 @@ REPO = Path(__file__).resolve().parents[2]
 NOTES = REPO / "experiments" / "notes"
 CUTOUTS = REPO / "experiments" / "blender" / "cutouts"
 LANG = os.environ.get("CBYP_LANG", "tr")
+POLISH = os.environ.get("CBYP_POLISH") == "1"
 FONT = ("/System/Library/Fonts/Hiragino Sans GB.ttc" if LANG == "zh"
         else "/System/Library/Fonts/Supplemental/Arial Bold.ttf")
 
@@ -493,6 +501,767 @@ def aim(cam, target):
     cam.rotation_euler = (Vector(target) - cam.location).to_track_quat("-Z", "Y").to_euler()
 
 
+# ---------------------------------------------------------------------------
+# Polish (only when CBYP_POLISH=1). Runs after the standard build, so the
+# delivery, gate, screen, clipboard and DockCam keep their exact objects,
+# positions, sizes and materials. Only non-protected scenery is replaced or
+# added, with a separate RNG stream, and nothing new is placed inside the
+# DockCam floor zone (x in [-2.5, 2.5], y in [3.5, 7.5]).
+
+def _pset(node, name, value):
+    """Set a shader-node input if it exists (Blender-version proof)."""
+    try:
+        if name in node.inputs:
+            node.inputs[name].default_value = value
+    except (KeyError, TypeError, AttributeError):
+        pass
+
+
+def _psetattr(ob, name, value):
+    try:
+        if hasattr(ob, name):
+            setattr(ob, name, value)
+    except (TypeError, AttributeError):
+        pass
+
+
+def _pcone(name, r1, r2, h, loc, m, rot=(0, 0, 0)):
+    bpy.ops.mesh.primitive_cone_add(radius1=r1, radius2=r2, depth=h, location=loc,
+                                    rotation=rot, vertices=24)
+    ob = bpy.context.object
+    ob.name = name
+    ob.data.materials.append(m)
+    return ob
+
+
+def _pdel(*names_or_prefixes):
+    """Delete objects by exact name or by name prefix (prefix ends with '*')."""
+    for ob in list(bpy.data.objects):
+        for pat in names_or_prefixes:
+            if (pat.endswith("*") and ob.name.startswith(pat[:-1])) or ob.name == pat:
+                bpy.data.objects.remove(ob, do_unlink=True)
+                break
+
+
+def _pnode(mat, ntype, name=None):
+    n = mat.node_tree.nodes.new(ntype)
+    if name:
+        n.name = name
+    return n
+
+
+def p_materials():
+    """Extra materials for the polished scene (all new names; M[] is untouched)."""
+    P = {}
+    P["floor"] = mat("p_floor", (0.62, 0.62, 0.60), rough=0.38)
+    # Subtle large-scale tonal variation on the epoxy floor.
+    nt = P["floor"].node_tree
+    b = next(n for n in nt.nodes if n.type == "BSDF_PRINCIPLED")
+    tex = _pnode(P["floor"], "ShaderNodeTexCoord")
+    mp = _pnode(P["floor"], "ShaderNodeMapping")
+    mp.inputs["Scale"].default_value = (14.0, 12.0, 1.0)
+    nz = _pnode(P["floor"], "ShaderNodeTexNoise")
+    nz.inputs["Scale"].default_value = 3.0
+    _pset(nz, "Detail", 4.0)
+    ramp = _pnode(P["floor"], "ShaderNodeValToRGB")
+    ramp.color_ramp.elements[0].color = (0.60, 0.60, 0.585, 1)
+    ramp.color_ramp.elements[0].position = 0.25
+    ramp.color_ramp.elements[1].color = (0.72, 0.72, 0.70, 1)
+    ramp.color_ramp.elements[1].position = 0.75
+    rramp = _pnode(P["floor"], "ShaderNodeValToRGB")
+    rramp.color_ramp.elements[0].color = (0.30, 0.30, 0.30, 1)
+    rramp.color_ramp.elements[0].position = 0.2
+    rramp.color_ramp.elements[1].color = (0.48, 0.48, 0.48, 1)
+    rramp.color_ramp.elements[1].position = 0.8
+    nt.links.new(tex.outputs["Object"], mp.inputs["Vector"])
+    nt.links.new(mp.outputs["Vector"], nz.inputs["Vector"])
+    nt.links.new(nz.outputs["Fac"], ramp.inputs["Fac"])
+    nt.links.new(nz.outputs["Fac"], rramp.inputs["Fac"])
+    nt.links.new(ramp.outputs["Color"], b.inputs["Base Color"])
+    nt.links.new(rramp.outputs["Color"], b.inputs["Roughness"])
+    _pset(b, "Coat Weight", 0.25)
+    _pset(b, "Coat Roughness", 0.4)
+
+    def wall_mat(name, brick_w, rotate):
+        m = mat(name, (0.80, 0.81, 0.82), rough=0.7)
+        nt = m.node_tree
+        b = next(n for n in nt.nodes if n.type == "BSDF_PRINCIPLED")
+        tex = _pnode(m, "ShaderNodeTexCoord")
+        mp = _pnode(m, "ShaderNodeMapping")
+        if rotate:
+            mp.inputs["Rotation"].default_value = (0, 0, math.radians(90))
+        br = _pnode(m, "ShaderNodeTexBrick")
+        _pset(br, "Offset", 0.0)
+        _pset(br, "Frequency", 1.0)
+        _pset(br, "Brick Width", brick_w)
+        _pset(br, "Row Height", 1.0)
+        _pset(br, "Mortar Size", 0.012)
+        _pset(br, "Mortar Smooth", 0.0)
+        _pset(br, "Bias", 0.0)
+        try:
+            br.inputs["Color1"].default_value = (0.80, 0.81, 0.82, 1)
+            br.inputs["Color2"].default_value = (0.77, 0.78, 0.79, 1)
+            br.inputs["Mortar"].default_value = (0.55, 0.56, 0.57, 1)
+        except KeyError:
+            pass
+        nt.links.new(tex.outputs["Object"], mp.inputs["Vector"])
+        nt.links.new(mp.outputs["Vector"], br.inputs["Vector"])
+        try:
+            nt.links.new(br.outputs["Color"], b.inputs["Base Color"])
+        except KeyError:
+            pass
+        return m
+
+    P["wall_back"] = wall_mat("p_wall_back", 1 / 13.4, False)
+    P["wall_side"] = wall_mat("p_wall_side", 1 / 26.0, True)
+    P["band"] = mat("p_band", (0.13, 0.25, 0.30), rough=0.6)
+    P["column"] = mat("p_column", (0.52, 0.54, 0.53), rough=0.5, metal=0.4)
+    P["yellow"] = mat("p_yellow", (0.92, 0.68, 0.03), rough=0.5)
+    P["dark_steel"] = mat("p_dark_steel", (0.18, 0.19, 0.20), rough=0.45, metal=0.7)
+    P["steel"] = mat("p_steel", (0.60, 0.61, 0.63), rough=0.35, metal=0.85)
+    P["chrome"] = mat("p_chrome", (0.85, 0.86, 0.88), rough=0.12, metal=1.0)
+    P["glass_dark"] = mat("p_glass_dark", (0.05, 0.08, 0.10), rough=0.08, metal=0.4)
+    P["cab_red"] = mat("p_cab_red", (0.62, 0.05, 0.03), rough=0.32, metal=0.15)
+    P["tyre"] = mat("p_tyre", (0.025, 0.025, 0.026), rough=0.9)
+    P["hub"] = mat("p_hub", (0.55, 0.55, 0.56), rough=0.35, metal=0.8)
+    P["trailer_in"] = mat("p_trailer_in", (0.72, 0.72, 0.70), rough=0.6)
+    P["wood"] = mat("p_wood", (0.55, 0.40, 0.24), rough=0.85)
+    P["wood_pale"] = mat("p_wood_pale", (0.68, 0.52, 0.32), rough=0.85)
+    P["cards"] = [mat(f"p_card{k}", c, rough=0.85) for k, c in enumerate(
+        [(0.62, 0.45, 0.28), (0.52, 0.36, 0.21), (0.70, 0.53, 0.34),
+         (0.46, 0.31, 0.18), (0.58, 0.42, 0.30)])]
+    P["paper"] = mat("p_paper", (0.93, 0.93, 0.90))
+    P["cone"] = mat("p_cone", (0.85, 0.22, 0.03), rough=0.55)
+    P["cone_white"] = mat("p_cone_white", (0.92, 0.92, 0.90), rough=0.5)
+    P["rack_blue"] = mat("p_rack_blue", (0.05, 0.20, 0.58), rough=0.4, metal=0.3)
+    P["rack_orange"] = mat("p_rack_orange", (0.88, 0.34, 0.02), rough=0.4, metal=0.3)
+    P["ceil"] = mat("p_ceil", (0.78, 0.79, 0.80), rough=0.9)
+    P["roof_steel"] = mat("p_roof_steel", (0.35, 0.37, 0.38), rough=0.55, metal=0.6)
+    P["shade"] = mat("p_shade", (0.10, 0.12, 0.11), rough=0.5, metal=0.5)
+    P["lamp_warm"] = mat("p_lamp_warm", (1.0, 0.82, 0.60), emit=6.0)
+    P["sky"] = mat("p_sky", (0.72, 0.84, 1.0), emit=5.0)
+    P["asphalt"] = mat("p_asphalt", (0.30, 0.30, 0.31), rough=0.95)
+    P["red"] = mat("p_red", (0.70, 0.05, 0.03), rough=0.5)
+    P["black"] = mat("p_black", (0.02, 0.02, 0.02), rough=0.85)
+    P["glass"] = mat("p_glass", (0.82, 0.90, 0.95), rough=0.06, metal=0.1)
+    P["glass"].blend_method = "BLEND"
+    _psetattr(P["glass"], "shadow_method", "NONE")
+    _pset(next(n for n in P["glass"].node_tree.nodes
+               if n.type == "BSDF_PRINCIPLED"), "Alpha", 0.22)
+    P["film"] = mat("p_film", (0.88, 0.92, 0.94), rough=0.18)
+    P["film"].blend_method = "BLEND"
+    _psetattr(P["film"], "shadow_method", "NONE")
+    _pset(next(n for n in P["film"].node_tree.nodes
+               if n.type == "BSDF_PRINCIPLED"), "Alpha", 0.32)
+    P["monitor"] = mat("p_monitor", (0.55, 0.75, 1.0), emit=2.0)
+    P["tyre_mark"] = mat("p_tyre_mark", (0.05, 0.05, 0.05), rough=0.9)
+    P["tyre_mark"].blend_method = "BLEND"
+    _psetattr(P["tyre_mark"], "shadow_method", "NONE")
+    _pset(next(n for n in P["tyre_mark"].node_tree.nodes
+               if n.type == "BSDF_PRINCIPLED"), "Alpha", 0.35)
+    return P
+
+
+def p_clear():
+    """Remove the plain placeholders the polish pass replaces."""
+    _pdel("trailer_*", "cargo*", "clutter_*", "rack*", "rp*", "fixture*", "door_roll",
+          "fl_*", "kapi-gec.png", "kapi-dur.png", "sef.png")
+    for ob in list(bpy.data.objects):
+        if ob.type == "LIGHT" and ob.data.type == "AREA":
+            bpy.data.objects.remove(ob, do_unlink=True)
+        # Clutter bags are unnamed spheres on the left; the gate lamps (x = 3.2) stay.
+        elif ob.type == "MESH" and ob.name.startswith("Sphere") and ob.location.x < -5:
+            bpy.data.objects.remove(ob, do_unlink=True)
+
+
+def p_shell(P):
+    """Epoxy floor, panelled walls with a dark band, columns, roof, ceiling."""
+    fl = bpy.data.objects["floor"]
+    fl.data.materials.clear()
+    fl.data.materials.append(P["floor"])
+    for name in ("wall_back_l", "wall_back_r", "wall_back_top"):
+        ob = bpy.data.objects[name]
+        ob.data.materials.clear()
+        ob.data.materials.append(P["wall_back"])
+    wl = bpy.data.objects["wall_left"]
+    wl.data.materials.clear()
+    wl.data.materials.append(P["wall_side"])
+    # Dark lower band (1.2 m) with a thin yellow top stripe, inside faces.
+    # The back band leaves the dock-door opening (x in [-1.7, 1.7]) free.
+    for sgn in (-1, 1):
+        box(f"p_band_back{sgn}", (13.3, 0.06, 1.2), (sgn * 8.35, 9.81, 0.6), P["band"])
+        box(f"p_band_back_y{sgn}", (13.3, 0.065, 0.07), (sgn * 8.35, 9.81, 1.235),
+            P["yellow"])
+    box("p_band_left", (0.06, 26, 1.2), (-14.81, 2, 0.6), P["band"])
+    box("p_band_left_y", (0.065, 26, 0.07), (-14.81, 2, 1.235), P["yellow"])
+    # Steel columns with yellow guards along the visible walls.
+    for x in (-13, -8, -3.5, 3.5, 9.2, 13):
+        box(f"p_col_b{x}", (0.28, 0.28, 7.0), (x, 9.66, 3.5), P["column"])
+        box(f"p_colg_b{x}", (0.44, 0.44, 0.5), (x, 9.66, 0.25), P["yellow"])
+    for y in (-10, -5, 0, 5, 9):
+        box(f"p_col_l{y}", (0.28, 0.28, 7.0), (-14.66, y, 3.5), P["column"])
+        box(f"p_colg_l{y}", (0.44, 0.44, 0.5), (-14.66, y, 0.25), P["yellow"])
+    # Roof: purlins between the existing beams, plus a ceiling plane.
+    for k, x in enumerate(-13.5 + k * 3.0 for k in range(10)):
+        box(f"p_purlin{k}", (0.15, 26, 0.18), (x, 2, 7.28), P["roof_steel"])
+    box("p_ceiling", (30, 26, 0.1), (0, 2, 7.5), P["ceil"])
+    # Tyre scuffs on the floor (thin translucent strips).
+    for k, (x, y, yaw, ln) in enumerate(
+            [(-1.2, 0.5, 8, 5.0), (-0.4, 0.7, 8, 5.0),
+             (6.5, -3.0, -25, 4.0), (7.3, -2.6, -25, 4.0),
+             (2.0, 8.6, 3, 2.5), (-4.5, -6.0, 70, 3.5)]):
+        box(f"p_scuff{k}", (0.14, ln, 0.002), (x, y, 0.004), P["tyre_mark"],
+            rot_z=math.radians(yaw))
+
+
+def p_lights(P):
+    """Warm high-bay spots plus daylight sun through the door.
+
+    Many wide, low-power cones with soft edges and soft shadows overlap
+    into even light instead of bright round pools.
+    """
+    for ix, x in enumerate((-11, -5.5, 0, 5.5, 11)):
+        for iy, y in enumerate((-6, 0, 6)):
+            cyl(f"p_bay_cable{ix}{iy}", 0.02, 0.9, (x, y, 7.0), P["dark_steel"])
+            _pcone(f"p_bay_shade{ix}{iy}", 0.44, 0.14, 0.46, (x, y, 6.42), P["shade"])
+            cyl(f"p_bay_disc{ix}{iy}", 0.36, 0.03, (x, y, 6.22), P["lamp_warm"])
+            bpy.ops.object.light_add(type="SPOT", location=(x, y, 6.15))
+            L = bpy.context.object
+            L.name = f"p_bay{ix}{iy}"
+            L.data.energy = 550
+            L.data.color = (1.0, 0.82, 0.62)
+            _psetattr(L.data, "spot_size", 1.15)
+            _psetattr(L.data, "spot_blend", 0.8)
+            _psetattr(L.data, "shadow_soft_size", 0.5)
+            L.data.use_shadow = True
+            aim(L, (x, y, 0))
+    bpy.ops.object.light_add(type="SUN", location=(3, 26, 17))
+    sun = bpy.context.object
+    sun.name = "p_sun"
+    sun.data.energy = 8.0
+    sun.data.color = (1.0, 0.97, 0.92)
+    _psetattr(sun.data, "angle", 0.06)
+    sun.data.use_shadow = True
+    aim(sun, (0, 4, 0))
+
+
+def p_sky(P):
+    """Bright exterior: apron, sky backdrop, parking guide lines."""
+    box("p_apron", (44, 24, 0.1), (0, 22, -0.06), P["asphalt"])
+    bpy.ops.mesh.primitive_plane_add(size=1, location=(0, 34, 9),
+                                     rotation=(math.radians(90), 0, 0))
+    sky = bpy.context.object
+    sky.name, sky.scale = "p_sky", (70, 26, 1)
+    sky.data.materials.append(P["sky"])
+    for k, x in enumerate((-2.2, 2.2)):
+        box(f"p_guideline{k}", (0.12, 12, 0.002), (x, 20, 0.005), P["paper"])
+
+
+def p_wheel(name, x, y, r, w, P):
+    cyl(f"{name}_tyre", r, w, (x, y, r), P["tyre"], rot=(0, math.radians(90), 0),
+        verts=28)
+    cyl(f"{name}_hub", r * 0.42, w + 0.02, (x, y, r), P["hub"],
+        rot=(0, math.radians(90), 0))
+
+
+def p_pallet(name, x, y, z0, P):
+    for k in range(5):
+        box(f"{name}_t{k}", (1.2, 0.14, 0.022), (x, y - 0.45 + k * 0.225, z0 + 0.123),
+            P["wood"])
+    for k in range(3):
+        box(f"{name}_b{k}", (1.2, 0.1, 0.1), (x, y - 0.45 + k * 0.45, z0 + 0.06),
+            P["wood"])
+    for k in range(2):
+        box(f"{name}_s{k}", (1.2, 0.1, 0.02), (x, y - 0.45 + k * 0.9, z0 + 0.01),
+            P["wood_pale"])
+
+
+def p_truck(P, rnd):
+    """Semi-truck backed up to the dock: open 8 m trailer, red tractor behind."""
+    trailer = mat("p_trailer", (0.82, 0.83, 0.85), rough=0.4, metal=0.3)
+    y0, tl = 10.25, 8.0
+    yc = y0 + tl / 2
+    box("p_tf_floor", (2.5, tl, 0.12), (0, yc, 0.48), P["dark_steel"])
+    box("p_tf_deck", (2.4, tl - 0.1, 0.02), (0, yc, 0.55), P["wood"])
+    for sgn in (-1, 1):
+        box(f"p_tf_wall{sgn}", (0.06, tl, 2.28), (sgn * 1.22, yc, 1.68), trailer,
+            bevel=0.005)
+        box(f"p_tf_in{sgn}", (0.02, tl - 0.2, 2.2), (sgn * 1.17, yc, 1.68),
+            P["trailer_in"])
+        for k in range(4):
+            box(f"p_tf_rib{sgn}{k}", (0.05, 0.08, 2.2),
+                (sgn * 1.15, y0 + 1 + k * 2.0, 1.68), P["dark_steel"])
+        box(f"p_tf_stripe{sgn}", (0.02, tl, 0.09), (sgn * 1.26, yc, 1.1), P["paper"])
+        box(f"p_tf_guard{sgn}", (0.06, 3.0, 0.28), (sgn * 1.18, 13.2, 0.30),
+            P["dark_steel"])
+        # Open rear doors folded back along the trailer sides.
+        box(f"p_tf_door{sgn}", (0.05, 1.25, 2.2), (sgn * 1.30, y0 + 0.68, 1.68),
+            trailer, bevel=0.005)
+        for k, dy in enumerate((0.35, 1.0)):
+            cyl(f"p_tf_rod{sgn}{k}", 0.016, 1.9, (sgn * 1.34, y0 + dy, 1.68),
+                P["chrome"])
+    box("p_tf_roof", (2.5, tl, 0.08), (0, yc, 2.90), trailer, bevel=0.005)
+    box("p_tf_front", (2.5, 0.08, 2.28), (0, y0 + tl - 0.04, 1.68), trailer)
+    for sgn in (-1, 1):
+        box(f"p_tf_post{sgn}", (0.09, 0.09, 2.28), (sgn * 1.21, y0 + 0.03, 1.68),
+            P["dark_steel"])
+    box("p_tf_lintel", (2.5, 0.09, 0.16), (0, y0 + 0.03, 2.80), P["dark_steel"])
+    tails = mat("p_taillight", (1.0, 0.08, 0.05), emit=2.0)
+    for sgn in (-1, 1):
+        box(f"p_tf_tail{sgn}", (0.14, 0.05, 0.28), (sgn * 1.02, y0 - 0.01, 0.72),
+            tails)
+    box("p_tf_bumper", (2.4, 0.14, 0.20), (0, y0 - 0.03, 0.32), P["dark_steel"])
+    for k, x in enumerate((-0.35, 0, 0.35)):
+        box(f"p_tf_marker{k}", (0.09, 0.05, 0.07), (x, y0 - 0.01, 2.80),
+            mat("p_marker", (1.0, 0.55, 0.05), emit=2.5))
+    for k, y in enumerate((15.0, 16.2)):
+        box(f"p_tf_axle{k}", (2.9, 0.14, 0.14), (0, y, 0.40), P["dark_steel"])
+        for sgn in (-1, 1):
+            p_wheel(f"p_tf_w{k}{sgn}", sgn * 1.48, y, 0.40, 0.36, P)
+    for sgn in (-1, 1):
+        box(f"p_tf_fender{sgn}", (0.55, 2.9, 0.06), (sgn * 1.48, 15.6, 0.86),
+            P["dark_steel"])
+        box(f"p_tf_leg{sgn}", (0.12, 0.12, 0.25), (sgn * 0.9, 17.3, 0.30),
+            P["dark_steel"])
+    # Cargo pallets inside the trailer, seen through the open rear.
+    for k, (x, y) in enumerate(((-0.60, 11.6), (0.60, 11.6), (0.0, 13.15))):
+        p_pallet(f"p_tc{k}", x, y, 0.56, P)
+        n = rnd.randint(2, 4)
+        for j in range(n):
+            w, d, h = rnd.choice([(0.55, 0.45, 0.4), (0.45, 0.4, 0.35),
+                                  (0.6, 0.5, 0.3)])
+            box(f"p_tc{k}c{j}", (w, d, h),
+                (x + rnd.uniform(-0.25, 0.25), y + rnd.uniform(-0.2, 0.2),
+                 0.695 + h / 2), rnd.choice(P["cards"]), bevel=0.008,
+                rot_z=rnd.uniform(-0.06, 0.06))
+        if k == 2:
+            box(f"p_tc{k}_film", (1.3, 1.1, 0.55), (x, y, 0.93), P["film"])
+        box(f"p_tc{k}_lbl", (0.3, 0.005, 0.2), (x, y - 0.48, 0.95), P["paper"])
+    strip = mat("p_strip", (0.9, 0.95, 1.0), emit=3.0)
+    box("p_tf_strip", (0.3, 2.2, 0.03), (0, 12.4, 2.76), strip)
+    bpy.ops.object.light_add(type="POINT", location=(0, 12.4, 2.3))
+    il = bpy.context.object
+    il.name = "p_trailer_light"
+    il.data.energy, il.data.color = 50, (0.88, 0.93, 1.0)
+    il.data.use_shadow = False
+    # --- tractor (faces away; its red rear-top shows over the trailer roof) ---
+    cab, dark, glass = P["cab_red"], P["dark_steel"], P["glass_dark"]
+    for sgn in (-1, 1):
+        box(f"p_c_chassis{sgn}", (0.16, 4.2, 0.28), (sgn * 0.45, 20.5, 0.72), dark)
+    box("p_c_cross", (1.1, 0.14, 0.14), (0, 19.0, 0.72), dark)
+    for k, y in enumerate((19.3, 20.4)):
+        for sgn in (-1, 1):
+            p_wheel(f"p_c_w{k}{sgn}", sgn * 1.0, y, 0.50, 0.40, P)
+        for sgn in (-1, 1):
+            box(f"p_c_flap{k}{sgn}", (0.55, 0.05, 0.45), (sgn * 1.0, 18.72, 0.42),
+                P["black"])
+    for sgn in (-1, 1):
+        p_wheel(f"p_c_fw{sgn}", sgn * 1.0, 21.9, 0.50, 0.36, P)
+        cyl(f"p_c_tank{sgn}", 0.32, 1.0, (sgn * 1.02, 21.15, 0.78), P["chrome"],
+            rot=(math.radians(90), 0, 0))
+        box(f"p_c_step{sgn}", (0.5, 0.35, 0.08), (sgn * 1.05, 22.35, 0.55), dark)
+    box("p_cab", (2.4, 1.9, 2.6), (0, 21.5, 2.0), cab, bevel=0.03)
+    box("p_cab_back_win", (1.6, 0.06, 0.5), (0, 20.53, 3.2), glass)
+    shield = box("p_cab_shield", (2.1, 0.06, 0.95), (0, 22.44, 2.78), glass)
+    shield.rotation_euler = (math.radians(12), 0, 0)
+    for sgn in (-1, 1):
+        box(f"p_cab_sidewin{sgn}", (0.06, 0.95, 0.7), (sgn * 1.21, 21.95, 2.78),
+            glass)
+        box(f"p_cab_stripe{sgn}", (0.03, 1.9, 0.22), (sgn * 1.22, 21.5, 1.55),
+            P["paper"])
+        box(f"p_cab_mirarm{sgn}", (0.3, 0.05, 0.05), (sgn * 1.32, 22.3, 2.95), dark)
+        box(f"p_cab_mir{sgn}", (0.07, 0.28, 0.42), (sgn * 1.45, 22.3, 2.85),
+            P["black"])
+        cyl(f"p_cab_stack{sgn}", 0.075, 2.7, (sgn * 0.98, 20.62, 2.9), P["chrome"])
+    box("p_cab_grille", (1.8, 0.08, 0.7), (0, 22.47, 1.30), P["chrome"])
+    box("p_cab_bumper", (2.4, 0.16, 0.35), (0, 22.5, 0.72), P["chrome"])
+    heads = mat("p_headlight", (1.0, 0.95, 0.85), emit=3.0)
+    for sgn in (-1, 1):
+        cyl(f"p_cab_head{sgn}", 0.14, 0.08, (sgn * 0.78, 22.5, 1.35), heads,
+            rot=(math.radians(90), 0, 0))
+        box(f"p_cab_ind{sgn}", (0.12, 0.06, 0.12), (sgn * 1.05, 22.49, 1.35),
+            mat("p_marker", (1.0, 0.55, 0.05), emit=2.5))
+    box("p_cab_plate", (0.44, 0.03, 0.11), (-0.5, 22.59, 0.72), P["paper"])
+    defl = box("p_cab_deflector", (2.2, 0.07, 1.25), (0, 20.95, 3.85), cab,
+               bevel=0.01)
+    defl.rotation_euler = (math.radians(38), 0, 0)
+    for k, x in enumerate((-0.4, 0, 0.4)):
+        box(f"p_cab_marker{k}", (0.09, 0.05, 0.07), (x, 20.52, 3.25),
+            mat("p_marker", (1.0, 0.55, 0.05), emit=2.5))
+
+
+def p_forklift(P):
+    """Counterbalance forklift in dock yellow: mast with forks, open overhead
+    guard, seat, steering wheel and lights. Front faces +y (toward the dock).
+    """
+    x, y = 8.0, -0.5
+    yellow, dark, steel = P["yellow"], P["dark_steel"], P["steel"]
+    black = mat("p_fl_black", (0.03, 0.03, 0.03), rough=0.8)
+    # Chassis and rounded rear counterweight.
+    box("p_fl_body", (1.10, 1.50, 0.50), (x, y - 0.10, 0.62), yellow, bevel=0.04)
+    box("p_fl_counter", (1.05, 0.50, 0.62), (x, y - 0.95, 0.66), yellow,
+        bevel=0.08)
+    box("p_fl_floor", (0.90, 0.70, 0.04), (x, y + 0.15, 0.90), black)
+    # Wheels: bigger drivers in front, smaller steers at the back.
+    for sgn in (-1, 1):
+        p_wheel(f"p_fl_wf{sgn}", x + sgn * 0.55, y + 0.55, 0.30, 0.24, P)
+        p_wheel(f"p_fl_wr{sgn}", x + sgn * 0.55, y - 0.75, 0.24, 0.20, P)
+    # Mast: outer rails, tie bars, inner chrome rails, carriage, forks.
+    ym = y + 1.05
+    for sgn in (-1, 1):
+        box(f"p_fl_rail{sgn}", (0.12, 0.14, 2.60), (x + sgn * 0.45, ym, 1.45),
+            dark)
+        box(f"p_fl_inner{sgn}", (0.08, 0.10, 2.30),
+            (x + sgn * 0.30, ym + 0.02, 1.45), P["chrome"])
+        box(f"p_fl_forkv{sgn}", (0.13, 0.06, 0.55),
+            (x + sgn * 0.27, ym + 0.14, 0.35), steel)
+        box(f"p_fl_fork{sgn}", (0.13, 1.15, 0.05),
+            (x + sgn * 0.27, ym + 0.72, 0.10), steel)
+        cyl(f"p_fl_ram{sgn}", 0.035, 0.80, (x + sgn * 0.42, y + 0.775, 1.20),
+            P["chrome"], rot=(math.radians(-37), 0, 0))
+    box("p_fl_tie_top", (1.02, 0.12, 0.14), (x, ym, 2.68), dark)
+    box("p_fl_tie_low", (1.02, 0.16, 0.18), (x, ym, 0.35), dark)
+    box("p_fl_carriage", (0.72, 0.08, 0.45), (x, ym + 0.12, 0.45), dark)
+    box("p_fl_axle", (1.10, 0.12, 0.12), (x, y + 0.55, 0.30), dark)
+    box("p_fl_mount", (1.00, 0.35, 0.25), (x, y + 0.80, 0.30), dark)
+    # Seat, column, wheel and dash.
+    box("p_fl_seatbase", (0.30, 0.30, 0.12), (x, y - 0.30, 0.93), dark)
+    box("p_fl_seat", (0.46, 0.42, 0.14), (x, y - 0.30, 1.02), black, bevel=0.03)
+    box("p_fl_seatback", (0.46, 0.12, 0.52), (x, y - 0.53, 1.32), black,
+        bevel=0.03)
+    cyl("p_fl_column", 0.035, 0.50, (x, y + 0.32, 1.15), dark,
+        rot=(math.radians(25), 0, 0))
+    cyl("p_fl_wheel", 0.12, 0.03, (x, y + 0.25, 1.38), black,
+        rot=(math.radians(90 - 25), 0, 0))
+    box("p_fl_dash", (0.50, 0.25, 0.18), (x, y + 0.42, 1.00), yellow, bevel=0.02)
+    # Overhead guard: four posts and an open slatted roof frame.
+    for ix, px in enumerate((x - 0.50, x + 0.50)):
+        for iy, py in enumerate((y - 0.80, y + 0.35)):
+            box(f"p_fl_post{ix}{iy}", (0.07, 0.07, 1.35), (px, py, 1.475), dark)
+    for ix, px in enumerate((x - 0.50, x + 0.50)):
+        box(f"p_fl_roofside{ix}", (0.07, 1.22, 0.07), (px, y - 0.225, 2.15),
+            dark)
+    for iy, py in enumerate((y - 0.80, y + 0.35)):
+        box(f"p_fl_roofend{iy}", (1.07, 0.07, 0.07), (x, py, 2.15), dark)
+    for k, py in enumerate((y - 0.55, y - 0.225, y + 0.10)):
+        box(f"p_fl_slat{k}", (1.00, 0.09, 0.05), (x, py, 2.15), dark)
+    # Working lights, tail light and amber beacon.
+    heads = mat("p_headlight", (1.0, 0.95, 0.85), emit=3.0)
+    for sgn in (-1, 1):
+        box(f"p_fl_head{sgn}", (0.12, 0.06, 0.10),
+            (x + sgn * 0.50, y + 0.39, 1.95), heads)
+    tails = mat("p_taillight", (1.0, 0.08, 0.05), emit=2.0)
+    box("p_fl_tail", (0.30, 0.05, 0.08), (x, y - 1.21, 0.75), tails)
+    beacon = mat("p_beacon", (1.0, 0.55, 0.05), emit=3.0)
+    cyl("p_fl_beacon", 0.05, 0.12, (x + 0.35, y - 0.80, 2.25), beacon)
+
+
+def p_door(P, light):
+    """Open roller door: slats up top, seal curtains, leveller, dock light."""
+    for k in range(8):
+        box(f"p_slat{k}", (3.3, 0.10, 0.11),
+            (0, 9.80 + (0.015 if k % 2 else -0.015), 3.50 + k * 0.12), P["steel"])
+    cyl("p_drum", 0.22, 3.4, (0, 9.68, 4.62), P["dark_steel"],
+        rot=(0, math.radians(90), 0))
+    box("p_drum_motor", (0.42, 0.35, 0.35), (1.45, 9.68, 4.62), P["yellow"])
+    for sgn in (-1, 1):
+        box(f"p_rail{sgn}", (0.10, 0.12, 3.4), (sgn * 1.58, 9.82, 1.7),
+            P["dark_steel"])
+        box(f"p_seal{sgn}", (0.60, 0.60, 3.4), (sgn * 1.55, 10.0, 1.7), P["black"])
+    box("p_seal_top", (3.7, 0.55, 0.28), (0, 10.12, 3.26), P["black"])
+    plate = box("p_leveller", (2.0, 1.4, 0.06), (0, 10.1, 0.29), P["steel"],
+                bevel=0.008)
+    plate.rotation_euler = (math.radians(22), 0, 0)
+    for sgn in (-1, 1):
+        edge = box(f"p_lev_edge{sgn}", (0.09, 1.4, 0.065), (sgn * 0.96, 10.1, 0.29),
+                   P["yellow"])
+        edge.rotation_euler = (math.radians(22), 0, 0)
+    # Dock signal light follows the gate state.
+    box("p_dock_housing", (0.20, 0.14, 0.32), (2.05, 9.76, 2.6), P["black"])
+    rgb = {"red": (1, 0.05, 0.03), "amber": (1, 0.55, 0), "green": (0.05, 1, 0.2)}[light]
+    lamp = mat(f"lamp_{light}_True", rgb, rough=0.3, emit=25)
+    bpy.ops.mesh.primitive_uv_sphere_add(radius=0.06, location=(2.05, 9.68, 2.6))
+    dl = bpy.context.object
+    dl.name = "p_dock_lens"
+    dl.data.materials.append(lamp)
+    bpy.ops.object.light_add(type="POINT", location=(2.05, 9.45, 2.6))
+    pl = bpy.context.object
+    pl.name = "p_dock_light"
+    pl.data.energy, pl.data.color = 25, rgb
+    pl.data.use_shadow = False
+    for sgn in (-1, 1):
+        cyl(f"p_bollard{sgn}", 0.11, 0.9, (sgn * 2.4, 9.2, 0.45), P["yellow"])
+        cyl(f"p_bollard_band{sgn}", 0.115, 0.12, (sgn * 2.4, 9.2, 0.66), P["black"])
+        box(f"p_bollard_base{sgn}", (0.3, 0.3, 0.04), (sgn * 2.4, 9.2, 0.02),
+            P["dark_steel"])
+
+
+def p_standees(P, light, cam_pos):
+    """Life-size character standees facing the overview camera.
+
+    The cut-out PNGs are RGBA with transparent surroundings; the front plane
+    discards them (blend_method CLIP, the same setting the glass and film
+    materials in this file use to stay transparent), so no opaque backer may
+    sit behind it - the character stands as a silhouette with a thin
+    solidified cardboard edge on a small foot.
+    """
+    card = mat("p_backer", (0.30, 0.22, 0.15), rough=0.9)
+    # Spots keep the pallet, gate, barrier and clipboard clear from both the
+    # genel and kapi cameras (and the standees out of the irsaliye close-up).
+    spots = [("spark.png", -4.2, 4.5, 2.1), ("sam.png", 2.7, 6.8, 2.2),
+             ("voice.png", -4.6, 2.1, 2.2), ("wonder.png", -8.2, 1.6, 2.1),
+             ("kapi-gec.png" if light == "green" else "kapi-dur.png",
+              6.3, 3.2, 2.3), ("sef.png", 8.2, 4.2, 2.4)]
+    for cutout, x, y, h in spots:
+        img = bpy.data.images.load(str(CUTOUTS / cutout))
+        m = bpy.data.materials.new("p_" + cutout)
+        m.use_nodes = True
+        m.blend_method = "CLIP"
+        _psetattr(m, "shadow_method", "CLIP")
+        nt = m.node_tree
+        tex = nt.nodes.new("ShaderNodeTexImage")
+        tex.image = img
+        bsdf = next(n for n in nt.nodes if n.type == "BSDF_PRINCIPLED")
+        nt.links.new(tex.outputs["Color"], bsdf.inputs["Base Color"])
+        nt.links.new(tex.outputs["Alpha"], bsdf.inputs["Alpha"])
+        bsdf.inputs["Roughness"].default_value = 0.6
+        w = h * img.size[0] / img.size[1]
+        yaw = math.atan2(cam_pos[0] - x, -(cam_pos[1] - y))
+        rot = (math.radians(90), 0, yaw)
+        bpy.ops.mesh.primitive_plane_add(size=1, location=(x, y, h / 2),
+                                         rotation=rot)
+        ob = bpy.context.object
+        ob.name, ob.scale = "p_stand_" + cutout, (w, h, 1)
+        ob.data.materials.append(m)
+        edge = ob.modifiers.new("edge", "SOLIDIFY")
+        edge.thickness, edge.offset = 0.012, 0.0
+        box(f"p_standft_{cutout}", (0.55, 0.4, 0.05), (x, y, 0.025), card)
+
+
+def p_racks(P, rnd):
+    """Tall pallet-rack rows, nearly every slot holding a loaded pallet."""
+    rows = [("A", 8.5, (-11.9, -9.2, -6.5)), ("B", 6.0, (-11.9, -9.2)),
+            ("C", -2.5, (-12.5, -9.8, -7.1)), ("D", -5.0, (-12.5, -9.8)),
+            ("E", -7.5, (-12.5, -9.8, -7.1))]
+    for letter, y, bays in rows:
+        for bi, bx in enumerate(bays):
+            for sx in (-1.29, 1.29):
+                for sy in (-0.49, 0.49):
+                    box(f"p_rk{letter}{bi}_up{sx}{sy}", (0.12, 0.12, 5.4),
+                        (bx + sx, y + sy, 2.7), P["rack_blue"])
+            for lv, zb in enumerate((1.6, 3.0, 4.4)):
+                for sy in (-0.49, 0.49):
+                    box(f"p_rk{letter}{bi}_beam{lv}{sy}", (2.58, 0.10, 0.14),
+                        (bx, y + sy, zb), P["rack_orange"])
+                # Location label on the beam face, readable from the aisle.
+                box(f"p_rk{letter}{bi}_beam{lv}_lbl", (0.5, 0.012, 0.12),
+                    (bx + rnd.uniform(-0.5, 0.5), y - 0.545, zb), P["paper"])
+            for lv, z0 in enumerate((0.02, 1.67, 3.07, 4.47)):
+                if rnd.random() < 0.05:
+                    continue
+                px = bx + rnd.uniform(-0.1, 0.1)
+                p_pallet(f"p_rk{letter}{bi}l{lv}", px, y, z0, P)
+                top = z0 + 0.134
+                # Bottom layer: tidy 2x2 stack, one height per slot so the
+                # top layer sits flush; varied browns and footprints.
+                h0 = rnd.choice([0.34, 0.38, 0.42])
+                lbl = None
+                for jx in (-0.30, 0.30):
+                    for jy in (-0.24, 0.24):
+                        w, d = rnd.choice([(0.52, 0.40), (0.46, 0.36),
+                                           (0.54, 0.42), (0.40, 0.34)])
+                        cx = px + jx + rnd.uniform(-0.02, 0.02)
+                        cy = y + jy + rnd.uniform(-0.02, 0.02)
+                        yaw = rnd.uniform(-0.05, 0.05)
+                        box(f"p_rk{letter}{bi}l{lv}b{jx}{jy}", (w, d, h0),
+                            (cx, cy, top + h0 / 2), rnd.choice(P["cards"]),
+                            bevel=0.008, rot_z=yaw)
+                        if jx < 0 and jy < 0:
+                            lbl = (cx, cy - d / 2, yaw, w)
+                # Top layer: one centred carton, or two side by side.
+                if rnd.random() < 0.55:
+                    tops = [(rnd.uniform(-0.08, 0.08),
+                             rnd.choice([(0.55, 0.42, 0.36),
+                                         (0.48, 0.38, 0.32),
+                                         (0.62, 0.46, 0.30)]))]
+                else:
+                    sizes = [(0.48, 0.38, 0.32), (0.42, 0.34, 0.30),
+                             (0.50, 0.40, 0.28)]
+                    tops = [(-0.30 + rnd.uniform(-0.04, 0.04),
+                             rnd.choice(sizes)),
+                            (0.30 + rnd.uniform(-0.04, 0.04),
+                             rnd.choice(sizes))]
+                th = 0.0
+                for j, (ox, (w, d, h)) in enumerate(tops):
+                    box(f"p_rk{letter}{bi}l{lv}t{j}", (w, d, h),
+                        (px + ox, y + rnd.uniform(-0.10, 0.10),
+                         top + h0 + h / 2), rnd.choice(P["cards"]),
+                        bevel=0.008, rot_z=rnd.uniform(-0.06, 0.06))
+                    th = max(th, h)
+                if rnd.random() < 0.35:
+                    fh = h0 + th + 0.04
+                    box(f"p_rk{letter}{bi}l{lv}_film", (1.3, 1.1, fh),
+                        (px, y, top + fh / 2 - 0.01), P["film"])
+                # Shipping label flush on the front bottom carton.
+                lx, ly, lyaw, lw = lbl
+                box(f"p_rk{letter}{bi}l{lv}_lbl",
+                    (min(0.38, lw * 0.8), 0.012, 0.15),
+                    (lx, ly - 0.004, top + 0.20), P["paper"], rot_z=lyaw)
+            box(f"p_rk{letter}{bi}_tag", (0.5, 0.012, 0.18), (bx + 0.75, y - 0.56,
+                1.6), P["paper"])
+            text(f"p_rk{letter}{bi}_txt", f"{letter}{bi + 1}", (bx + 0.75, y - 0.575,
+                 1.6), 0.13, P["black"])
+    bpy.data.objects["sign_raf_bg"].location = (-10, -3.75, 5.2)
+    bpy.data.objects["sign_raf"].location = (-10, -3.78, 5.2)
+    for k, dx in enumerate((-1.0, 1.0)):
+        cyl(f"p_sign_cable{k}", 0.015, 2.0, (-10 + dx, -3.75, 6.45),
+            P["dark_steel"])
+
+
+def p_props(P, rnd):
+    """Floor props: walkways, cones, pallets, hand truck, extinguisher, office."""
+    for k, x in enumerate((-4.2, -2.8)):
+        box(f"p_walk{k}", (0.10, 11.5, 0.004), (x, -4.25, 0.003), P["yellow"])
+    for k, y in enumerate((-8.5, -9.1)):
+        box(f"p_lane{k}", (21.5, 0.10, 0.004), (-2.5, y, 0.003), P["yellow"])
+    floor_tape("p_dhatch_o", -2.2, 7.9, 2.2, 9.3, P["yellow"])
+    hatch("p_dhatch", -2.2, 7.9, 2.2, 9.3, P["yellow"])
+    for k, (x, y) in enumerate(((-2.9, 3.1), (2.9, 3.1), (-2.9, 7.9), (2.9, 7.9))):
+        box(f"p_cone_base{k}", (0.36, 0.36, 0.04), (x, y, 0.02), P["cone"])
+        _pcone(f"p_cone{k}", 0.20, 0.035, 0.55, (x, y, 0.315), P["cone"])
+        _pcone(f"p_cone_band{k}", 0.135, 0.095, 0.13, (x, y, 0.37),
+               P["cone_white"])
+    for k in range(8):
+        p_pallet(f"p_stack{k}", 3.6, 8.6, 0.02 + k * 0.15, P)
+    for k, (x, y) in enumerate(((10.8, 1.0), (10.8, -0.8))):
+        p_pallet(f"p_wait{k}", x, y, 0.02, P)
+        for j in range(4):
+            w, d = rnd.choice([(0.55, 0.42), (0.5, 0.36)])
+            h = rnd.choice([0.38, 0.42])
+            box(f"p_wait{k}c{j}", (w, d, h),
+                (x - 0.28 + (j % 2) * 0.56, y - 0.24 + (j // 2) * 0.48,
+                 0.154 + h / 2), rnd.choice(P["cards"]), bevel=0.008)
+        box(f"p_wait{k}top", (0.9, 0.7, 0.35), (x, y, 0.154 + 0.42 + 0.175),
+            rnd.choice(P["cards"]), bevel=0.008)
+        box(f"p_wait{k}_film", (1.3, 1.1, 1.0), (x, y, 0.62), P["film"])
+        box(f"p_wait{k}_lbl", (0.35, 0.012, 0.22), (x - 0.3, y - 0.56, 0.5),
+            P["paper"])
+    # Hand truck (sack barrow) near the workbench.
+    hx, hy = -6.6, 2.2
+    for dy in (-0.25, 0.25):
+        box(f"p_ht_rail{dy}", (0.05, 0.05, 1.25), (hx - 0.1, hy + dy, 0.65),
+            P["red"])
+        cyl(f"p_ht_wheel{dy}", 0.13, 0.06, (hx - 0.1, hy + dy, 0.13), P["black"],
+            rot=(math.radians(90), 0, 0))
+    for z in (0.4, 0.9):
+        box(f"p_ht_cross{z}", (0.05, 0.55, 0.05), (hx - 0.1, hy, z), P["red"])
+    box("p_ht_plate", (0.45, 0.55, 0.04), (hx + 0.12, hy, 0.03), P["dark_steel"])
+    box("p_ht_grip", (0.05, 0.55, 0.05), (hx - 0.1, hy, 1.28), P["black"])
+    # Fire extinguisher on the back wall.
+    cyl("p_ext", 0.075, 0.5, (4.2, 9.72, 1.45), P["red"])
+    cyl("p_ext_top", 0.02, 0.12, (4.2, 9.72, 1.75), P["black"])
+    cyl("p_ext_hose", 0.015, 0.35, (4.29, 9.72, 1.58), P["black"])
+    box("p_ext_handle", (0.12, 0.03, 0.03), (4.2, 9.72, 1.82), P["dark_steel"])
+    box("p_ext_sign", (0.45, 0.03, 0.32), (4.2, 9.79, 2.25), P["red"])
+    text("p_ext_txt", "!", (4.2, 9.77, 2.25), 0.25, P["paper"])
+    p_office(P)
+
+
+def p_office(P):
+    """Small glass-walled office cabin with a desk."""
+    cx, cy = 11.0, 6.25
+    box("p_of_slab", (3.6, 3.7, 0.12), (cx, cy, 0.06), P["ceil"])
+    box("p_of_roof", (3.7, 3.8, 0.14), (cx, cy, 2.82), P["ceil"])
+    box("p_of_fascia", (3.72, 3.82, 0.10), (cx, cy, 2.72), P["rack_blue"])
+    for gx, gy, along_y in ((9.35, cy, True), (cx, 7.95, False), (cx, 4.55, False)):
+        if along_y:
+            box(f"p_of_glass{gx}", (0.05, 3.4, 2.5), (gx, gy, 1.37), P["glass"])
+            box(f"p_of_head{gx}", (0.09, 3.4, 0.12), (gx, gy, 2.68),
+                P["dark_steel"])
+            box(f"p_of_sill{gx}", (0.09, 3.4, 0.12), (gx, gy, 0.18),
+                P["dark_steel"])
+            for k, my in enumerate((4.6, 5.45, 6.3, 7.15, 7.9)):
+                box(f"p_of_mull{gx}{k}", (0.09, 0.09, 2.5), (gx, my, 1.37),
+                    P["dark_steel"])
+        else:
+            box(f"p_of_glass{gy}", (3.3, 0.05, 2.5), (gx, gy, 1.37), P["glass"])
+            box(f"p_of_head{gy}", (3.3, 0.09, 0.12), (gx, gy, 2.68),
+                P["dark_steel"])
+            box(f"p_of_sill{gy}", (3.3, 0.09, 0.12), (gx, gy, 0.18),
+                P["dark_steel"])
+            for k, mx in enumerate((9.6, 10.7, 11.8, 12.5)):
+                box(f"p_of_mull{gy}{k}", (0.09, 0.09, 2.5), (mx, gy, 1.37),
+                    P["dark_steel"])
+    box("p_of_back", (0.12, 3.5, 2.7), (12.65, cy, 1.41), P["ceil"])
+    box("p_of_door", (0.10, 1.0, 2.2), (9.33, 5.0, 1.22), P["dark_steel"])
+    box("p_of_door_gl", (0.06, 0.78, 1.9), (9.33, 5.0, 1.25), P["glass"])
+    box("p_of_door_hd", (0.06, 0.05, 0.18), (9.27, 5.35, 1.15), P["chrome"])
+    box("p_of_desk", (1.5, 0.7, 0.05), (11.9, 6.9, 0.78), P["wood_pale"])
+    for dx in (-0.65, 0.65):
+        for dy in (-0.28, 0.28):
+            box(f"p_of_leg{dx}{dy}", (0.05, 0.05, 0.75),
+                (11.9 + dx, 6.9 + dy, 0.40), P["dark_steel"])
+    box("p_of_mon", (0.55, 0.05, 0.34), (11.9, 7.1, 0.99), P["black"])
+    box("p_of_mon_gl", (0.50, 0.012, 0.29), (11.9, 7.07, 0.99), P["monitor"])
+    box("p_of_kb", (0.4, 0.15, 0.02), (11.9, 6.75, 0.815), P["black"])
+    box("p_of_papers", (0.3, 0.4, 0.03), (11.4, 6.9, 0.82), P["paper"])
+    box("p_of_seat", (0.45, 0.45, 0.06), (11.9, 6.2, 0.5), P["black"])
+    box("p_of_seatbk", (0.45, 0.06, 0.5), (11.9, 6.0, 0.8), P["black"])
+    cyl("p_of_post", 0.03, 0.5, (11.9, 6.2, 0.25), P["dark_steel"])
+    cyl("p_of_based", 0.28, 0.04, (11.9, 6.2, 0.14), P["dark_steel"])
+    box("p_of_shelf", (0.9, 0.32, 0.05), (12.1, 5.0, 1.2), P["wood_pale"])
+    box("p_of_shelf2", (0.9, 0.32, 0.05), (12.1, 5.0, 0.7), P["wood_pale"])
+    for k, c in enumerate(((0.7, 0.1, 0.1), (0.1, 0.2, 0.6), (0.1, 0.5, 0.2),
+                           (0.85, 0.65, 0.1))):
+        box(f"p_of_bind{k}", (0.09, 0.24, 0.3),
+            (12.0 + k * 0.14, 5.0, 1.38), mat(f"p_bind{k}", c, rough=0.6))
+    box("p_of_panel", (1.2, 0.6, 0.03), (cx, cy, 2.60), P["monitor"])
+    bpy.ops.object.light_add(type="POINT", location=(cx, cy, 2.4))
+    ol = bpy.context.object
+    ol.name = "p_office_light"
+    ol.data.energy, ol.data.color = 40, (1.0, 0.9, 0.78)
+    ol.data.use_shadow = False
+
+
+def p_quality():
+    """Warmer ambient plus the best EEVEE offers (all version-guarded)."""
+    bg = bpy.context.scene.world.node_tree.nodes["Background"]
+    bg.inputs["Color"].default_value = (0.32, 0.32, 0.33, 1)
+    bg.inputs["Strength"].default_value = 0.5
+    ee = bpy.context.scene.eevee
+    for key, val in (("use_raytracing", True), ("use_soft_shadows", True),
+                     ("taa_render_samples", 64), ("taa_samples", 4),
+                     ("use_taa_reprojection", True), ("use_bloom", True),
+                     ("bloom_threshold", 1.0), ("shadow_pool_size", 2048)):
+        _psetattr(ee, key, val)
+
+
+def polish(cams, V):
+    rnd = random.Random(99)
+    P = p_materials()
+    p_clear()
+    p_shell(P)
+    p_lights(P)
+    p_sky(P)
+    p_truck(P, rnd)
+    p_door(P, V["light"])
+    p_forklift(P)
+    g = cams["genel"]
+    g.location = (10.8, -9.8, 4.8)
+    g.data.lens = 21
+    aim(g, (0, 5.3, 0.45))  # the delivery pallet is the centre of the shot
+    # Exterior camera: the whole semi-truck backed up to the dock, tractor
+    # unit included (the cab is hidden behind the trailer from inside).
+    bpy.ops.object.camera_add(location=(8.0, 26.5, 3.4))
+    cams["disari"] = bpy.context.object
+    cams["disari"].data.lens = 24
+    aim(cams["disari"], (0, 16.5, 1.3))
+    p_standees(P, V["light"], g.location)
+    p_racks(P, rnd)
+    p_props(P, rnd)
+    p_quality()
+
+
 def build(variant):
     bpy.ops.wm.read_factory_settings(use_empty=True)
     _mats.clear()
@@ -544,6 +1313,8 @@ def build(variant):
     cams["irsaliye"] = bpy.context.object
     cams["irsaliye"].data.lens = 36
     aim(cams["irsaliye"], (-3.0, 5.55, 1.43))
+    if POLISH:
+        polish(cams, V)
     return cams, cartons
 
 
@@ -567,10 +1338,17 @@ if __name__ == "__main__":
     out = Path(args[0]).resolve()
     out.mkdir(parents=True, exist_ok=True)
     truth_file = out / "depo-truth.json"
-    truth = json.loads(truth_file.read_text()) if truth_file.exists() else {}
+    truth = {} if POLISH else (json.loads(truth_file.read_text())
+                               if truth_file.exists() else {})
     for variant in args[1:] or list(VARIANTS):
         cams, cartons = build(variant)
+        if POLISH:
+            cams = {k: c for k, c in cams.items()
+                    if k in ("genel", "kapi", "irsaliye", "disari")}
         render(cams, out, variant)
+        if POLISH:
+            print("rendered", variant, "(polish, no truth)")
+            continue
         V = VARIANTS[variant]
         truth[variant] = {
             "note": V["note"], "note_qty": 12, "note_product": PRODUCT, "lang": LANG,
@@ -581,4 +1359,5 @@ if __name__ == "__main__":
             "expected_decision": V["decision"],
         }
         print("rendered", variant)
-    truth_file.write_text(json.dumps(truth, ensure_ascii=False, indent=2))
+    if not POLISH:
+        truth_file.write_text(json.dumps(truth, ensure_ascii=False, indent=2))
