@@ -172,8 +172,11 @@ and Spark pulls out the number, the supplier and whether the speaker was sure
 (`cbyp/voice.py`). On four Turkish clips, with and without keyword biasing, 8/8 were right:
 Turkish number words, a self-correction ("24 dedim ama aslında 22" → 22) and a hedge
 ("galiba on iki" → not sure). In the gate, an unsure receiver or a number that differs from
-the camera sends the delivery to a human. The clips are synthetic (macOS Turkish voice);
-real voices at a noisy dock are next.
+the camera sends the delivery to a human. The clips are synthetic, in all four languages
+from ElevenLabs (the first Turkish set, macOS `say`, is kept in `experiments/voice/tr-say/`;
+it also scored 8/8). With the ElevenLabs Turkish voice the numbers stayed 8/8, but without
+keywords the supplier came out as "Doğan Gündağ"; with them, "Doğan Gıda". Real voices at a
+noisy dock are next.
 
 ### PDF notes: text no one can see
 

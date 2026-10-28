@@ -1,9 +1,10 @@
 """Muse Voice Transcribe on short Turkish receiving sentences, with and without keywords.
 
 Usage: [CBYP_LANG=en|de|zh] .venv/bin/python experiments/voice_check.py
-Turkish clips in experiments/voice/*.wav (macOS 'say -v Yelda', converted to 24 kHz mono WAV);
-other languages in experiments/voice/<lang>/ (ElevenLabs, experiments/make_voice.py). Each
-folder has a truth.json; writes voice_check.json to the language's results folder.
+Turkish clips in experiments/voice/*.wav, other languages in experiments/voice/<lang>/, all
+from ElevenLabs (experiments/make_voice.py; the first Turkish set, macOS 'say -v Yelda', is in
+experiments/voice/tr-say/ with its result results/voice_check_say.json). Each folder has a
+truth.json; writes voice_check.json to the language's results folder.
 """
 import json
 import sys

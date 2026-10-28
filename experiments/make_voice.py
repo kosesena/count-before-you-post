@@ -1,9 +1,10 @@
-"""Speak the four receiving sentences in English, German and Chinese with ElevenLabs.
+"""Speak the four receiving sentences in every language with ElevenLabs.
 
-Usage: .venv/bin/python experiments/make_voice.py en|de|zh
+Usage: .venv/bin/python experiments/make_voice.py tr|en|de|zh
 Needs ELEVENLABS_API_KEY in .env (optional ELEVENLABS_VOICE_ID; otherwise the first voice on
-the account). Writes experiments/voice/<lang>/*.wav (24 kHz mono 16-bit) and truth.json.
-The Turkish clips were made with macOS `say -v Yelda` and stay as they are.
+the account). Writes experiments/voice/<lang>/*.wav (Turkish: experiments/voice/*.wav, where
+the dock reads it), 24 kHz mono 16-bit, and truth.json. The first Turkish clips, made with
+macOS `say -v Yelda`, are kept in experiments/voice/tr-say/.
 """
 import json
 import os
@@ -20,6 +21,13 @@ API = "https://api.elevenlabs.io/v1"
 
 # Same four situations as the Turkish clips: plain, number last, self-correction, unsure.
 SENTENCES = {
+    "tr": {
+        "01-basit": ("On iki koli geldi, Doğan Gıda'dan.", 12, "Doğan Gıda"),
+        "02-sayi-sonda": ("Doğan Gıda'nın ayçiçek yağı geldi, toplam on bir koli.", 11,
+                          "Doğan Gıda"),
+        "03-duzeltme": ("Yirmi dört koli dedim ama yanlış saydım, aslında yirmi iki koli.", 22, ""),
+        "04-belirsiz": ("Kolilerin bir kısmı üst üste, tam sayamadım, galiba on iki.", 12, ""),
+    },
     "en": {
         "01-basit": ("Twelve cartons came in, from Harbor Foods.", 12, "Harbor Foods"),
         "02-sayi-sonda": ("Harbor Foods' sunflower oil is here, eleven cartons in total.", 11,
@@ -62,7 +70,7 @@ def main(lang):
     _load_env()
     voice = os.environ.get("ELEVENLABS_VOICE_ID") or \
         json.loads(call("/voices"))["voices"][0]["voice_id"]
-    out = HERE / "voice" / lang
+    out = HERE / "voice" / ("" if lang == "tr" else lang)
     out.mkdir(parents=True, exist_ok=True)
     truth = {}
     for name, (text, qty, supplier) in SENTENCES[lang].items():

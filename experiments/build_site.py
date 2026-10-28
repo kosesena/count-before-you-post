@@ -168,8 +168,7 @@ def build(lang):
                       "said": row["truth"]["quantity"]})
 
     data = {"lang": lang,
-            "voice_source": "synthetic voice, macOS 'say'" if lang == "tr"
-            else "synthetic voice, ElevenLabs",
+            "voice_source": "synthetic voice, ElevenLabs",
             "rules": list(RULES), "cases": cases, "voice": clips, "characters": cast,
             "cast": jpg(ROOT / "assets" / "mascots" / "cast.jpg", "cast.jpg", 1600),
             "summary": {"cases": len(cases),

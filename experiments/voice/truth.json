@@ -1,4 +1,23 @@
-{"01-basit": {"quantity": 12, "supplier": "Doğan Gıda"},
- "02-sayi-sonda": {"quantity": 11, "supplier": "Doğan Gıda"},
- "03-duzeltme": {"quantity": 22, "supplier": ""},
- "04-belirsiz": {"quantity": 12, "supplier": "", "uncertain": true}}
+{
+ "01-basit": {
+  "quantity": 12,
+  "supplier": "Doğan Gıda",
+  "text": "On iki koli geldi, Doğan Gıda'dan."
+ },
+ "02-sayi-sonda": {
+  "quantity": 11,
+  "supplier": "Doğan Gıda",
+  "text": "Doğan Gıda'nın ayçiçek yağı geldi, toplam on bir koli."
+ },
+ "03-duzeltme": {
+  "quantity": 22,
+  "supplier": "",
+  "text": "Yirmi dört koli dedim ama yanlış saydım, aslında yirmi iki koli."
+ },
+ "04-belirsiz": {
+  "quantity": 12,
+  "supplier": "",
+  "text": "Kolilerin bir kısmı üst üste, tam sayamadım, galiba on iki.",
+  "uncertain": true
+ }
+}

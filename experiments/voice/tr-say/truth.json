@@ -1,0 +1,4 @@
+{"01-basit": {"quantity": 12, "supplier": "Doğan Gıda"},
+ "02-sayi-sonda": {"quantity": 11, "supplier": "Doğan Gıda"},
+ "03-duzeltme": {"quantity": 22, "supplier": ""},
+ "04-belirsiz": {"quantity": 12, "supplier": "", "uncertain": true}}
