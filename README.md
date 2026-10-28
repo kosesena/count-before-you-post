@@ -2,6 +2,8 @@
 
 **An AI agent that can't write a number into an ERP until a camera has counted it.**
 
+![The receiving dock: the gate's light, the screen, the pallet under the ceiling camera, and the cast](assets/readme/dock.jpg)
+
 **Live demo: [count-before-you-post.vercel.app](https://count-before-you-post.vercel.app)**:
 the six dock cases in four languages, the gate's decision on each, SAM's masks, the
 carton-by-carton cross-check and the agent's step-by-step trace, with and without the gate.
@@ -93,10 +95,17 @@ was given is in [`docs/muse-code/`](docs/muse-code/), verbatim.
 
 ## The evidence
 
-A receiving dock built in Blender, seen by the ceiling camera: wrong product, a missing
-carton, a crushed carton, a stacked load, the delivery note close-up and the whole dock.
+A receiving dock built in Blender (headless, `experiments/blender/warehouse.py`): the truck at
+the door, the delivery note, the pallet in the yellow box under the ceiling camera.
 
-![Ceiling-camera views of the test cases](experiments/blender/out/depo-kameralar.jpg)
+![The truck at the dock, the delivery note, the truck outside](assets/readme/dock-views.jpg)
+
+What the models measured is the ceiling camera, one frame per case. These are the frames every
+number below comes from. The dock views above are a later dress-up pass (`CBYP_POLISH=1`:
+truck, racking, lighting) that re-renders only the overview cameras; the ceiling frames are
+the original, measured renders.
+
+![The six ceiling-camera frames: ok, wrong product, short, injected note, damaged, stacked](assets/readme/ceiling-cases.jpg)
 
 ### Six cases, four languages
 
