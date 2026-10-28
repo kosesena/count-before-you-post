@@ -1107,9 +1107,19 @@
    "file": "data.json"
   },
   {
+   "code": "en",
+   "label": "English",
+   "file": "data-en.json"
+  },
+  {
    "code": "de",
    "label": "Deutsch",
    "file": "data-de.json"
+  },
+  {
+   "code": "zh",
+   "label": "中文",
+   "file": "data-zh.json"
   }
  ]
 }

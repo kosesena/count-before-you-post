@@ -1,0 +1,132 @@
+[
+  {
+    "clip": "01-basit",
+    "keywords": false,
+    "transcript": "到了十二十二项施害港视频送来的。",
+    "certain": true,
+    "product": "",
+    "quantity": 12,
+    "supplier": "",
+    "unit": "项",
+    "truth": {
+      "quantity": 12,
+      "supplier": "海港食品",
+      "text": "到了十二箱，是海港食品送来的。"
+    },
+    "ok": true
+  },
+  {
+    "clip": "01-basit",
+    "keywords": true,
+    "transcript": "到了十二箱施害港食品送来的。",
+    "certain": true,
+    "product": "",
+    "quantity": 12,
+    "supplier": "施害港食品",
+    "unit": "箱",
+    "truth": {
+      "quantity": 12,
+      "supplier": "海港食品",
+      "text": "到了十二箱，是海港食品送来的。"
+    },
+    "ok": true
+  },
+  {
+    "clip": "02-sayi-sonda",
+    "keywords": false,
+    "transcript": "汉刚视频的规划自由刀了，一共十一箱。,",
+    "certain": true,
+    "product": "",
+    "quantity": 11,
+    "supplier": "",
+    "unit": "箱",
+    "truth": {
+      "quantity": 11,
+      "supplier": "海港食品",
+      "text": "海港食品的葵花籽油到了，一共十一箱。"
+    },
+    "ok": true
+  },
+  {
+    "clip": "02-sayi-sonda",
+    "keywords": true,
+    "transcript": "海港食品的葵花籽油到了,到了，一个五十一箱。",
+    "certain": true,
+    "product": "葵花籽油",
+    "quantity": 51,
+    "supplier": "海港食品",
+    "unit": "箱",
+    "truth": {
+      "quantity": 11,
+      "supplier": "海港食品",
+      "text": "海港食品的葵花籽油到了，一共十一箱。"
+    },
+    "ok": false
+  },
+  {
+    "clip": "03-duzeltme",
+    "keywords": false,
+    "transcript": "我刚才说二十四乡，但是输错了，其实是二十二乡。",
+    "certain": true,
+    "product": "",
+    "quantity": 22,
+    "supplier": "",
+    "unit": "乡",
+    "truth": {
+      "quantity": 22,
+      "supplier": "",
+      "text": "我刚才说二十四箱，但是数错了，其实是二十二箱。"
+    },
+    "ok": true
+  },
+  {
+    "clip": "03-duzeltme",
+    "keywords": true,
+    "transcript": "我刚才说二十四箱,但是输错了,其实是二十二箱。。",
+    "certain": true,
+    "product": "",
+    "quantity": 22,
+    "supplier": "",
+    "unit": "箱",
+    "truth": {
+      "quantity": 22,
+      "supplier": "",
+      "text": "我刚才说二十四箱，但是数错了，其实是二十二箱。"
+    },
+    "ok": true
+  },
+  {
+    "clip": "04-belirsiz",
+    "keywords": false,
+    "transcript": "有些箱子摞在一起， 我美术清楚，清楚， 好像像是十二箱。",
+    "certain": false,
+    "product": "",
+    "quantity": 12,
+    "supplier": "",
+    "unit": "箱",
+    "truth": {
+      "quantity": 12,
+      "supplier": "",
+      "text": "有些箱子摞在一起，我没数清楚，好像是十二箱。",
+      "uncertain": true
+    },
+    "ok": true
+  },
+  {
+    "clip": "04-belirsiz",
+    "keywords": true,
+    "transcript": "有些箱子落在一起， 我美术清楚。 好像是十二箱。",
+    "certain": false,
+    "product": "",
+    "quantity": 12,
+    "supplier": "",
+    "unit": "箱",
+    "truth": {
+      "quantity": 12,
+      "supplier": "",
+      "text": "有些箱子摞在一起，我没数清楚，好像是十二箱。",
+      "uncertain": true
+    },
+    "ok": true
+  }
+]

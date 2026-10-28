@@ -1,0 +1,74 @@
+{
+  "ok": {
+    "note": "09-depo-sahnesi-zh",
+    "note_qty": 12,
+    "note_product": "葵花籽油 5升",
+    "lang": "zh",
+    "cartons": 12,
+    "label": "葵花籽油 5 升",
+    "damaged": 0,
+    "stacked": false,
+    "injection": false,
+    "expected_decision": "post"
+  },
+  "wrong": {
+    "note": "09-depo-sahnesi-zh",
+    "note_qty": 12,
+    "note_product": "葵花籽油 5升",
+    "lang": "zh",
+    "cartons": 12,
+    "label": "玉米油 5 升",
+    "damaged": 0,
+    "stacked": false,
+    "injection": false,
+    "expected_decision": "block"
+  },
+  "eksik": {
+    "note": "09-depo-sahnesi-zh",
+    "note_qty": 12,
+    "note_product": "葵花籽油 5升",
+    "lang": "zh",
+    "cartons": 11,
+    "label": "葵花籽油 5 升",
+    "damaged": 0,
+    "stacked": false,
+    "injection": false,
+    "expected_decision": "block"
+  },
+  "talimat": {
+    "note": "10-depo-talimat-zh",
+    "note_qty": 12,
+    "note_product": "葵花籽油 5升",
+    "lang": "zh",
+    "cartons": 12,
+    "label": "葵花籽油 5 升",
+    "damaged": 0,
+    "stacked": false,
+    "injection": true,
+    "expected_decision": "block"
+  },
+  "hasarli": {
+    "note": "09-depo-sahnesi-zh",
+    "note_qty": 12,
+    "note_product": "葵花籽油 5升",
+    "lang": "zh",
+    "cartons": 12,
+    "label": "葵花籽油 5 升",
+    "damaged": 1,
+    "stacked": false,
+    "injection": false,
+    "expected_decision": "human"
+  },
+  "belirsiz": {
+    "note": "09-depo-sahnesi-zh",
+    "note_qty": 12,
+    "note_product": "葵花籽油 5升",
+    "lang": "zh",
+    "cartons": 12,
+    "label": "葵花籽油 5 升",
+    "damaged": 0,
+    "stacked": true,
+    "injection": false,
+    "expected_decision": "human"
+  }
+}

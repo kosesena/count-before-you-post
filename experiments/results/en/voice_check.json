@@ -1,0 +1,132 @@
+[
+  {
+    "clip": "01-basit",
+    "keywords": false,
+    "transcript": "twelve cartons came in from Harbor Foods.",
+    "certain": true,
+    "product": "",
+    "quantity": 12,
+    "supplier": "Harbor Foods",
+    "unit": "cartons",
+    "truth": {
+      "quantity": 12,
+      "supplier": "Harbor Foods",
+      "text": "Twelve cartons came in, from Harbor Foods."
+    },
+    "ok": true
+  },
+  {
+    "clip": "01-basit",
+    "keywords": true,
+    "transcript": "twelve cartons came in from Harbor Foods.",
+    "certain": true,
+    "product": "",
+    "quantity": 12,
+    "supplier": "Harbor Foods",
+    "unit": "cartons",
+    "truth": {
+      "quantity": 12,
+      "supplier": "Harbor Foods",
+      "text": "Twelve cartons came in, from Harbor Foods."
+    },
+    "ok": true
+  },
+  {
+    "clip": "02-sayi-sonda",
+    "keywords": false,
+    "transcript": "Harbor food sunflower oil is here, 11 cartons in total.",
+    "certain": true,
+    "product": "sunflower oil",
+    "quantity": 11,
+    "supplier": "Harbor food",
+    "unit": "cartons",
+    "truth": {
+      "quantity": 11,
+      "supplier": "Harbor Foods",
+      "text": "Harbor Foods' sunflower oil is here, eleven cartons in total."
+    },
+    "ok": true
+  },
+  {
+    "clip": "02-sayi-sonda",
+    "keywords": true,
+    "transcript": "Harbor Foods sunflower oil is here 11 cartons in total.",
+    "certain": true,
+    "product": "sunflower oil",
+    "quantity": 11,
+    "supplier": "Harbor Foods",
+    "unit": "cartons",
+    "truth": {
+      "quantity": 11,
+      "supplier": "Harbor Foods",
+      "text": "Harbor Foods' sunflower oil is here, eleven cartons in total."
+    },
+    "ok": true
+  },
+  {
+    "clip": "03-duzeltme",
+    "keywords": false,
+    "transcript": "I said 24 cartons but I miscounted. It's actually 22.",
+    "certain": true,
+    "product": "",
+    "quantity": 22,
+    "supplier": "",
+    "unit": "cartons",
+    "truth": {
+      "quantity": 22,
+      "supplier": "",
+      "text": "I said twenty-four cartons, but I miscounted. It's actually twenty-two."
+    },
+    "ok": true
+  },
+  {
+    "clip": "03-duzeltme",
+    "keywords": true,
+    "transcript": "I said 24 cartons, but I miscounted. It's actually 22..",
+    "certain": true,
+    "product": "",
+    "quantity": 22,
+    "supplier": "",
+    "unit": "cartons",
+    "truth": {
+      "quantity": 22,
+      "supplier": "",
+      "text": "I said twenty-four cartons, but I miscounted. It's actually twenty-two."
+    },
+    "ok": true
+  },
+  {
+    "clip": "04-belirsiz",
+    "keywords": false,
+    "transcript": "some of the cartons are stacked i couldn't count them all 12 i think",
+    "certain": false,
+    "product": "",
+    "quantity": 12,
+    "supplier": "",
+    "unit": "cartons",
+    "truth": {
+      "quantity": 12,
+      "supplier": "",
+      "text": "Some of the cartons are stacked, I couldn't count them all. Twelve, I think.",
+      "uncertain": true
+    },
+    "ok": true
+  },
+  {
+    "clip": "04-belirsiz",
+    "keywords": true,
+    "transcript": "Some of the of the cartons are stacked, I couldn't count them all, twelve, I think.",
+    "certain": false,
+    "product": "",
+    "quantity": 12,
+    "supplier": "",
+    "unit": "cartons",
+    "truth": {
+      "quantity": 12,
+      "supplier": "",
+      "text": "Some of the cartons are stacked, I couldn't count them all. Twelve, I think.",
+      "uncertain": true
+    },
+    "ok": true
+  }
+]

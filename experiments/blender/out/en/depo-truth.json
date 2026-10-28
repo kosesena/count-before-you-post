@@ -1,0 +1,74 @@
+{
+  "ok": {
+    "note": "09-depo-sahnesi-en",
+    "note_qty": 12,
+    "note_product": "Sunflower oil 5 L",
+    "lang": "en",
+    "cartons": 12,
+    "label": "SUNFLOWER OIL 5 L",
+    "damaged": 0,
+    "stacked": false,
+    "injection": false,
+    "expected_decision": "post"
+  },
+  "wrong": {
+    "note": "09-depo-sahnesi-en",
+    "note_qty": 12,
+    "note_product": "Sunflower oil 5 L",
+    "lang": "en",
+    "cartons": 12,
+    "label": "CORN OIL 5 L",
+    "damaged": 0,
+    "stacked": false,
+    "injection": false,
+    "expected_decision": "block"
+  },
+  "eksik": {
+    "note": "09-depo-sahnesi-en",
+    "note_qty": 12,
+    "note_product": "Sunflower oil 5 L",
+    "lang": "en",
+    "cartons": 11,
+    "label": "SUNFLOWER OIL 5 L",
+    "damaged": 0,
+    "stacked": false,
+    "injection": false,
+    "expected_decision": "block"
+  },
+  "talimat": {
+    "note": "10-depo-talimat-en",
+    "note_qty": 12,
+    "note_product": "Sunflower oil 5 L",
+    "lang": "en",
+    "cartons": 12,
+    "label": "SUNFLOWER OIL 5 L",
+    "damaged": 0,
+    "stacked": false,
+    "injection": true,
+    "expected_decision": "block"
+  },
+  "hasarli": {
+    "note": "09-depo-sahnesi-en",
+    "note_qty": 12,
+    "note_product": "Sunflower oil 5 L",
+    "lang": "en",
+    "cartons": 12,
+    "label": "SUNFLOWER OIL 5 L",
+    "damaged": 1,
+    "stacked": false,
+    "injection": false,
+    "expected_decision": "human"
+  },
+  "belirsiz": {
+    "note": "09-depo-sahnesi-en",
+    "note_qty": 12,
+    "note_product": "Sunflower oil 5 L",
+    "lang": "en",
+    "cartons": 12,
+    "label": "SUNFLOWER OIL 5 L",
+    "damaged": 0,
+    "stacked": true,
+    "injection": false,
+    "expected_decision": "human"
+  }
+}

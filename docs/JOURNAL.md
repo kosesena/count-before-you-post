@@ -414,6 +414,26 @@ Wonder joins the cast as the ninth character (a clerk with a fountain pen and a 
 Sena's concept, drawn with Muse Image), on duty. Muse Code then added the drafts to the demo
 page, the language selector and a Muse Wonder tile (`docs/muse-code/demo-site-languages.md`).
 
+## 28 Oct: English, German and Chinese, end to end
+
+Each language is its own run of the whole pipeline (`experiments/run_language.sh <lang>`);
+the table is in the README. In every language the gate made the right call on all six cases
+and no wrong receipt reached ERPNext. The Spark agent alone posted one wrong receipt in
+Turkish and English and two in German and Chinese (it also posted the short delivery). Behind
+the gate it tried to write receipts that should not exist (the injected note everywhere, the
+damaged load in Chinese) and the gate refused them.
+
+What went wrong on the way, and the fixes:
+- Three languages at once on a ~100 KB/s uplink timed out (SAM, Spark); reading now saves
+  after every case and resumes, and the languages run one after another.
+- Long agent runs lost their chain: "referenced response not found or expired". The run is
+  retried up to three times, never after a real receipt was written.
+- A night-time network drop stopped the Chinese and English runs halfway; they resumed from
+  the saved readings the next morning.
+- The gate's product match had to ignore word breaks ("SONNENBLUMEN-ÖL", "葵花籽油 5升").
+- Voice heard "一共十一箱" (eleven in total) as "一个五十一箱" (51). That is the receiver rule
+  doing its job: a spoken number the camera doesn't confirm goes to the supervisor.
+
 ---
 
 ## Open

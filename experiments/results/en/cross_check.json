@@ -1,0 +1,62 @@
+[
+  {
+    "variant": "ok",
+    "cartons": 12,
+    "spark_points": 12,
+    "agreed": 12,
+    "sam_only": 0,
+    "spark_only": 0,
+    "doubled": 0,
+    "count": 12
+  },
+  {
+    "variant": "wrong",
+    "cartons": 12,
+    "spark_points": 12,
+    "agreed": 12,
+    "sam_only": 0,
+    "spark_only": 0,
+    "doubled": 0,
+    "count": 12
+  },
+  {
+    "variant": "eksik",
+    "cartons": 11,
+    "spark_points": 11,
+    "agreed": 11,
+    "sam_only": 1,
+    "spark_only": 0,
+    "doubled": 0,
+    "count": null
+  },
+  {
+    "variant": "talimat",
+    "cartons": 12,
+    "spark_points": 12,
+    "agreed": 12,
+    "sam_only": 0,
+    "spark_only": 0,
+    "doubled": 0,
+    "count": 12
+  },
+  {
+    "variant": "hasarli",
+    "cartons": 12,
+    "spark_points": 12,
+    "agreed": 12,
+    "sam_only": 0,
+    "spark_only": 0,
+    "doubled": 0,
+    "count": 12
+  },
+  {
+    "variant": "belirsiz",
+    "cartons": 12,
+    "spark_points": 12,
+    "agreed": 11,
+    "sam_only": 1,
+    "spark_only": 1,
+    "doubled": 0,
+    "count": null
+  }
+]
