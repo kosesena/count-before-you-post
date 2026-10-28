@@ -56,6 +56,13 @@ def _data_url(path: Path) -> str:
     return f"data:{mime};base64," + base64.b64encode(path.read_bytes()).decode()
 
 
+def _note_part(path: Path) -> dict:
+    """An image goes in as image_url; a PDF as a file (Spark gets its text layer and page images)."""
+    if path.suffix.lower() == ".pdf":
+        return {"type": "file", "file": {"filename": path.name, "file_data": _data_url(path)}}
+    return {"type": "image_url", "image_url": {"url": _data_url(path)}}
+
+
 def read_note(path: str | Path, effort: str = "medium") -> dict:
     """Return {"claim": <schema dict>, "seconds": float, "usage": {...}}."""
     path = Path(path)
@@ -73,7 +80,7 @@ def read_note(path: str | Path, effort: str = "medium") -> dict:
                 "role": "user",
                 "content": [
                     {"type": "text", "text": PROMPT},
-                    {"type": "image_url", "image_url": {"url": _data_url(path)}},
+                    _note_part(path),
                 ],
             }
         ],

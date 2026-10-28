@@ -45,6 +45,29 @@ def look(path):
     return json.loads(r.choices[0].message.content)
 
 
+VIDEO_PROMPT = (
+    "Video of a pallet at a warehouse receiving dock, filmed by someone walking around it. "
+    "Use every frame: read the product name printed on the carton labels exactly as written, "
+    "count the distinct cartons (each carton once, however many frames show it), count cartons "
+    "that look crushed, wet or torn, and say whether cartons are stacked and whether some "
+    "stay hidden in every frame."
+)
+
+
+def look_video(path):
+    """Spark watches a walk-around mp4 of the pallet: product, count, damage, stacking."""
+    url = "data:video/mp4;base64," + base64.b64encode(Path(path).read_bytes()).decode()
+    r = client().chat.completions.create(
+        model=SPARK, reasoning_effort="medium", max_tokens=8000,
+        response_format={"type": "json_schema",
+                         "json_schema": {"name": "pallet", "strict": True, "schema": LOOK}},
+        messages=[{"role": "user", "content": [
+            {"type": "text", "text": VIDEO_PROMPT},
+            {"type": "video_url", "video_url": {"url": url}}]}],
+    )
+    return json.loads(r.choices[0].message.content)
+
+
 def sam_confs(path, concept):
     """Confidences of every detection at or above MIN_CONF, highest first."""
     confs = [d.conf or 0 for d in parse(segment_image(path, concept))]
