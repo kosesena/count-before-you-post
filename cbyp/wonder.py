@@ -80,6 +80,7 @@ def parse(text: str) -> dict | None:
     head, _, body = text.strip().partition("\n\n")
     lines = dict(line.split(":", 1) for line in head.splitlines() if ":" in line)
     title, to, body = lines.get("TITLE", "").strip(), lines.get("TO", "").strip(), body.strip()
-    if not title or not to or len(body) < 60 or "TITLE:" in body:
+    # Length in bytes: a whole Chinese damage report fits in ~40 characters.
+    if not title or not to or len(body.encode()) < 60 or "TITLE:" in body:
         return None
     return {"title": title, "to": to, "body": body}

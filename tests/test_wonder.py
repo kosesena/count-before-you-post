@@ -54,6 +54,12 @@ class WonderTest(unittest.TestCase):
         self.assertIsNone(parse('function"}REDACTED? Need to reason more?"}'))
         self.assertIsNone(parse("TITLE: x\nTO: y\n\nshort"))
 
+    def test_short_chinese_body_is_accepted(self):
+        from cbyp.wonder import parse
+        text = ("TITLE: 损坏报告\nTO: 供应商和承运人\n\n"
+                "本次交付葵花籽油5升共12箱，其中1箱损坏。建议部分收货11箱。此为草稿，待主管批准。")
+        self.assertEqual(parse(text)["title"], "损坏报告")
+
 
 if __name__ == "__main__":
     unittest.main()

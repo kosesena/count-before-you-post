@@ -433,6 +433,12 @@ What went wrong on the way, and the fixes:
 - The gate's product match had to ignore word breaks ("SONNENBLUMEN-ÖL", "葵花籽油 5升").
 - Voice heard "一共十一箱" (eleven in total) as "一个五十一箱" (51). That is the receiver rule
   doing its job: a spoken number the camera doesn't confirm goes to the supervisor.
+- Wonder's Chinese damage report was right but only ~40 characters long, under the parser's
+  60-character floor for a broken answer; the floor now counts bytes (`cbyp/wonder.py`).
+- One extra real receipt: the first gated Chinese run wrote MAT-PRE-2026-00005 for the `ok`
+  case, then lost its chain before saving its result row. The retry rule held (no second
+  write in that run), but the rerun wrote MAT-PRE-2026-00006 for the same delivery. Next fix:
+  save the row the moment a receipt is written.
 
 ---
 

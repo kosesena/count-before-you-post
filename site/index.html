@@ -369,7 +369,8 @@ function renderStats(s) {
     `<div class="stat"><b><span class="sdot bad"></span>${esc(s.wrong_without_gate)}/${esc(s.cases)}</b>` +
     `<span>deliveries a system that trusts the note gets wrong</span></div>` +
     `<div class="stat"><b><span class="sdot mid"></span>${esc(s.wrong_agent_no_gate)}/${esc(s.cases)}</b>` +
-    `<span>wrong receipts from the Spark agent on its own (the injected note)</span></div>` +
+    `<span>wrong receipts from the Spark agent on its own` +
+    (s.agent_no_gate_cases?.length ? ` (${esc(s.agent_no_gate_cases.join(", "))})` : "") + `</span></div>` +
     `<div class="stat"><b><span class="sdot good"></span>${esc(s.wrong_with_gate)}/${esc(s.cases)}</b>` +
     `<span>wrong receipts reach the ERP behind the gate</span></div>` +
     `<div class="stat"><b><span class="sdot mid"></span>${esc(s.gate_right)}/${esc(s.cases)}</b>` +

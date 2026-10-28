@@ -180,6 +180,9 @@ def build(lang):
                         "wrong_with_gate": sum(c["gate"]["action"] == "post"
                                                and c["expected"] != "post" for c in cases),
                         "gate_right": sum(c["gate"]["action"] == c["expected"] for c in cases)}}
+    data["summary"]["agent_no_gate_cases"] = [
+        c["title"].lower() for c in cases
+        if c["without_gate"] and c["without_gate"]["posted"] and c["expected"] != "post"]
     name = "data.json" if lang == "tr" else f"data-{lang}.json"
     (SITE / name).write_text(json.dumps(data, ensure_ascii=False, indent=1))
     print(f"{lang}: {len(cases)} cases, {len(clips)} clips -> site/{name}")
