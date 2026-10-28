@@ -9,6 +9,7 @@ The gate is plain code, not a model: no text on the note or in a model answer ca
 change a rule. Rules run in order and the first one that fires decides.
 
   instruction on the note        -> block   (never follow it; quantity stays from the table)
+  invisible text in a PDF note   -> human   (white or tiny text no person and no Spark saw)
   note unreadable                -> human
   label product != note product  -> block
   stacked / cartons hidden       -> human   (count cannot be verified)
@@ -62,8 +63,8 @@ class Decision:
 
 
 # The rules in the order they run; Decision.rule names the one that fired.
-RULES = ("instruction", "unreadable", "wrong_product", "hidden", "damaged", "disagree",
-         "receiver", "match", "mismatch")
+RULES = ("instruction", "invisible_text", "unreadable", "wrong_product", "hidden", "damaged",
+         "disagree", "receiver", "match", "mismatch")
 
 
 def sam_bands(confs: list[float]) -> tuple[int, int]:
@@ -94,9 +95,10 @@ def cross_count(cross) -> int | None:
 
 
 def decide(note: dict, sam_confs: list[float], look: dict, cross=None,
-           spoken: dict | None = None) -> Decision:
+           spoken: dict | None = None, invisible: list[str] | None = None) -> Decision:
     """cross: an optional crosscheck.CrossCheck; when given it replaces the count bands.
-    spoken: an optional voice.understand() result, the receiver's own count."""
+    spoken: an optional voice.understand() result, the receiver's own count.
+    invisible: pdf_text.invisible_lines() of a PDF note, found in code, not by Spark."""
     items = note.get("items") or []
     sure, doubtful = sam_bands(sam_confs)
     evidence = {"note": [(i["quantity"], i["description"]) for i in items],
@@ -109,6 +111,10 @@ def decide(note: dict, sam_confs: list[float], look: dict, cross=None,
     if note.get("embedded_instructions"):
         return out("instruction", BLOCK, "The note contains instructions to software; not followed. "
                    "Supervisor notified: " + " | ".join(note["embedded_instructions"]))
+    if invisible:
+        evidence["invisible"] = invisible
+        return out("invisible_text", HUMAN, "The PDF note carries text no one can see (white or "
+                   "under 4 pt); the supervisor reads it first: " + " | ".join(invisible))
     if len(items) != 1 or not items[0].get("legible", False):
         return out("unreadable", HUMAN, "Delivery note has no single legible line item.")
     item = items[0]

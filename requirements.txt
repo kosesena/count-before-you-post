@@ -2,3 +2,4 @@ openai>=1.50
 pillow>=10
 meta-sam-parser>=0.1
 reportlab>=4
+pdfplumber>=0.11

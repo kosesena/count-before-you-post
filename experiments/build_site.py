@@ -44,8 +44,9 @@ CAST = [
      "I'm Voice. I write down what the receiver says at the dock, \u201con iki koli geldi\u201d, "
      "so the gate gets a third count, and I notice when they aren't sure."),
     ("kapi", "Kapı", "the gate, plain code", "#a16207", "on duty",
-     "I'm Kapı, Turkish for gate. I'm not a model, I'm nine rules in plain code. Nothing "
-     "written on a note can talk me into posting. No agreement, no receipt."),
+     "I'm Kapı, Turkish for gate. I'm not a model, I'm ten rules in plain code. Nothing "
+     "written on a note, not even in white ink, can talk me into posting. No agreement, "
+     "no receipt."),
     ("sef", "Şef", "the human supervisor", "#1d4ed8", "on duty",
      "I'm Şef, the human in the loop. A crushed carton, a stacked load, a number nobody "
      "can confirm: when Kapı isn't sure, the decision comes to me."),

@@ -318,6 +318,7 @@ const esc = s => String(s ?? "").replace(/[&<>"']/g, c =>
   ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c]));
 const RULE_LABEL = {
   instruction: "Hidden instruction in the note",
+  invisible_text: "Invisible text in a PDF note",
   unreadable: "Note has no legible line",
   wrong_product: "Label product differs from the note",
   hidden: "Cartons stacked or hidden",
@@ -327,7 +328,7 @@ const RULE_LABEL = {
   match: "Camera and note agree",
   mismatch: "Count confirmed, differs from the note"
 };
-const RULE_ARROW = { instruction: "block", unreadable: "human", wrong_product: "block",
+const RULE_ARROW = { instruction: "block", invisible_text: "human", unreadable: "human", wrong_product: "block",
   hidden: "human", damaged: "human", disagree: "human", receiver: "human",
   match: "post", mismatch: "block" };
 const ACTION = { post: "POST", block: "BLOCK", human: "ASK THE SUPERVISOR" };

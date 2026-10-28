@@ -3,6 +3,7 @@
  "voice_source": "synthetic voice, macOS 'say'",
  "rules": [
   "instruction",
+  "invisible_text",
   "unreadable",
   "wrong_product",
   "hidden",
@@ -1037,7 +1038,7 @@
    "model": "the gate, plain code",
    "colour": "#a16207",
    "status": "on duty",
-   "line": "I'm Kapı, Turkish for gate. I'm not a model, I'm nine rules in plain code. Nothing written on a note can talk me into posting. No agreement, no receipt.",
+   "line": "I'm Kapı, Turkish for gate. I'm not a model, I'm ten rules in plain code. Nothing written on a note, not even in white ink, can talk me into posting. No agreement, no receipt.",
    "portrait": "img/hello-kapi.jpg",
    "avatar": "img/av-kapi.jpg"
   },
