@@ -493,6 +493,31 @@ pieces were missing and are now in:
 
 57 tests pass.
 
+## 28 Oct: Wonder audits, an open-weight second reader, Turkish voices from ElevenLabs
+
+- **Wonder audit** (`cbyp/wonder.py: audit_note`, rule `audit`): Muse Wonder gets the note and
+  Spark's JSON and answers QUANTITY / PRODUCT SUPPORTED or NOT with a quote, INSTRUCTIONS NONE
+  or FOUND with a quote (plain form, parsed; its JSON schema was unreliable earlier). 63 calls:
+  real readings 26/27 confirmed, tampered ones 36/36 caught (quantity +5, product swapped,
+  instructions emptied). The one "miss" was Spark's own misreading of 籽 as 籏 on the Chinese
+  injected note, which Wonder flagged. About 2 cents and 10 s per audit.
+- **Open-weight second reader** (`cbyp/second_reader.py`, rule `readers_disagree`), through
+  OpenRouter with our own credit (the Meta API does not serve open weights). First run noisy
+  (kept as `second_reader_v1.json`); after pinning schema-capable hosts (Spark Open: Fireworks,
+  Together, Modal, not the fp4 Makora host; Glimmer: DeepInfra bf16) and Glimmer's recommended
+  sampling (temperature 1.0, top_p 0.95, top_k 64, 16k tokens): Spark Open 27/27 usable, 25/27
+  quantities right, 3/21 invented instructions; Glimmer 24/27 usable. Asked only before a post,
+  neither changed a single gate decision on the dock cases. Spark Open misread the Turkish
+  injected note's product as the injected sentence itself: a reader can be steered, the gate
+  cannot.
+- Both checks only ever turn a post into "ask Şef"; a block or a human decision stays as it is
+  (tested).
+- **Turkish voices** now from ElevenLabs like the other three languages; Voice Transcribe 8/8
+  again. Without keywords the supplier came out as "Doğan Gündağ" and "Doğu Angıdağı", with
+  them right. The macOS clips and their 8/8 are in `experiments/voice/tr-say/`.
+- Meta's workshop recording read from Vimeo's own transcript (notes outside the repo); its
+  memo ends "unverified", which is the gap this project fills.
+
 ---
 
 ## Open

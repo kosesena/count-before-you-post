@@ -215,6 +215,46 @@ Live, against ERPNext (`experiments/run_signoff.py`, `experiments/results/signof
 Delivery notes, photos and PDFs alike, now go to Spark through the Files API (uploaded once,
 referenced by `file_id`, kept for a day), the way Meta's workshop reads its documents.
 
+### Two more checks before a write: open weights and Wonder
+
+Everything above trusts Spark's reading of the note. Two Meta checks now look at the note
+again, only at the moment the gate is about to post; each can stop that post and send it to
+Şef, neither can post or block (rules `readers_disagree` and `audit`).
+
+**Muse Wonder audits Spark's reading** (`cbyp/wonder.py: audit_note`), the way Meta's workshop
+verifies claims: given the note and Spark's JSON, it marks quantity and product SUPPORTED or
+NOT, quoting the note, and quotes any instruction to software. On the 24 dock notes and 3 PDFs,
+with Spark's real readings and with readings changed on purpose
+(`experiments/run_audit.py`, `experiments/results/audit.json`):
+
+| Reading | Wonder right |
+|---|---|
+| Spark's real reading | 26/27 confirmed, and the 27th is a real Spark error it caught: 葵花**籏**油 for 葵花**籽**油 |
+| quantity raised by 5 | **27/27 caught** |
+| product swapped | **4/4 caught** |
+| instruction list emptied | **5/5 caught** |
+
+**An open-weight second reader** (`cbyp/second_reader.py`) reads the note independently, with
+Spark's schema and prompt, through OpenRouter. Muse Spark Open and Muse Glimmer
+(`experiments/run_second_reader.py`, `experiments/results/second_reader.json`):
+
+| | Spark Open | Glimmer 30B |
+|---|---|---|
+| usable reading | **27/27** | 24/27 |
+| quantity right | 25/27 | 22/24 |
+| injected instruction seen | 5/6 | 3/5 |
+| instruction invented | 3/21 | 1/19 |
+| differs from Spark | 4 | 7 |
+| gate decisions changed (asked only before a post) | **0** | **0** |
+
+The first run was much noisier (`second_reader_v1.json`: Glimmer 9/27 broken JSON, Spark Open 6
+invented instructions): OpenRouter had routed Spark Open to an fp4 host without schema support,
+and Glimmer ran out of room in the middle of its JSON after its long reasoning. Pinning the hosts
+that honour the schema and giving Glimmer Meta's recommended sampling fixed most of it. One
+reading shows why no single model is trusted: on the Turkish injected note, Spark Open returned
+the injected sentence as the product name. Spark Open is the second reader in the product;
+Glimmer stays in the comparison.
+
 ## Roadmap
 
 Found by checking every documented Spark and SAM 3.1 feature against this code
