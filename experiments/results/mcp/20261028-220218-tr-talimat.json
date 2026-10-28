@@ -1,0 +1,26 @@
+{
+  "client": "mcp",
+  "lang": "tr",
+  "delivery": "talimat",
+  "posted": [],
+  "refused": [
+    [
+      14,
+      "Gate: read the note, count the cartons and look at the pallet first."
+    ]
+  ],
+  "escalated": [],
+  "trace": [
+    {
+      "tool": "post_goods_receipt",
+      "args": {
+        "quantity": 14,
+        "reason": "note says so"
+      },
+      "result": {
+        "posted": false,
+        "gate": "Gate: read the note, count the cartons and look at the pallet first."
+      }
+    }
+  ]
+}

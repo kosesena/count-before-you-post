@@ -1,0 +1,81 @@
+{
+ "01-eksik": {
+  "receiver": 11,
+  "driver": 12,
+  "uncertain": false,
+  "lines": [
+   [
+    "driver",
+    "Doğan Gıda'dan on iki koli getirdim, imzalar mısınız?"
+   ],
+   [
+    "receiver",
+    "Bir dakika, saydım, on bir koli var. Biri eksik."
+   ]
+  ]
+ },
+ "02-tamam": {
+  "receiver": 12,
+  "driver": 12,
+  "uncertain": false,
+  "lines": [
+   [
+    "driver",
+    "On iki koli ayçiçek yağı, Doğan Gıda."
+   ],
+   [
+    "receiver",
+    "Saydım, on iki. Tamam."
+   ]
+  ]
+ },
+ "03-son-soz": {
+  "receiver": 10,
+  "driver": 12,
+  "uncertain": false,
+  "lines": [
+   [
+    "receiver",
+    "Burada on koli var."
+   ],
+   [
+    "driver",
+    "Hayır, on iki getirdim, ikisi arkada kaldı."
+   ],
+   [
+    "receiver",
+    "Arkaya da baktım, yok. On koli."
+   ]
+  ]
+ },
+ "04-sofor-sonda": {
+  "receiver": 11,
+  "driver": 12,
+  "uncertain": false,
+  "lines": [
+   [
+    "receiver",
+    "On bir koli saydım."
+   ],
+   [
+    "driver",
+    "Bende irsaliyede on iki yazıyor, on iki diye girin."
+   ]
+  ]
+ },
+ "05-belirsiz": {
+  "receiver": 18,
+  "driver": 20,
+  "uncertain": true,
+  "lines": [
+   [
+    "driver",
+    "Yirmi koli getirdim."
+   ],
+   [
+    "receiver",
+    "Üst üste duruyorlar, tam sayamadım, galiba on sekiz."
+   ]
+  ]
+ }
+}

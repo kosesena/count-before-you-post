@@ -1,0 +1,146 @@
+[
+  {
+    "clip": "01-eksik",
+    "way": "plain",
+    "quantity": 11,
+    "certain": true,
+    "truth": 11,
+    "ok": true
+  },
+  {
+    "clip": "01-eksik",
+    "way": "diarized",
+    "quantity": 11,
+    "certain": true,
+    "truth": 11,
+    "ok": true,
+    "turns": [
+      {
+        "speaker": "A",
+        "transcript": "Doğan Gıda'dan on iki koli getirdim, getirdim. İmzalarlar mısınız?"
+      },
+      {
+        "speaker": "B",
+        "transcript": "Bir dakika saydım on bir koli var. Biri eksik."
+      }
+    ],
+    "driver_quantity": 12,
+    "speakers": 2
+  },
+  {
+    "clip": "02-tamam",
+    "way": "plain",
+    "quantity": 12,
+    "certain": true,
+    "truth": 12,
+    "ok": true
+  },
+  {
+    "clip": "02-tamam",
+    "way": "diarized",
+    "quantity": 12,
+    "certain": true,
+    "truth": 12,
+    "ok": true,
+    "turns": [
+      {
+        "speaker": "A",
+        "transcript": "On iki koli ayçiçek yağı Doğan Gıda."
+      },
+      {
+        "speaker": "B",
+        "transcript": "Saydım on iki. Tamam."
+      }
+    ],
+    "driver_quantity": 12,
+    "speakers": 2
+  },
+  {
+    "clip": "03-son-soz",
+    "way": "plain",
+    "quantity": 10,
+    "certain": true,
+    "truth": 10,
+    "ok": true
+  },
+  {
+    "clip": "03-son-soz",
+    "way": "diarized",
+    "quantity": 10,
+    "certain": true,
+    "truth": 10,
+    "ok": true,
+    "turns": [
+      {
+        "speaker": "A",
+        "transcript": "Burada on koli var."
+      },
+      {
+        "speaker": "B",
+        "transcript": "Hayır, on iki getirdim, ikisi ikisi arkada kaldı."
+      },
+      {
+        "speaker": "A",
+        "transcript": "Arkaya da baktım, yok. On koli."
+      }
+    ],
+    "driver_quantity": 12,
+    "speakers": 2
+  },
+  {
+    "clip": "04-sofor-sonda",
+    "way": "plain",
+    "quantity": 12,
+    "certain": true,
+    "truth": 11,
+    "ok": false
+  },
+  {
+    "clip": "04-sofor-sonda",
+    "way": "diarized",
+    "quantity": 11,
+    "certain": true,
+    "truth": 11,
+    "ok": true,
+    "turns": [
+      {
+        "speaker": "A",
+        "transcript": "On bir koli saydım."
+      },
+      {
+        "speaker": "A",
+        "transcript": "Ben de İrsaliye'de on iki on iki yazıyor on iki diye girin."
+      }
+    ],
+    "driver_quantity": 12,
+    "speakers": 1
+  },
+  {
+    "clip": "05-belirsiz",
+    "way": "plain",
+    "quantity": 18,
+    "certain": false,
+    "truth": 18,
+    "ok": true
+  },
+  {
+    "clip": "05-belirsiz",
+    "way": "diarized",
+    "quantity": 18,
+    "certain": false,
+    "truth": 18,
+    "ok": true,
+    "turns": [
+      {
+        "speaker": "A",
+        "transcript": "Yirmi koli getirdim."
+      },
+      {
+        "speaker": "B",
+        "transcript": "Üst üste duruyorlar, tam sayamadım galiba on sekiz."
+      }
+    ],
+    "driver_quantity": 20,
+    "speakers": 2
+  }
+]

@@ -21,7 +21,7 @@ plain code on purpose.
 |---|---|---|---|
 | **Muse Spark** (`muse-spark-1.3`) | Spark | Reads the delivery note (a photo or a PDF, uploaded through the Files API) into strict JSON, looks at the pallet, puts a point on every carton, and runs the receiving agent | `cbyp/delivery_note.py`, `cbyp/perception.py`, `cbyp/agent.py` |
 | **SAM 3.1** | Sam | Finds and outlines every carton, with a confidence for each | `cbyp/sam.py`, `cbyp/crosscheck.py` |
-| **Muse Voice Transcribe** | Voice | Writes down the receiver's spoken count (Turkish) | `cbyp/voice.py` |
+| **Muse Voice Transcribe** | Voice | Writes down the receiver's spoken count (Turkish), with the supplier and product as keywords; with diarization it tells the driver's claim from the receiver's own count | `cbyp/voice.py`, `experiments/voice_dialogue.py` |
 | **Muse Wonder** (`muse-wonder-1.0`) | Wonder | Writes the paperwork when the gate stops a delivery: the dispute to the supplier, the damage report, or a note to the supervisor, in the delivery note's language, as a draft for the supervisor | `cbyp/wonder.py`, `experiments/wonder_drafts.py` |
 | **Muse Image** | Iris | Drew every character in this repository and on the demo page | `experiments/mascots_from_ref.py`, `experiments/mascot_design.py`, `assets/mascots/` |
 | **Muse Code** (CLI) | Ada | Wrote the ERPNext client and its tests, and the demo page | `cbyp/erpnext.py`, `tests/test_erpnext.py`, `site/index.html` |
@@ -280,7 +280,8 @@ Found by checking every documented Spark and SAM 3.1 feature against this code
 | `cbyp/agent.py` | The Spark receiving agent; the ERP tool sits behind the gate |
 | `cbyp/perception.py` | Spark looking at the pallet, Spark's points, SAM confidences |
 | `cbyp/crosscheck.py` | SAM and Spark agreeing carton by carton |
-| `cbyp/voice.py` | Muse Voice Transcribe + Spark: the receiver's spoken count |
+| `cbyp/voice.py` | Muse Voice Transcribe + Spark: the receiver's spoken count; driver and receiver apart (diarization) |
+| `cbyp/mcp_server.py` | The gate as an MCP server: an agent we did not write (Muse Code) works the dock with the same tools and the same gate |
 | `cbyp/erpnext.py` | ERPNext client, writes a Purchase Receipt only on a *post* decision (written by Muse Code) |
 | `tests/` | Offline tests for the gate and the ERPNext client |
 | `experiments/make_notes.py`, `read_notes.py` | Synthetic delivery notes (TR, EN, DE, ZH, injections) and the reading test |
@@ -291,6 +292,8 @@ Found by checking every documented Spark and SAM 3.1 feature against this code
 | `experiments/run_agent.py` | The agent on the six cases, with and without the gate |
 | `experiments/draw_masks.py`, `cross_check.py` | SAM masks and the object cross-check, drawn |
 | `experiments/voice_check.py`, `voice/` | Turkish voice clips and the transcription check |
+| `experiments/voice_dialogue.py`, `voice/dialogue/` | Driver and receiver talking at the dock: plain transcript vs diarized turns |
+| `demo/muse-dock/` | Muse Code at the dock: `muse-dock.sh` starts it with the gate's MCP server |
 | `experiments/post_to_erp.py` | Sends the gate's decisions to a real ERPNext |
 | `docs/muse-code/` | Tasks given to Muse Code, verbatim |
 | `experiments/results/` | Raw JSON from every run |
