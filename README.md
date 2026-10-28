@@ -305,10 +305,10 @@ Spark's schema and prompt. Muse Spark Open, measured on two hosts, and Muse Glim
 | injected instruction seen | 5/6 | 5/6 | 3/5 |
 | instruction invented | **2/20** | 3/21 | 1/19 |
 | gate decisions changed | 1: clean PDF → Şef | **0** | **0** |
-| median time per note | **13.8 s** | 19.8 s | 11.4 s |
+| median time per note | 13.8 s | 19.8 s | 11.4 s |
 
 The product now reads with Spark Open on **Baseten**, through the hackathon's partner credits.
-It was faster, and the one decision it changed went the safe way: it saw an instruction in the
+It was faster than Spark Open via OpenRouter, and the one decision it changed went the safe way: it saw an instruction in the
 clean PDF that isn't there, so that delivery would wait for Şef instead of posting. That costs
 a supervisor's look, not a wrong receipt. Baseten takes no file parts, so a PDF goes to it as
 the page image. The last column is still OpenRouter.
