@@ -16,6 +16,10 @@ At a warehouse dock, the goods receipt is typed from the delivery note. Whatever
 says becomes stock, money owed to the supplier, and the next order. Give that job to an AI
 agent and it trusts the paper too.
 
+I got to know this world in my SAP (ABAP) internship, and built in it before:
+[GlovesOn](https://github.com/kosesena/GlovesOn), a hands-free voice agent that posts goods
+receipts into SAP.
+
 I measured this before the hackathon. In my graduation project (a multi-agent ordering system
 writing to ERPNext), messages that inflated a quantity reached the ERP in **6 of 21 runs**.
 Nothing in the pipeline had independent evidence of the real amount. The attack messages
