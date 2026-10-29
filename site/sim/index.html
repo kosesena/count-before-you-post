@@ -14,6 +14,8 @@
   --human: #b45309; --human-bg: #fbeed3; --accent: #9a3412; --accent-bg: #fbeedf;
   --shadow: 0 1px 2px rgba(74, 55, 25, .12), 0 6px 22px rgba(74, 55, 25, .16);
   --radius: 14px;
+  --glass: rgba(11,18,38,.72); --glass-edge: rgba(255,255,255,.14);
+  --dpost: #4ade80; --dblock: #f87171; --dhuman: #fbbf24;
 }
 * { box-sizing: border-box; }
 html, body { margin: 0; height: 100%; overflow: hidden; overscroll-behavior: none; }
@@ -27,8 +29,11 @@ body {
 .mono, code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .82em; }
 /* ---------- overlay cards ---------- */
 .card {
-  background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
-  box-shadow: var(--shadow); padding: 18px 20px;
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(16px) saturate(1.3); backdrop-filter: blur(16px) saturate(1.3);
+  border: 1px solid var(--glass-edge); border-radius: 20px;
+  box-shadow: 0 12px 40px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.12);
+  padding: 18px 20px; color: #f2f5ff;
 }
 /* ---------- cinematic intro (the 3D dock stays live behind it) ---------- */
 #introWrap {
@@ -152,8 +157,8 @@ body.playing #hud { display: block; }
   font-size: 12.5px; pointer-events: auto;
 }
 #noteCard img { width: 100%; height: 96px; object-fit: cover; border-radius: 8px; display: block; background: var(--line); }
-#noteCard p { margin: 6px 2px 2px; font-weight: 700; line-height: 1.35; }
-#noteCard small { display: block; color: var(--muted); font-weight: 400; }
+#noteCard p { margin: 6px 2px 2px; font-weight: 700; line-height: 1.35; color: #fff; }
+#noteCard small { display: block; color: rgba(235,240,255,.7); font-weight: 400; }
 #hint {
   position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%);
   background: rgba(38, 33, 26, .88); color: #f1f4ec; font-size: 14.5px; font-weight: 600;
@@ -162,8 +167,11 @@ body.playing #hud { display: block; }
 }
 #demoLink {
   position: absolute; top: 10px; left: 10px; pointer-events: auto;
-  background: var(--panel); border: 1px solid var(--line); border-radius: 99px;
-  padding: 6px 14px; font-size: 13.5px; color: var(--ink); text-decoration: none; box-shadow: var(--shadow);
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(16px) saturate(1.3); backdrop-filter: blur(16px) saturate(1.3);
+  border: 1px solid var(--glass-edge); border-radius: 99px;
+  padding: 6px 14px; font-size: 13.5px; color: #fff; text-decoration: none;
+  box-shadow: 0 8px 24px rgba(0,0,0,.35);
 }
 #tallyChip {
   position: absolute; top: 52px; left: 10px; pointer-events: none;
@@ -222,46 +230,77 @@ body.seat #demoLink, body.seat #noteCard { display: none !important; }
 body.deciding #reads { display: flex; }
 body.deciding #noteCard, body.deciding #keys, body.deciding #joy, body.deciding #pickBtn, body.deciding #camBtn { display: none !important; }
 .read {
-  background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
-  box-shadow: var(--shadow); padding: 10px 12px; font-size: 13.5px;
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(16px) saturate(1.3); backdrop-filter: blur(16px) saturate(1.3);
+  border: 1px solid var(--glass-edge); border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.1);
+  padding: 10px 12px; font-size: 13.5px; color: #f2f5ff;
   animation: pop .3s ease-out;
 }
 @keyframes pop { from { opacity: 0; transform: translateY(8px); } }
-.read .who { display: flex; align-items: center; gap: 8px; font-weight: 800; margin-bottom: 4px; }
-.read .who img { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; border: 2px solid var(--line); }
-.read p { margin: 0; overflow-wrap: anywhere; }
-.read .flag { color: var(--block); font-weight: 700; }
-.read.gate-post { border-left: 6px solid var(--post); }
-.read.gate-block { border-left: 6px solid var(--block); }
-.read.gate-human { border-left: 6px solid var(--human); }
+.read .who { display: flex; align-items: center; gap: 8px; font-weight: 800; margin-bottom: 4px; color: #fff; }
+.read .who img { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(255,255,255,.25); background: #0b1226; }
+.read p { margin: 0; overflow-wrap: anywhere; color: rgba(255,255,255,.92); }
+.read p b { color: #fff; }
+.read .flag { color: var(--dblock); font-weight: 700; }
+.read.gate-post { border-left: 6px solid var(--dpost); }
+.read.gate-block { border-left: 6px solid var(--dblock); }
+.read.gate-human { border-left: 6px solid var(--dhuman); }
+.read.gate-post, .read.gate-block, .read.gate-human { padding: 12px 14px; }
+.read .verdict-word { font-size: 22px; font-weight: 800; letter-spacing: -.01em; }
+.read.gate-post .verdict-word { color: var(--dpost); }
+.read.gate-block .verdict-word { color: var(--dblock); }
+.read.gate-human .verdict-word { color: var(--dhuman); }
 .dots { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 6px; }
 .dots i { width: 13px; height: 13px; border-radius: 3px; display: block; }
-.dots i.a { background: var(--post); } .dots i.s { background: var(--human); } .dots i.p { background: var(--block); }
+.dots i.a { background: var(--dpost); } .dots i.s { background: var(--dhuman); } .dots i.p { background: var(--dblock); }
 /* ---------- result ---------- */
 #resultWrap {
-  position: fixed; inset: 0; z-index: 40; display: none; align-items: center; justify-content: center;
-  padding: 14px; background: rgba(32, 36, 31, .45); overflow-y: auto;
+  position: fixed; inset: 0; z-index: 40; display: none;
+  align-items: stretch; justify-content: flex-end;
+  padding: 12px; background: transparent; pointer-events: none;
 }
 body.done #resultWrap { display: flex; }
-#result { width: min(560px, 96vw); max-height: calc(100dvh - 28px); overflow-y: auto; }
-#result h2 { margin: 0 0 6px; font-size: clamp(22px, 5vw, 28px); letter-spacing: -.01em; }
-#result.post h2 { color: var(--post); } #result.block h2 { color: var(--block); } #result.human h2 { color: var(--human); }
-#result .doc { font-size: 15px; font-weight: 700; margin: 0 0 8px; }
-#result .point { background: var(--bg); border: 1px solid var(--line); border-radius: 10px;
-  padding: 10px 12px; font-size: 14px; margin: 10px 0 0; }
-.draft { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; margin-top: 10px; }
-.draft .doc-kind { font-size: 12px; font-weight: 700; color: var(--muted); }
-.draft .doc-title { font-size: 15px; font-weight: 700; margin: 2px 0; }
-.draft .doc-to { font-size: 12.5px; color: var(--muted); margin: 0 0 6px; }
-.draft .doc-body { font-size: 13.5px; margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+#result { width: 440px; max-width: min(440px, calc(100vw - 24px)); height: calc(100dvh - 24px); overflow-y: auto; pointer-events: auto; }
+#result h2 { margin: 0; font-size: clamp(24px, 2.6vw, 30px); letter-spacing: -.01em; line-height: 1.1; }
+#result.post h2 { color: var(--dpost); } #result.block h2 { color: var(--dblock); } #result.human h2 { color: var(--dhuman); }
+.v-head { display: flex; gap: 12px; align-items: center; margin-bottom: 10px; }
+.v-fig { width: 76px; height: 96px; object-fit: contain; flex: none; border-radius: 12px;
+  background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.14); }
+.v-title { min-width: 0; flex: 1 1 auto; }
+.v-badge { flex: none; font-size: 12px; font-weight: 800; letter-spacing: .06em; border-radius: 8px; padding: 6px 10px; color: #0b1226; }
+.v-badge.post { background: var(--dpost); } .v-badge.block { background: var(--dblock); } .v-badge.human { background: var(--dhuman); }
+#result .v-doc { font-size: 20px; font-weight: 800; margin: 6px 0 0; color: #fff; overflow-wrap: anywhere; }
+#result .v-doc .mono { font-size: .78em; }
+#result .v-reason { font-size: 15px; margin: 10px 0 0; color: rgba(255,255,255,.92); overflow-wrap: anywhere; }
+.v-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+.v-tile { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.14);
+  border-radius: 14px; padding: 10px 12px; min-width: 0; }
+.v-tile h3 { font-size: 11.5px; text-transform: uppercase; letter-spacing: .07em; margin: 0 0 6px; color: rgba(255,255,255,.72); }
+.v-tile p { margin: 0; font-size: 14px; font-weight: 700; color: #fff; overflow-wrap: anywhere; }
+.v-tile.bad { border-color: var(--dblock); box-shadow: 0 0 0 1px var(--dblock); }
+.v-tile.behind.post { border-color: var(--dpost); box-shadow: 0 0 0 1px var(--dpost); }
+.v-tile.behind.block { border-color: var(--dblock); box-shadow: 0 0 0 1px var(--dblock); }
+.v-tile.behind.human { border-color: var(--dhuman); box-shadow: 0 0 0 1px var(--dhuman); }
+.v-draft { border: 1px solid rgba(255,255,255,.14); border-radius: 14px; margin-top: 12px;
+  background: rgba(255,255,255,.05); }
+.v-draft summary { cursor: pointer; padding: 10px 12px; font-size: 14px; font-weight: 700; color: #fff; }
+.v-draft .letter { margin: 0 12px 12px; background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.1); border-radius: 12px; padding: 12px 14px; }
+.v-draft .doc-kind { font-size: 12px; font-weight: 700; color: rgba(255,255,255,.65); }
+.v-draft .doc-title { font-size: 16px; font-weight: 700; margin: 2px 0; color: #fff; }
+.v-draft .doc-to { font-size: 12.5px; color: rgba(255,255,255,.65); margin: 0 0 8px; }
+.v-draft .doc-body { font-size: 14.5px; line-height: 1.65; margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; color: rgba(255,255,255,.94); }
+.v-draft .v-fullreason { font-size: 13px; line-height: 1.6; margin: 10px 12px 12px; color: rgba(255,255,255,.75); overflow-wrap: anywhere; }
 .btnrow { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
 .btnrow button, .btnrow a {
   font: inherit; font-size: 15px; font-weight: 700; cursor: pointer; text-decoration: none;
-  border-radius: 10px; padding: 10px 18px; border: 1px solid var(--line);
-  background: var(--bg); color: var(--ink);
+  border-radius: 12px; padding: 10px 18px; border: 1px solid rgba(255,255,255,.22);
+  background: rgba(255,255,255,.08); color: #fff;
 }
-.btnrow .primary { background: var(--accent); border-color: var(--accent); color: #fff; }
-#tally { font-size: 13px; color: var(--muted); margin: 12px 0 0; }
+.btnrow .primary { background: linear-gradient(180deg, #ff8b2e, #f96a0e); border-color: rgba(255,255,255,.35); color: #fff;
+  box-shadow: 0 6px 24px rgba(249,106,14,.45), inset 0 1px 0 rgba(255,255,255,.35); }
+#tally { font-size: 13px; color: rgba(255,255,255,.7); margin: 12px 0 0; }
 #fps { position: fixed; z-index: 50; left: 10px; bottom: 10px; background: rgba(0,0,0,.7); color: #0f0;
   font: 12px ui-monospace, monospace; padding: 4px 10px; border-radius: 6px; display: none; }
 #err {
@@ -274,6 +313,11 @@ body.done #resultWrap { display: flex; }
   #cases button { font-size: 14px; padding: 10px 6px; }
   #noteCard { width: 132px; } #noteCard img { height: 72px; }
   #keys { display: none; }
+  #reads { top: auto; bottom: 12px; right: 10px; left: 10px; width: auto; max-height: 38dvh; }
+  #resultWrap { padding: 0; align-items: flex-end; justify-content: stretch; }
+  #result { width: 100%; max-width: 100%; height: 40dvh; border-radius: 20px 20px 0 0; }
+  .v-tiles { grid-template-columns: 1fr; }
+  .v-fig { width: 60px; height: 76px; }
 }
 @media (min-width: 901px) {
   /* the cast stands left of the loading line, the way the mockup shows */
@@ -400,7 +444,7 @@ const PEOPLE = [
   { id: "sam",     name: "Sam",     job: "counts the cartons",          b: [3.5, 6.8],  h: 2.40 },
   { id: "voice",   name: "Voice",   job: "hears the receiver",          b: [-4.6, 2.1], h: 2.40 },
   { id: "kapi",    name: "Kapı",    job: "the gate",                    b: [4.0, 2.0],   h: 2.62 },
-  { id: "sef",     name: "Şef",     job: "signs off",                   b: [-1.1, 2.4],  h: 2.62 },
+  { id: "sef",     name: "Şef",     job: "signs off",                   b: [-2.6, 2.4],  h: 2.62 },
   { id: "wonder",  name: "Wonder",  job: "checks and writes the paperwork", b: [-8.2, 1.6], h: 2.40 },
   { id: "rover",   name: "Rover",   job: "reads the note again",        b: [9.5, 2.5],   h: 2.40 },
   { id: "glimmer", name: "Glimmer", job: "the other open-weight reader", b: [1.0, 0.5],  h: 2.40 },
@@ -408,6 +452,20 @@ const PEOPLE = [
   { id: "ada",     name: "Ada",     job: "wrote the code",              b: [-9.6, -0.9], h: 2.40 },
 ];
 const AV = id => `../img/av-${id}.jpg`;
+// Ring colours for the reading-card avatars (site/data-en.json; rover reads as spark-open).
+const CHAR_COL_FALLBACK = { spark: "#f97316", sam: "#3b82f6", voice: "#1e3a8a", kapi: "#a16207",
+  sef: "#1d4ed8", wonder: "#ca8a04", rover: "#0d9488", glimmer: "#8b5cf6", iris: "#db2777", ada: "#0f766e" };
+const CHAR_COL = {};
+function charColour(id) {
+  if (CHAR_COL[id]) return CHAR_COL[id];
+  try {
+    const list = (G.data && G.data.characters) || [];
+    const want = id === "rover" ? "spark-open" : id;
+    const m = list.find(c => c.id === want);
+    if (m && m.colour) { CHAR_COL[id] = m.colour; return m.colour; }
+  } catch {}
+  return CHAR_COL_FALLBACK[id] || "rgba(255,255,255,.25)";
+}
 const ZONE = { x0: -2.48, x1: 2.48, y0: 3.32, y1: 7.68 };   // receiving zone (yellow tape)
 const DOOR = { x0: -1.0, x1: 1.0, y0: 9.44, y1: 10.76 };    // doorway volume: the open dock door,
   // listed in colliders.json but the forklift drives through it up the leveller.
@@ -604,19 +662,51 @@ async function loadDock() {
   gatePool.renderOrder = 2;
   scene.add(gatePool);
 
-  // Decision screen: a canvas plane just in front of the baked display.
+  // Decision screen: the live canvas becomes the visible face of the baked
+  // display, so it shows "waiting for the pallet" then POST / BLOCK / ASK ŞEF.
   screenMesh = need("screen");
   screenCanvas = document.createElement("canvas");
   screenCanvas.width = 512; screenCanvas.height = 304;
   screenCtx = screenCanvas.getContext("2d");
   screenTex = new THREE.CanvasTexture(screenCanvas);
   screenTex.colorSpace = THREE.SRGBColorSpace;
-  const plane = new THREE.Mesh(
-    new THREE.PlaneGeometry(1.38, 0.82),
-    new THREE.MeshBasicMaterial({ map: screenTex, toneMapped: false }));
-  plane.position.copy(V3(-3.6, 2.6, 1.75));
-  plane.position.z += 0.016;   // three +z faces the dock front, like the baked panel
-  scene.add(plane);
+  screenMesh.updateWorldMatrix(true, true);
+  screenMesh.traverse(o => {
+    if (!o.isMesh) return;
+    const mats = Array.isArray(o.material) ? o.material : [o.material];
+    let swapped = false;
+    const news = mats.map(m => {
+      if (m && m.map) {
+        swapped = true;
+        const nm = new THREE.MeshBasicMaterial({ map: screenTex, toneMapped: false });
+        nm.side = m.side || THREE.FrontSide;
+        return nm;
+      }
+      return m;
+    });
+    if (swapped) o.material = Array.isArray(o.material) ? news : news[0];
+  });
+  // Fallback if the baked face carries no map: a canvas plane on its front.
+  let liveFace = false;
+  screenMesh.traverse(o => {
+    if (!o.isMesh || liveFace) return;
+    const mats = Array.isArray(o.material) ? o.material : [o.material];
+    if (mats.some(m => m && m.map === screenTex)) liveFace = true;
+  });
+  if (!liveFace) {
+    try {
+      const bbox = new THREE.Box3().setFromObject(screenMesh);
+      if (!bbox.isEmpty()) {
+        const c = bbox.getCenter(new THREE.Vector3());
+        const s = bbox.getSize(new THREE.Vector3());
+        const plane = new THREE.Mesh(
+          new THREE.PlaneGeometry(Math.max(0.5, s.x * 0.92), Math.max(0.3, s.y * 0.88)),
+          new THREE.MeshBasicMaterial({ map: screenTex, toneMapped: false }));
+        plane.position.set(c.x, c.y, bbox.max.z + 0.008);
+        scene.add(plane);
+      }
+    } catch (e) { console.warn("screen fallback:", e); }
+  }
   drawScreen(null);
   try { buildCab(); } catch (e) { console.warn("cab failed:", e); }
   renderer.shadowMap.needsUpdate = true;   // static dock (and forklift) placed
@@ -941,7 +1031,7 @@ function faceBlender(rec, fromX, fromY, toX, toY) {
   rec.group.rotation.y = Math.atan2(dx, -dy) + Math.PI;
 }
 // Beside the pallet (~1.4 m), on the deciding-camera side, never the forklift side.
-// side -1 = west of the pallet, +1 = east; both south enough to face px=-4.6,py=-2.4.
+// side -1 = west of the pallet, +1 = east; both south enough to face the front camera.
 function palletSpot(px, py, side, fx, fy) {
   let ox = side * 1.12, oy = -0.84;
   try {
@@ -1507,8 +1597,11 @@ function stepCamera(dt) {
   const F = G.fork;
   let px, py, pz, lx, ly, lz, k = 1 - Math.exp(-4 * dt);
   if (G.phase === "deciding" || G.phase === "done") {
-    // Frame the pallet, the gate and the screen.
-    px = -4.6; py = -2.4; pz = 3.3; lx = 0.2; ly = 3.8; lz = 1.0;
+    // Gentle three-quarter from the dock floor's front, high enough to look over
+    // the foreground cast at the pallet, the walker(s), the gate lamp and screen.
+    // Portrait phones pull further back so the pallet and walker stay upper-frame.
+    if (camera.aspect < 0.9) { px = -1.4; py = -6.8; pz = 6.1; lx = 0.1; ly = 3.4; lz = 0.7; }
+    else { px = -2.0; py = -5.6; pz = 5.2; lx = 0.3; ly = 4.0; lz = 0.9; }
     k = 1 - Math.exp(-2.2 * dt);
   } else if (G.camMode === "seat" && G.phase === "driving") {
     // Driver's seat: eye 2.05 m up, just behind the wheel, riding the cab.
@@ -1549,7 +1642,7 @@ function readCard(avatars, who, html, cls) {
   const d = document.createElement("div");
   d.className = "read" + (cls ? " " + cls : "");
   d.innerHTML = `<div class="who">${avatars.map(a =>
-    `<img src="${AV(a)}" alt="">`).join("")}${esc(who)}</div><p>${html}</p>`;
+    `<img src="${AV(a)}" alt="" style="border-color:${esc(charColour(a))}">`).join("")}${esc(who)}</div><p>${html}</p>`;
   $("reads").appendChild(d);
   d.scrollIntoView({ block: "nearest" });
   return d;
@@ -1606,7 +1699,7 @@ function startDeciding() {
     const g8 = cs.gate;
     const word = { post: "POST", block: "BLOCK", human: "ASK ŞEF" }[g8.action];
     readCard(["kapi"], "Kapı decides",
-      `<b>${word}</b> — ${esc(g8.reason)}` +
+      `<span class="verdict-word">${word}</span> — ${esc(g8.reason)}` +
       (g8.quantity != null ? ` Quantity: <b>${g8.quantity}</b>.` : ""),
       "gate-" + g8.action);
     setGateLight(g8.action);
@@ -1618,6 +1711,22 @@ function startDeciding() {
 }
 
 // ---------- result ----------
+const DOC_LABEL = { supplier_dispute: "Dispute to the supplier", damage_report: "Damage report", supervisor_note: "Note to Şef" };
+const firstSentence = s => {
+  s = String(s ?? "");
+  if (s.length <= 110) return s;
+  const m = s.match(/^.*?[.!?](\s|$)/);
+  return (m ? m[0].trim() : s).trim() || s;
+};
+const cap1 = s => s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
+function draftDetails(d, fullReason) {
+  const kind = DOC_LABEL[d.document] || d.document;
+  return `<details class="v-draft"><summary>Read Wonder's draft · ${esc(kind)}</summary>` +
+    `<div class="letter"><div class="doc-kind">${esc(kind)} · Wonder's draft</div>` +
+    `<div class="doc-title">${esc(d.title)}</div><div class="doc-to">To: ${esc(d.to)}</div>` +
+    `<p class="doc-body">${esc(d.body)}</p></div>` +
+    `<p class="v-fullreason">Gate reason in full: ${esc(fullReason)}</p></details>`;
+}
 function showResult() {
   const cs = G.cs;
   G.phase = "done";
@@ -1628,30 +1737,35 @@ function showResult() {
   if (wrong) G.wrongCount++;
   document.body.classList.add("done");
   document.body.classList.remove("deciding");
+  if (g8.action === "human") wave("sef");
   const R = $("result");
   R.className = "card " + g8.action;
-  let h = "";
+  const badge = { post: "POST", block: "BLOCK", human: "ASK ŞEF" }[g8.action] || g8.action;
+  const title = g8.action === "post" ? "Receipt written to the ERP"
+    : g8.action === "block" ? "Nothing written" : "Sent to Şef";
+  let h = `<div class="v-head"><img class="v-fig" src="../img/fig-kapi.webp" alt="Kapı">` +
+    `<div class="v-title"><h2>${title}</h2>`;
   if (g8.action === "post") {
     const [qty, doc] = posted[0] || [g8.quantity, ""];
-    h += `<h2>Receipt written to the ERP</h2>
-      <p class="doc">${qty} cartons · <span class="mono">${esc(doc)}</span></p>
-      <p>${esc(g8.reason)}</p>`;
-  } else if (g8.action === "block") {
-    h += `<h2>Nothing written</h2><p>${esc(g8.reason)}</p>`;
-    if (cs.draft) h += draftHtml(cs.draft, "Wonder's draft");
-  } else {
-    h += `<h2>Sent to Şef</h2><p>${esc(g8.reason)}</p>`;
-    wave("sef");
-    if (cs.draft) h += draftHtml(cs.draft, "Wonder's draft");
+    h += `<p class="v-doc">${qty} cartons · <span class="mono">${esc(doc)}</span></p>`;
   }
+  h += `</div><span class="v-badge ${g8.action}">${esc(badge)}</span></div>`;
+  h += `<p class="v-reason">${esc(firstSentence(g8.reason))}</p>`;
   // The point: what the same agent did without the gate, next to what the gate let through.
   const wg = cs.without_gate.posted || [];
   const left = wg.length ? `posted ${wg.join(", ")}` : (cs.without_gate.supervisor ? "asked Şef" : "posted nothing");
   const right = posted.length ? `${posted.map(p => p[0]).join(", ")} reached the ERP${posted[0][1] ? ` as ${posted[0][1]}` : ""}` : "nothing reached the ERP";
-  h += `<p class="point">Without the gate the agent ${esc(left)}; behind the gate, ${esc(right)}.</p>`;
-  h += `<div class="btnrow"><button class="primary" id="againBtn">Try another delivery</button>
-    <a href="../">Back to the demo</a></div>
-    <p id="tally">wrong receipts that reached the ERP: ${G.wrongCount}</p>`;
+  const wgWrong = wg.length > 0 && g8.action !== "post";
+  h += `<div class="v-tiles"><div class="v-tile without${wgWrong ? " bad" : ""}">` +
+    `<h3>Without the gate</h3><p>The agent ${esc(left)}</p></div>` +
+    `<div class="v-tile behind ${g8.action}"><h3>Behind the gate</h3><p>${esc(cap1(right))}</p></div></div>`;
+  if (cs.draft) h += draftDetails(cs.draft, g8.reason);
+  else if (firstSentence(g8.reason) !== String(g8.reason))
+    h += `<details class="v-draft"><summary>Read the full gate reason</summary>` +
+      `<p class="v-fullreason">${esc(g8.reason)}</p></details>`;
+  h += `<div class="btnrow"><button class="primary" id="againBtn">Try another delivery</button>` +
+    `<a href="../">Back to the demo</a></div>` +
+    `<p id="tally">wrong receipts that reached the ERP: ${G.wrongCount}</p>`;
   R.innerHTML = h;
   $("tallyChip").textContent = `wrong receipts that reached the ERP: ${G.wrongCount}`;
   $("againBtn").addEventListener("click", () => {
@@ -1661,12 +1775,7 @@ function showResult() {
     G.phase = "intro";
     $("introWrap").style.display = "flex";
   });
-}
-const DOC_LABEL = { supplier_dispute: "Dispute to the supplier", damage_report: "Damage report", supervisor_note: "Note to Şef" };
-function draftHtml(d, by) {
-  return `<div class="draft"><div class="doc-kind">${esc(DOC_LABEL[d.document] || d.document)} · ${esc(by)}</div>
-    <div class="doc-title">${esc(d.title)}</div><div class="doc-to">To: ${esc(d.to)}</div>
-    <p class="doc-body">${esc(d.body)}</p></div>`;
+  try { $("againBtn").focus(); } catch {}
 }
 
 // ---------- intro / boot ----------
@@ -1789,15 +1898,37 @@ function updateHint() {
 
 // ---------- labels ----------
 const _pv = new THREE.Vector3();
+// During deciding/done only the walkers of this case (plus Kapı) keep labels.
+function decidingLabels() {
+  const s = new Set(Object.keys(G._walkerTargets || {}));
+  s.add("kapi");
+  return s;
+}
 function updateLabels() {
+  const quiet = G.phase === "deciding" || G.phase === "done";
+  const showSet = quiet ? decidingLabels() : null;
+  const placed = [];
   for (const p of PEOPLE) {
     const rec = CHAR[p.id];
     if (!rec || !rec.loaded) continue;
+    if (showSet && !showSet.has(p.id)) { rec.label.style.display = "none"; continue; }
     _pv.set(rec.x, 3.075, -rec.y).project(camera);
-    if (_pv.z > 1 || _pv.z < -1) { rec.label.style.display = "none"; continue; }
+    if (_pv.z > 1 || _pv.z < -1 || Math.abs(_pv.x) > 1.05 || Math.abs(_pv.y) > 1.05) {
+      rec.label.style.display = "none"; continue;
+    }
+    let sx = (_pv.x * 0.5 + 0.5) * innerWidth;
+    let sy = (-_pv.y * 0.5 + 0.5) * innerHeight;
+    if (quiet) {
+      // Stack overlapping labels upward so the shown ones never cover each other.
+      for (let guard = 0; guard < 4; guard++) {
+        const hit = placed.find(q => Math.abs(q[0] - sx) < 160 && Math.abs(q[1] - sy) < 46);
+        if (!hit) break;
+        sy = hit[1] - 48;
+      }
+      placed.push([sx, sy]);
+    }
     rec.label.style.display = "block";
-    rec.label.style.transform =
-      `translate(${(_pv.x * 0.5 + 0.5) * innerWidth}px, ${(-_pv.y * 0.5 + 0.5) * innerHeight}px) translate(-50%, -100%)`;
+    rec.label.style.transform = `translate(${sx}px, ${sy}px) translate(-50%, -100%)`;
   }
 }
 
