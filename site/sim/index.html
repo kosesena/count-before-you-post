@@ -396,16 +396,16 @@ import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 // ---------- config ----------
 const CASES = ["ok", "wrong", "eksik", "talimat", "hasarli", "belirsiz"];
 const PEOPLE = [
-  { id: "spark",   name: "Spark",   job: "reads the note",              b: [-4.2, 4.5], h: 1.60 },
-  { id: "sam",     name: "Sam",     job: "counts the cartons",          b: [2.7, 6.8],  h: 1.60 },
-  { id: "voice",   name: "Voice",   job: "hears the receiver",          b: [-4.6, 2.1], h: 1.60 },
-  { id: "kapi",    name: "Kapı",    job: "the gate",                    b: [4.0, 2.0],   h: 1.75 },
-  { id: "sef",     name: "Şef",     job: "signs off",                   b: [-0.3, 3.0],  h: 1.75 },
-  { id: "wonder",  name: "Wonder",  job: "checks and writes the paperwork", b: [-8.2, 1.6], h: 1.60 },
-  { id: "rover",   name: "Rover",   job: "reads the note again",        b: [9.0, 2.5],   h: 1.60 },
-  { id: "glimmer", name: "Glimmer", job: "the other open-weight reader", b: [1.0, 0.5],  h: 1.60 },
-  { id: "iris",    name: "Iris",    job: "drew the cast",               b: [-6.6, -0.6], h: 1.60 },
-  { id: "ada",     name: "Ada",     job: "wrote the code",              b: [-9.6, -0.9], h: 1.60 },
+  { id: "spark",   name: "Spark",   job: "reads the note",              b: [-4.2, 4.5], h: 2.40 },
+  { id: "sam",     name: "Sam",     job: "counts the cartons",          b: [3.5, 6.8],  h: 2.40 },
+  { id: "voice",   name: "Voice",   job: "hears the receiver",          b: [-4.6, 2.1], h: 2.40 },
+  { id: "kapi",    name: "Kapı",    job: "the gate",                    b: [4.0, 2.0],   h: 2.62 },
+  { id: "sef",     name: "Şef",     job: "signs off",                   b: [-1.1, 2.4],  h: 2.62 },
+  { id: "wonder",  name: "Wonder",  job: "checks and writes the paperwork", b: [-8.2, 1.6], h: 2.40 },
+  { id: "rover",   name: "Rover",   job: "reads the note again",        b: [9.5, 2.5],   h: 2.40 },
+  { id: "glimmer", name: "Glimmer", job: "the other open-weight reader", b: [1.0, 0.5],  h: 2.40 },
+  { id: "iris",    name: "Iris",    job: "drew the cast",               b: [-6.6, -0.6], h: 2.40 },
+  { id: "ada",     name: "Ada",     job: "wrote the code",              b: [-9.6, -0.9], h: 2.40 },
 ];
 const AV = id => `../img/av-${id}.jpg`;
 const ZONE = { x0: -2.48, x1: 2.48, y0: 3.32, y1: 7.68 };   // receiving zone (yellow tape)
@@ -526,7 +526,7 @@ let screenCanvas, screenTex, screenCtx;
 // Driver's-seat cab, built from simple meshes (visible in seat view only).
 let cabGroup = null, wheelSpinner = null;
 let dashCanvas = null, dashCtx = null, dashTex = null, dashAt = 0;
-const CHAR = {};   // id -> { group, mixer, idle, wave, waveLen, loaded, label }
+const CHAR = {};   // id -> { group, mixer, idle, walk, wave, waveLen, loaded, label, hx, hy, x, y, walking }
 // Soft round sprite: dark for contact shadows, white (tinted) for light pools.
 let contactTex = null, poolTex = null, gatePool = null;
 function radialTex(stops) {
@@ -852,8 +852,10 @@ function tagFor(p) {
   return d;
 }
 async function loadCharacter(p) {
-  const rec = { group: null, mixer: null, idle: null, wave: null, loaded: false,
-                label: tagFor(p), bx: p.b[0], by: p.b[1], pop: 0 };
+  const rec = { group: null, mixer: null, idle: null, walk: null, wave: null, loaded: false,
+                label: tagFor(p), bx: p.b[0], by: p.b[1], hx: p.b[0], hy: p.b[1],
+                x: p.b[0], y: p.b[1], walking: false, tx: p.b[0], ty: p.b[1],
+                faceX: 0, faceY: 5.5, hasFace: false, pendingWave: false, pop: 0 };
   CHAR[p.id] = rec;
   const g = await loadOne(CHAR_URL(p.id));
   const root = g.scene;
@@ -874,7 +876,7 @@ async function loadCharacter(p) {
   // the frame cost. Each gets a fake contact blob instead.
   grp.traverse(o => { if (o.isMesh) { o.castShadow = false; o.receiveShadow = false; } });
   if (!contactTex) contactTex = radialTex([[0, "rgba(0,0,0,0.5)"], [0.55, "rgba(0,0,0,0.25)"], [1, "rgba(0,0,0,0)"]]);
-  const blob = new THREE.Mesh(new THREE.PlaneGeometry(1.15, 1.15),
+  const blob = new THREE.Mesh(new THREE.PlaneGeometry(1.725, 1.725),
     new THREE.MeshBasicMaterial({ map: contactTex, transparent: true, depthWrite: false }));
   blob.rotation.x = -Math.PI / 2;
   blob.position.y = 0.02;
@@ -886,20 +888,170 @@ async function loadCharacter(p) {
   rec.mixer = new THREE.AnimationMixer(root);
   const find = n => g.animations.find(a => a.name === n);
   if (find("Idle")) { rec.idle = rec.mixer.clipAction(find("Idle")); rec.idle.play(); }
+  if (find("Walk")) {
+    rec.walk = rec.mixer.clipAction(find("Walk"));
+    rec.walk.setLoop(THREE.LoopRepeat);
+  }
   if (find("Wave")) {
     rec.wave = rec.mixer.clipAction(find("Wave"));
     rec.wave.setLoop(THREE.LoopOnce, 1);
     rec.wave.clampWhenFinished = true;
     rec.waveLen = find("Wave").duration * 1000;
   }
+  // If the deciding walk was dispatched while this character still loaded,
+  // start it now (same spot, no teleport during play).
+  try {
+    const pend = G._walkerTargets && G._walkerTargets[p.id];
+    if (pend && G.phase === "deciding") startWalkTo(p.id, pend.tx, pend.ty, pend.fx, pend.fy);
+  } catch {}
 }
-function wave(id) {
+function waveImmediate(id) {
   const rec = CHAR[id];
   if (!rec || !rec.loaded || !rec.wave || !rec.idle) return;
+  try { if (rec.walk) rec.walk.stop(); } catch {}
   rec.idle.stop();
   rec.wave.reset().play();
   clearTimeout(rec._wt);
-  rec._wt = setTimeout(() => { if (rec.loaded) { rec.wave.stop(); rec.idle.play(); } }, (rec.waveLen || 2000) + 150);
+  rec._wt = setTimeout(() => { if (rec.loaded) { try { rec.wave.stop(); } catch {} rec.idle.play(); } }, (rec.waveLen || 2000) + 150);
+}
+function wave(id) {
+  const rec = CHAR[id];
+  // A walker plays its action on arrival instead of mid-stride; never cut Walk.
+  if (rec && rec.walking) { rec.pendingWave = true; return; }
+  waveImmediate(id);
+}
+function playWalk(rec) {
+  if (!rec || !rec.mixer || !rec.loaded || !rec.walk || !rec.idle) return;
+  try {
+    rec.idle.fadeOut(0.25);
+    rec.walk.reset().setEffectiveTimeScale(1).setEffectiveWeight(1).fadeIn(0.25).play();
+  } catch {}
+}
+function playIdle(rec) {
+  if (!rec || !rec.mixer || !rec.loaded || !rec.walk || !rec.idle) return;
+  try {
+    rec.walk.fadeOut(0.25);
+    rec.idle.reset().setEffectiveTimeScale(1).setEffectiveWeight(1).fadeIn(0.25).play();
+  } catch {}
+}
+function faceBlender(rec, fromX, fromY, toX, toY) {
+  if (!rec || !rec.group) return;
+  const dx = toX - fromX, dy = toY - fromY;
+  if (Math.hypot(dx, dy) < 1e-6) return;
+  rec.group.rotation.y = Math.atan2(dx, -dy) + Math.PI;
+}
+// Beside the pallet (~1.4 m), on the deciding-camera side, never the forklift side.
+// side -1 = west of the pallet, +1 = east; both south enough to face px=-4.6,py=-2.4.
+function palletSpot(px, py, side, fx, fy) {
+  let ox = side * 1.12, oy = -0.84;
+  try {
+    const fdx = fx - px, fdy = fy - py, fl = Math.hypot(fdx, fdy) || 1;
+    const sl = Math.hypot(ox, oy) || 1;
+    const dot = (ox * fdx + oy * fdy) / (sl * fl);
+    if (dot > 0.643 || Math.hypot(px + ox - fx, py + oy - fy) < 1.0) {
+      ox = side * 1.4; oy = 0;   // pure flank
+      const dot2 = (ox * fdx + oy * fdy) / (1.4 * fl);
+      if (dot2 > 0.643 || Math.hypot(px + ox - fx, py + oy - fy) < 1.0) {
+        ox = side * 0.7; oy = 1.21;   // north fallback, still 1.4 m out
+      }
+    }
+  } catch {}
+  return { x: px + ox, y: py + oy };
+}
+function kapiSpot() {
+  let bx = 3.4, by = 2.4;
+  try {
+    if (barrierMesh) {
+      const v = new THREE.Vector3();
+      barrierMesh.getWorldPosition(v);
+      if (isFinite(v.x) && isFinite(v.z)) { bx = v.x; by = -v.z; }
+    }
+  } catch {}
+  return { x: bx - 1.2, y: by - 0.5 };
+}
+function startWalkTo(id, tx, ty, fx, fy) {
+  if (!G._walkerTargets) G._walkerTargets = {};
+  G._walkerTargets[id] = { tx, ty, fx, fy };
+  const rec = CHAR[id];
+  if (!rec) return;
+  if (!rec.loaded || !rec.group) return;   // loadCharacter resumes on load
+  if (reducedMotion) {
+    rec.walking = false; rec.pendingWave = false;
+    rec.x = tx; rec.y = ty; rec.tx = tx; rec.ty = ty;
+    rec.group.position.set(tx, 0, -ty);
+    faceBlender(rec, tx, ty, fx, fy);
+    return;
+  }
+  if (Math.hypot(tx - rec.x, ty - rec.y) < 0.05) {
+    rec.walking = false;
+    faceBlender(rec, rec.x, rec.y, fx, fy);
+    return;
+  }
+  rec.tx = tx; rec.ty = ty; rec.faceX = fx; rec.faceY = fy; rec.hasFace = true;
+  rec.pendingWave = false; rec.walking = true;
+  faceBlender(rec, rec.x, rec.y, tx, ty);
+  playWalk(rec);
+}
+function updateWalkers(dt) {
+  const SPD = 1.3;
+  for (const p of PEOPLE) {
+    const rec = CHAR[p.id];
+    if (!rec || !rec.loaded || !rec.group || !rec.walking) continue;
+    const dx = rec.tx - rec.x, dy = rec.ty - rec.y;
+    const dist = Math.hypot(dx, dy), step = SPD * dt;
+    if (dist <= step) {
+      rec.x = rec.tx; rec.y = rec.ty; rec.walking = false;
+      rec.group.position.x = rec.x; rec.group.position.z = -rec.y;
+      rec.group.position.y = 0;
+      if (rec.hasFace) faceBlender(rec, rec.x, rec.y, rec.faceX, rec.faceY);
+      playIdle(rec);
+      if (rec.pendingWave) { rec.pendingWave = false; waveImmediate(p.id); }
+    } else if (dist > 1e-6) {
+      rec.x += dx / dist * step; rec.y += dy / dist * step;
+      rec.group.position.x = rec.x; rec.group.position.z = -rec.y;
+      rec.group.position.y = 0;
+    }
+  }
+}
+function sendAllHome() {
+  G._walkerTargets = {};
+  for (const p of PEOPLE) {
+    const rec = CHAR[p.id];
+    if (!rec) continue;
+    rec.walking = false; rec.pendingWave = false; rec.hasFace = false;
+    rec.tx = rec.hx; rec.ty = rec.hy; rec.x = rec.hx; rec.y = rec.hy;
+    if (!rec.loaded || !rec.group) continue;
+    rec.group.position.set(rec.hx, 0, -rec.hy);
+    faceBlender(rec, rec.hx, rec.hy, 0, 5.5);
+    try {
+      if (rec.walk) rec.walk.stop();
+      if (rec.wave) rec.wave.stop();
+      if (rec.idle) { rec.idle.reset().setEffectiveWeight(1).setEffectiveTimeScale(1).play(); }
+    } catch {}
+    clearTimeout(rec._wt);
+  }
+}
+function dispatchWalkers() {
+  const caseId = (G.cs && G.cs.id) || G.caseId;
+  const px = G.pallet.x, py = G.pallet.y, fx = G.fork.x, fy = G.fork.y;
+  if (caseId === "talimat") {
+    const s = kapiSpot();
+    startWalkTo("kapi", s.x, s.y, fx, fy);
+    return;
+  }
+  if (caseId === "belirsiz") {
+    const west = palletSpot(px, py, -1, fx, fy), east = palletSpot(px, py, 1, fx, fy);
+    startWalkTo("sam", east.x, east.y, px, py);
+    startWalkTo("spark", west.x, west.y, px, py);
+    return;
+  }
+  const solo = { ok: "sam", wrong: "spark", eksik: "sam", hasarli: "sef" }[caseId];
+  if (!solo) return;
+  const rec = CHAR[solo];
+  const hx = rec ? rec.hx : px, hy = rec ? rec.hy : py;
+  const west = palletSpot(px, py, -1, fx, fy), east = palletSpot(px, py, 1, fx, fy);
+  const chosen = Math.hypot(west.x - hx, west.y - hy) <= Math.hypot(east.x - hx, east.y - hy) ? west : east;
+  startWalkTo(solo, chosen.x, chosen.y, px, py);
 }
 
 // Soft pulsing outline over the cartons while Sam counts.
@@ -1330,6 +1482,7 @@ function resetScene() {
   renderer.shadowMap.needsUpdate = true;   // forklift and pallet teleported
   (G._seqs || []).forEach(clearTimeout);
   G._seqs = [];
+  try { sendAllHome(); } catch {}
 }
 function restartCase() {
   if (G.phase === "intro" || !G.cs) return;
@@ -1405,6 +1558,7 @@ function startDeciding() {
   G.phase = "deciding";
   document.body.classList.add("deciding");
   setHint("");
+  try { dispatchWalkers(); } catch (e) { if (DEBUG) console.warn("walkers:", e); }
   const cs = G.cs;
   const note = cs.note.items.map(it => `${it.quantity} × ${it.description}`).join("; ");
   // 1. Spark reads the note.
@@ -1503,6 +1657,7 @@ function showResult() {
   $("againBtn").addEventListener("click", () => {
     document.body.classList.remove("done", "deciding", "playing");
     $("reads").innerHTML = "";
+    try { sendAllHome(); } catch {}
     G.phase = "intro";
     $("introWrap").style.display = "flex";
   });
@@ -1638,7 +1793,7 @@ function updateLabels() {
   for (const p of PEOPLE) {
     const rec = CHAR[p.id];
     if (!rec || !rec.loaded) continue;
-    _pv.set(p.b[0], 2.05, -p.b[1]).project(camera);
+    _pv.set(rec.x, 3.075, -rec.y).project(camera);
     if (_pv.z > 1 || _pv.z < -1) { rec.label.style.display = "none"; continue; }
     rec.label.style.display = "block";
     rec.label.style.transform =
@@ -1658,6 +1813,7 @@ function tick() {
   try {
     if (G.phase === "driving") { pollKeys(); stepFork(dt); updateHint(); }
     else if (G.phase === "intro") { /* camera drift only */ }
+    try { updateWalkers(dt); } catch {}
     // Barrier eases open on post.
     if (G.barrierOpen && barrierMesh && barrierMesh.rotation.x < -0.02) {
       barrierMesh.rotation.x = Math.min(0, barrierMesh.rotation.x + dt * 1.4);
@@ -1672,7 +1828,7 @@ function tick() {
         rec.inner.scale.setScalar(s);
       }
       const d = camera.position.distanceTo(rec.group.position);
-      if (d < 25 && rec.mixer) rec.mixer.update(dt);
+      if ((d < 25 || rec.walking) && rec.mixer) rec.mixer.update(dt);
     }
     if (outline && outline.visible) {
       outline.position.copy(deliveryGroup.position);
@@ -1707,7 +1863,7 @@ function tick() {
 // For our checks only (?test): the game state and the two actions, so a script can play a
 // case to the result card. Nothing is exposed without ?test.
 if (new URLSearchParams(location.search).has("test"))
-  window.__sim = { G, pickup: () => pickupPallet(true), drop: dropPallet, DROP, ZONE };
+  window.__sim = { G, CHAR, pickup: () => pickupPallet(true), drop: dropPallet, DROP, ZONE };
 if ("ontouchstart" in window || navigator.maxTouchPoints > 0) document.body.classList.add("touch");
 boot();
 tick();
