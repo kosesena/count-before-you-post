@@ -1263,7 +1263,8 @@
    "status": "on duty",
    "line": "Hi, I'm Spark. I read the delivery note into strict JSON, look at the pallet and run the receiving agent. I'm quick to post, which is exactly why Kapı is here.",
    "portrait": "img/hello-spark.jpg",
-   "avatar": "img/av-spark.jpg"
+   "avatar": "img/av-spark.jpg",
+   "bg": "#f18f52"
   },
   {
    "id": "sam",
@@ -1273,7 +1274,8 @@
    "status": "on duty",
    "line": "I'm Sam. I find every carton on the dock camera and outline it, pixel by pixel, and say how sure I am: 0.88 and up is sure. One day I'd like to look through the receiver's glasses instead of the ceiling.",
    "portrait": "img/hello-sam.jpg",
-   "avatar": "img/av-sam.jpg"
+   "avatar": "img/av-sam.jpg",
+   "bg": "#96b7e3"
   },
   {
    "id": "voice",
@@ -1283,7 +1285,8 @@
    "status": "on duty",
    "line": "I'm Voice. I write down what the receiver says at the dock, “on iki koli geldi”, so the gate gets a third count, and I notice when they aren't sure. When the driver talks too, I keep their claim apart from what the receiver counted.",
    "portrait": "img/hello-voice.jpg",
-   "avatar": "img/av-voice.jpg"
+   "avatar": "img/av-voice.jpg",
+   "bg": "#18315d"
   },
   {
    "id": "kapi",
@@ -1293,7 +1296,8 @@
    "status": "on duty",
    "line": "I'm Kapı, Turkish for gate. I'm not a model, I'm twelve rules in plain code. Nothing written on a note, not even in white ink, can talk me into posting. No agreement, no receipt.",
    "portrait": "img/hello-kapi.jpg",
-   "avatar": "img/av-kapi.jpg"
+   "avatar": "img/av-kapi.jpg",
+   "bg": "#e9cdb2"
   },
   {
    "id": "sef",
@@ -1303,7 +1307,8 @@
    "status": "on duty",
    "line": "I'm Şef, the human in the loop. A crushed carton, a stacked load, a number nobody can confirm: when Kapı isn't sure, the decision comes to me.",
    "portrait": "img/hello-sef.jpg",
-   "avatar": "img/av-sef.jpg"
+   "avatar": "img/av-sef.jpg",
+   "bg": "#7cb1e9"
   },
   {
    "id": "wonder",
@@ -1313,7 +1318,8 @@
    "status": "on duty",
    "line": "I'm Wonder, the clerk. When Kapı stops a delivery I write the paperwork: the dispute to the supplier, the damage report, or a note to Şef. Only facts from the evidence, and nothing is sent until Şef approves.",
    "portrait": "img/hello-wonder.jpg",
-   "avatar": "img/av-wonder.jpg"
+   "avatar": "img/av-wonder.jpg",
+   "bg": "#c79158"
   },
   {
    "id": "ada",
@@ -1323,7 +1329,8 @@
    "status": "done",
    "line": "I'm Ada, named after Ada Lovelace. With Muse Code I wrote the ERPNext client that turns Kapı's yes into a Purchase Receipt, its tests, and this page. Then I worked the dock myself, through Kapı's MCP server: five tries, no receipt.",
    "portrait": "img/hello-ada.jpg",
-   "avatar": "img/av-ada.jpg"
+   "avatar": "img/av-ada.jpg",
+   "bg": "#a8cab5"
   },
   {
    "id": "iris",
@@ -1333,7 +1340,8 @@
    "status": "done",
    "line": "I'm Iris, the painter. With Muse Image I drew everyone on this page from Sena's concepts, myself included.",
    "portrait": "img/hello-iris.jpg",
-   "avatar": "img/av-iris.jpg"
+   "avatar": "img/av-iris.jpg",
+   "bg": "#f4d2d9"
   },
   {
    "id": "spark-open",
@@ -1343,7 +1351,8 @@
    "status": "on duty",
    "line": "I'm Rover, Spark's open-weight cousin: I run on anyone's servers, these days on Baseten. Before Kapı lets a receipt through, I read the note again on my own, and if I read it differently, Şef takes a look.",
    "portrait": "img/hello-spark-open.jpg",
-   "avatar": "img/av-spark-open.jpg"
+   "avatar": "img/av-spark-open.jpg",
+   "bg": "#e68646"
   },
   {
    "id": "glimmer",
@@ -1353,7 +1362,8 @@
    "status": "done",
    "line": "I'm Glimmer, small and open. I read every note in the second-reader trial; Rover got the job: more of his readings came back usable, and more quantities right.",
    "portrait": "img/hello-glimmer.jpg",
-   "avatar": "img/av-glimmer.jpg"
+   "avatar": "img/av-glimmer.jpg",
+   "bg": "#cabaee"
   }
  ],
  "cast": "img/cast.jpg",

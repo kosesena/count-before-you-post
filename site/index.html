@@ -147,34 +147,23 @@ h2 { font-size: 24px; letter-spacing: -.01em; margin: 42px 0 4px; }
 }
 .member.dark .pill { border-color: rgba(255, 255, 255, .35); background: rgba(0, 0, 0, .25); }
 .member .bubble {
-  position: relative; margin: 14px 0 20px; padding: 12px 14px;
-  font-size: 14px; line-height: 1.55; overflow-wrap: anywhere;
-  color: #221d15; background: rgba(255, 255, 255, .62);
-  border: 1px solid rgba(255, 255, 255, .55); border-radius: 14px;
-  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
-  box-shadow: 0 4px 14px rgba(31, 27, 20, .12);
+  /* The line sits right on the card's colour (Sena: no bubble). Colour follows the card:
+     dark text on light cards, light text on dark ones. */
+  margin: 14px 0 18px; padding: 0 0 0 14px;
+  font-size: 15.5px; line-height: 1.6; font-weight: 500; overflow-wrap: anywhere;
+  color: rgba(34, 29, 21, .9); border-left: 3px solid var(--c);
 }
-.member.dark .bubble {
-  color: #f6f3ec; background: rgba(8, 14, 30, .52);
-  border-color: rgba(255, 255, 255, .18);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, .35);
-}
-.member .bubble::after {
-  content: ""; position: absolute; bottom: -7px; left: 30px; width: 13px; height: 13px;
-  background: inherit; transform: rotate(45deg); border-bottom-right-radius: 3px;
-  border-right: 1px solid rgba(255, 255, 255, .55); border-bottom: 1px solid rgba(255, 255, 255, .55);
-}
-.member.dark .bubble::after {
-  border-right-color: rgba(255, 255, 255, .18); border-bottom-color: rgba(255, 255, 255, .18);
-}
-.member .shot { position: relative; margin-top: auto; }
-.member .shot::before {
-  content: ""; position: absolute; left: 0; right: 0; top: 0; height: 24%; z-index: 1;
-  background: linear-gradient(to bottom, var(--cardbg) 0%, rgba(255, 255, 255, 0) 100%);
-  pointer-events: none;
+.member.dark .bubble { color: rgba(246, 243, 236, .94); }
+.member .shot {
+  /* .shot is also the dock camera image's class: drop its frame here. The image's mask
+     does the fade into the card. */
+  position: relative; margin-top: auto; border: 0; border-radius: 0; background: none;
 }
 .member img.portrait {
   width: 100%; aspect-ratio: 1; object-fit: cover; display: block; margin: 0; background: var(--cardbg);
+  /* The picture's own top edge fades out, so no line shows where it meets the card. */
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 26%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 26%);
 }
 .roles { font-size: 13px; color: var(--muted); margin: 14px 0 0; max-width: 46rem; }
 .langrow { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: 0 0 4px; }

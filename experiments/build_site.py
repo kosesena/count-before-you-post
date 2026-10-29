@@ -160,7 +160,8 @@ def build(lang):
             (160, 160)).save(SITE / "img" / f"av-{cid}.jpg", quality=85)
         cast.append({"id": cid, "name": name, "model": model, "colour": colour,
                      "status": status, "line": line,
-                     "portrait": jpg(src, f"hello-{cid}.jpg", 640), "avatar": f"img/av-{cid}.jpg"})
+                     "portrait": jpg(src, f"hello-{cid}.jpg", 640), "avatar": f"img/av-{cid}.jpg",
+                     "bg": card_colour(im)})
 
     vfile = RES / "voice_check.json"
     voice = json.loads(vfile.read_text()) if vfile.exists() else []
@@ -205,6 +206,14 @@ def build(lang):
     name = "data.json" if lang == "tr" else f"data-{lang}.json"
     (SITE / name).write_text(json.dumps(data, ensure_ascii=False, indent=1))
     print(f"{lang}: {len(cases)} cases, {len(clips)} clips -> site/{name}")
+
+
+def card_colour(hello):
+    """The backdrop colour of a hello portrait, so its card can take the same colour and the
+    portrait melts into it."""
+    w, h = hello.size
+    corners = [hello.getpixel(p) for p in ((10, 10), (w - 11, 10), (10, h // 2), (w - 11, h // 2))]
+    return "#%02x%02x%02x" % tuple(sum(c[i] for c in corners) // 4 for i in range(3))
 
 
 # Muse Code's sessions behind the MCP server (the first two files there are our own client test).
