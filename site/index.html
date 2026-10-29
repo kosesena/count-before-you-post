@@ -236,7 +236,7 @@ h2 { font-size: 24px; letter-spacing: -.01em; margin: 42px 0 4px; }
 .member:hover img.cutout { transform: translateY(-6px); }
 .member .body {
   flex: 1 1 auto; min-width: 0; align-self: center; position: relative;
-  border-radius: 24px; padding: 28px 30px 26px; overflow: hidden;
+  border-radius: 24px; padding: 28px 30px 26px; overflow: hidden; z-index: 3;
   color: #f2f5ff;
   background: rgba(255, 255, 255, .07);
   background:
@@ -569,6 +569,7 @@ footer p { margin: 4px 0; }
 }
 /* Cast: video + zigzag figure/panel rows (row styles live with .member above). */
 .cast-section { padding-top: 26px; }
+.cast-band { padding-bottom: 40px; }
 .castshot video { display: block; width: 100%; height: auto; border-radius: 18px;
   border: 1px solid var(--line); box-shadow: var(--shadow); background: #000; }
 </style>
@@ -718,7 +719,7 @@ footer p { margin: 4px 0; }
   </main>
   </div>
 </div>
-<div class="wrap">
+<div class="story cast-band"><div class="wrap">
   <section class="cast-section" aria-labelledby="h-cast">
     <figure class="castshot">
       <video id="castVideo" autoplay muted loop playsinline preload="metadata"></video>
@@ -730,6 +731,8 @@ footer p { margin: 4px 0; }
     <div class="crew" id="crew"></div>
     <p class="roles" id="roles"></p>
   </section>
+</div></div>
+<div class="wrap">
 
   <footer>
     <p>Built during the Meta Global AI Developer Hackathon, 26 Oct &ndash; 4 Nov 2026, by Sena K&ouml;se.</p>
@@ -871,10 +874,10 @@ function renderCrew(list) {
     `<div class="body"><p class="eyebrow">${esc(STATUS_TEXT[m.status] || m.status)}</p>` +
     `<p class="name">${esc(m.name)}</p>` +
     `<p class="model">Model  · ${esc(m.model)}</p>` +
-    `<p class="line"> ${esc(m.line)} </p>` +
+    `<p class="line">“${esc(m.line)}”</p>` +
     (job0 ? `<p class="job0">${esc(job0)}</p>` : "") +
-    `<span class="open">Open profile &rarr;</span>` +
-    `<canvas class="fx" aria-hidden="true"></canvas></div></a>`;
+    `<span class="open">Open profile &rarr;</span></div>` +
+    `<canvas class="fx" aria-hidden="true"></canvas></a>`;
   }).join("");
   $("roles").textContent =
     "On duty = working at the dock. Built part of it = made part of this project.";
@@ -1719,8 +1722,8 @@ const FX = {
         if (p.y < S.py - 12) { p.y = S.py + S.ph + 8; p.x = frnd(S.px + 16, S.px + S.pw - 16); }
         ctx.globalAlpha = 0.5 + 0.4 * (0.5 + 0.5 * Math.sin(t * 3 + p.ph));
         ctx.font = "700 " + p.s + "px ui-monospace, SFMono-Regular, Menlo, monospace";
-        ctx.fillStyle = "#0b3d39";
-        ctx.shadowColor = "rgba(255,255,255,.95)"; ctx.shadowBlur = 6;
+        ctx.fillStyle = "#ccfbf1";
+        ctx.shadowColor = "#0f766e"; ctx.shadowBlur = 10;
         ctx.fillText(p.g, p.x, p.y);
       }
       ctx.restore();
@@ -1785,10 +1788,13 @@ function startFx(card) {
   if (fxActive && fxActive.card === card) return;
   stopFx();
   const canvas = card.querySelector("canvas.fx");
-  const panel = card.querySelector(".body");
-  if (!canvas || !panel) return;
-  const rp = panel.getBoundingClientRect();
-  const S = { w: rp.width, h: rp.height, px: 0, py: 0, pw: rp.width, ph: rp.height };
+  const img = card.querySelector("img.cutout");
+  if (!canvas || !img) return;
+  // Effects play around the figure, as on the old cards; the glass panel sits above them.
+  const rc = card.getBoundingClientRect();
+  const ri = img.getBoundingClientRect();
+  const S = { w: rc.width, h: rc.height,
+    px: ri.left - rc.left, py: ri.top - rc.top, pw: ri.width, ph: ri.height };
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
   canvas.width = Math.max(1, Math.round(S.w * dpr));
   canvas.height = Math.max(1, Math.round(S.h * dpr));

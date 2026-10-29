@@ -147,6 +147,11 @@ gate and the supervisor.
 (`experiments/mascot_portraits.py`). Each is a full-HD transparent PNG (1080×1920) in
 [`assets/mascots/portraits/`](assets/mascots/portraits/). Fan-made, not official Meta mascots.*
 
+**Two Turkish names.** The dock in this project is a Turkish one, so two characters kept their
+Turkish names. **Kapı** (say *KAH-puh*) means *gate*. **Şef** (say *shef*, from the French
+*chef*) means *chief*: it is what a Turkish warehouse calls the shift supervisor. The receiver
+speaks Turkish too: *"on iki koli geldi"* means *"twelve cartons came"*.
+
 ## The evidence
 
 A receiving dock built in Blender (headless, `experiments/blender/warehouse.py`): the truck at

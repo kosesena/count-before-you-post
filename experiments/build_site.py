@@ -42,15 +42,16 @@ CAST = [
      "how sure I am: 0.88 and up is sure. One day I'd like to look through the receiver's "
      "glasses instead of the ceiling."),
     ("voice", "Voice", "Muse Voice Transcribe", "#1e3a8a", "on duty",
-     "I'm Voice. I write down what the receiver says at the dock, \u201con iki koli geldi\u201d, "
+     "I'm Voice. I write down what the receiver says at the dock, \u201con iki koli geldi\u201d (twelve cartons came), "
      "so the gate gets a third count, and I notice when they aren't sure. When the driver "
      "talks too, I keep their claim apart from what the receiver counted."),
     ("kapi", "Kapı", "the gate, plain code", "#a16207", "on duty",
-     "I'm Kapı, Turkish for gate. I'm not a model, I'm twelve rules in plain code. Nothing "
+     "I'm Kapı (say KAH-puh), Turkish for gate. I'm not a model, I'm twelve rules in plain code. Nothing "
      "written on a note, not even in white ink, can talk me into posting. No agreement, "
      "no receipt."),
     ("sef", "Şef", "the human supervisor", "#1d4ed8", "on duty",
-     "I'm Şef, the human in the loop. A crushed carton, a stacked load, a number nobody "
+     "I'm Şef (say shef), Turkish for chief: the shift supervisor, the human in "
+     "the loop. A crushed carton, a stacked load, a number nobody "
      "can confirm: when Kapı isn't sure, the decision comes to me."),
     ("wonder", "Wonder", "Muse Wonder", "#ca8a04", "on duty",
      "I'm Wonder, the clerk. When Kapı stops a delivery I write the paperwork: the dispute to "
@@ -340,23 +341,30 @@ def profile(cid):
 def hero():
     """The top of the page: the scene Muse Image drew for the chosen design, without text
     (experiments/site_mockups.py background), and the seven tool characters drawn in its light
-    (experiments/hero_characters.py). Falls back to the Blender dock render."""
+    (experiments/hero_characters.py); `figures` holds all ten for the cast. Falls back to the Blender dock render."""
     drawn = HERE / "mockups" / "hero-bg-1.png"
     src = drawn if drawn.exists() else HERE / "blender" / "out" / "cast" / "cast-genel.png"
     if not src.exists():
         return {}
-    tools = {}
-    for cid in ("spark", "sam", "voice", "iris", "ada", "wonder", "spark-open"):
+    tools, figures = {}, {}
+    for cid in ("spark", "sam", "voice", "kapi", "sef", "wonder", "ada", "iris", "spark-open",
+                "glimmer"):
         fig = ROOT / "assets" / "mascots" / "hero" / f"{'rover' if cid == 'spark-open' else cid}.png"
         if fig.exists():
             im = Image.open(fig)
-            im.resize((440, round(440 * im.height / im.width)), Image.LANCZOS).save(
-                SITE / "img" / f"hero-{cid}.webp", "WEBP", quality=88, method=6)
-            tools[cid] = f"img/hero-{cid}.webp"
+            if cid not in ("kapi", "sef", "glimmer"):
+                im.resize((440, round(440 * im.height / im.width)), Image.LANCZOS).save(
+                    SITE / "img" / f"hero-{cid}.webp", "WEBP", quality=88, method=6)
+                tools[cid] = f"img/hero-{cid}.webp"
+            # Larger, for the cast section: all ten characters in the same light.
+            w = min(760, im.width)
+            im.resize((w, round(w * im.height / im.width)), Image.LANCZOS).save(
+                SITE / "img" / f"fig-{cid}.webp", "WEBP", quality=88, method=6)
+            figures[cid] = f"img/fig-{cid}.webp"
     return {"hero": {"src": jpg(src, "hero-dock.jpg", 2016),
                      "alt": "A warehouse receiving dock at dusk: a truck with cartons at the open "
                             "door, a wrapped pallet, a traffic light.",
-                     "tools": tools}}
+                     "tools": tools, "figures": figures}}
 
 
 def card_colour(hello):

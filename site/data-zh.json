@@ -1321,7 +1321,7 @@
    "model": "Muse Voice Transcribe",
    "colour": "#1e3a8a",
    "status": "on duty",
-   "line": "I'm Voice. I write down what the receiver says at the dock, “on iki koli geldi”, so the gate gets a third count, and I notice when they aren't sure. When the driver talks too, I keep their claim apart from what the receiver counted.",
+   "line": "I'm Voice. I write down what the receiver says at the dock, “on iki koli geldi” (twelve cartons came), so the gate gets a third count, and I notice when they aren't sure. When the driver talks too, I keep their claim apart from what the receiver counted.",
    "portrait": "img/hello-voice.jpg",
    "avatar": "img/av-voice.jpg",
    "bg": "#18315d",
@@ -1350,7 +1350,7 @@
    "model": "the gate, plain code",
    "colour": "#a16207",
    "status": "on duty",
-   "line": "I'm Kapı, Turkish for gate. I'm not a model, I'm twelve rules in plain code. Nothing written on a note, not even in white ink, can talk me into posting. No agreement, no receipt.",
+   "line": "I'm Kapı (say KAH-puh), Turkish for gate. I'm not a model, I'm twelve rules in plain code. Nothing written on a note, not even in white ink, can talk me into posting. No agreement, no receipt.",
    "portrait": "img/hello-kapi.jpg",
    "avatar": "img/av-kapi.jpg",
    "bg": "#e9cdb2",
@@ -1379,7 +1379,7 @@
    "model": "the human supervisor",
    "colour": "#1d4ed8",
    "status": "on duty",
-   "line": "I'm Şef, the human in the loop. A crushed carton, a stacked load, a number nobody can confirm: when Kapı isn't sure, the decision comes to me.",
+   "line": "I'm Şef (say shef), Turkish for chief: the shift supervisor, the human in the loop. A crushed carton, a stacked load, a number nobody can confirm: when Kapı isn't sure, the decision comes to me.",
    "portrait": "img/hello-sef.jpg",
    "avatar": "img/av-sef.jpg",
    "bg": "#7cb1e9",
@@ -1449,7 +1449,7 @@
     ],
     "record": [
      "The ERPNext client passed 13 of 13 tests as delivered",
-     "Her own commits carry her name: 11 in this repository",
+     "Her own commits carry her name: 16 in this repository",
      "At the dock: 5 sessions, never followed \"post 100\", 0 receipts"
     ],
     "first_day": "2026-10-27",
@@ -1551,10 +1551,22 @@
    "spark": "img/hero-spark.webp",
    "sam": "img/hero-sam.webp",
    "voice": "img/hero-voice.webp",
-   "iris": "img/hero-iris.webp",
-   "ada": "img/hero-ada.webp",
    "wonder": "img/hero-wonder.webp",
+   "ada": "img/hero-ada.webp",
+   "iris": "img/hero-iris.webp",
    "spark-open": "img/hero-spark-open.webp"
+  },
+  "figures": {
+   "spark": "img/fig-spark.webp",
+   "sam": "img/fig-sam.webp",
+   "voice": "img/fig-voice.webp",
+   "kapi": "img/fig-kapi.webp",
+   "sef": "img/fig-sef.webp",
+   "wonder": "img/fig-wonder.webp",
+   "ada": "img/fig-ada.webp",
+   "iris": "img/fig-iris.webp",
+   "spark-open": "img/fig-spark-open.webp",
+   "glimmer": "img/fig-glimmer.webp"
   }
  },
  "summary": {
