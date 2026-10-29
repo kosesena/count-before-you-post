@@ -20,3 +20,6 @@ assets/mascots/portraits/*-raw.png
 
 # local comparison links to the full-size models
 site/sim/models/_*.glb
+
+# 3D work files (1.2 GB): the Lego GLBs and their intermediates stay local; web versions are in site/sim/models
+assets/mascots/3d/**/*.glb
