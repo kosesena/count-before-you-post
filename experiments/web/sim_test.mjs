@@ -54,17 +54,17 @@ for (const c of data.cases) {
   const y0 = await ev("window.__sim.G.fork.y");
   await key("ArrowUp", "keyDown"); await sleep(1000); await key("ArrowUp", "keyUp");
   const moved = Math.abs((await ev("window.__sim.G.fork.y")) - y0) > 0.2;
-  // In front of the pallet, heading into the trailer (+y); fork tips 1.8 m ahead.
-  await ev(`(() => { const S = window.__sim, F = S.G.fork, P = S.G.pallet; F.x = P.x; F.y = P.y - 1.8; F.h = P.yaw || 0; F.v = 0; })()`);
+  // In front of the pallet, heading into the trailer (+y), at the hook's pick distance.
+  await ev(`(() => { const S = window.__sim, F = S.G.fork, P = S.G.pallet, K = S.FORK || { pick: 1.8 }; F.x = P.x; F.y = P.y - K.pick; F.h = P.yaw || 0; F.v = 0; })()`);
   await sleep(300);
   const picked = await ev("window.__sim.pickup()");
-  // Carry it so the pallet lands on the middle of the zone (set down 1.19 m ahead).
-  await ev(`(() => { const F = window.__sim.G.fork; F.x = 0; F.y = 5.5 - 1.19; F.h = 0; F.v = 0; })()`);
+  // Carry it so the pallet lands on the middle of the zone (set down FORK.set ahead).
+  await ev(`(() => { const S = window.__sim, F = S.G.fork, K = S.FORK || { set: 1.19 }; F.x = 0; F.y = 5.5 - K.set; F.h = 0; F.v = 0; })()`);
   await sleep(500);
   await ev("window.__sim.drop()");
   const done = await until(`document.body.classList.contains("done")`, 30000);
   await sleep(1200);
-  const text = await ev(`(document.querySelector(".result, #result, [class*=result]") || document.body).innerText.slice(0, 600)`);
+  const text = await ev(`(document.getElementById("result") || document.querySelector(".result, [class*=result]") || document.body).innerText.slice(0, 600)`);
   const shot = await send("Page.captureScreenshot", { format: "png" });
   writeFileSync(`${outDir}/sim-${c.id}.png`, Buffer.from(shot.result.data, "base64"));
   const want = { post: /written to the ERP/i, block: /nothing written/i, human: /sent to Ş?ef|Şef/i }[c.gate.action];
