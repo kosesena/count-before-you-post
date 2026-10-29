@@ -2,10 +2,11 @@
 import json
 import sys
 import unittest
+import urllib.parse
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from cbyp.erpnext import Client, ERPNextError, GateRefused  # noqa: E402
+from cbyp.erpnext import AlreadyReceived, Client, ERPNextError, GateRefused  # noqa: E402
 from cbyp.gate import Decision  # noqa: E402
 
 
@@ -49,11 +50,13 @@ class Writer(unittest.TestCase):
             self.assertEqual(fake.calls, [])
 
     def test_post_creates_and_submits(self):
-        fake = Fake([ok({"data": {"name": "MAT-PRE-0001"}}),
+        fake = Fake([ok({"data": []}), ok({"data": {"name": "MAT-PRE-0001"}}),
                      ok({"data": {"name": "MAT-PRE-0001", "docstatus": 1}})])
         self.assertEqual(post(client_for(fake)), "MAT-PRE-0001")
-        self.assertEqual(len(fake.calls), 2)
-        create, submit = fake.calls
+        self.assertEqual(len(fake.calls), 3)
+        check, create, submit = fake.calls
+        self.assertEqual(check["method"], "GET")
+        self.assertIn("IRS-42", urllib.parse.unquote(check["url"]))
         self.assertEqual(create["method"], "POST")
         self.assertIn("Purchase", create["url"])
         item = create["body"]["items"][0]
@@ -65,10 +68,17 @@ class Writer(unittest.TestCase):
         self.assertEqual((submit["method"], submit["body"]), ("PUT", {"docstatus": 1}))
         self.assertIn("MAT-PRE-0001", submit["url"])
 
+    def test_a_delivery_already_received_is_not_written_again(self):
+        fake = Fake([ok({"data": [{"name": "MAT-PRE-0001"}]})])
+        with self.assertRaises(AlreadyReceived) as ctx:
+            post(client_for(fake))
+        self.assertIn("MAT-PRE-0001", str(ctx.exception))
+        self.assertEqual([c["method"] for c in fake.calls], ["GET"])
+
     def test_server_error_carries_message_not_secret(self):
         server = {"exception": "ValidationError",
                   "_server_messages": json.dumps([json.dumps({"message": "Item AYC-5L is not a stock item"})])}
-        fake = Fake([(417, server)])
+        fake = Fake([ok({"data": []}), (417, server)])
         with self.assertRaises(ERPNextError) as ctx:
             post(client_for(fake))
         self.assertIn("not a stock item", str(ctx.exception))

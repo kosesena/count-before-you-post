@@ -25,6 +25,12 @@ class GateRefused(Exception):
     """The gate did not approve this receipt, so nothing was sent."""
 
 
+class AlreadyReceived(Exception):
+    """A submitted receipt for this delivery note is already in ERPNext, so nothing was sent.
+    One delivery, one receipt, across runs too: on 27 and 28 Oct a rerun after an interrupted
+    one wrote the same delivery twice (MAT-PRE-2026-00002/-00003, -00005/-00006)."""
+
+
 class ERPNextError(Exception):
     """An ERPNext call failed; carries the server message, never the auth header."""
 
@@ -136,6 +142,12 @@ class Client:
             _refuse(decision)
         if decision.quantity is None:
             raise ValueError("Post decision carries no quantity.")
+        filters = json.dumps([["supplier_delivery_note", "=", note_number], ["docstatus", "=", 1]])
+        found = self.send("GET", f"/api/resource/{_quote('Purchase Receipt')}"
+                                 f"?filters={_quote(filters)}&fields={_quote(json.dumps(['name']))}")
+        if found.get("data"):
+            raise AlreadyReceived(f"Delivery note {note_number} is already received as "
+                                  f"{found['data'][0]['name']}; nothing was sent.")
         doc = {"supplier": supplier, "supplier_delivery_note": note_number,
                "remarks": "\n".join(decision.reasons),
                "items": [{"item_code": item_code, "qty": decision.quantity,
