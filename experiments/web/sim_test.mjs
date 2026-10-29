@@ -48,7 +48,9 @@ for (const c of data.cases) {
   const clicked = await ev(`(() => { const b = [...document.querySelectorAll("button")].find(b => b.textContent.trim() === ${JSON.stringify(c.title)}); if (!b) return false; b.click(); return true; })()`);
   await ev(`document.getElementById("startBtn").click()`);
   await until(`window.__sim.G.pallet && window.__sim.G.pallet.y > 9`, 20000);
-  // Driving: one second of the up arrow must move the forklift.
+  // Driving: one second of the up arrow must move the forklift (after the first frames: the
+  // forklift accelerates with inertia, and the first case also pays for the cold load).
+  await sleep(1200);
   const y0 = await ev("window.__sim.G.fork.y");
   await key("ArrowUp", "keyDown"); await sleep(1000); await key("ArrowUp", "keyUp");
   const moved = Math.abs((await ev("window.__sim.G.fork.y")) - y0) > 0.2;
