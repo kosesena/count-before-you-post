@@ -1316,6 +1316,13 @@ def p_rooms(P):
     rugmat = mat("p_room_rug", _hex("#c9bfae"), rough=0.95)
     desk_grey = mat("p_room_deskgrey", (0.45, 0.46, 0.47), rough=0.7)
     lav = mat("p_room_lav", _hex("#a78bfa"), rough=0.6, emit=0.8)
+    soil = mat("p_room_soil", _hex("#3b2a1e"), rough=0.95)
+    leaf2 = mat("p_room_leaf2", _hex("#4caf50"), rough=0.8)
+    pink = mat("p_room_pink", _hex("#f9a8d4"), rough=0.5)
+    framewood = mat("p_room_frame", _hex("#4a3220"), rough=0.7)
+    bookmats = [mat(f"p_room_book{k}", c, rough=0.6) for k, c in enumerate(
+        [_hex("#b91c1c"), _hex("#1d4ed8"), _hex("#15803d"), _hex("#f59e0b"),
+         _hex("#7c3aed"), _hex("#0e7490")])]
     # id, name plate, colour, floor (0 ground, 1 upper), room x0.
     characters = (
         ("voice", "Voice", "#1e3a8a", 0, -15),
@@ -1336,6 +1343,7 @@ def p_rooms(P):
         cmat = mat(f"p_room_c_{cid}", col, rough=0.95)
         cglow = mat(f"p_room_g_{cid}", col, rough=0.5, emit=1.6)
         pre = f"p_room_{cid}_"
+        S = 1.25  # furniture/prop scale for the 2.4 m characters (shell stays)
         # Back wall fully in the character's colour, proud of the hall band behind it.
         box(f"{pre}back", (6.0, 0.08, 3.0), (xc, -17.70, z0 + 1.5), cmat)
         # Pale divider to the east; the westernmost rooms also line the hall wall.
@@ -1377,15 +1385,15 @@ def p_rooms(P):
         box(f"{pre}sill", (x1 - x0 - 0.06, 0.09, 0.07), (xc, yg, z0 + 0.035),
             P["dark_steel"])
         box(f"{pre}dhead", (1.07, 0.09, 0.09), (xd, yg, zt), P["dark_steel"])
-        box(f"{pre}plate", (1.7, 0.10, 0.42), (xc, yg, z0 + 2.76), P["dark_steel"])
-        box(f"{pre}plateface", (1.6, 0.04, 0.35), (xc, yg + 0.045, z0 + 2.76),
-            plaque)
-        text(f"{pre}name", name, (xc, yg + 0.075, z0 + 2.76), 0.30, txt_white,
+        # Name plate: 1.8 x 0.4 m in the character's colour, bold white name,
+        # both emissive so the plate reads from the middle of the yard.
+        box(f"{pre}plate", (1.8, 0.12, 0.40), (xc, yg, z0 + 2.76), cglow)
+        text(f"{pre}name", name, (xc, yg + 0.075, z0 + 2.76), 0.34, txt_white,
              rot=(math.radians(90), 0, math.radians(180)))
         bpy.ops.object.light_add(type="POINT", location=(xc, yg + 0.7, z0 + 2.7))
         sgl = bpy.context.object
         sgl.name = f"{pre}signlight"
-        sgl.data.energy, sgl.data.color = 12, (1.0, 0.95, 0.88)
+        sgl.data.energy, sgl.data.color = 20, (1.0, 0.95, 0.88)
         sgl.data.use_shadow = False
         # Floor slab above (ground rooms) or balcony and roof (upper rooms).
         if floor == 0:
@@ -1427,24 +1435,36 @@ def p_rooms(P):
         # between the seat and the glass, and the west doorway stays clear).
         wide = cid in ("spark", "sam", "voice", "kapi", "sef", "wonder", "ada",
                        "iris", "glimmer", "rover")
-        dw = 1.8 if wide else 1.4
+        dw = 2.2
         deskmat = {"spark": P["wood"], "voice": P["wood"], "wonder": P["wood"],
                    "iris": P["wood"], "glimmer": P["wood"], "rover": desk_grey,
                    "kapi": cardb}.get(cid, P["wood_pale"])
-        yd, yc, dt = -14.7, -15.5, z0 + 0.775
-        box(f"{pre}desk", (dw, 0.7, 0.05), (xc, yd, z0 + 0.75), deskmat,
+        yd, yc, dt = -14.7, -15.5, z0 + 0.775 * S  # desk top ~0.97 for 2.4 m sitters
+        box(f"{pre}desk", (dw, 0.85, 0.06), (xc, yd, z0 + 0.775 * S - 0.03), deskmat,
             bevel=0.008)
-        for a, lx in enumerate((xc - dw / 2 + 0.08, xc + dw / 2 - 0.08)):
-            for b, ly in enumerate((yd - 0.27, yd + 0.27)):
-                box(f"{pre}deskleg{a}{b}", (0.05, 0.05, 0.725),
-                    (lx, ly, z0 + 0.3625), P["dark_steel"])
-        box(f"{pre}seat", (0.45, 0.45, 0.06), (xc, yc, z0 + 0.47), P["black"])
-        box(f"{pre}seatback", (0.45, 0.06, 0.5), (xc, yc - 0.25, z0 + 0.75),
+        for a, lx in enumerate((xc - dw / 2 + 0.10, xc + dw / 2 - 0.10)):
+            for b, ly in enumerate((yd - 0.34, yd + 0.34)):
+                box(f"{pre}deskleg{a}{b}", (0.06, 0.06, 0.91),
+                    (lx, ly, z0 + 0.455), P["dark_steel"])
+        # Chair faces the yard (+y); seat top 0.625, back scaled to match.
+        box(f"{pre}seat", (0.56, 0.56, 0.08), (xc, yc, z0 + 0.585), P["black"])
+        box(f"{pre}seatback", (0.56, 0.08, 0.78), (xc, yc - 0.30, z0 + 1.0),
             P["black"])
-        cyl(f"{pre}seatpost", 0.03, 0.45, (xc, yc, z0 + 0.22), P["dark_steel"])
-        cyl(f"{pre}seatbase", 0.26, 0.04, (xc, yc, z0 + 0.02), P["dark_steel"])
-        if wide:
-            box(f"{pre}rug", (1.8, 1.0, 0.012), (xc, -14.1, z0 + 0.006), rugmat)
+        cyl(f"{pre}seatpost", 0.035, 0.56, (xc, yc, z0 + 0.28), P["dark_steel"])
+        cyl(f"{pre}seatbase", 0.32, 0.05, (xc, yc, z0 + 0.025), P["dark_steel"])
+        # Rug under the desk and chair, edged in the character's colour.
+        box(f"{pre}rug", (2.8, 2.4, 0.014), (xc, -15.0, z0 + 0.007), rugmat)
+        for sgn, tag in ((-1, "w"), (1, "e")):
+            box(f"{pre}rugedge{tag}", (0.10, 2.4, 0.016),
+                (xc + sgn * 1.35, -15.0, z0 + 0.008), cmat)
+        for sgn, tag in ((-1, "s"), (1, "n")):
+            box(f"{pre}rugedge{tag}", (2.8, 0.10, 0.016),
+                (xc, -15.0 + sgn * 1.15, z0 + 0.008), cmat)
+        # Pendant ceiling lamp with a warm bulb over the front of the desk.
+        cyl(f"{pre}pendcord", 0.015, 0.55, (xc, -14.2, z0 + 2.70), P["black"])
+        _pcone(f"{pre}pendshade", 0.22, 0.07, 0.20, (xc, -14.2, z0 + 2.35),
+               cmat)
+        _psphere(f"{pre}pendbulb", 0.05, (xc, -14.2, z0 + 2.26), lamp_warm)
 
         def laptop(tag, px):
             box(f"{pre}lap{tag}", (0.34, 0.24, 0.025), (px, yd - 0.08, dt + 0.0125),
@@ -1462,7 +1482,9 @@ def p_rooms(P):
             box(f"{pre}monp{tag}", (0.04, 0.04, 0.12), (px, yd, dt + 0.07),
                 P["dark_steel"])
 
-        if cid == "spark":
+        # Legacy unscaled per-room dress is disabled (none of these branches can
+        # run); the dense scaled rooms are built in the second chain below.
+        if cid == "__legacy_spark":
             # Wooden reading desk with drawers, lamp, trays, magnifier, pen cup.
             box(f"{pre}drawers", (0.5, 0.6, 0.68), (xc - 0.6, yd, z0 + 0.36),
                 P["wood"])
@@ -1561,7 +1583,7 @@ def p_rooms(P):
                              (0.85, 0.65, 0.1), (0.6, 0.2, 0.6))[b], rough=0.6))
             box(f"{pre}shelfbox", (0.4, 0.28, 0.25), (shx - 0.1, -17.45,
                 z0 + 1.745), cardb)
-        elif cid == "sam":
+        elif cid == "__legacy_sam":
             # Pallet model with cartons on the desk, tally counter, pencil.
             px = xc - 0.40
             for k in range(3):
@@ -1643,7 +1665,7 @@ def p_rooms(P):
                 z0 + 1.75), draw_blue)
             _psphere(f"{pre}esheetpin", 0.018, (xe - 0.04, -16.3, z0 + 1.94),
                      pin_blue)
-        elif cid == "voice":
+        elif cid == "__legacy_voice":
             # Wooden radio desk: reel-to-reel, warm lamp, notepad, headphones.
             box(f"{pre}drawers", (0.5, 0.6, 0.68), (xc + 0.6, yd, z0 + 0.36),
                 P["wood"])
@@ -1722,7 +1744,7 @@ def p_rooms(P):
                 P["black"], rot=(math.radians(90), 0, 0))
             cyl(f"{pre}spkcone1", 0.06, 0.02, (spx, spy + 0.14, z0 + 0.86),
                 P["black"], rot=(math.radians(90), 0, 0))
-        elif cid == "kapi":
+        elif cid == "__legacy_kapi":
             # Cardboard desk with tape rolls and a clipboard.
             box(f"{pre}modesty", (1.7, 0.04, 0.6), (xc, yd - 0.3, z0 + 0.42),
                 cardb)
@@ -1814,7 +1836,7 @@ def p_rooms(P):
                 z0 + 1.75), P["paper"])
             _psphere(f"{pre}eslippin", 0.018, (xe - 0.04, -16.2, z0 + 1.92),
                      pin_red)
-        elif cid == "sef":
+        elif cid == "__legacy_sef":
             # Foreman's desk: radio, thermos, approval stamp, signed papers.
             wx = xc - 0.62
             box(f"{pre}radio", (0.09, 0.06, 0.20), (wx, yd - 0.05, dt + 0.10),
@@ -1871,7 +1893,7 @@ def p_rooms(P):
                 z0 + 1.7), P["paper"])
             _psphere(f"{pre}rosterpin", 0.018, (xe - 0.04, -16.4, z0 + 1.90),
                      pin_red)
-        elif cid == "wonder":
+        elif cid == "__legacy_wonder":
             # Old post office: typewriter, stamp rack, clipboard, plant, mug.
             tx = xc - 0.52
             box(f"{pre}twbody", (0.42, 0.36, 0.14), (tx, yd, dt + 0.07),
@@ -1963,7 +1985,7 @@ def p_rooms(P):
                     (xw + 0.03, -16.5 + k * 0.5, z0 + 1.8), P["paper"])
                 _psphere(f"{pre}wcardpin{k}", 0.018,
                          (xw + 0.04, -16.5 + k * 0.5, z0 + 1.88), pin_red)
-        elif cid == "ada":
+        elif cid == "__legacy_ada":
             # Maker lab: laptop, notebook, plant, whiteboard, server rack, neon.
             laptop("a", xc + 0.55)
             box(f"{pre}notebookl", (0.16, 0.22, 0.015), (xc - 0.18, yd + 0.1,
@@ -2028,7 +2050,7 @@ def p_rooms(P):
                     (xe - 0.03, -16.0 + k * 0.55, z0 + 1.7), P["paper"])
                 _psphere(f"{pre}eprintpin{k}", 0.018,
                          (xe - 0.04, -16.0 + k * 0.55, z0 + 1.88), pin_blue)
-        elif cid == "iris":
+        elif cid == "__legacy_iris":
             # Design studio: flat drawing tablet with a sketch, palette, pencil
             # jar and paint tubes on the wooden desk (all low or off-centre).
             tabx = xc - 0.40
@@ -2129,7 +2151,7 @@ def p_rooms(P):
                 cyl(f"{pre}floorpen{k}", 0.012, 0.17, (xc + 1.1 + k * 0.12,
                     -14.0 + k * 0.08, z0 + 0.012), pm,
                     rot=(math.radians(90), 0, math.radians(60 + k * 25)))
-        elif cid == "rover":
+        elif cid == "__legacy_rover":
             # Field station: rugged laptop with yellow corners, globe and pen
             # jar on the grey desk; the tall props sit off-centre.
             lx = xc - 0.50
@@ -2252,7 +2274,7 @@ def p_rooms(P):
                     -15.8 + k * 0.6, z0 + 1.70), P["paper"])
                 _psphere(f"{pre}enotepin{k}", 0.018, (xe - 0.04,
                          -15.8 + k * 0.6, z0 + 1.86), pin_red)
-        elif cid == "glimmer":
+        elif cid == "__legacy_glimmer":
             # Crystal reading room: open notebook and pen low in the centre,
             # lavender and a glowing crystal off-centre on the wooden desk.
             box(f"{pre}notebookl", (0.16, 0.22, 0.015), (xc - 0.09, yd + 0.08,
@@ -2329,6 +2351,2034 @@ def p_rooms(P):
             vl.name = f"{pre}violet"
             vl.data.energy, vl.data.color = 25, (0.62, 0.55, 1.0)
             vl.data.use_shadow = False
+        # === dense scaled rooms (2.4 m characters; shell and doorway untouched) ===
+        # Side-liner inner faces; tall side units hug them. The west unit stops
+        # short of the doorway; flat boards cover the front section of the wall.
+        xwf, xef = xw + 0.02, xe - 0.02
+        wy0, wy1 = -17.4, (-15.2 if x0 == -15 else -14.9)
+        ey0, ey1 = -17.4, -13.9
+        if cid == "spark":
+            # --- desk: drawers, lamp, trays, clipboard, magnifier, pens, books ---
+            box(f"{pre}drawers", (0.62, 0.75, 0.85), (xc - 0.65, yd, z0 + 0.455),
+                P["wood"])
+            for k in range(3):
+                box(f"{pre}drawer{k}", (0.56, 0.02, 0.22),
+                    (xc - 0.65, yd + 0.385, z0 + 0.20 + k * 0.275),
+                    P["wood_pale"])
+                cyl(f"{pre}drawerk{k}", 0.018, 0.035,
+                    (xc - 0.65, yd + 0.40, z0 + 0.20 + k * 0.275),
+                    P["dark_steel"], rot=(math.radians(90), 0, 0))
+            lampx = xc + 0.85
+            cyl(f"{pre}lampbase", 0.085, 0.035, (lampx, yd - 0.20, dt + 0.018),
+                P["dark_steel"])
+            cyl(f"{pre}lamparm", 0.018, 0.52, (lampx, yd - 0.20, dt + 0.27),
+                P["dark_steel"], rot=(math.radians(-18), 0, 0))
+            _pcone(f"{pre}lampshade", 0.11, 0.045, 0.15,
+                   (lampx, yd - 0.11, dt + 0.55), P["dark_steel"],
+                   rot=(math.radians(-30), 0, 0))
+            _psphere(f"{pre}lampbulb", 0.035, (lampx, yd - 0.07, dt + 0.50),
+                     lamp_warm)
+            bpy.ops.object.light_add(type="POINT",
+                                     location=(lampx, yd - 0.07, dt + 0.40))
+            dll = bpy.context.object
+            dll.name = f"{pre}desklight"
+            dll.data.energy, dll.data.color = 18, (1.0, 0.80, 0.55)
+            dll.data.use_shadow = False
+            trayx = xc - 0.55
+            for k in range(2):
+                box(f"{pre}tray{k}", (0.42, 0.32, 0.03),
+                    (trayx, yd - 0.08, dt + 0.035 + k * 0.125),
+                    P["dark_steel"])
+                box(f"{pre}trayn{k}", (0.37, 0.27, 0.06),
+                    (trayx, yd - 0.08, dt + 0.075 + k * 0.125), P["paper"])
+            for a, ox in enumerate((-0.19, 0.19)):
+                box(f"{pre}traypost{a}", (0.03, 0.03, 0.27),
+                    (trayx + ox, yd - 0.22, dt + 0.135), P["dark_steel"])
+            box(f"{pre}clip", (0.30, 0.40, 0.018), (xc + 0.08, yd + 0.05,
+                dt + 0.009), P["wood"])
+            box(f"{pre}clippaper", (0.26, 0.36, 0.006), (xc + 0.08, yd + 0.05,
+                dt + 0.021), P["paper"])
+            box(f"{pre}clipclip", (0.10, 0.035, 0.025), (xc + 0.08, yd - 0.13,
+                dt + 0.025), P["dark_steel"])
+            cyl(f"{pre}magrim", 0.085, 0.012, (xc - 0.12, yd + 0.22, dt + 0.007),
+                P["dark_steel"])
+            cyl(f"{pre}maglens", 0.075, 0.014, (xc - 0.12, yd + 0.22, dt + 0.009),
+                P["glass"])
+            cyl(f"{pre}maghandle", 0.015, 0.17,
+                (xc + 0.06, yd + 0.22, dt + 0.015), P["wood"],
+                rot=(0, math.radians(90), 0))
+            cyl(f"{pre}pencup", 0.055, 0.125, (xc - 0.62, yd + 0.22, dt + 0.062),
+                cmat)
+            for k in range(4):
+                cyl(f"{pre}pen{k}", 0.007, 0.17,
+                    (xc - 0.64 + (k % 2) * 0.03, yd + 0.21 + (k // 2) * 0.03,
+                     dt + 0.13), P["black"])
+            box(f"{pre}book0", (0.30, 0.22, 0.045), (xc + 0.55, yd + 0.18,
+                dt + 0.022), cmat)
+            box(f"{pre}book1", (0.27, 0.20, 0.04), (xc + 0.55, yd + 0.18,
+                dt + 0.065), P["paper"])
+            box(f"{pre}papers", (0.30, 0.22, 0.04), (xc + 0.30, yd - 0.05,
+                dt + 0.02), P["paper"])
+            box(f"{pre}stickpad", (0.12, 0.12, 0.03), (xc + 0.92, yd + 0.20,
+                dt + 0.015), sticky_or)
+            # --- back wall: big cork board, checklists, clock, stickies ---
+            boardx = xc + 0.4
+            box(f"{pre}board", (3.6, 0.07, 1.7), (boardx, -17.60, z0 + 1.95),
+                P["wood"])
+            box(f"{pre}cork", (3.45, 0.03, 1.55), (boardx, -17.57, z0 + 1.95),
+                cork)
+            for r in range(2):
+                for c in range(6):
+                    nx = boardx - 1.375 + c * 0.55
+                    nz = z0 + 2.28 - r * 0.68
+                    box(f"{pre}bnote{r}{c}", (0.42, 0.02, 0.52),
+                        (nx, -17.55, nz), P["paper"])
+                    box(f"{pre}bhi{r}{c}", (0.36, 0.024, 0.06),
+                        (nx, -17.55, nz - 0.05), hi_yellow)
+                    _psphere(f"{pre}bpin{r}{c}", 0.022, (nx, -17.53, nz + 0.23),
+                             pin_red if (r + c) % 2 else pin_blue)
+            for a, lx in enumerate((xc - 2.30, xc - 1.82)):
+                for b, lz in enumerate((z0 + 2.30, z0 + 1.60)):
+                    box(f"{pre}check{a}{b}", (0.40, 0.02, 0.55),
+                        (lx, -17.62, lz), P["paper"])
+                    box(f"{pre}checkhi{a}{b}", (0.34, 0.024, 0.06),
+                        (lx, -17.62, lz - 0.03), hi_yellow)
+                    _psphere(f"{pre}checkpin{a}{b}", 0.022, (lx, -17.60,
+                             lz + 0.25), pin_green)
+            cyl(f"{pre}clockrim", 0.18, 0.03, (xc + 2.55, -17.59, z0 + 2.35),
+                P["dark_steel"], rot=(math.radians(90), 0, 0))
+            cyl(f"{pre}clockface", 0.16, 0.035, (xc + 2.55, -17.585, z0 + 2.35),
+                P["paper"], rot=(math.radians(90), 0, 0))
+            box(f"{pre}clockh", (0.03, 0.012, 0.08), (xc + 2.53, -17.56,
+                z0 + 2.36), P["black"])
+            box(f"{pre}clockm", (0.02, 0.012, 0.12), (xc + 2.57, -17.56,
+                z0 + 2.38), P["black"])
+            for k, pm in enumerate((sticky_or, sticky_ye)):
+                box(f"{pre}bsticky{k}", (0.16, 0.02, 0.16),
+                    (xc + 2.55, -17.62, z0 + 1.80 - k * 0.25), pm)
+            # --- west wall: full-height shelf with archive boxes, books, jars ---
+            wyc, Lw, scx = (wy0 + wy1) / 2, wy1 - wy0, xwf + 0.20
+            for e, ey in enumerate((wy0 + 0.03, wy1 - 0.03)):
+                box(f"{pre}wshup{e}", (0.38, 0.06, 2.35), (scx, ey, z0 + 1.175),
+                    P["wood"])
+            for s, sz in enumerate((0.40, 1.00, 1.55, 2.05, 2.325)):
+                box(f"{pre}wshb{s}", (0.36, Lw, 0.05), (scx, wyc, z0 + sz),
+                    P["wood"])
+            for k, oy in enumerate((-0.70, 0.0, 0.70)):
+                box(f"{pre}wshbox{k}", (0.30, 0.55, 0.32),
+                    (scx, wyc + oy, z0 + 0.585), cardb)
+                box(f"{pre}wshboxl{k}", (0.012, 0.30, 0.15),
+                    (scx + 0.156, wyc + oy, z0 + 0.585), P["paper"])
+            for k in range(8):
+                box(f"{pre}wshbook{k}", (0.24, 0.09, 0.38),
+                    (scx, wy0 + 0.45 + k * 0.20, z0 + 1.215),
+                    bookmats[k % len(bookmats)])
+            for k in range(8):
+                box(f"{pre}wshbind{k}", (0.26, 0.10, 0.40),
+                    (scx, wy0 + 0.45 + k * 0.20, z0 + 1.775),
+                    cmat if k % 3 == 2 else bookmats[(k + 2) % len(bookmats)])
+            for k, oy in enumerate((-0.70, 0.0, 0.70)):
+                cyl(f"{pre}wshjar{k}", 0.07, 0.22, (scx, wyc + oy, z0 + 2.185),
+                    P["glass"])
+            _pcone(f"{pre}wshpot", 0.05, 0.065, 0.11, (scx, wyc + 0.35,
+                   z0 + 2.13), terra)
+            for k in range(3):
+                lf = _pcone(f"{pre}wshleaf{k}", 0.035, 0.006, 0.16,
+                            (scx + (k - 1) * 0.03, wyc + 0.35, z0 + 2.26),
+                            leaf)
+                lf.rotation_euler = (0.25 * (k - 1), 0, 0)
+            box(f"{pre}wpeg", (0.03, 1.0, 0.8), (xwf + 0.015, -14.25, z0 + 1.70),
+                cork)
+            for k, oy in enumerate((-0.30, -0.05, 0.20, 0.38)):
+                cyl(f"{pre}wpeghook{k}", 0.012, 0.08, (xwf + 0.05, -14.25 + oy,
+                    z0 + 1.85), P["dark_steel"], rot=(0, math.radians(90), 0))
+                box(f"{pre}wpegtool{k}", (0.02, 0.16, 0.30),
+                    (xwf + 0.06, -14.25 + oy, z0 + 1.62),
+                    (P["paper"], sticky_ye, P["paper"], cmat)[k])
+            # --- east wall: binder shelf, crates, framed certificate, poster ---
+            ey1s = -15.2
+            eyc, Le, ecx = (ey0 + ey1s) / 2, ey1s - ey0, xef - 0.20
+            for e, ey in enumerate((ey0 + 0.03, ey1s - 0.03)):
+                box(f"{pre}eshup{e}", (0.38, 0.06, 2.35), (ecx, ey, z0 + 1.175),
+                    P["wood"])
+            for s, sz in enumerate((0.40, 1.00, 1.55, 2.05, 2.325)):
+                box(f"{pre}eshb{s}", (0.36, Le, 0.05), (ecx, eyc, z0 + sz),
+                    P["wood"])
+            for k in range(6):
+                box(f"{pre}eshbind{k}", (0.26, 0.10, 0.40),
+                    (ecx, ey0 + 0.40 + k * 0.28, z0 + 1.215),
+                    bookmats[(k + 1) % len(bookmats)])
+            for k in range(6):
+                box(f"{pre}eshbook{k}", (0.24, 0.09, 0.38),
+                    (ecx, ey0 + 0.45 + k * 0.26, z0 + 1.775),
+                    bookmats[(k + 3) % len(bookmats)])
+            for k, oy in enumerate((-0.55, 0.55)):
+                box(f"{pre}eshbox{k}", (0.30, 0.70, 0.32),
+                    (ecx, eyc + oy, z0 + 0.585), cardb)
+                box(f"{pre}eshboxl{k}", (0.012, 0.36, 0.15),
+                    (ecx - 0.156, eyc + oy, z0 + 0.585), P["paper"])
+            for k, oy in enumerate((-0.55, 0.0, 0.55)):
+                box(f"{pre}eshfile{k}", (0.30, 0.42, 0.26),
+                    (ecx, eyc + oy, z0 + 2.205),
+                    (cmat, P["paper"], sticky_ye)[k])
+            box(f"{pre}ecert", (0.03, 0.52, 0.66), (xef - 0.015, -14.30,
+                z0 + 2.30), framewood)
+            box(f"{pre}ecertp", (0.032, 0.44, 0.58), (xef - 0.015, -14.30,
+                z0 + 2.30), P["paper"])
+            _psphere(f"{pre}ecertseal", 0.035, (xef - 0.04, -14.30, z0 + 2.12),
+                     pin_red)
+            box(f"{pre}eposter", (0.02, 0.46, 0.60), (xef - 0.01, -14.30,
+                z0 + 1.45), sticky_ye)
+            _psphere(f"{pre}eposterpin", 0.022, (xef - 0.03, -14.30, z0 + 1.73),
+                     pin_blue)
+            # --- floor: plant, crates, bin ---
+            _pcone(f"{pre}pot", 0.10, 0.13, 0.26, (x1 - 0.70, -16.90,
+                   z0 + 0.13), terra)
+            cyl(f"{pre}potsoil", 0.11, 0.03, (x1 - 0.70, -16.90, z0 + 0.25),
+                soil)
+            for k in range(5):
+                lf = _pcone(f"{pre}leaf{k}", 0.05, 0.008, 0.38,
+                            (x1 - 0.70 + (k - 2) * 0.04, -16.90, z0 + 0.48),
+                            leaf if k % 2 else leaf2)
+                lf.rotation_euler = (0.28 * (k - 2), 0.15 * (k % 2 - 0.5), 0)
+            box(f"{pre}crate0", (0.55, 0.55, 0.45), (x0 + 0.85, -17.00,
+                z0 + 0.225), cardb)
+            box(f"{pre}crate0l", (0.30, 0.02, 0.18), (x0 + 0.85, -16.72,
+                z0 + 0.25), P["paper"])
+            box(f"{pre}crate1", (0.48, 0.48, 0.38), (x0 + 0.85, -17.00,
+                z0 + 0.64), cardb)
+            box(f"{pre}crate2", (0.40, 0.40, 0.32), (x0 + 1.50, -17.00,
+                z0 + 0.16), P["wood"])
+            cyl(f"{pre}bin", 0.16, 0.42, (xc + 1.45, -14.90, z0 + 0.21),
+                P["dark_steel"])
+            cyl(f"{pre}binrim", 0.17, 0.04, (xc + 1.45, -14.90, z0 + 0.42),
+                P["steel"])
+            _psphere(f"{pre}binpaper", 0.055, (xc + 1.45, -14.90, z0 + 0.44),
+                     P["paper"])
+        elif cid == "sam":
+            # --- desk: two pallet models, tally counter, notebook, pencils ---
+            for m, px in enumerate((xc - 0.62, xc - 0.05)):
+                for k in range(3):
+                    box(f"{pre}pslat{m}{k}", (0.30, 0.045, 0.015),
+                        (px, yd + 0.10 + (k - 1) * 0.075, dt + 0.026), P["wood"])
+                for k in range(2):
+                    box(f"{pre}pblk{m}{k}", (0.30, 0.035, 0.025),
+                        (px, yd + 0.10 + (k - 0.5) * 0.15, dt + 0.006),
+                        P["wood"])
+                for k, (ox, oy) in enumerate(((-0.075, 0.035), (0.075, 0.035),
+                                             (-0.075, -0.055), (0.075, -0.055))):
+                    box(f"{pre}pcarton{m}{k}", (0.125, 0.085, 0.085),
+                        (px + ox, yd + 0.10 + oy, dt + 0.076), cardb,
+                        bevel=0.005)
+            box(f"{pre}tally", (0.15, 0.09, 0.11), (xc + 0.55, yd + 0.10,
+                dt + 0.055), brass)
+            cyl(f"{pre}tallybtn", 0.018, 0.035, (xc + 0.55, yd + 0.10,
+                dt + 0.125), P["black"])
+            box(f"{pre}tallyface", (0.11, 0.012, 0.06), (xc + 0.55, yd + 0.148,
+                dt + 0.06), P["paper"])
+            box(f"{pre}tallyside", (0.03, 0.05, 0.02), (xc + 0.64, yd + 0.10,
+                dt + 0.05), P["black"])
+            box(f"{pre}notebook", (0.34, 0.26, 0.025), (xc + 0.10, yd - 0.02,
+                dt + 0.012), P["paper"])
+            box(f"{pre}nbline0", (0.26, 0.015, 0.004), (xc + 0.10, yd + 0.02,
+                dt + 0.026), draw_blue)
+            box(f"{pre}nbline1", (0.20, 0.015, 0.004), (xc + 0.10, yd - 0.04,
+                dt + 0.026), draw_blue)
+            cyl(f"{pre}pencil0", 0.007, 0.21, (xc - 0.15, yd + 0.24, dt + 0.009),
+                hi_yellow, rot=(math.radians(90), 0, math.radians(70)))
+            cyl(f"{pre}pencil1", 0.007, 0.21, (xc + 0.35, yd - 0.18, dt + 0.009),
+                draw_blue, rot=(math.radians(90), 0, math.radians(-55)))
+            box(f"{pre}ruler", (0.38, 0.05, 0.012), (xc - 0.30, yd - 0.20,
+                dt + 0.006), P["wood_pale"])
+            box(f"{pre}pstack", (0.28, 0.22, 0.05), (xc + 0.88, yd - 0.10,
+                dt + 0.025), P["paper"])
+            for k in range(3):
+                box(f"{pre}pclip{k}", (0.035, 0.012, 0.008),
+                    (xc + 0.80 + k * 0.05, yd + 0.24, dt + 0.005),
+                    P["dark_steel"])
+            # --- back wall: eight carton drawings in two rows, sample ledge ---
+            for r in range(2):
+                for c in range(4):
+                    sx = xc - 2.10 + c * 1.40
+                    sz = z0 + 2.30 - r * 0.90
+                    box(f"{pre}draw{r}{c}", (0.62, 0.02, 0.75),
+                        (sx, -17.62, sz), P["paper"])
+                    box(f"{pre}drawt{r}{c}", (0.42, 0.012, 0.035),
+                        (sx, -17.60, sz + 0.19), draw_blue)
+                    box(f"{pre}drawb{r}{c}", (0.42, 0.012, 0.035),
+                        (sx, -17.60, sz - 0.19), draw_blue)
+                    box(f"{pre}drawl{r}{c}", (0.035, 0.012, 0.41),
+                        (sx - 0.19, -17.60, sz), draw_blue)
+                    box(f"{pre}drawr{r}{c}", (0.035, 0.012, 0.41),
+                        (sx + 0.19, -17.60, sz), draw_blue)
+                    box(f"{pre}drawf{r}{c}", (0.20, 0.012, 0.03),
+                        (sx, -17.60, sz), draw_blue)
+                    _psphere(f"{pre}drawpin{r}{c}", 0.022, (sx, -17.60,
+                             sz + 0.34), pin_blue if c % 2 else hi_yellow)
+            box(f"{pre}ledge", (4.6, 0.28, 0.05), (xc, -17.50, z0 + 0.62),
+                P["wood"])
+            for a, ox in enumerate((-1.8, 1.8)):
+                box(f"{pre}ledbr{a}", (0.06, 0.24, 0.12), (xc + ox, -17.50,
+                    z0 + 0.53), P["dark_steel"])
+            for k, ox in enumerate((-1.5, -0.5, 0.5, 1.5)):
+                box(f"{pre}sample{k}", (0.42, 0.24, 0.30),
+                    (xc + ox, -17.50, z0 + 0.80), cardb)
+                box(f"{pre}samplel{k}", (0.24, 0.012, 0.14),
+                    (xc + ox, -17.37, z0 + 0.80), P["paper"])
+            # --- west wall: camera-gear shelf; tally board on the front ---
+            wyc, Lw, scx = (wy0 + wy1) / 2, wy1 - wy0, xwf + 0.20
+            for e, ey in enumerate((wy0 + 0.03, wy1 - 0.03)):
+                box(f"{pre}wshup{e}", (0.38, 0.06, 2.35), (scx, ey, z0 + 1.175),
+                    P["dark_steel"])
+            for s, sz in enumerate((0.40, 1.00, 1.55, 2.05, 2.325)):
+                box(f"{pre}wshb{s}", (0.36, Lw, 0.05), (scx, wyc, z0 + sz),
+                    P["wood"])
+            for k, oy in enumerate((-0.70, 0.10, 0.80)):
+                box(f"{pre}wshbox{k}", (0.30, 0.50, 0.30),
+                    (scx, wyc + oy, z0 + 0.575), P["black"])
+                box(f"{pre}wshboxl{k}", (0.012, 0.28, 0.12),
+                    (scx + 0.156, wyc + oy, z0 + 0.575), hi_yellow)
+            for k in range(3):
+                cyl(f"{pre}wlens{k}", 0.075, 0.16,
+                    (scx, wyc - 0.70 + k * 0.70, z0 + 1.105), P["black"])
+                cyl(f"{pre}wlensg{k}", 0.055, 0.02,
+                    (scx, wyc - 0.70 + k * 0.70, z0 + 1.19), P["monitor"])
+            for k in range(4):
+                box(f"{pre}wbatt{k}", (0.20, 0.14, 0.10),
+                    (scx, wyc - 0.75 + k * 0.50, z0 + 1.63),
+                    led_grn if k % 2 else P["black"])
+            for k, oy in enumerate((-0.60, 0.20)):
+                box(f"{pre}wcase{k}", (0.30, 0.55, 0.24),
+                    (scx, wyc + oy, z0 + 2.195), draw_blue)
+            box(f"{pre}wtally", (0.04, 0.62, 0.80), (xwf + 0.02, -14.25,
+                z0 + 1.70), framewood)
+            box(f"{pre}wtallyp", (0.042, 0.54, 0.72), (xwf + 0.02, -14.25,
+                z0 + 1.70), P["paper"])
+            for k in range(4):
+                box(f"{pre}wtallym{k}", (0.045, 0.03, 0.30),
+                    (xwf + 0.02, -14.42 + k * 0.11, z0 + 1.70), P["black"])
+            # --- east wall: tall carton store, full length ---
+            eyc, Le, ecx = (ey0 + ey1) / 2, ey1 - ey0, xef - 0.20
+            for e, ey in enumerate((ey0 + 0.03, ey1 - 0.03)):
+                box(f"{pre}eshup{e}", (0.38, 0.06, 2.35), (ecx, ey, z0 + 1.175),
+                    P["dark_steel"])
+            for s, sz in enumerate((0.40, 1.00, 1.55, 2.05, 2.325)):
+                box(f"{pre}eshb{s}", (0.36, Le, 0.05), (ecx, eyc, z0 + sz),
+                    P["wood"])
+            for k in range(5):
+                box(f"{pre}eship{k}", (0.32, 0.45, 0.36),
+                    (ecx, ey0 + 0.55 + k * 0.62, z0 + 0.605),
+                    cardb if k % 2 else P["wood_pale"])
+                box(f"{pre}eshipl{k}", (0.012, 0.26, 0.16),
+                    (ecx - 0.166, ey0 + 0.55 + k * 0.62, z0 + 0.605),
+                    P["paper"])
+            for k in range(5):
+                box(f"{pre}ebox{k}", (0.30, 0.42, 0.34),
+                    (ecx, ey0 + 0.55 + k * 0.62, z0 + 1.195), cardb)
+            for k in range(4):
+                box(f"{pre}ebox2{k}", (0.28, 0.50, 0.30),
+                    (ecx, ey0 + 0.70 + k * 0.72, z0 + 1.725), P["wood_pale"])
+            for k in range(3):
+                box(f"{pre}eflat{k}", (0.26, 0.60, 0.18),
+                    (ecx, ey0 + 0.80 + k * 0.95, z0 + 2.165), cardb)
+            # --- floor: tripod camera, side table, plant, crates, bin ---
+            tx, ty = xc + 1.95, -14.90
+            for k, a in enumerate((math.radians(90), math.radians(210),
+                                  math.radians(330))):
+                lx, ly = tx + math.cos(a) * 0.35, ty + math.sin(a) * 0.35
+                leg = cyl(f"{pre}tleg{k}", 0.025, 1.90,
+                          ((tx + lx) / 2, (ty + ly) / 2, z0 + 0.90),
+                          P["dark_steel"])
+                leg.rotation_euler = (0.35 * math.sin(a), -0.35 * math.cos(a), 0)
+            box(f"{pre}thead", (0.16, 0.16, 0.10), (tx, ty, z0 + 1.82),
+                P["dark_steel"])
+            box(f"{pre}tcam", (0.28, 0.18, 0.18), (tx, ty, z0 + 1.96),
+                P["black"])
+            cyl(f"{pre}tlens", 0.06, 0.12, (tx, ty + 0.14, z0 + 1.96),
+                P["black"], rot=(math.radians(90), 0, 0))
+            cyl(f"{pre}tglass", 0.042, 0.015, (tx, ty + 0.205, z0 + 1.96),
+                P["monitor"], rot=(math.radians(90), 0, 0))
+            stx = x0 + 1.10
+            box(f"{pre}stable", (1.0, 0.75, 0.06), (stx, -16.30, z0 + 0.90),
+                P["wood_pale"])
+            for a, ox in enumerate((-0.42, 0.42)):
+                for b, oy in enumerate((-0.30, 0.30)):
+                    box(f"{pre}stableleg{a}{b}", (0.06, 0.06, 0.87),
+                        (stx + ox, -16.30 + oy, z0 + 0.435), P["dark_steel"])
+            box(f"{pre}cam2", (0.25, 0.16, 0.16), (stx - 0.15, -16.30,
+                z0 + 1.01), P["black"])
+            cyl(f"{pre}cam2lens", 0.05, 0.10, (stx - 0.15, -16.19, z0 + 1.01),
+                P["black"], rot=(math.radians(90), 0, 0))
+            box(f"{pre}cam2note", (0.30, 0.22, 0.02), (stx + 0.28, -16.30,
+                z0 + 0.94), P["paper"])
+            _pcone(f"{pre}pot", 0.10, 0.13, 0.26, (x1 - 0.75, -16.90,
+                   z0 + 0.13), terra)
+            cyl(f"{pre}potsoil", 0.11, 0.03, (x1 - 0.75, -16.90, z0 + 0.25),
+                soil)
+            for k in range(5):
+                lf = _pcone(f"{pre}leaf{k}", 0.05, 0.008, 0.38,
+                            (x1 - 0.75 + (k - 2) * 0.04, -16.90, z0 + 0.48),
+                            leaf if k % 2 else leaf2)
+                lf.rotation_euler = (0.28 * (k - 2), 0.15 * (k % 2 - 0.5), 0)
+            box(f"{pre}crate0", (0.55, 0.55, 0.45), (x0 + 0.90, -17.05,
+                z0 + 0.225), cardb)
+            box(f"{pre}crate0l", (0.30, 0.02, 0.18), (x0 + 0.90, -16.77,
+                z0 + 0.25), P["paper"])
+            box(f"{pre}crate1", (0.48, 0.48, 0.38), (x0 + 0.90, -17.05,
+                z0 + 0.64), P["wood_pale"])
+            cyl(f"{pre}bin", 0.16, 0.42, (xc + 1.30, -15.30, z0 + 0.21),
+                P["dark_steel"])
+            cyl(f"{pre}binrim", 0.17, 0.04, (xc + 1.30, -15.30, z0 + 0.42),
+                P["steel"])
+            _psphere(f"{pre}binpaper", 0.055, (xc + 1.30, -15.30, z0 + 0.44),
+                     P["paper"])
+        elif cid == "voice":
+            # --- desk: reel-to-reel, lamp, notepad, headphones, tapes, pens ---
+            box(f"{pre}drawers", (0.62, 0.75, 0.85), (xc + 0.65, yd, z0 + 0.455),
+                P["wood"])
+            for k in range(3):
+                box(f"{pre}drawer{k}", (0.56, 0.02, 0.22),
+                    (xc + 0.65, yd + 0.385, z0 + 0.20 + k * 0.275),
+                    P["wood_pale"])
+                cyl(f"{pre}drawerk{k}", 0.018, 0.035,
+                    (xc + 0.65, yd + 0.40, z0 + 0.20 + k * 0.275),
+                    P["dark_steel"], rot=(math.radians(90), 0, 0))
+            rx = xc + 0.78
+            box(f"{pre}reelbody", (0.62, 0.28, 0.40), (rx, yd - 0.02, dt + 0.20),
+                P["wood"], bevel=0.01)
+            for sgn2 in (-1, 1):
+                cyl(f"{pre}reel{sgn2}", 0.105, 0.035,
+                    (rx + sgn2 * 0.15, yd + 0.13, dt + 0.28), P["paper"],
+                    rot=(math.radians(90), 0, 0))
+                cyl(f"{pre}reelhub{sgn2}", 0.025, 0.06,
+                    (rx + sgn2 * 0.15, yd + 0.13, dt + 0.28), P["dark_steel"],
+                    rot=(math.radians(90), 0, 0))
+            for k in range(3):
+                cyl(f"{pre}reelknob{k}", 0.015, 0.035, (rx - 0.18 + k * 0.09,
+                    yd + 0.13, dt + 0.06), P["black"],
+                    rot=(math.radians(90), 0, 0))
+            box(f"{pre}reelwin", (0.16, 0.012, 0.07), (rx + 0.17, yd + 0.125,
+                dt + 0.06), led_grn)
+            lampx = xc - 0.85
+            cyl(f"{pre}lampbase", 0.085, 0.035, (lampx, yd - 0.20, dt + 0.018),
+                P["dark_steel"])
+            cyl(f"{pre}lamparm", 0.018, 0.52, (lampx, yd - 0.20, dt + 0.27),
+                P["dark_steel"], rot=(math.radians(-18), 0, 0))
+            _pcone(f"{pre}lampshade", 0.11, 0.045, 0.15,
+                   (lampx, yd - 0.11, dt + 0.55), P["dark_steel"],
+                   rot=(math.radians(-30), 0, 0))
+            _psphere(f"{pre}lampbulb", 0.035, (lampx, yd - 0.07, dt + 0.50),
+                     lamp_warm)
+            bpy.ops.object.light_add(type="POINT",
+                                     location=(lampx, yd - 0.07, dt + 0.40))
+            dll = bpy.context.object
+            dll.name = f"{pre}desklight"
+            dll.data.energy, dll.data.color = 18, (1.0, 0.80, 0.55)
+            dll.data.use_shadow = False
+            box(f"{pre}notepad", (0.38, 0.28, 0.035), (xc - 0.10, yd + 0.10,
+                dt + 0.018), P["paper"])
+            for k in range(2):
+                box(f"{pre}noteline{k}", (0.30, 0.015, 0.004),
+                    (xc - 0.10, yd + 0.14 - k * 0.07, dt + 0.037), P["black"])
+            cyl(f"{pre}notepen", 0.008, 0.17, (xc - 0.10, yd + 0.10, dt + 0.045),
+                P["black"], rot=(math.radians(90), 0, math.radians(25)))
+            hx = xc + 0.15
+            for sgn2 in (-1, 1):
+                cyl(f"{pre}cup{sgn2}", 0.06, 0.05,
+                    (hx + sgn2 * 0.085, yd + 0.18, dt + 0.025), P["black"])
+            box(f"{pre}hband", (0.23, 0.05, 0.025), (hx, yd + 0.18, dt + 0.06),
+                P["black"])
+            cyl(f"{pre}pencup", 0.055, 0.125, (xc + 0.50, yd + 0.20, dt + 0.062),
+                cmat)
+            for k in range(3):
+                cyl(f"{pre}pen{k}", 0.007, 0.17,
+                    (xc + 0.48 + k * 0.02, yd + 0.19 + (k % 2) * 0.02,
+                     dt + 0.13), hi_yellow if k == 0 else P["black"])
+            for k in range(2):
+                box(f"{pre}tapebox{k}", (0.30, 0.22, 0.07),
+                    (xc - 0.50, yd - 0.05, dt + 0.035 + k * 0.07),
+                    P["paper"] if k == 0 else cardb)
+            box(f"{pre}stickpad", (0.12, 0.12, 0.03), (xc - 0.15, yd - 0.20,
+                dt + 0.015), sticky_ye)
+            # --- back wall: ten notes in two rows, tape shelf below ---
+            for r in range(2):
+                for c in range(5):
+                    sx = xc - 2.0 + c * 1.0
+                    sz = z0 + 2.25 - r * 0.65
+                    pm = (P["paper"], sticky_ye, P["paper"], sticky_or,
+                          P["paper"])[c]
+                    box(f"{pre}wallnote{r}{c}", (0.38, 0.02, 0.48),
+                        (sx, -17.62, sz), pm)
+                    box(f"{pre}wallline{r}{c}", (0.28, 0.024, 0.03),
+                        (sx, -17.62, sz - 0.02), P["black"])
+                    _psphere(f"{pre}wallpin{r}{c}", 0.022, (sx, -17.60,
+                             sz + 0.21), (pin_red, pin_blue, pin_green)[(r + c)
+                             % 3])
+            box(f"{pre}tapeshelf", (4.2, 0.28, 0.05), (xc, -17.50, z0 + 0.85),
+                P["wood"])
+            for a, ox in enumerate((-1.6, 1.6)):
+                box(f"{pre}tapeshelfb{a}", (0.06, 0.24, 0.12), (xc + ox, -17.50,
+                    z0 + 0.76), P["dark_steel"])
+            for k in range(6):
+                cyl(f"{pre}tapereel{k}", 0.10, 0.04,
+                    (xc - 1.75 + k * 0.70, -17.50, z0 + 0.975), P["paper"],
+                    rot=(math.radians(90), 0, 0))
+                cyl(f"{pre}tapereelh{k}", 0.025, 0.06,
+                    (xc - 1.75 + k * 0.70, -17.50, z0 + 0.975), P["dark_steel"],
+                    rot=(math.radians(90), 0, 0))
+            for k in range(2):
+                box(f"{pre}tapebk{k}", (0.30, 0.22, 0.06),
+                    (xc + 1.85, -17.50, z0 + 0.905 + k * 0.06),
+                    bookmats[k % len(bookmats)])
+            # --- west wall: tape-archive shelf; gold record and poster ---
+            wyc, Lw, scx = (wy0 + wy1) / 2, wy1 - wy0, xwf + 0.20
+            for e, ey in enumerate((wy0 + 0.03, wy1 - 0.03)):
+                box(f"{pre}wshup{e}", (0.38, 0.06, 2.35), (scx, ey, z0 + 1.175),
+                    P["wood"])
+            for s, sz in enumerate((0.40, 1.00, 1.55, 2.05, 2.325)):
+                box(f"{pre}wshb{s}", (0.36, Lw, 0.05), (scx, wyc, z0 + sz),
+                    P["wood"])
+            for k, oy in enumerate((-0.60, 0.0, 0.60)):
+                box(f"{pre}wshbox{k}", (0.30, 0.45, 0.32),
+                    (scx, wyc + oy, z0 + 0.585), cardb)
+                box(f"{pre}wshboxl{k}", (0.012, 0.26, 0.14),
+                    (scx + 0.156, wyc + oy, z0 + 0.585), P["paper"])
+            for k in range(6):
+                box(f"{pre}wshbook{k}", (0.24, 0.09, 0.38),
+                    (scx, wy0 + 0.40 + k * 0.26, z0 + 1.215),
+                    bookmats[(k + 4) % len(bookmats)])
+            for k in range(4):
+                box(f"{pre}wtape{k}", (0.28, 0.30, 0.18),
+                    (scx, wyc - 0.75 + k * 0.50, z0 + 1.665),
+                    (P["paper"], cardb, sticky_ye, P["paper"])[k])
+            for k, oy in enumerate((-0.45, 0.45)):
+                cyl(f"{pre}wshjar{k}", 0.07, 0.22, (scx, wyc + oy, z0 + 2.185),
+                    P["glass"])
+            for k in range(3):
+                box(f"{pre}wshflat{k}", (0.26, 0.34, 0.055),
+                    (scx, wyc + 0.05, z0 + 2.105 + k * 0.058),
+                    bookmats[k % len(bookmats)])
+            box(f"{pre}wrecord", (0.04, 0.62, 0.62), (xwf + 0.02, -14.35,
+                z0 + 1.95), framewood)
+            cyl(f"{pre}wrecdisc", 0.20, 0.025, (xwf + 0.045, -14.35, z0 + 1.95),
+                brass, rot=(0, math.radians(90), 0))
+            cyl(f"{pre}wreclab", 0.06, 0.028, (xwf + 0.045, -14.35, z0 + 1.95),
+                pin_red, rot=(0, math.radians(90), 0))
+            box(f"{pre}wposter", (0.02, 0.50, 0.60), (xwf + 0.01, -14.35,
+                z0 + 1.10), sticky_ye)
+            _psphere(f"{pre}wposterpin", 0.022, (xwf + 0.03, -14.35, z0 + 1.38),
+                     pin_blue)
+            # --- east wall: book shelf; show poster and hanging headphones ---
+            ey1s = -15.2
+            eyc, Le, ecx = (ey0 + ey1s) / 2, ey1s - ey0, xef - 0.20
+            for e, ey in enumerate((ey0 + 0.03, ey1s - 0.03)):
+                box(f"{pre}eshup{e}", (0.38, 0.06, 2.35), (ecx, ey, z0 + 1.175),
+                    P["wood"])
+            for s, sz in enumerate((0.40, 1.00, 1.55, 2.05, 2.325)):
+                box(f"{pre}eshb{s}", (0.36, Le, 0.05), (ecx, eyc, z0 + sz),
+                    P["wood"])
+            for k, oy in enumerate((-0.55, 0.55)):
+                box(f"{pre}eshbox{k}", (0.30, 0.60, 0.32),
+                    (ecx, eyc + oy, z0 + 0.585), P["wood_pale"])
+            for k in range(6):
+                box(f"{pre}eshbook{k}", (0.24, 0.09, 0.38),
+                    (ecx, ey0 + 0.40 + k * 0.26, z0 + 1.215),
+                    bookmats[k % len(bookmats)])
+            for k, oy in enumerate((-0.55, 0.0, 0.55)):
+                box(f"{pre}eradio{k}", (0.28, 0.40, 0.24),
+                    (ecx, eyc + oy, z0 + 1.695),
+                    (cmat, P["black"], draw_blue)[k])
+            _pcone(f"{pre}eshpot", 0.05, 0.065, 0.11, (ecx, eyc - 0.55,
+                   z0 + 2.13), terra)
+            for k in range(3):
+                lf = _pcone(f"{pre}eshleaf{k}", 0.035, 0.006, 0.16,
+                            (ecx + (k - 1) * 0.03, eyc - 0.55, z0 + 2.26),
+                            leaf2)
+                lf.rotation_euler = (0.25 * (k - 1), 0, 0)
+            for k, oy in enumerate((0.30, 0.70)):
+                cyl(f"{pre}eshjar{k}", 0.07, 0.22, (ecx, eyc + oy, z0 + 2.185),
+                    P["glass"])
+            box(f"{pre}eshow", (0.03, 0.55, 0.70), (xef - 0.015, -14.30,
+                z0 + 2.05), framewood)
+            box(f"{pre}eshowp", (0.032, 0.47, 0.62), (xef - 0.015, -14.30,
+                z0 + 2.05), cmat)
+            box(f"{pre}eshowl0", (0.034, 0.36, 0.05), (xef - 0.015, -14.30,
+                z0 + 2.12), P["paper"])
+            box(f"{pre}eshowl1", (0.034, 0.28, 0.05), (xef - 0.015, -14.30,
+                z0 + 1.98), P["paper"])
+            cyl(f"{pre}epeg", 0.015, 0.14, (xef - 0.07, -14.30, z0 + 1.35),
+                P["dark_steel"], rot=(0, math.radians(90), 0))
+            for sgn2 in (-1, 1):
+                cyl(f"{pre}ehang{sgn2}", 0.06, 0.05,
+                    (xef - 0.16, -14.30 + sgn2 * 0.085, z0 + 1.28), P["black"])
+            box(f"{pre}ehangband", (0.05, 0.23, 0.025), (xef - 0.16, -14.30,
+                z0 + 1.345), P["black"])
+            # --- floor: two speakers, plant, crates, bin ---
+            for s, (spx, stag) in enumerate(((x0 + 1.0, "a"),
+                                            (x1 - 0.75, "b"))):
+                box(f"{pre}spkstand{stag}", (0.42, 0.38, 0.90),
+                    (spx, -16.95, z0 + 0.45), P["dark_steel"])
+                box(f"{pre}speaker{stag}", (0.40, 0.32, 0.62),
+                    (spx, -16.95, z0 + 1.21), P["wood"], bevel=0.01)
+                cyl(f"{pre}spkcone{stag}0", 0.11, 0.02, (spx, -16.78, z0 + 1.30),
+                    P["black"], rot=(math.radians(90), 0, 0))
+                cyl(f"{pre}spkcone{stag}1", 0.07, 0.02, (spx, -16.78, z0 + 1.06),
+                    P["black"], rot=(math.radians(90), 0, 0))
+            _pcone(f"{pre}pot", 0.10, 0.13, 0.26, (x1 - 0.60, -14.30,
+                   z0 + 0.13), terra)
+            cyl(f"{pre}potsoil", 0.11, 0.03, (x1 - 0.60, -14.30, z0 + 0.25),
+                soil)
+            for k in range(5):
+                lf = _pcone(f"{pre}leaf{k}", 0.05, 0.008, 0.38,
+                            (x1 - 0.60 + (k - 2) * 0.04, -14.30, z0 + 0.48),
+                            leaf if k % 2 else leaf2)
+                lf.rotation_euler = (0.28 * (k - 2), 0.15 * (k % 2 - 0.5), 0)
+            box(f"{pre}crate0", (0.55, 0.55, 0.45), (xc - 1.50, -17.00,
+                z0 + 0.225), cardb)
+            box(f"{pre}crate0l", (0.30, 0.02, 0.18), (xc - 1.50, -16.72,
+                z0 + 0.25), P["paper"])
+            box(f"{pre}crate1", (0.48, 0.48, 0.38), (xc - 1.50, -17.00,
+                z0 + 0.64), P["wood_pale"])
+            cyl(f"{pre}bin", 0.16, 0.42, (xc + 1.45, -15.00, z0 + 0.21),
+                P["dark_steel"])
+            cyl(f"{pre}binrim", 0.17, 0.04, (xc + 1.45, -15.00, z0 + 0.42),
+                P["steel"])
+            _psphere(f"{pre}binpaper", 0.055, (xc + 1.45, -15.00, z0 + 0.44),
+                     P["paper"])
+        elif cid == "kapi":
+            # --- cardboard desk: tape, clipboard, pencil, signal, books, stamp ---
+            box(f"{pre}modesty", (2.1, 0.05, 0.75), (xc, yd - 0.36, z0 + 0.50),
+                cardb)
+            for k in range(2):
+                tx = xc - 0.72 + k * 0.17
+                cyl(f"{pre}taperoll{k}", 0.075, 0.06, (tx, yd + 0.15,
+                    dt + 0.03), P["paper"])
+                cyl(f"{pre}tapercore{k}", 0.03, 0.066, (tx, yd + 0.15,
+                    dt + 0.03), cardb)
+            box(f"{pre}clip", (0.30, 0.40, 0.018), (xc - 0.30, yd + 0.05,
+                dt + 0.009), cardb)
+            box(f"{pre}clippaper", (0.26, 0.36, 0.006), (xc - 0.30, yd + 0.05,
+                dt + 0.021), P["paper"])
+            box(f"{pre}clipclip", (0.10, 0.035, 0.025), (xc - 0.30, yd - 0.13,
+                dt + 0.025), P["dark_steel"])
+            cyl(f"{pre}pencil", 0.007, 0.21, (xc + 0.05, yd + 0.20, dt + 0.009),
+                hi_yellow, rot=(math.radians(90), 0, math.radians(-60)))
+            box(f"{pre}sigbase", (0.14, 0.14, 0.03), (xc + 0.78, yd + 0.05,
+                dt + 0.015), P["black"])
+            cyl(f"{pre}sigpole", 0.02, 0.30, (xc + 0.78, yd + 0.05, dt + 0.18),
+                P["dark_steel"])
+            box(f"{pre}sighead", (0.13, 0.11, 0.36), (xc + 0.78, yd + 0.05,
+                dt + 0.48), P["black"])
+            _psphere(f"{pre}siggreen", 0.04, (xc + 0.78, yd + 0.108, dt + 0.38),
+                     lamp_green)
+            _psphere(f"{pre}sigamber", 0.04, (xc + 0.78, yd + 0.108, dt + 0.48),
+                     lamp_amber)
+            _psphere(f"{pre}sigred", 0.04, (xc + 0.78, yd + 0.108, dt + 0.58),
+                     lamp_red)
+            box(f"{pre}rulebook0", (0.32, 0.24, 0.05), (xc + 0.35, yd - 0.10,
+                dt + 0.025), cardb)
+            box(f"{pre}rulebook1", (0.30, 0.22, 0.045), (xc + 0.35, yd - 0.10,
+                dt + 0.072), P["paper"])
+            box(f"{pre}stamppad", (0.20, 0.15, 0.025), (xc + 0.05, yd - 0.12,
+                dt + 0.012), P["dark_steel"])
+            box(f"{pre}stamp", (0.15, 0.10, 0.09), (xc + 0.05, yd - 0.12,
+                dt + 0.07), P["red"], bevel=0.01)
+            cyl(f"{pre}stamphandle", 0.02, 0.06, (xc + 0.05, yd - 0.12,
+                dt + 0.135), P["black"])
+            box(f"{pre}pstack", (0.30, 0.22, 0.05), (xc - 0.65, yd - 0.15,
+                dt + 0.025), P["paper"])
+            # --- back wall: big three-lamp panel, screen, knobs, rule plaques ---
+            px = xc + 0.9
+            box(f"{pre}kpanel", (2.6, 0.15, 1.7), (px, -17.55, z0 + 1.95),
+                cardb, bevel=0.01)
+            for k, lm in enumerate((lamp_red_on, lamp_amber_on, lamp_green)):
+                cyl(f"{pre}bezel{k}", 0.14, 0.04, (xc + 0.05, -17.46,
+                    z0 + 2.40 - k * 0.45), P["black"],
+                    rot=(math.radians(90), 0, 0))
+                _psphere(f"{pre}plamp{k}", 0.11, (xc + 0.05, -17.44,
+                         z0 + 2.40 - k * 0.45), lm)
+            box(f"{pre}pscreen", (0.9, 0.05, 0.38), (xc + 1.55, -17.46,
+                z0 + 2.40), P["black"])
+            for k in range(2):
+                box(f"{pre}pscreenl{k}", (0.70, 0.012, 0.05), (xc + 1.55,
+                    -17.43, z0 + 2.46 - k * 0.12), P["paper"])
+            for r in range(2):
+                for c in range(4):
+                    cyl(f"{pre}pknob{r}{c}", 0.035, 0.06,
+                        (xc + 1.15 + c * 0.27, -17.46, z0 + 1.85 - r * 0.35),
+                        P["black"], rot=(math.radians(90), 0, 0))
+            rules = ("instruction", "invisible text", "unreadable",
+                     "wrong product", "hidden", "damaged", "disagree",
+                     "receiver", "readers disagree", "audit", "match",
+                     "mismatch")
+            for k, rule in enumerate(rules):
+                colx = xc - 2.20 + (k % 2) * 1.10
+                rowz = z0 + 2.55 - (k // 2) * 0.33
+                box(f"{pre}rule{k}", (1.0, 0.03, 0.28), (colx, -17.62, rowz),
+                    P["paper"])
+                text(f"{pre}rulet{k}", f"{k + 1} {rule}", (colx, -17.60, rowz),
+                     0.10, P["black"],
+                     rot=(math.radians(90), 0, math.radians(180)))
+            box(f"{pre}ruletitle", (2.1, 0.03, 0.22), (xc - 1.65, -17.62,
+                z0 + 2.83), cmat)
+            text(f"{pre}ruletitlet", "12 RULES", (xc - 1.65, -17.60, z0 + 2.83),
+                 0.13, txt_white, rot=(math.radians(90), 0, math.radians(180)))
+            # --- west wall: packing-supply shelf; striped barrier board ---
+            wyc, Lw, scx = (wy0 + wy1) / 2, wy1 - wy0, xwf + 0.20
+            for e, ey in enumerate((wy0 + 0.03, wy1 - 0.03)):
+                box(f"{pre}wshup{e}", (0.38, 0.06, 2.35), (scx, ey, z0 + 1.175),
+                    cardb)
+            for s, sz in enumerate((0.40, 1.00, 1.55, 2.05, 2.325)):
+                box(f"{pre}wshb{s}", (0.36, Lw, 0.05), (scx, wyc, z0 + sz),
+                    cardb)
+            for k in range(5):
+                box(f"{pre}wflat{k}", (0.24, 0.06, 0.55),
+                    (scx, wyc - 0.50 + k * 0.25, z0 + 0.70), cardb)
+            for k, oy in enumerate((-0.80, 0.80)):
+                box(f"{pre}wshbox{k}", (0.30, 0.50, 0.32),
+                    (scx, wyc + oy, z0 + 0.585), P["wood_pale"])
+            for k in range(6):
+                cyl(f"{pre}wtape{k}", 0.075, 0.06,
+                    (scx, wy0 + 0.40 + k * 0.30, z0 + 1.055), P["paper"])
+                cyl(f"{pre}wtapec{k}", 0.03, 0.066,
+                    (scx, wy0 + 0.40 + k * 0.30, z0 + 1.055), cardb)
+            for k in range(4):
+                cyl(f"{pre}wstring{k}", 0.06, 0.10,
+                    (scx, wyc - 0.75 + k * 0.50, z0 + 1.625), cork)
+            for k, oy in enumerate((-0.55, 0.15, 0.75)):
+                box(f"{pre}wshfile{k}", (0.30, 0.40, 0.24),
+                    (scx, wyc + oy, z0 + 2.195),
+                    (cmat, P["paper"], cardb)[k])
+            box(f"{pre}wbarrier", (0.03, 0.70, 0.90), (xwf + 0.015, -14.25,
+                z0 + 1.70), P["paper"])
+            for k in range(4):
+                box(f"{pre}wbarrier{k}", (0.034, 0.70, 0.12),
+                    (xwf + 0.015, -14.25, z0 + 1.42 + k * 0.20),
+                    P["red"] if k % 2 == 0 else P["paper"])
+            _psphere(f"{pre}wbarrierpin", 0.022, (xwf + 0.04, -14.25, z0 + 2.12),
+                     pin_red)
+            # --- east wall: rule-binder shelf, spare lamps, packing slips ---
+            ey1s = -15.2
+            eyc, Le, ecx = (ey0 + ey1s) / 2, ey1s - ey0, xef - 0.20
+            for e, ey in enumerate((ey0 + 0.03, ey1s - 0.03)):
+                box(f"{pre}eshup{e}", (0.38, 0.06, 2.35), (ecx, ey, z0 + 1.175),
+                    cardb)
+            for s, sz in enumerate((0.40, 1.00, 1.55, 2.05, 2.325)):
+                box(f"{pre}eshb{s}", (0.36, Le, 0.05), (ecx, eyc, z0 + sz),
+                    cardb)
+            for k, oy in enumerate((-0.55, 0.55)):
+                box(f"{pre}eshbox{k}", (0.30, 0.60, 0.32),
+                    (ecx, eyc + oy, z0 + 0.585), cardb)
+            for k in range(6):
+                box(f"{pre}eshbind{k}", (0.26, 0.10, 0.40),
+                    (ecx, ey0 + 0.40 + k * 0.28, z0 + 1.215),
+                    cmat if k % 2 else bookmats[k % len(bookmats)])
+            for k, lm in enumerate((lamp_red_on, lamp_amber_on, lamp_green)):
+                cyl(f"{pre}espbase{k}", 0.07, 0.04, (ecx, eyc - 0.60 + k * 0.60,
+                    z0 + 1.595), P["black"])
+                _psphere(f"{pre}esplamp{k}", 0.09, (ecx, eyc - 0.60 + k * 0.60,
+                         z0 + 1.70), lm)
+            for k, oy in enumerate((-0.55, 0.15, 0.70)):
+                box(f"{pre}eshfile{k}", (0.30, 0.38, 0.24),
+                    (ecx, eyc + oy, z0 + 2.195), P["wood_pale"])
+            for k in range(4):
+                box(f"{pre}eslip{k}", (0.02, 0.22, 0.30),
+                    (xef - 0.01, -14.70 + k * 0.28, z0 + 1.75), P["paper"])
+                _psphere(f"{pre}eslippin{k}", 0.018,
+                         (xef - 0.03, -14.70 + k * 0.28, z0 + 1.88), pin_red)
+            # --- floor: lectern with rule book, barrier pole, plant, crates ---
+            lxx, lyy = xc + 1.9, -15.9
+            box(f"{pre}lectbase", (0.62, 0.62, 0.07), (lxx, lyy, z0 + 0.035),
+                cardb)
+            box(f"{pre}lectpost", (0.15, 0.15, 1.25), (lxx, lyy, z0 + 0.695),
+                cardb)
+            top = box(f"{pre}lecttop", (0.88, 0.62, 0.05),
+                      (lxx, lyy, z0 + 1.375), cardb)
+            top.rotation_euler = (math.radians(-25), 0, 0)
+            for sgn2, tag2 in ((-1, "l"), (1, "r")):
+                pg = box(f"{pre}page{tag2}", (0.40, 0.55, 0.018),
+                         (lxx + sgn2 * 0.205, lyy, z0 + 1.41), P["paper"])
+                pg.parent = top
+                pg.matrix_parent_inverse.identity()
+                pg.scale = (0.40 / 0.88, 0.55 / 0.62, 0.018 / 0.05)
+                pg.location = (sgn2 * 0.205 / 0.88, 0, 0.034 / 0.05)
+            spine = box(f"{pre}spine", (0.035, 0.55, 0.022),
+                        (lxx, lyy, z0 + 1.41), cardb)
+            spine.parent = top
+            spine.matrix_parent_inverse.identity()
+            spine.scale = (0.035 / 0.88, 0.55 / 0.62, 0.022 / 0.05)
+            spine.location = (0, 0, 0.034 / 0.05)
+            lean = math.radians(12)
+            for k in range(6):
+                t = (k + 0.5) * 0.35
+                pole = cyl(f"{pre}pole{k}", 0.055, 0.35,
+                           (x1 - 0.65 - math.sin(lean) * t, -17.15,
+                            z0 + math.cos(lean) * t),
+                           P["red"] if k % 2 == 0 else P["paper"])
+                pole.rotation_euler = (0, lean, 0)
+            _pcone(f"{pre}pot", 0.10, 0.13, 0.26, (x0 + 0.85, -17.00,
+                   z0 + 0.13), terra)
+            cyl(f"{pre}potsoil", 0.11, 0.03, (x0 + 0.85, -17.00, z0 + 0.25),
+                soil)
+            for k in range(5):
+                lf = _pcone(f"{pre}leaf{k}", 0.05, 0.008, 0.38,
+                            (x0 + 0.85 + (k - 2) * 0.04, -17.00, z0 + 0.48),
+                            leaf if k % 2 else leaf2)
+                lf.rotation_euler = (0.28 * (k - 2), 0.15 * (k % 2 - 0.5), 0)
+            box(f"{pre}crate0", (0.55, 0.55, 0.45), (x0 + 1.60, -17.05,
+                z0 + 0.225), cardb)
+            box(f"{pre}crate0l", (0.30, 0.02, 0.18), (x0 + 1.60, -16.77,
+                z0 + 0.25), P["paper"])
+            box(f"{pre}crate1", (0.48, 0.48, 0.38), (x0 + 1.60, -17.05,
+                z0 + 0.64), cardb)
+            cyl(f"{pre}bin", 0.16, 0.42, (xc - 1.40, -14.90, z0 + 0.21),
+                cmat)
+            cyl(f"{pre}binrim", 0.17, 0.04, (xc - 1.40, -14.90, z0 + 0.42),
+                P["dark_steel"])
+            _psphere(f"{pre}binpaper", 0.055, (xc - 1.40, -14.90, z0 + 0.44),
+                     P["paper"])
+        elif cid == "sef":
+            # --- desk: radio, thermos, stamp, signed papers, pens, notebook ---
+            wx = xc - 0.70
+            box(f"{pre}radio", (0.11, 0.075, 0.25), (wx, yd - 0.05, dt + 0.125),
+                P["black"])
+            cyl(f"{pre}radioant", 0.01, 0.20, (wx + 0.035, yd - 0.06,
+                dt + 0.33), P["black"])
+            box(f"{pre}radioscr", (0.06, 0.012, 0.05), (wx, yd - 0.005,
+                dt + 0.17), P["monitor"])
+            for k in range(3):
+                box(f"{pre}radiokey{k}", (0.02, 0.012, 0.02),
+                    (wx - 0.025 + k * 0.025, yd - 0.005, dt + 0.10),
+                    P["dark_steel"])
+            cyl(f"{pre}thermos", 0.062, 0.32, (xc - 0.45, yd + 0.15, dt + 0.16),
+                P["chrome"])
+            cyl(f"{pre}thermcap", 0.04, 0.06, (xc - 0.45, yd + 0.15,
+                dt + 0.35), P["black"])
+            box(f"{pre}stamppad", (0.20, 0.15, 0.025), (xc + 0.10, yd + 0.08,
+                dt + 0.012), P["dark_steel"])
+            box(f"{pre}stamp", (0.15, 0.10, 0.09), (xc + 0.10, yd + 0.08,
+                dt + 0.07), P["red"], bevel=0.01)
+            cyl(f"{pre}stamphandle", 0.02, 0.06, (xc + 0.10, yd + 0.08,
+                dt + 0.135), P["black"])
+            _psphere(f"{pre}stampknob", 0.035, (xc + 0.10, yd + 0.08,
+                     dt + 0.175), P["black"])
+            box(f"{pre}sigstack", (0.38, 0.28, 0.075), (xc + 0.62, yd,
+                dt + 0.037), P["paper"])
+            box(f"{pre}sigtop", (0.35, 0.25, 0.01), (xc + 0.62, yd, dt + 0.08),
+                P["paper"])
+            box(f"{pre}sigline", (0.22, 0.018, 0.005), (xc + 0.62, yd + 0.04,
+                dt + 0.087), P["black"])
+            cyl(f"{pre}pencup", 0.055, 0.125, (xc + 0.90, yd + 0.15, dt + 0.062),
+                cmat)
+            for k in range(3):
+                cyl(f"{pre}pen{k}", 0.007, 0.17,
+                    (xc + 0.88 + k * 0.02, yd + 0.14 + (k % 2) * 0.02,
+                     dt + 0.13), P["black"])
+            box(f"{pre}notebook", (0.34, 0.26, 0.03), (xc - 0.15, yd - 0.12,
+                dt + 0.015), cmat)
+            cyl(f"{pre}notepen", 0.008, 0.17, (xc - 0.15, yd - 0.12, dt + 0.038),
+                P["black"], rot=(math.radians(90), 0, math.radians(15)))
+            box(f"{pre}dutysheet", (0.30, 0.22, 0.008), (xc + 0.30, yd - 0.18,
+                dt + 0.004), P["paper"])
+            cyl(f"{pre}flagpole", 0.012, 0.45, (xc - 0.90, yd + 0.10,
+                dt + 0.225), P["wood"])
+            box(f"{pre}flag", (0.22, 0.02, 0.14), (xc - 0.79, yd + 0.10,
+                dt + 0.38), cmat)
+            # --- back wall: big shift planner, wall walkie, certificates ---
+            bx = xc + 0.6
+            box(f"{pre}planner", (2.6, 0.06, 1.6), (bx, -17.60, z0 + 1.95),
+                P["wood"])
+            for r in range(3):
+                for c in range(4):
+                    cx2 = bx - 0.90 + c * 0.60
+                    cz = z0 + 2.35 - r * 0.45
+                    box(f"{pre}card{r}{c}", (0.52, 0.02, 0.38), (cx2, -17.57,
+                        cz), (P["paper"], sticky_ye, sticky_or)[(r + c) % 3])
+                    _psphere(f"{pre}cardpin{r}{c}", 0.02, (cx2, -17.55,
+                             cz + 0.16), (pin_red, pin_blue, pin_green)[c % 3])
+            box(f"{pre}wallwalkie", (0.34, 0.12, 0.62), (xc - 2.05, -17.56,
+                z0 + 1.95), P["black"])
+            cyl(f"{pre}wallwalkieant", 0.025, 0.40, (xc - 1.95, -17.56,
+                z0 + 2.45), P["black"])
+            box(f"{pre}wallwalkiescr", (0.18, 0.012, 0.12), (xc - 2.05, -17.49,
+                z0 + 2.05), P["monitor"])
+            for k in range(6):
+                box(f"{pre}wallwalkiek{k}", (0.04, 0.012, 0.04),
+                    (xc - 2.10 + (k % 2) * 0.10, -17.49,
+                     z0 + 1.90 - (k // 2) * 0.09), P["dark_steel"])
+            for k, cz in enumerate((z0 + 2.30, z0 + 1.60)):
+                box(f"{pre}cert{k}", (0.50, 0.04, 0.62), (xc + 2.35, -17.60,
+                    cz), framewood)
+                box(f"{pre}certp{k}", (0.42, 0.045, 0.54), (xc + 2.35, -17.60,
+                    cz), P["paper"])
+                _psphere(f"{pre}certseal{k}", 0.03, (xc + 2.35, -17.57,
+                         cz - 0.18), pin_red)
+            # --- west wall: binder shelf, safety vests, hard hat, poster ---
+            wyc, Lw, scx = (wy0 + wy1) / 2, wy1 - wy0, xwf + 0.20
+            for e, ey in enumerate((wy0 + 0.03, wy1 - 0.03)):
+                box(f"{pre}wshup{e}", (0.38, 0.06, 2.35), (scx, ey, z0 + 1.175),
+                    P["wood"])
+            for s, sz in enumerate((0.40, 1.00, 1.55, 2.05, 2.325)):
+                box(f"{pre}wshb{s}", (0.36, Lw, 0.05), (scx, wyc, z0 + sz),
+                    P["wood"])
+            box(f"{pre}wshbox0", (0.30, 0.60, 0.32), (scx, wyc - 0.75,
+                z0 + 0.585), cardb)
+            for k, pm in enumerate((hi_yellow, sticky_or, cmat)):
+                box(f"{pre}wvest{k}", (0.30, 0.45, 0.08),
+                    (scx, wyc + 0.45, z0 + 0.465 + k * 0.08), pm)
+            for k in range(8):
+                box(f"{pre}wshbook{k}", (0.24, 0.09, 0.38),
+                    (scx, wy0 + 0.45 + k * 0.20, z0 + 1.215),
+                    bookmats[(k + 2) % len(bookmats)])
+            for k in range(6):
+                box(f"{pre}wshbind{k}", (0.26, 0.10, 0.40),
+                    (scx, wy0 + 0.45 + k * 0.26, z0 + 1.775),
+                    bookmats[k % len(bookmats)])
+            for k, oy in enumerate((-0.55, 0.15, 0.75)):
+                box(f"{pre}wshfile{k}", (0.30, 0.40, 0.24),
+                    (scx, wyc + oy, z0 + 2.195), P["wood_pale"])
+            cyl(f"{pre}hatpeg", 0.015, 0.14, (xwf + 0.07, -14.40, z0 + 1.75),
+                P["dark_steel"], rot=(0, math.radians(90), 0))
+            hat = _psphere(f"{pre}hat", 0.16, (xwf + 0.22, -14.40, z0 + 1.79),
+                           hat_blue)
+            hat.scale = (1, 1, 0.62)
+            cyl(f"{pre}hatbrim", 0.19, 0.025, (xwf + 0.22, -14.40, z0 + 1.75),
+                hat_blue)
+            box(f"{pre}wposter", (0.02, 0.50, 0.60), (xwf + 0.01, -14.40,
+                z0 + 1.00), P["paper"])
+            _psphere(f"{pre}wposterpin", 0.022, (xwf + 0.03, -14.40, z0 + 1.28),
+                     pin_red)
+            # --- east wall: filing cabinet, short shelf, roster, clock ---
+            box(f"{pre}cabinet", (0.62, 0.62, 1.50), (xef - 0.35, -16.90,
+                z0 + 0.75), P["dark_steel"], bevel=0.01)
+            for k in range(4):
+                box(f"{pre}cabdrawer{k}", (0.54, 0.02, 0.30),
+                    (xef - 0.35, -16.58, z0 + 0.25 + k * 0.36), P["steel"])
+                box(f"{pre}cabhandle{k}", (0.16, 0.03, 0.03),
+                    (xef - 0.35, -16.57, z0 + 0.25 + k * 0.36), P["black"])
+            ey0s, ey1s = -16.40, -15.00
+            eyc, Le, ecx = (ey0s + ey1s) / 2, ey1s - ey0s, xef - 0.20
+            for e, ey in enumerate((ey0s + 0.03, ey1s - 0.03)):
+                box(f"{pre}eshup{e}", (0.38, 0.06, 2.35), (ecx, ey, z0 + 1.175),
+                    P["wood"])
+            for s, sz in enumerate((0.40, 1.00, 1.55, 2.05, 2.325)):
+                box(f"{pre}eshb{s}", (0.36, Le, 0.05), (ecx, eyc, z0 + sz),
+                    P["wood"])
+            box(f"{pre}eshbox0", (0.30, 0.60, 0.32), (ecx, eyc, z0 + 0.585),
+                cardb)
+            for k in range(4):
+                box(f"{pre}eshbook{k}", (0.24, 0.09, 0.38),
+                    (ecx, ey0s + 0.30 + k * 0.24, z0 + 1.215),
+                    bookmats[(k + 1) % len(bookmats)])
+            for k in range(4):
+                box(f"{pre}eshbind{k}", (0.26, 0.10, 0.40),
+                    (ecx, ey0s + 0.30 + k * 0.24, z0 + 1.775),
+                    bookmats[(k + 4) % len(bookmats)])
+            for k, oy in enumerate((-0.30, 0.30)):
+                box(f"{pre}eshfile{k}", (0.30, 0.45, 0.24),
+                    (ecx, eyc + oy, z0 + 2.195), P["paper"])
+            box(f"{pre}roster", (0.03, 0.70, 0.90), (xef - 0.015, -14.30,
+                z0 + 1.60), framewood)
+            box(f"{pre}rosterp", (0.032, 0.62, 0.82), (xef - 0.015, -14.30,
+                z0 + 1.60), P["paper"])
+            for k in range(5):
+                box(f"{pre}rosterl{k}", (0.034, 0.50, 0.05), (xef - 0.015,
+                    -14.30, z0 + 1.88 - k * 0.14),
+                    sticky_ye if k % 2 else draw_blue)
+            _psphere(f"{pre}rosterpin", 0.022, (xef - 0.04, -14.30, z0 + 1.99),
+                     pin_red)
+            cyl(f"{pre}eclockrim", 0.15, 0.03, (xef - 0.03, -14.30, z0 + 2.45),
+                P["dark_steel"], rot=(0, math.radians(90), 0))
+            cyl(f"{pre}eclockface", 0.13, 0.035, (xef - 0.03, -14.30, z0 + 2.45),
+                P["paper"], rot=(0, math.radians(90), 0))
+            # --- floor: plant, cones, toolbox, crate, bin ---
+            _pcone(f"{pre}pot", 0.10, 0.13, 0.26, (x0 + 0.70, -16.95,
+                   z0 + 0.13), terra)
+            cyl(f"{pre}potsoil", 0.11, 0.03, (x0 + 0.70, -16.95, z0 + 0.25),
+                soil)
+            for k in range(5):
+                lf = _pcone(f"{pre}leaf{k}", 0.05, 0.008, 0.38,
+                            (x0 + 0.70 + (k - 2) * 0.04, -16.95, z0 + 0.48),
+                            leaf if k % 2 else leaf2)
+                lf.rotation_euler = (0.28 * (k - 2), 0.15 * (k % 2 - 0.5), 0)
+            for k, cy in enumerate((-16.60, -15.90)):
+                box(f"{pre}conebase{k}", (0.42, 0.42, 0.05), (x0 + 1.30, cy,
+                    z0 + 0.025), P["cone"] if "cone" in P else P["red"])
+                _pcone(f"{pre}cone{k}", 0.22, 0.04, 0.62, (x0 + 1.30, cy,
+                       z0 + 0.36), P["red"])
+                _pcone(f"{pre}coneband{k}", 0.155, 0.115, 0.15, (x0 + 1.30, cy,
+                       z0 + 0.42), P["paper"])
+            box(f"{pre}toolbox", (0.55, 0.30, 0.30), (xc + 1.50, -16.20,
+                z0 + 0.15), P["red"], bevel=0.01)
+            box(f"{pre}toolhandle", (0.30, 0.05, 0.05), (xc + 1.50, -16.20,
+                z0 + 0.325), P["black"])
+            for a, ox in enumerate((-0.18, 0.18)):
+                box(f"{pre}toollatch{a}", (0.06, 0.02, 0.08),
+                    (xc + 1.50 + ox, -16.04, z0 + 0.18), P["black"])
+            box(f"{pre}crate0", (0.50, 0.50, 0.42), (x0 + 1.45, -17.05,
+                z0 + 0.21), P["wood"])
+            box(f"{pre}crate0l", (0.28, 0.02, 0.16), (x0 + 1.45, -16.79,
+                z0 + 0.24), P["paper"])
+            cyl(f"{pre}bin", 0.16, 0.42, (xc + 1.45, -14.90, z0 + 0.21),
+                P["dark_steel"])
+            cyl(f"{pre}binrim", 0.17, 0.04, (xc + 1.45, -14.90, z0 + 0.42),
+                P["steel"])
+            _psphere(f"{pre}binpaper", 0.055, (xc + 1.45, -14.90, z0 + 0.44),
+                     P["paper"])
+        elif cid == "wonder":
+            # --- desk: typewriter, stamp rack, clipboard, mug, plant, papers ---
+            tx = xc - 0.60
+            box(f"{pre}twbody", (0.52, 0.45, 0.18), (tx, yd, dt + 0.09),
+                P["paper"], bevel=0.015)
+            cyl(f"{pre}twroller", 0.045, 0.55, (tx, yd - 0.15, dt + 0.21),
+                P["dark_steel"], rot=(0, math.radians(90), 0))
+            for sgn2 in (-1, 1):
+                cyl(f"{pre}twknob{sgn2}", 0.03, 0.04, (tx + sgn2 * 0.29,
+                    yd - 0.15, dt + 0.21), P["black"],
+                    rot=(0, math.radians(90), 0))
+            for r in range(3):
+                for c in range(8):
+                    box(f"{pre}twk{r}{c}", (0.04, 0.04, 0.03),
+                        (tx - 0.175 + c * 0.05, yd + 0.02 + r * 0.055,
+                         dt + 0.19), P["black"])
+            sheet = box(f"{pre}twsheet", (0.38, 0.012, 0.38), (tx, yd - 0.17,
+                        dt + 0.40), P["paper"])
+            sheet.rotation_euler = (math.radians(-12), 0, 0)
+            box(f"{pre}rackbase", (0.45, 0.15, 0.035), (xc - 0.05, yd + 0.15,
+                dt + 0.018), P["wood"])
+            for k in range(3):
+                sx = xc - 0.17 + k * 0.12
+                box(f"{pre}stampbase{k}", (0.09, 0.11, 0.03),
+                    (sx, yd + 0.15, dt + 0.05), P["dark_steel"])
+                cyl(f"{pre}stamph{k}", 0.02, 0.07, (sx, yd + 0.15, dt + 0.10),
+                    P["wood"])
+                _psphere(f"{pre}stampk{k}", 0.028, (sx, yd + 0.15, dt + 0.145),
+                         P["wood"])
+            box(f"{pre}clip", (0.30, 0.40, 0.018), (xc + 0.35, yd + 0.05,
+                dt + 0.009), P["wood"])
+            box(f"{pre}clippaper", (0.26, 0.36, 0.006), (xc + 0.35, yd + 0.05,
+                dt + 0.021), P["paper"])
+            box(f"{pre}clipclip", (0.10, 0.035, 0.025), (xc + 0.35, yd - 0.13,
+                dt + 0.025), P["dark_steel"])
+            cyl(f"{pre}mug", 0.05, 0.12, (xc + 0.62, yd + 0.18, dt + 0.06),
+                hi_yellow)
+            box(f"{pre}mugh0", (0.02, 0.02, 0.07), (xc + 0.68, yd + 0.18,
+                dt + 0.06), hi_yellow)
+            box(f"{pre}mugh1", (0.03, 0.02, 0.02), (xc + 0.67, yd + 0.18,
+                dt + 0.09), hi_yellow)
+            box(f"{pre}mugh2", (0.03, 0.02, 0.02), (xc + 0.67, yd + 0.18,
+                dt + 0.03), hi_yellow)
+            _pcone(f"{pre}dpot", 0.045, 0.062, 0.11, (xc + 0.85, yd - 0.12,
+                   dt + 0.055), terra)
+            for k in range(4):
+                lf = _pcone(f"{pre}dleaf{k}", 0.032, 0.006, 0.17,
+                            (xc + 0.85 + (k - 1.5) * 0.025, yd - 0.12,
+                             dt + 0.19), leaf)
+                lf.rotation_euler = (0.22 * (k - 1.5), 0, 0)
+            box(f"{pre}pstack0", (0.32, 0.26, 0.06), (xc + 0.30, yd - 0.15,
+                dt + 0.03), P["paper"])
+            box(f"{pre}pstack1", (0.28, 0.22, 0.04), (xc - 0.35, yd - 0.18,
+                dt + 0.02), P["paper"])
+            for k in range(5):
+                box(f"{pre}pclip{k}", (0.035, 0.012, 0.008),
+                    (xc - 0.20 + k * 0.09, yd + 0.26 - (k % 2) * 0.05,
+                     dt + 0.004), P["dark_steel"])
+            box(f"{pre}stapler", (0.16, 0.06, 0.03), (xc + 0.05, yd - 0.22,
+                dt + 0.015), P["red"])
+            box(f"{pre}staplertop", (0.15, 0.05, 0.04), (xc + 0.05, yd - 0.22,
+                dt + 0.05), P["dark_steel"])
+            # --- back wall: big pigeonholes east, framed map west ---
+            phx = xc + 0.8
+            box(f"{pre}phback", (2.6, 0.05, 1.6), (phx, -17.60, z0 + 1.70),
+                P["wood"])
+            box(f"{pre}phtop", (2.6, 0.34, 0.05), (phx, -17.42, z0 + 2.525),
+                P["wood"])
+            box(f"{pre}phbot", (2.6, 0.34, 0.05), (phx, -17.42, z0 + 0.875),
+                P["wood"])
+            for sgn2, tag2 in ((-1, "w"), (1, "e")):
+                box(f"{pre}phside{tag2}", (0.05, 0.34, 1.6),
+                    (phx + sgn2 * 1.275, -17.42, z0 + 1.70), P["wood"])
+            box(f"{pre}phmid", (2.5, 0.30, 0.04), (phx, -17.42, z0 + 1.70),
+                P["wood"])
+            for k in range(3):
+                box(f"{pre}phdiv{k}", (0.04, 0.30, 1.52),
+                    (phx - 0.63 + k * 0.63, -17.42, z0 + 1.70), P["wood"])
+            for r in range(2):
+                for c in range(4):
+                    env = box(f"{pre}env{r}{c}", (0.42, 0.20, 0.30),
+                              (phx - 0.945 + c * 0.63, -17.42,
+                               z0 + 1.31 + r * 0.78),
+                              P["paper"] if (r + c) % 3 else sticky_ye)
+                    env.rotation_euler = (0, 0, 0.04 * (c - 1.5))
+            mx = xc - 1.95
+            box(f"{pre}mapframe", (1.3, 0.05, 1.0), (mx, -17.60, z0 + 1.95),
+                P["wood"])
+            box(f"{pre}map", (1.2, 0.02, 0.9), (mx, -17.58, z0 + 1.95),
+                P["paper"])
+            box(f"{pre}mapriver", (0.9, 0.024, 0.05), (mx, -17.58, z0 + 1.88),
+                draw_blue)
+            box(f"{pre}maproad", (0.06, 0.024, 0.70), (mx + 0.15, -17.58,
+                z0 + 1.95), cork)
+            box(f"{pre}mappark", (0.25, 0.024, 0.18), (mx - 0.25, -17.58,
+                z0 + 2.10), leaf)
+            for k, (ox, oy) in enumerate(((-0.45, 0.32), (0.45, 0.32),
+                                         (-0.45, -0.32), (0.45, -0.32))):
+                _psphere(f"{pre}mappin{k}", 0.022, (mx + ox, -17.56,
+                         z0 + 1.95 + oy),
+                         (pin_red, pin_blue, pin_green, pin_red)[k])
+            for k, ox in enumerate((-0.40, 0.40)):
+                box(f"{pre}mapnote{k}", (0.20, 0.026, 0.26), (mx + ox, -17.58,
+                    z0 + 1.90), P["paper"])
+            # --- west wall: parcel shelf; postcards and poster on the front ---
+            wyc, Lw, scx = (wy0 + wy1) / 2, wy1 - wy0, xwf + 0.20
+            for e, ey in enumerate((wy0 + 0.03, wy1 - 0.03)):
+                box(f"{pre}wshup{e}", (0.38, 0.06, 2.35), (scx, ey, z0 + 1.175),
+                    P["wood"])
+            for s, sz in enumerate((0.40, 1.00, 1.55, 2.05, 2.325)):
+                box(f"{pre}wshb{s}", (0.36, Lw, 0.05), (scx, wyc, z0 + sz),
+                    P["wood"])
+            for k, oy in enumerate((-0.70, 0.0, 0.70)):
+                box(f"{pre}wparcel{k}", (0.30, 0.55, 0.32),
+                    (scx, wyc + oy, z0 + 0.585), cardb)
+                box(f"{pre}wparcell{k}", (0.012, 0.30, 0.15),
+                    (scx + 0.156, wyc + oy, z0 + 0.585), P["paper"])
+            for k in range(4):
+                cyl(f"{pre}wstring{k}", 0.07, 0.12,
+                    (scx, wyc - 0.75 + k * 0.50, z0 + 1.085), cork)
+            for k in range(2):
+                cyl(f"{pre}wtape{k}", 0.075, 0.06,
+                    (scx, wyc + 0.85 + k * 0.25, z0 + 1.055), P["paper"])
+            box(f"{pre}scalebase", (0.30, 0.30, 0.05), (scx, wyc - 0.55,
+                z0 + 1.60), P["dark_steel"])
+            box(f"{pre}scalepole", (0.04, 0.04, 0.30), (scx, wyc - 0.55,
+                z0 + 1.775), P["dark_steel"])
+            cyl(f"{pre}scaledial", 0.09, 0.03, (scx + 0.10, wyc - 0.55,
+                z0 + 1.90), P["paper"], rot=(0, math.radians(90), 0))
+            box(f"{pre}scaletray", (0.24, 0.24, 0.03), (scx, wyc - 0.55,
+                z0 + 1.945), P["steel"])
+            for k, oy in enumerate((0.35, 0.75)):
+                box(f"{pre}wshbook{k}", (0.24, 0.12, 0.36),
+                    (scx, wyc + oy, z0 + 1.755), bookmats[k % len(bookmats)])
+            for k, oy in enumerate((-0.60, 0.10, 0.70)):
+                box(f"{pre}wenv{k}", (0.26, 0.36, 0.12),
+                    (scx, wyc + oy, z0 + 2.135), P["paper"])
+            for k in range(4):
+                box(f"{pre}wcard{k}", (0.02, 0.24, 0.18),
+                    (xwf + 0.01, -14.70 + k * 0.30, z0 + 1.75), P["paper"])
+                _psphere(f"{pre}wcardpin{k}", 0.018,
+                         (xwf + 0.03, -14.70 + k * 0.30, z0 + 1.82), pin_red)
+            box(f"{pre}wposter", (0.02, 0.50, 0.60), (xwf + 0.01, -14.25,
+                z0 + 1.05), sticky_ye)
+            _psphere(f"{pre}wposterpin", 0.022, (xwf + 0.03, -14.25, z0 + 1.33),
+                     pin_blue)
+            # --- east wall: album shelf; framed stamps and postcard ---
+            ey1s = -15.2
+            eyc, Le, ecx = (ey0 + ey1s) / 2, ey1s - ey0, xef - 0.20
+            for e, ey in enumerate((ey0 + 0.03, ey1s - 0.03)):
+                box(f"{pre}eshup{e}", (0.38, 0.06, 2.35), (ecx, ey, z0 + 1.175),
+                    P["wood"])
+            for s, sz in enumerate((0.40, 1.00, 1.55, 2.05, 2.325)):
+                box(f"{pre}eshb{s}", (0.36, Le, 0.05), (ecx, eyc, z0 + sz),
+                    P["wood"])
+            for k, oy in enumerate((-0.55, 0.55)):
+                box(f"{pre}eshbox{k}", (0.30, 0.60, 0.32),
+                    (ecx, eyc + oy, z0 + 0.585), cardb)
+            for k in range(4):
+                box(f"{pre}ealbum{k}", (0.28, 0.12, 0.36),
+                    (ecx, ey0 + 0.45 + k * 0.38, z0 + 1.205),
+                    bookmats[(k + 2) % len(bookmats)])
+            for k, oy in enumerate((-0.55, 0.10, 0.65)):
+                box(f"{pre}eenv{k}", (0.26, 0.36, 0.12),
+                    (ecx, eyc + oy, z0 + 1.635), P["paper"])
+            _pcone(f"{pre}eshpot", 0.05, 0.065, 0.11, (ecx, eyc - 0.60,
+                   z0 + 2.13), terra)
+            for k in range(3):
+                lf = _pcone(f"{pre}eshleaf{k}", 0.035, 0.006, 0.16,
+                            (ecx + (k - 1) * 0.03, eyc - 0.60, z0 + 2.26),
+                            leaf)
+                lf.rotation_euler = (0.25 * (k - 1), 0, 0)
+            for k, oy in enumerate((0.10, 0.60)):
+                cyl(f"{pre}eshjar{k}", 0.07, 0.22, (ecx, eyc + oy, z0 + 2.185),
+                    P["glass"])
+            box(f"{pre}estamps", (0.03, 0.55, 0.70), (xef - 0.015, -14.30,
+                z0 + 2.00), framewood)
+            for r in range(3):
+                for c in range(3):
+                    box(f"{pre}estamp{r}{c}", (0.032, 0.10, 0.12),
+                        (xef - 0.015, -14.44 + c * 0.14, z0 + 2.13 - r * 0.14),
+                        bookmats[(r * 3 + c) % len(bookmats)])
+            box(f"{pre}epcard", (0.02, 0.30, 0.22), (xef - 0.01, -14.30,
+                z0 + 1.20), P["paper"])
+            _psphere(f"{pre}epcardpin", 0.018, (xef - 0.03, -14.30, z0 + 1.29),
+                     pin_green)
+            # --- floor: mail sacks, parcels, stool, plant, bin ---
+            for k, sy in enumerate((-16.60, -15.95)):
+                sk = _psphere(f"{pre}sack{k}", 0.28, (x0 + 0.85, sy, z0 + 0.21),
+                              cork if k == 0 else cardb)
+                sk.scale = (1.1, 1.0, 0.75)
+                cyl(f"{pre}sacktie{k}", 0.05, 0.08, (x0 + 0.85, sy, z0 + 0.44),
+                    P["dark_steel"])
+                box(f"{pre}sacklab{k}", (0.16, 0.012, 0.12), (x0 + 1.13, sy,
+                    z0 + 0.22), P["paper"])
+            box(f"{pre}parcel0", (0.60, 0.50, 0.40), (x1 - 0.80, -16.95,
+                z0 + 0.20), cardb)
+            box(f"{pre}parcel0l", (0.30, 0.02, 0.16), (x1 - 0.80, -16.69,
+                z0 + 0.22), P["paper"])
+            box(f"{pre}parcel1", (0.55, 0.45, 0.35), (x1 - 0.80, -16.95,
+                z0 + 0.575), P["wood_pale"])
+            box(f"{pre}parcel2", (0.45, 0.40, 0.30), (x1 - 0.80, -16.95,
+                z0 + 0.90), cardb)
+            cyl(f"{pre}stoolseat", 0.22, 0.07, (x0 + 2.05, -14.55, z0 + 0.62),
+                cmat)
+            cyl(f"{pre}stoolpost", 0.03, 0.58, (x0 + 2.05, -14.55, z0 + 0.29),
+                P["dark_steel"])
+            cyl(f"{pre}stoolbase", 0.20, 0.04, (x0 + 2.05, -14.55, z0 + 0.02),
+                P["dark_steel"])
+            _pcone(f"{pre}pot", 0.10, 0.13, 0.26, (x1 - 0.60, -14.30,
+                   z0 + 0.13), terra)
+            cyl(f"{pre}potsoil", 0.11, 0.03, (x1 - 0.60, -14.30, z0 + 0.25),
+                soil)
+            for k in range(5):
+                lf = _pcone(f"{pre}leaf{k}", 0.05, 0.008, 0.38,
+                            (x1 - 0.60 + (k - 2) * 0.04, -14.30, z0 + 0.48),
+                            leaf if k % 2 else leaf2)
+                lf.rotation_euler = (0.28 * (k - 2), 0.15 * (k % 2 - 0.5), 0)
+            cyl(f"{pre}bin", 0.16, 0.42, (xc + 1.45, -14.90, z0 + 0.21),
+                P["dark_steel"])
+            cyl(f"{pre}binrim", 0.17, 0.04, (xc + 1.45, -14.90, z0 + 0.42),
+                P["steel"])
+            _psphere(f"{pre}binpaper", 0.055, (xc + 1.45, -14.90, z0 + 0.44),
+                     P["paper"])
+        elif cid == "ada":
+            # --- desk: pink laptop, notebook, plant, pen, glasses, cables, mug ---
+            lx = xc + 0.55
+            box(f"{pre}lapbase", (0.46, 0.34, 0.035), (lx, yd + 0.02,
+                dt + 0.018), pink)
+            box(f"{pre}lapkeys", (0.40, 0.26, 0.01), (lx, yd + 0.02,
+                dt + 0.04), P["dark_steel"])
+            box(f"{pre}laplid", (0.46, 0.035, 0.32), (lx, yd - 0.16,
+                dt + 0.185), pink)
+            box(f"{pre}lapscreen", (0.40, 0.012, 0.26), (lx, yd - 0.14,
+                dt + 0.185), P["monitor"])
+            for k in range(3):
+                box(f"{pre}lapline{k}", (0.30, 0.014, 0.018), (lx, yd - 0.132,
+                    dt + 0.24 - k * 0.06), P["paper"])
+            box(f"{pre}notebookl", (0.20, 0.28, 0.018), (xc - 0.26, yd + 0.10,
+                dt + 0.009), P["paper"])
+            box(f"{pre}notebookr", (0.20, 0.28, 0.018), (xc - 0.05, yd + 0.10,
+                dt + 0.009), P["paper"])
+            for k in range(2):
+                box(f"{pre}noteline{k}", (0.15, 0.012, 0.004),
+                    (xc - 0.26, yd + 0.15 - k * 0.06, dt + 0.02), P["black"])
+            cyl(f"{pre}notepen", 0.008, 0.17, (xc - 0.15, yd + 0.10, dt + 0.026),
+                cmat, rot=(math.radians(90), 0, math.radians(80)))
+            _pcone(f"{pre}dpot", 0.045, 0.062, 0.11, (xc - 0.70, yd - 0.02,
+                   dt + 0.055), terra)
+            for k in range(3):
+                lf = _pcone(f"{pre}dleaf{k}", 0.032, 0.006, 0.15,
+                            (xc - 0.70 + (k - 1) * 0.03, yd - 0.02, dt + 0.18),
+                            leaf)
+                lf.rotation_euler = (0.25 * (k - 1), 0, 0)
+            cyl(f"{pre}pen", 0.008, 0.17, (xc + 0.05, yd + 0.18, dt + 0.009),
+                P["black"], rot=(math.radians(90), 0, math.radians(30)))
+            for sgn2 in (-1, 1):
+                cyl(f"{pre}glassrim{sgn2}", 0.045, 0.008,
+                    (xc + 0.02 + sgn2 * 0.055, yd - 0.12, dt + 0.005),
+                    P["dark_steel"])
+            box(f"{pre}glassbridge", (0.05, 0.015, 0.008), (xc + 0.02, yd - 0.12,
+                dt + 0.005), P["dark_steel"])
+            box(f"{pre}sticky0", (0.10, 0.10, 0.012), (xc - 0.35, yd + 0.20,
+                dt + 0.006), sticky_ye)
+            box(f"{pre}sticky1", (0.10, 0.10, 0.012), (xc + 0.30, yd + 0.22,
+                dt + 0.006), sticky_or)
+            for k in range(3):
+                cyl(f"{pre}coil{k}", 0.09, 0.025, (xc + 0.88, yd + 0.10,
+                    dt + 0.013 + k * 0.025), P["black"])
+            cyl(f"{pre}mug", 0.05, 0.12, (xc - 0.45, yd - 0.18, dt + 0.06),
+                cmat)
+            box(f"{pre}mugh", (0.02, 0.02, 0.07), (xc - 0.39, yd - 0.18,
+                dt + 0.06), cmat)
+            # --- back wall: big whiteboard, neon "</>", server rack ---
+            wbx = xc - 0.9
+            box(f"{pre}wbframe", (2.6, 0.06, 1.5), (wbx, -17.60, z0 + 2.00),
+                P["dark_steel"])
+            box(f"{pre}wb", (2.5, 0.02, 1.4), (wbx, -17.57, z0 + 2.00),
+                P["paper"])
+            for k, (ox, oy, ln, horiz) in enumerate(
+                    ((-0.80, 0.45, 0.60, True), (0.10, 0.45, 0.60, True),
+                     (-0.80, 0.05, 0.60, True), (0.30, -0.10, 0.50, False),
+                     (-0.30, -0.40, 0.70, True), (0.70, 0.10, 0.60, False))):
+                if horiz:
+                    box(f"{pre}wbline{k}", (ln, 0.024, 0.025),
+                        (wbx + ox, -17.56, z0 + 2.00 + oy), P["black"])
+                else:
+                    box(f"{pre}wbline{k}", (0.025, 0.024, ln),
+                        (wbx + ox, -17.56, z0 + 2.00 + oy), P["black"])
+            for k, (ox, oy) in enumerate(((-0.80, 0.45), (0.10, 0.45),
+                                         (-0.30, -0.40), (0.70, -0.10))):
+                box(f"{pre}wbnode{k}", (0.12, 0.026, 0.10), (wbx + ox, -17.56,
+                    z0 + 2.00 + oy), draw_blue)
+            box(f"{pre}wbsticky0", (0.16, 0.026, 0.16), (wbx + 0.95, -17.56,
+                z0 + 2.35), sticky_ye)
+            box(f"{pre}wbsticky1", (0.16, 0.026, 0.16), (wbx + 0.95, -17.56,
+                z0 + 1.65), pink)
+            box(f"{pre}wbtray", (0.60, 0.08, 0.04), (wbx - 0.60, -17.55,
+                z0 + 1.32), P["dark_steel"])
+            for k, pm in enumerate((pin_red, P["black"])):
+                cyl(f"{pre}wbmarker{k}", 0.012, 0.14, (wbx - 0.70 + k * 0.20,
+                    -17.55, z0 + 1.36), pm,
+                    rot=(math.radians(90), 0, math.radians(90)))
+            box(f"{pre}neonback", (1.2, 0.04, 0.7), (xc + 1.7, -17.60,
+                z0 + 2.30), P["glass"])
+            text(f"{pre}neon", "</>", (xc + 1.7, -17.57, z0 + 2.30), 0.42,
+                 neon_teal, rot=(math.radians(90), 0, math.radians(180)))
+            for a, ox in enumerate((-0.52, 0.52)):
+                for b, oy in enumerate((-0.27, 0.27)):
+                    _psphere(f"{pre}neonbolt{a}{b}", 0.02,
+                             (xc + 1.7 + ox, -17.57, z0 + 2.30 + oy),
+                             P["dark_steel"])
+            bpy.ops.object.light_add(type="POINT",
+                                     location=(xc + 1.7, -17.20, z0 + 2.30))
+            nl = bpy.context.object
+            nl.name = f"{pre}neonlight"
+            nl.data.energy, nl.data.color = 10, (0.05, 0.95, 0.85)
+            nl.data.use_shadow = False
+            rx = x1 - 1.15
+            box(f"{pre}rack", (1.1, 0.75, 1.9), (rx, -17.20, z0 + 0.95),
+                P["black"], bevel=0.01)
+            for s in range(5):
+                sz = z0 + 0.35 + s * 0.38
+                box(f"{pre}rshelf{s}", (1.0, 0.02, 0.05), (rx, -16.82, sz),
+                    P["steel"])
+                for k in range(3):
+                    box(f"{pre}rled{s}{k}", (0.06, 0.02, 0.04),
+                        (rx - 0.30 + k * 0.30, -16.81, sz + 0.06),
+                        led_grn if (s + k) % 2 == 0 else led_blue)
+            for k, pm in enumerate((pin_red, hi_yellow, led_blue)):
+                box(f"{pre}rcable{k}", (0.04, 0.03, 1.20),
+                    (rx - 0.20 + k * 0.20, -16.83, z0 + 0.95), pm)
+            box(f"{pre}racktop", (0.80, 0.60, 0.25), (rx, -17.20, z0 + 2.025),
+                P["dark_steel"])
+            # --- west wall: book shelf, parts bins, robot toy, circuit poster ---
+            wyc, Lw, scx = (wy0 + wy1) / 2, wy1 - wy0, xwf + 0.20
+            for e, ey in enumerate((wy0 + 0.03, wy1 - 0.03)):
+                box(f"{pre}wshup{e}", (0.38, 0.06, 2.35), (scx, ey, z0 + 1.175),
+                    P["dark_steel"])
+            for s, sz in enumerate((0.40, 1.00, 1.55, 2.05, 2.325)):
+                box(f"{pre}wshb{s}", (0.36, Lw, 0.05), (scx, wyc, z0 + sz),
+                    P["wood"])
+            for k, oy in enumerate((-0.55, 0.55)):
+                box(f"{pre}wshbox{k}", (0.30, 0.60, 0.32),
+                    (scx, wyc + oy, z0 + 0.585), cardb)
+            for k in range(6):
+                box(f"{pre}wshbook{k}", (0.24, 0.09, 0.38),
+                    (scx, wy0 + 0.40 + k * 0.26, z0 + 1.215),
+                    bookmats[k % len(bookmats)])
+            for k in range(6):
+                box(f"{pre}wparts{k}", (0.24, 0.24, 0.14),
+                    (scx, wy0 + 0.35 + k * 0.28, z0 + 1.645),
+                    bookmats[(k + 1) % len(bookmats)])
+            box(f"{pre}robotbase", (0.20, 0.20, 0.06), (scx, wyc - 0.60,
+                z0 + 2.38), P["dark_steel"])
+            box(f"{pre}robotbody", (0.16, 0.16, 0.20), (scx, wyc - 0.60,
+                z0 + 2.51), cmat)
+            box(f"{pre}robothead", (0.14, 0.14, 0.12), (scx, wyc - 0.60,
+                z0 + 2.67), P["dark_steel"])
+            cyl(f"{pre}robotant", 0.008, 0.10, (scx, wyc - 0.60, z0 + 2.78),
+                P["black"])
+            for k, oy in enumerate((-0.04, 0.04)):
+                box(f"{pre}roboteye{k}", (0.03, 0.03, 0.03),
+                    (scx + 0.085, wyc - 0.60 + oy, z0 + 2.68), led_blue)
+            for k, oy in enumerate((0.10, 0.55)):
+                box(f"{pre}wshfile{k}", (0.28, 0.38, 0.22),
+                    (scx, wyc + oy, z0 + 2.185), P["paper"])
+            box(f"{pre}wcircuit", (0.02, 0.55, 0.70), (xwf + 0.01, -14.35,
+                z0 + 1.95), draw_blue)
+            for k in range(3):
+                box(f"{pre}wcircuitl{k}", (0.024, 0.40, 0.03), (xwf + 0.01,
+                    -14.35, z0 + 2.10 - k * 0.15), P["paper"])
+            for k in range(2):
+                box(f"{pre}wcircuitp{k}", (0.024, 0.08, 0.08), (xwf + 0.01,
+                    -14.50 + k * 0.30, z0 + 1.78), brass)
+            box(f"{pre}wprint", (0.02, 0.34, 0.42), (xwf + 0.01, -14.35,
+                z0 + 1.10), P["paper"])
+            _psphere(f"{pre}wprintpin", 0.022, (xwf + 0.03, -14.35, z0 + 1.29),
+                     pin_green)
+            # --- east wall: book shelf, spools, keyboard, printouts ---
+            ey1s = -15.2
+            eyc, Le, ecx = (ey0 + ey1s) / 2, ey1s - ey0, xef - 0.20
+            for e, ey in enumerate((ey0 + 0.03, ey1s - 0.03)):
+                box(f"{pre}eshup{e}", (0.38, 0.06, 2.35), (ecx, ey, z0 + 1.175),
+                    P["dark_steel"])
+            for s, sz in enumerate((0.40, 1.00, 1.55, 2.05, 2.325)):
+                box(f"{pre}eshb{s}", (0.36, Le, 0.05), (ecx, eyc, z0 + sz),
+                    P["wood"])
+            for k, oy in enumerate((-0.55, 0.55)):
+                box(f"{pre}eshbox{k}", (0.30, 0.60, 0.32),
+                    (ecx, eyc + oy, z0 + 0.585), P["wood_pale"])
+            for k in range(6):
+                box(f"{pre}eshbook{k}", (0.24, 0.09, 0.38),
+                    (ecx, ey0 + 0.40 + k * 0.26, z0 + 1.215),
+                    bookmats[(k + 3) % len(bookmats)])
+            for k, oy in enumerate((-0.60, 0.60)):
+                cyl(f"{pre}espool{k}", 0.12, 0.10, (ecx, eyc + oy, z0 + 1.625),
+                    P["wood"])
+                cyl(f"{pre}espoolc{k}", 0.05, 0.12, (ecx, eyc + oy, z0 + 1.625),
+                    (pin_red, draw_blue)[k])
+            box(f"{pre}ekeyboard", (0.30, 0.14, 0.04), (ecx, eyc, z0 + 1.595),
+                P["black"])
+            for k in range(4):
+                box(f"{pre}ekey{k}", (0.05, 0.03, 0.02),
+                    (ecx - 0.09 + k * 0.06, eyc, z0 + 1.625), P["paper"])
+            for k, oy in enumerate((-0.55, 0.10, 0.65)):
+                box(f"{pre}eshfile{k}", (0.28, 0.38, 0.22),
+                    (ecx, eyc + oy, z0 + 2.185), P["paper"])
+            for k in range(2):
+                box(f"{pre}eprint{k}", (0.02, 0.30, 0.40),
+                    (xef - 0.01, -14.55 + k * 0.50, z0 + 1.70), P["paper"])
+                _psphere(f"{pre}eprintpin{k}", 0.018,
+                         (xef - 0.03, -14.55 + k * 0.50, z0 + 1.88), pin_blue)
+            # --- floor: plant, crates, bin ---
+            _pcone(f"{pre}pot", 0.10, 0.13, 0.26, (x1 - 0.60, -14.30,
+                   z0 + 0.13), terra)
+            cyl(f"{pre}potsoil", 0.11, 0.03, (x1 - 0.60, -14.30, z0 + 0.25),
+                soil)
+            for k in range(5):
+                lf = _pcone(f"{pre}leaf{k}", 0.05, 0.008, 0.38,
+                            (x1 - 0.60 + (k - 2) * 0.04, -14.30, z0 + 0.48),
+                            leaf if k % 2 else leaf2)
+                lf.rotation_euler = (0.28 * (k - 2), 0.15 * (k % 2 - 0.5), 0)
+            box(f"{pre}crate0", (0.55, 0.55, 0.45), (x0 + 1.05, -17.05,
+                z0 + 0.225), cardb)
+            box(f"{pre}crate0l", (0.30, 0.02, 0.18), (x0 + 1.05, -16.77,
+                z0 + 0.30), P["paper"])
+            box(f"{pre}crate0f", (0.30, 0.022, 0.06), (x0 + 1.05, -16.77,
+                z0 + 0.18), pin_red)
+            box(f"{pre}crate1", (0.48, 0.48, 0.38), (x0 + 1.05, -17.05,
+                z0 + 0.64), P["wood_pale"])
+            cyl(f"{pre}bin", 0.16, 0.42, (xc + 1.45, -14.90, z0 + 0.21),
+                P["dark_steel"])
+            cyl(f"{pre}binrim", 0.17, 0.04, (xc + 1.45, -14.90, z0 + 0.42),
+                P["steel"])
+            _psphere(f"{pre}binpaper", 0.055, (xc + 1.45, -14.90, z0 + 0.44),
+                     P["paper"])
+        elif cid == "iris":
+            # --- desk: propped tablet, palette, jar, tubes, sheets, brushes ---
+            tabx = xc - 0.55
+            tab = box(f"{pre}tablet", (0.62, 0.04, 0.45), (tabx, yd + 0.05,
+                      dt + 0.24), P["black"], bevel=0.005)
+            tab.rotation_euler = (math.radians(-15), 0, 0)
+            box(f"{pre}tabscreen", (0.54, 0.012, 0.37), (tabx, yd + 0.085,
+                dt + 0.245), P["paper"])
+            box(f"{pre}sketch0", (0.34, 0.014, 0.02), (tabx - 0.03, yd + 0.088,
+                dt + 0.30), P["black"])
+            box(f"{pre}sketch1", (0.02, 0.014, 0.24), (tabx + 0.12, yd + 0.088,
+                dt + 0.22), P["black"])
+            box(f"{pre}sketch2", (0.24, 0.014, 0.02), (tabx - 0.05, yd + 0.088,
+                dt + 0.14), P["black"])
+            cyl(f"{pre}sketchhead", 0.045, 0.014, (tabx - 0.14, yd + 0.088,
+                dt + 0.30), cmat, rot=(math.radians(90), 0, 0))
+            palx = xc + 0.40
+            cyl(f"{pre}palette", 0.14, 0.018, (palx, yd + 0.15, dt + 0.009),
+                P["wood_pale"])
+            for k, (ox, oy, pm) in enumerate(((-0.06, 0.05, pin_red),
+                                             (0.04, 0.06, pin_blue),
+                                             (-0.01, -0.01, pin_green),
+                                             (0.07, -0.04, hi_yellow),
+                                             (-0.07, -0.06, cmat))):
+                cyl(f"{pre}pblob{k}", 0.018, 0.010, (palx + ox, yd + 0.15 + oy,
+                    dt + 0.022), pm)
+            jarx = xc + 0.78
+            cyl(f"{pre}penjar", 0.062, 0.14, (jarx, yd - 0.08, dt + 0.07),
+                P["glass"])
+            for k, (ox, oy, pm) in enumerate(((-0.02, 0.0, pin_red),
+                                             (0.02, 0.01, pin_blue),
+                                             (0.0, -0.02, pin_green),
+                                             (0.015, 0.025, hi_yellow))):
+                pen = cyl(f"{pre}ppen{k}", 0.008, 0.21,
+                          (jarx + ox, yd - 0.08 + oy, dt + 0.13), pm)
+                pen.rotation_euler = (0.08 * (k - 1.5), 0.06 * (k % 2 - 0.5), 0)
+            for k, (ox, pm) in enumerate(((-0.05, pin_red), (0.10, draw_blue))):
+                cyl(f"{pre}tube{k}", 0.018, 0.12, (xc + ox, yd - 0.20,
+                    dt + 0.018), pm, rot=(math.radians(90), 0,
+                    math.radians(70 + k * 20)))
+            box(f"{pre}sheet0", (0.34, 0.26, 0.006), (xc + 0.05, yd + 0.08,
+                dt + 0.003), P["paper"], rot_z=0.06)
+            box(f"{pre}sheet1", (0.34, 0.26, 0.006), (xc + 0.12, yd + 0.02,
+                dt + 0.009), P["paper"], rot_z=-0.08)
+            for k in range(3):
+                cyl(f"{pre}brush{k}", 0.008, 0.20,
+                    (xc + 0.30 + k * 0.05, yd - 0.12, dt + 0.009),
+                    P["wood"], rot=(math.radians(90), 0, math.radians(75)))
+            cyl(f"{pre}watercup", 0.05, 0.11, (xc - 0.25, yd + 0.20, dt + 0.055),
+                P["glass"])
+            cyl(f"{pre}water", 0.042, 0.02, (xc - 0.25, yd + 0.20, dt + 0.09),
+                draw_blue)
+            for k, pm in enumerate((pin_red, pin_blue, pin_green, hi_yellow,
+                                    cmat)):
+                cyl(f"{pre}cpencil{k}", 0.008, 0.18,
+                    (xc - 0.80, yd - 0.02 + k * 0.05, dt + 0.009), pm,
+                    rot=(math.radians(90), 0, math.radians(80)))
+            box(f"{pre}eraser", (0.06, 0.04, 0.025), (xc + 0.55, yd - 0.18,
+                dt + 0.012), pink)
+            # --- back wall: sketch string across the full width, mini frames ---
+            cyl(f"{pre}string", 0.008, 5.6, (xc, -17.58, z0 + 2.55), cork,
+                rot=(0, math.radians(90), 0))
+            for k in range(7):
+                sx = xc - 2.4 + k * 0.8
+                box(f"{pre}sk{k}", (0.52, 0.02, 0.62), (sx, -17.58, z0 + 2.10),
+                    P["paper"])
+                box(f"{pre}skclip{k}", (0.06, 0.035, 0.09), (sx, -17.58,
+                    z0 + 2.47), P["wood"])
+                box(f"{pre}skline{k}", (0.34, 0.024, 0.025), (sx, -17.57,
+                    z0 + 2.16), P["black"])
+                box(f"{pre}skfig{k}", (0.025, 0.024, 0.30), (sx + 0.06, -17.57,
+                    z0 + 1.98), P["black"])
+                box(f"{pre}skacc{k}", (0.12, 0.024, 0.12), (sx - 0.10, -17.57,
+                    z0 + 1.95), cmat if k % 2 else draw_blue)
+            for k, ox in enumerate((-1.2, 0.0, 1.2)):
+                box(f"{pre}mini{k}", (0.34, 0.03, 0.40), (xc + ox, -17.60,
+                    z0 + 1.30), framewood)
+                box(f"{pre}minip{k}", (0.28, 0.032, 0.34), (xc + ox, -17.60,
+                    z0 + 1.30), P["paper"])
+                box(f"{pre}minidot{k}", (0.10, 0.034, 0.10), (xc + ox, -17.60,
+                    z0 + 1.30), (cmat, hi_yellow, draw_blue)[k])
+            # --- easel with canvas west-back, mannequin east ---
+            ex = x0 + 1.90
+            for sgn2 in (-1, 1):
+                box(f"{pre}ealeg{sgn2}", (0.06, 0.06, 2.0),
+                    (ex + sgn2 * 0.30, -16.70, z0 + 1.0), P["wood"])
+            rear = box(f"{pre}ealegr", (0.06, 0.06, 2.0), (ex, -16.95,
+                       z0 + 0.95), P["wood"])
+            rear.rotation_euler = (math.radians(12), 0, 0)
+            box(f"{pre}eacross", (0.66, 0.05, 0.05), (ex, -16.70, z0 + 1.55),
+                P["wood"])
+            box(f"{pre}ealedge", (0.72, 0.06, 0.06), (ex, -16.68, z0 + 1.02),
+                P["wood"])
+            box(f"{pre}eacanvas", (0.68, 0.05, 0.88), (ex, -16.66, z0 + 1.50),
+                P["paper"])
+            box(f"{pre}eaart0", (0.22, 0.012, 0.28), (ex - 0.10, -16.63,
+                z0 + 1.54), cmat)
+            box(f"{pre}eaart1", (0.15, 0.012, 0.18), (ex + 0.15, -16.63,
+                z0 + 1.44), draw_blue)
+            box(f"{pre}eaart2", (0.12, 0.012, 0.12), (ex + 0.12, -16.63,
+                z0 + 1.72), hi_yellow)
+            box(f"{pre}eatray", (0.40, 0.25, 0.04), (ex - 0.10, -16.62,
+                z0 + 1.07), P["wood"])
+            mx, my = x1 - 0.75, -16.60
+            cyl(f"{pre}manstand", 0.20, 0.05, (mx, my, z0 + 0.025), P["wood"])
+            cyl(f"{pre}manpost", 0.025, 0.15, (mx, my, z0 + 0.10), P["wood"])
+            for sgn2 in (-1, 1):
+                cyl(f"{pre}manleg{sgn2}", 0.03, 0.32, (mx + sgn2 * 0.075, my,
+                    z0 + 0.36), P["wood"])
+                arm = cyl(f"{pre}manarm{sgn2}", 0.025, 0.32,
+                          (mx + sgn2 * 0.15, my, z0 + 0.66), P["wood"])
+                arm.rotation_euler = (0, sgn2 * -0.12, 0)
+            box(f"{pre}mantorso", (0.22, 0.12, 0.34), (mx, my, z0 + 0.68),
+                P["wood"], bevel=0.02)
+            cyl(f"{pre}manneck", 0.025, 0.07, (mx, my, z0 + 0.885), P["wood"])
+            _psphere(f"{pre}manhead", 0.075, (mx, my, z0 + 0.98), P["wood"])
+            # --- west wall: paint shelf; framed picture and poster on front ---
+            wyc, Lw, scx = (wy0 + wy1) / 2, wy1 - wy0, xwf + 0.20
+            for e, ey in enumerate((wy0 + 0.03, wy1 - 0.03)):
+                box(f"{pre}wshup{e}", (0.38, 0.06, 2.35), (scx, ey, z0 + 1.175),
+                    P["wood"])
+            for s, sz in enumerate((0.40, 1.00, 1.55, 2.05, 2.325)):
+                box(f"{pre}wshb{s}", (0.36, Lw, 0.05), (scx, wyc, z0 + sz),
+                    P["wood"])
+            for k, oy in enumerate((-0.70, 0.70)):
+                box(f"{pre}wshbox{k}", (0.30, 0.55, 0.32),
+                    (scx, wyc + oy, z0 + 0.585), cardb)
+            for k in range(3):
+                box(f"{pre}wcanvas{k}", (0.08, 0.45, 0.60),
+                    (scx - 0.10 + k * 0.10, wyc + 0.05, z0 + 0.725),
+                    P["paper"])
+            for k in range(6):
+                cyl(f"{pre}wjar{k}", 0.06, 0.14,
+                    (scx, wy0 + 0.40 + k * 0.30, z0 + 1.095), P["glass"])
+                if k % 2 == 0:
+                    cyl(f"{pre}wjarfill{k}", 0.05, 0.06,
+                        (scx, wy0 + 0.40 + k * 0.30, z0 + 1.055),
+                        bookmats[k % len(bookmats)])
+            for k, oy in enumerate((-0.55, 0.55)):
+                cyl(f"{pre}wbrushcup{k}", 0.055, 0.12, (scx, wyc + oy,
+                    z0 + 1.635), cmat)
+            for k in range(3):
+                box(f"{pre}wskbook{k}", (0.26, 0.32, 0.05),
+                    (scx, wyc + 0.0, z0 + 1.60 + k * 0.052),
+                    bookmats[(k + 1) % len(bookmats)])
+            for k, oy in enumerate((-0.55, 0.15, 0.75)):
+                box(f"{pre}wshfile{k}", (0.30, 0.40, 0.24),
+                    (scx, wyc + oy, z0 + 2.195), P["paper"])
+            box(f"{pre}wframe", (0.03, 0.55, 0.70), (xwf + 0.015, -14.30,
+                z0 + 1.95), framewood)
+            box(f"{pre}wframep", (0.032, 0.47, 0.62), (xwf + 0.015, -14.30,
+                z0 + 1.95), P["paper"])
+            box(f"{pre}wframea0", (0.034, 0.16, 0.20), (xwf + 0.015, -14.38,
+                z0 + 1.98), cmat)
+            box(f"{pre}wframea1", (0.034, 0.12, 0.14), (xwf + 0.015, -14.18,
+                z0 + 1.88), draw_blue)
+            box(f"{pre}wposter", (0.02, 0.50, 0.60), (xwf + 0.01, -14.30,
+                z0 + 1.05), sticky_ye)
+            _psphere(f"{pre}wposterpin", 0.022, (xwf + 0.03, -14.30, z0 + 1.33),
+                     pin_red)
+            # --- east wall: sketchbook shelf; pinned sketches on the front ---
+            ey1s = -15.2
+            eyc, Le, ecx = (ey0 + ey1s) / 2, ey1s - ey0, xef - 0.20
+            for e, ey in enumerate((ey0 + 0.03, ey1s - 0.03)):
+                box(f"{pre}eshup{e}", (0.38, 0.06, 2.35), (ecx, ey, z0 + 1.175),
+                    P["wood"])
+            for s, sz in enumerate((0.40, 1.00, 1.55, 2.05, 2.325)):
+                box(f"{pre}eshb{s}", (0.36, Le, 0.05), (ecx, eyc, z0 + sz),
+                    P["wood"])
+            for k, oy in enumerate((-0.55, 0.55)):
+                box(f"{pre}eshbox{k}", (0.30, 0.60, 0.32),
+                    (ecx, eyc + oy, z0 + 0.585), cardb)
+            for k in range(6):
+                box(f"{pre}eskbook{k}", (0.30, 0.24, 0.05),
+                    (ecx, eyc - 0.55 + (k // 3) * 1.10, z0 + 1.05 + (k % 3)
+                     * 0.052), P["paper"])
+            for k in range(6):
+                box(f"{pre}eshbook{k}", (0.24, 0.09, 0.38),
+                    (ecx, ey0 + 0.40 + k * 0.26, z0 + 1.775),
+                    bookmats[(k + 5) % len(bookmats)])
+            for k, oy in enumerate((-0.55, 0.10, 0.65)):
+                box(f"{pre}epaint{k}", (0.28, 0.36, 0.22),
+                    (ecx, eyc + oy, z0 + 2.165),
+                    (cmat, P["paper"], draw_blue)[k])
+            for k in range(2):
+                box(f"{pre}esk{k}", (0.02, 0.32, 0.40),
+                    (xef - 0.01, -14.55 + k * 0.50, z0 + 1.75), P["paper"])
+                _psphere(f"{pre}eskpin{k}", 0.018,
+                         (xef - 0.03, -14.55 + k * 0.50, z0 + 1.93), pin_blue)
+            # --- floor: plant, pencils, canvas crate, bin ---
+            _pcone(f"{pre}pot", 0.10, 0.13, 0.26, (x1 - 0.60, -14.30,
+                   z0 + 0.13), terra)
+            cyl(f"{pre}potsoil", 0.11, 0.03, (x1 - 0.60, -14.30, z0 + 0.25),
+                soil)
+            for k in range(5):
+                lf = _pcone(f"{pre}leaf{k}", 0.05, 0.008, 0.38,
+                            (x1 - 0.60 + (k - 2) * 0.04, -14.30, z0 + 0.48),
+                            leaf if k % 2 else leaf2)
+                lf.rotation_euler = (0.28 * (k - 2), 0.15 * (k % 2 - 0.5), 0)
+            for k, pm in enumerate((pin_red, pin_green, draw_blue)):
+                cyl(f"{pre}floorpen{k}", 0.012, 0.21, (xc + 1.10 + k * 0.15,
+                    -14.30 + k * 0.10, z0 + 0.015), pm,
+                    rot=(math.radians(90), 0, math.radians(60 + k * 25)))
+            box(f"{pre}crate0", (0.55, 0.45, 0.35), (x0 + 0.85, -17.00,
+                z0 + 0.175), P["wood"])
+            for k in range(3):
+                cv = box(f"{pre}canvas{k}", (0.06, 0.40, 0.55),
+                         (x0 + 0.75 + k * 0.10, -17.00, z0 + 0.50), P["paper"])
+                cv.rotation_euler = (0, 0, 0.06 * (k - 1))
+            cyl(f"{pre}bin", 0.16, 0.42, (xc + 1.45, -15.10, z0 + 0.21),
+                cmat)
+            cyl(f"{pre}binrim", 0.17, 0.04, (xc + 1.45, -15.10, z0 + 0.42),
+                P["dark_steel"])
+            _psphere(f"{pre}binpaper", 0.055, (xc + 1.45, -15.10, z0 + 0.44),
+                     P["paper"])
+        elif cid == "glimmer":
+            # --- desk: notebook, lavender, crystal, pen, books, orb, candle ---
+            box(f"{pre}notebookl", (0.20, 0.28, 0.018), (xc - 0.11, yd + 0.08,
+                dt + 0.009), P["paper"])
+            box(f"{pre}notebookr", (0.20, 0.28, 0.018), (xc + 0.11, yd + 0.08,
+                dt + 0.009), P["paper"])
+            for k in range(2):
+                box(f"{pre}noteline{k}", (0.15, 0.010, 0.005),
+                    (xc - 0.11, yd + 0.13 - k * 0.07, dt + 0.020), P["black"])
+                box(f"{pre}noteliner{k}", (0.15, 0.010, 0.005),
+                    (xc + 0.11, yd + 0.13 - k * 0.07, dt + 0.020), P["black"])
+            _pcone(f"{pre}lavpot", 0.045, 0.062, 0.11, (xc - 0.62, yd - 0.05,
+                   dt + 0.055), terra)
+            for k, ox in enumerate((-0.025, 0.025, 0.0)):
+                stem = cyl(f"{pre}lavstem{k}", 0.007, 0.20,
+                           (xc - 0.62 + ox, yd - 0.05, dt + 0.21), leaf)
+                stem.rotation_euler = (0.20 * (k - 1), 0.12 * (k - 1), 0)
+                _pcone(f"{pre}lavhead{k}", 0.030, 0.008, 0.11,
+                       (xc - 0.62 + ox + 0.02 * (k - 1), yd - 0.05, dt + 0.35),
+                       lav)
+            cyl(f"{pre}crybase", 0.06, 0.025, (xc + 0.58, yd - 0.08, dt + 0.012),
+                P["dark_steel"])
+            _pcone(f"{pre}crydesk", 0.055, 0.010, 0.17, (xc + 0.58, yd - 0.08,
+                   dt + 0.11), orb_mat)
+            cyl(f"{pre}notepen", 0.008, 0.17, (xc + 0.30, yd + 0.10, dt + 0.009),
+                lav, rot=(math.radians(90), 0, math.radians(25)))
+            box(f"{pre}book0", (0.30, 0.22, 0.045), (xc + 0.30, yd - 0.15,
+                dt + 0.022), cmat)
+            box(f"{pre}book1", (0.27, 0.20, 0.04), (xc + 0.30, yd - 0.15,
+                dt + 0.065), P["paper"])
+            box(f"{pre}notestack", (0.26, 0.20, 0.05), (xc - 0.20, yd - 0.15,
+                dt + 0.025), P["paper"])
+            cyl(f"{pre}orbstand", 0.03, 0.04, (xc - 0.35, yd + 0.22, dt + 0.02),
+                P["dark_steel"])
+            _psphere(f"{pre}orb", 0.045, (xc - 0.35, yd + 0.22, dt + 0.08),
+                     lav)
+            cyl(f"{pre}candle", 0.035, 0.12, (xc + 0.85, yd + 0.15, dt + 0.06),
+                P["paper"])
+            _psphere(f"{pre}candleflame", 0.02, (xc + 0.85, yd + 0.15,
+                     dt + 0.135), lamp_warm)
+            # --- back wall: three crystal shelves, notes row below ---
+            for s, shz in enumerate((1.30, 1.85, 2.40)):
+                box(f"{pre}cryshelf{s}", (3.2, 0.32, 0.06), (xc, -17.50,
+                    z0 + shz), P["wood"])
+                for a, ox in enumerate((-1.20, 1.20)):
+                    box(f"{pre}crybr{s}{a}", (0.06, 0.26, 0.10),
+                        (xc + ox, -17.50, z0 + shz - 0.08), P["dark_steel"])
+                for k, (cr, ch) in enumerate(((0.045, 0.16), (0.060, 0.24),
+                                             (0.050, 0.20), (0.070, 0.28))):
+                    _pcone(f"{pre}cry{s}{k}", cr, 0.010, ch,
+                           (xc - 1.20 + k * 0.80, -17.50,
+                            z0 + shz + 0.03 + ch / 2), orb_mat)
+            for k, ox in enumerate((-1.20, 0.0, 1.20)):
+                box(f"{pre}wallnote{k}", (0.30, 0.02, 0.38), (xc + ox, -17.60,
+                    z0 + 0.75), P["paper"])
+                box(f"{pre}walldot{k}", (0.12, 0.024, 0.12), (xc + ox, -17.60,
+                    z0 + 0.71), lav)
+                _psphere(f"{pre}wallpin{k}", 0.022, (xc + ox, -17.58,
+                         z0 + 0.92), pin_blue)
+            # --- west wall: book shelf, glow jars, moon picture, poster ---
+            wyc, Lw, scx = (wy0 + wy1) / 2, wy1 - wy0, xwf + 0.20
+            for e, ey in enumerate((wy0 + 0.03, wy1 - 0.03)):
+                box(f"{pre}wshup{e}", (0.38, 0.06, 2.35), (scx, ey, z0 + 1.175),
+                    P["wood"])
+            for s, sz in enumerate((0.40, 1.00, 1.55, 2.05, 2.325)):
+                box(f"{pre}wshb{s}", (0.36, Lw, 0.05), (scx, wyc, z0 + sz),
+                    P["wood"])
+            for k, oy in enumerate((-0.70, 0.70)):
+                box(f"{pre}wshbox{k}", (0.30, 0.55, 0.32),
+                    (scx, wyc + oy, z0 + 0.585), cardb)
+            box(f"{pre}wshbox2", (0.30, 0.45, 0.28), (scx, wyc + 0.05,
+                z0 + 0.565), P["wood_pale"])
+            for k in range(8):
+                box(f"{pre}wshbook{k}", (0.24, 0.09, 0.38),
+                    (scx, wy0 + 0.45 + k * 0.20, z0 + 1.215),
+                    bookmats[(k + 5) % len(bookmats)])
+            for k, pm in enumerate((lav, orb_mat, led_blue, hi_yellow)):
+                cyl(f"{pre}wglow{k}", 0.07, 0.22,
+                    (scx, wyc - 0.75 + k * 0.50, z0 + 1.685), P["glass"])
+                cyl(f"{pre}wglowfill{k}", 0.055, 0.08,
+                    (scx, wyc - 0.75 + k * 0.50, z0 + 1.615), pm)
+            for k in range(2):
+                box(f"{pre}wshflat{k}", (0.26, 0.36, 0.055),
+                    (scx, wyc - 0.45, z0 + 2.105 + k * 0.058),
+                    bookmats[k % len(bookmats)])
+            box(f"{pre}wshfile0", (0.30, 0.45, 0.24), (scx, wyc + 0.55,
+                z0 + 2.195), lav)
+            box(f"{pre}wmoon", (0.03, 0.55, 0.70), (xwf + 0.015, -14.30,
+                z0 + 1.95), framewood)
+            box(f"{pre}wmoonbg", (0.032, 0.47, 0.62), (xwf + 0.015, -14.30,
+                z0 + 1.95), P["black"])
+            cyl(f"{pre}wmoonm", 0.12, 0.034, (xwf + 0.015, -14.30, z0 + 2.00),
+                P["paper"], rot=(0, math.radians(90), 0))
+            for k, (oy, oz) in enumerate(((-0.15, 0.12), (0.12, -0.05),
+                                         (0.05, 0.20))):
+                _psphere(f"{pre}wmoonstar{k}", 0.015, (xwf + 0.03, -14.30 + oy,
+                         z0 + 1.95 + oz), P["paper"])
+            box(f"{pre}wposter", (0.02, 0.50, 0.60), (xwf + 0.01, -14.30,
+                z0 + 1.05), lav)
+            _psphere(f"{pre}wposterpin", 0.022, (xwf + 0.03, -14.30, z0 + 1.33),
+                     pin_blue)
+            # --- east wall: crystal shelf, books, dreamcatcher, note ---
+            ey1s = -15.2
+            eyc, Le, ecx = (ey0 + ey1s) / 2, ey1s - ey0, xef - 0.20
+            for e, ey in enumerate((ey0 + 0.03, ey1s - 0.03)):
+                box(f"{pre}eshup{e}", (0.38, 0.06, 2.35), (ecx, ey, z0 + 1.175),
+                    P["wood"])
+            for s, sz in enumerate((0.40, 1.00, 1.55, 2.05, 2.325)):
+                box(f"{pre}eshb{s}", (0.36, Le, 0.05), (ecx, eyc, z0 + sz),
+                    P["wood"])
+            for k, oy in enumerate((-0.55, 0.55)):
+                box(f"{pre}eshbox{k}", (0.30, 0.60, 0.32),
+                    (ecx, eyc + oy, z0 + 0.585), cardb)
+            for k, (cr, ch) in enumerate(((0.040, 0.12), (0.055, 0.20),
+                                         (0.045, 0.15), (0.060, 0.22),
+                                         (0.042, 0.13), (0.052, 0.18))):
+                _pcone(f"{pre}ecry{k}", cr, 0.008, ch,
+                       (ecx, ey0 + 0.35 + k * 0.30, z0 + 1.025 + ch / 2),
+                       orb_mat)
+            for k in range(6):
+                box(f"{pre}eshbook{k}", (0.24, 0.09, 0.38),
+                    (ecx, ey0 + 0.40 + k * 0.26, z0 + 1.775),
+                    bookmats[k % len(bookmats)])
+            for k, oy in enumerate((-0.55, 0.55)):
+                cyl(f"{pre}eshjar{k}", 0.07, 0.22, (ecx, eyc + oy, z0 + 2.185),
+                    P["glass"])
+            box(f"{pre}eshfile0", (0.28, 0.40, 0.22), (ecx, eyc + 0.05,
+                z0 + 2.185), P["paper"])
+            cyl(f"{pre}dreamhoop", 0.13, 0.025, (xef - 0.06, -14.30, z0 + 2.05),
+                P["wood"], rot=(0, math.radians(90), 0))
+            _psphere(f"{pre}dreambead", 0.025, (xef - 0.06, -14.30, z0 + 2.05),
+                     lav)
+            for k, oy in enumerate((-0.08, 0.0, 0.08)):
+                cyl(f"{pre}dreamstr{k}", 0.006, 0.30, (xef - 0.06, -14.30 + oy,
+                    z0 + 1.75), P["paper"])
+                _psphere(f"{pre}dreamdrop{k}", 0.02, (xef - 0.06, -14.30 + oy,
+                         z0 + 1.58), (lav, pink, hi_yellow)[k])
+            box(f"{pre}enote", (0.02, 0.30, 0.38), (xef - 0.01, -14.30,
+                z0 + 1.10), P["paper"])
+            _psphere(f"{pre}enotepin", 0.018, (xef - 0.03, -14.30, z0 + 1.27),
+                     pin_green)
+            # --- floor: lavender, chest, scattered notes, bin, violet light ---
+            _pcone(f"{pre}pot", 0.13, 0.16, 0.30, (x0 + 0.70, -16.95,
+                   z0 + 0.15), terra)
+            cyl(f"{pre}potsoil", 0.14, 0.03, (x0 + 0.70, -16.95, z0 + 0.29),
+                soil)
+            for k in range(5):
+                stem = cyl(f"{pre}stem{k}", 0.008, 0.45,
+                           (x0 + 0.70 + (k - 2) * 0.05, -16.95, z0 + 0.52),
+                           leaf)
+                stem.rotation_euler = (0.15 * (k - 2), 0, 0)
+                _pcone(f"{pre}flavhead{k}", 0.035, 0.008, 0.13,
+                       (x0 + 0.70 + (k - 2) * 0.08, -16.95, z0 + 0.80), lav)
+            box(f"{pre}chest", (0.70, 0.45, 0.40), (x1 - 0.85, -16.95,
+                z0 + 0.20), P["wood"])
+            box(f"{pre}chestlid", (0.70, 0.45, 0.12), (x1 - 0.85, -16.95,
+                z0 + 0.46), P["wood_pale"])
+            for a, ox in enumerate((-0.22, 0.22)):
+                box(f"{pre}chestband{a}", (0.08, 0.47, 0.54),
+                    (x1 - 0.85 + ox, -16.95, z0 + 0.26), brass)
+            box(f"{pre}chestlock", (0.08, 0.03, 0.10), (x1 - 0.85, -16.72,
+                z0 + 0.38), brass)
+            for k, (fx, fy, yaw) in enumerate(((xc - 0.30, -14.30, 0.15),
+                                              (xc + 0.45, -14.15, -0.20),
+                                              (xc + 0.85, -14.50, 0.30),
+                                              (xc - 0.05, -14.55, -0.10))):
+                box(f"{pre}floornote{k}", (0.20, 0.28, 0.005), (fx, fy,
+                    z0 + 0.003), P["paper"], rot_z=yaw)
+            cyl(f"{pre}bin", 0.16, 0.42, (xc + 1.45, -14.90, z0 + 0.21),
+                P["dark_steel"])
+            cyl(f"{pre}binrim", 0.17, 0.04, (xc + 1.45, -14.90, z0 + 0.42),
+                P["steel"])
+            _psphere(f"{pre}binpaper", 0.055, (xc + 1.45, -14.90, z0 + 0.44),
+                     P["paper"])
+            bpy.ops.object.light_add(type="POINT",
+                                     location=(xc, -15.6, z0 + 1.8))
+            vl = bpy.context.object
+            vl.name = f"{pre}violet"
+            vl.data.energy, vl.data.color = 25, (0.62, 0.55, 1.0)
+            vl.data.use_shadow = False
+        elif cid == "rover":
+            # --- desk: rugged laptop, globe, pen jar, checklist, mug, compass ---
+            lx = xc - 0.55
+            box(f"{pre}lapbase", (0.48, 0.35, 0.035), (lx, yd + 0.02,
+                dt + 0.018), P["black"])
+            box(f"{pre}lapkeys", (0.40, 0.26, 0.01), (lx, yd + 0.02,
+                dt + 0.04), P["dark_steel"])
+            box(f"{pre}laplid", (0.48, 0.035, 0.32), (lx, yd - 0.165,
+                dt + 0.185), P["black"])
+            box(f"{pre}lapscreen", (0.42, 0.012, 0.26), (lx, yd - 0.145,
+                dt + 0.185), P["monitor"])
+            for k in range(2):
+                box(f"{pre}lapline{k}", (0.32, 0.014, 0.018), (lx, yd - 0.137,
+                    dt + 0.22 - k * 0.07), P["paper"])
+            for a, ox in enumerate((-0.195, 0.195)):
+                for b, oz in enumerate((dt + 0.06, dt + 0.31)):
+                    box(f"{pre}lapcorner{a}{b}", (0.08, 0.014, 0.08),
+                        (lx + ox, yd - 0.143, oz), hi_yellow)
+                box(f"{pre}lapbump{a}", (0.08, 0.06, 0.04),
+                    (lx + ox, yd + 0.16, dt + 0.02), hi_yellow)
+            gx = xc + 0.52
+            cyl(f"{pre}globase", 0.075, 0.025, (gx, yd + 0.05, dt + 0.012),
+                P["wood"])
+            cyl(f"{pre}glopost", 0.015, 0.07, (gx, yd + 0.05, dt + 0.06),
+                P["wood"])
+            _psphere(f"{pre}globe", 0.095, (gx, yd + 0.05, dt + 0.18),
+                     draw_blue)
+            box(f"{pre}gloland", (0.06, 0.025, 0.05), (gx, yd + 0.13,
+                dt + 0.18), leaf)
+            jarx = xc + 0.80
+            cyl(f"{pre}penjar", 0.055, 0.125, (jarx, yd - 0.08, dt + 0.062),
+                P["dark_steel"])
+            for k, (ox, pm) in enumerate(((-0.02, hi_yellow), (0.02, pin_red),
+                                         (0.0, pin_blue))):
+                cyl(f"{pre}ppen{k}", 0.007, 0.18, (jarx + ox, yd - 0.08,
+                    dt + 0.13), pm)
+            check = box(f"{pre}check", (0.30, 0.40, 0.01), (xc + 0.02,
+                        yd + 0.08, dt + 0.005), P["paper"])
+            check.rotation_euler = (0, 0, 0.08)
+            for k in range(3):
+                box(f"{pre}checkline{k}", (0.20, 0.015, 0.005), (xc + 0.02,
+                    yd + 0.16 - k * 0.08, dt + 0.011), P["black"])
+            cyl(f"{pre}mug", 0.05, 0.12, (xc - 0.15, yd + 0.15, dt + 0.06),
+                cmat)
+            box(f"{pre}mugh", (0.02, 0.02, 0.07), (xc - 0.09, yd + 0.15,
+                dt + 0.06), cmat)
+            for sgn2 in (-1, 1):
+                cyl(f"{pre}earcup{sgn2}", 0.06, 0.05,
+                    (xc + 0.30 + sgn2 * 0.085, yd - 0.15, dt + 0.025),
+                    P["black"])
+            box(f"{pre}earband", (0.23, 0.05, 0.025), (xc + 0.30, yd - 0.15,
+                dt + 0.06), P["black"])
+            cyl(f"{pre}compass", 0.05, 0.02, (xc - 0.30, yd - 0.15, dt + 0.01),
+                brass)
+            box(f"{pre}needle", (0.07, 0.012, 0.005), (xc - 0.30, yd - 0.15,
+                dt + 0.022), pin_red)
+            for k, pm in enumerate((P["paper"], cork, P["paper"])):
+                box(f"{pre}mapfold{k}", (0.32, 0.24, 0.012),
+                    (xc - 0.85, yd + 0.05, dt + 0.006 + k * 0.012), pm)
+            # --- back wall: postcard string, thermos shelf below ---
+            cyl(f"{pre}string", 0.008, 5.2, (xc, -17.58, z0 + 2.40), cork,
+                rot=(0, math.radians(90), 0))
+            for k, cap in enumerate(("AMS", "NRT", "SEA", "BER", "GRU")):
+                px = xc - 2.0 + k * 1.0
+                box(f"{pre}card{k}", (0.58, 0.03, 0.48), (px, -17.58,
+                    z0 + 2.05), P["dark_steel"])
+                box(f"{pre}cardclip{k}", (0.05, 0.035, 0.12), (px, -17.58,
+                    z0 + 2.32), P["wood"])
+                box(f"{pre}cardphoto{k}", (0.50, 0.015, 0.32), (px, -17.565,
+                    z0 + 2.10), P["paper"])
+                box(f"{pre}cardsky{k}", (0.50, 0.018, 0.12), (px, -17.56,
+                    z0 + 2.18), draw_blue)
+                box(f"{pre}cardbldg{k}", (0.28, 0.018, 0.18), (px - 0.06,
+                    -17.56, z0 + 2.06), P["steel"])
+                box(f"{pre}cardcap{k}", (0.50, 0.018, 0.10), (px, -17.56,
+                    z0 + 1.88), P["black"])
+                text(f"{pre}cardcapt{k}", cap, (px, -17.55, z0 + 1.88), 0.09,
+                     P["paper"], rot=(math.radians(90), 0, math.radians(180)))
+            box(f"{pre}thshelf", (0.90, 0.28, 0.05), (x0 + 1.0, -17.55,
+                z0 + 1.10), P["wood_pale"])
+            for a, ox in enumerate((-0.35, 0.35)):
+                box(f"{pre}thshelfb{a}", (0.05, 0.22, 0.10), (x0 + 1.0 + ox,
+                    -17.55, z0 + 1.02), P["dark_steel"])
+            cyl(f"{pre}thermos", 0.06, 0.32, (x0 + 0.82, -17.55, z0 + 1.285),
+                P["chrome"])
+            cyl(f"{pre}thermcap", 0.038, 0.06, (x0 + 0.82, -17.55, z0 + 1.47),
+                P["black"])
+            box(f"{pre}thshelfbox", (0.20, 0.22, 0.15), (x0 + 1.22, -17.55,
+                z0 + 1.20), cardb)
+            # --- west wall: gear shelf; field notes and mountain poster ---
+            wyc, Lw, scx = (wy0 + wy1) / 2, wy1 - wy0, xwf + 0.20
+            for e, ey in enumerate((wy0 + 0.03, wy1 - 0.03)):
+                box(f"{pre}wshup{e}", (0.38, 0.06, 2.35), (scx, ey, z0 + 1.175),
+                    P["dark_steel"])
+            for s, sz in enumerate((0.40, 1.00, 1.55, 2.05, 2.325)):
+                box(f"{pre}wshb{s}", (0.36, Lw, 0.05), (scx, wyc, z0 + sz),
+                    P["wood"])
+            for k, oy in enumerate((-0.70, 0.70)):
+                box(f"{pre}wshbox{k}", (0.30, 0.55, 0.32),
+                    (scx, wyc + oy, z0 + 0.585), cardb)
+            box(f"{pre}wshbox2", (0.30, 0.45, 0.28), (scx, wyc + 0.05,
+                z0 + 0.565), P["wood_pale"])
+            for k in range(3):
+                cyl(f"{pre}wrope{k}", 0.11, 0.06,
+                    (scx, wyc - 0.70 + k * 0.60, z0 + 1.055), cork)
+            for k, oy in enumerate((0.55, 0.85)):
+                box(f"{pre}wshbook{k}", (0.24, 0.12, 0.36),
+                    (scx, wyc + oy, z0 + 1.205), bookmats[k % len(bookmats)])
+            for k, pm in enumerate((P["chrome"], draw_blue, pin_red)):
+                cyl(f"{pre}wbottle{k}", 0.05, 0.20,
+                    (scx, wyc - 0.60 + k * 0.45, z0 + 1.675), pm)
+            box(f"{pre}wshfileS", (0.28, 0.40, 0.22), (scx, wyc + 0.70,
+                z0 + 1.685), P["paper"])
+            for k, oy in enumerate((-0.55, 0.15, 0.75)):
+                box(f"{pre}wshfile{k}", (0.30, 0.40, 0.24),
+                    (scx, wyc + oy, z0 + 2.195), P["wood_pale"])
+            for k in range(2):
+                box(f"{pre}wnote{k}", (0.02, 0.30, 0.38),
+                    (xwf + 0.01, -14.60 + k * 0.50, z0 + 1.70), P["paper"])
+                _psphere(f"{pre}wnotepin{k}", 0.018,
+                         (xwf + 0.03, -14.60 + k * 0.50, z0 + 1.87), pin_green)
+            box(f"{pre}wmount0", (0.024, 0.36, 0.18), (xwf + 0.012, -14.35,
+                z0 + 1.15), draw_blue)
+            box(f"{pre}wmount1", (0.024, 0.24, 0.14), (xwf + 0.012, -14.35,
+                z0 + 1.30), draw_blue)
+            box(f"{pre}wmountcap", (0.024, 0.12, 0.08), (xwf + 0.012, -14.35,
+                z0 + 1.41), P["paper"])
+            # --- east wall: case shelf; notes and small framed map ---
+            ey1s = -15.2
+            eyc, Le, ecx = (ey0 + ey1s) / 2, ey1s - ey0, xef - 0.20
+            for e, ey in enumerate((ey0 + 0.03, ey1s - 0.03)):
+                box(f"{pre}eshup{e}", (0.38, 0.06, 2.35), (ecx, ey, z0 + 1.175),
+                    P["dark_steel"])
+            for s, sz in enumerate((0.40, 1.00, 1.55, 2.05, 2.325)):
+                box(f"{pre}eshb{s}", (0.36, Le, 0.05), (ecx, eyc, z0 + sz),
+                    P["wood"])
+            box(f"{pre}ecase", (0.40, 0.50, 0.30), (ecx, eyc - 0.55,
+                z0 + 0.575), P["dark_steel"])
+            box(f"{pre}ecasestick", (0.012, 0.20, 0.12), (ecx - 0.206,
+                eyc - 0.55, z0 + 0.60), hi_yellow)
+            box(f"{pre}eshbox0", (0.30, 0.55, 0.32), (ecx, eyc + 0.55,
+                z0 + 0.585), cardb)
+            for k, pm in enumerate((P["chrome"], pin_red, draw_blue)):
+                cyl(f"{pre}ebottle{k}", 0.05, 0.20,
+                    (ecx, eyc - 0.60 + k * 0.45, z0 + 1.125), pm)
+            box(f"{pre}eshfileS", (0.28, 0.38, 0.22), (ecx, eyc + 0.65,
+                z0 + 1.135), P["paper"])
+            for k in range(4):
+                box(f"{pre}eshbook{k}", (0.24, 0.09, 0.38),
+                    (ecx, ey0 + 0.45 + k * 0.30, z0 + 1.775),
+                    bookmats[(k + 2) % len(bookmats)])
+            cyl(f"{pre}ecoil", 0.11, 0.06, (ecx, eyc + 0.75, z0 + 1.605),
+                P["black"])
+            for k, oy in enumerate((-0.55, 0.55)):
+                box(f"{pre}eshfile{k}", (0.30, 0.55, 0.24),
+                    (ecx, eyc + oy, z0 + 2.195), cardb)
+            for k in range(2):
+                box(f"{pre}enote{k}", (0.02, 0.30, 0.38),
+                    (xef - 0.01, -14.60 + k * 0.50, z0 + 1.70), P["paper"])
+                _psphere(f"{pre}enotepin{k}", 0.018,
+                         (xef - 0.03, -14.60 + k * 0.50, z0 + 1.87), pin_red)
+            box(f"{pre}emapframe", (0.03, 0.44, 0.54), (xef - 0.015, -14.35,
+                z0 + 1.10), framewood)
+            box(f"{pre}emapp", (0.032, 0.38, 0.48), (xef - 0.015, -14.35,
+                z0 + 1.10), P["paper"])
+            box(f"{pre}emapriver", (0.034, 0.30, 0.04), (xef - 0.015, -14.35,
+                z0 + 1.08), draw_blue)
+            # --- floor: stacked cases, radio case, cables, plant, bin ---
+            cxr, cyr = x1 - 0.95, -16.95
+            for k, (w, d, h) in enumerate(((0.85, 0.60, 0.42),
+                                          (0.80, 0.55, 0.40),
+                                          (0.75, 0.52, 0.38))):
+                cz = z0 + (0.21 if k == 0 else 0.62 if k == 1 else 1.01)
+                box(f"{pre}case{k}", (w, d, h), (cxr, cyr, cz),
+                    P["dark_steel"], bevel=0.01)
+                for a, ox in enumerate((-0.25, 0.25)):
+                    box(f"{pre}caselatch{k}{a}", (0.07, 0.02, 0.10),
+                        (cxr + ox, cyr + d / 2 + 0.005, cz), P["black"])
+                for a, (ox, pm) in enumerate(((-0.12, P["paper"]),
+                                             (0.15, hi_yellow if k % 2 == 0
+                                              else draw_blue))):
+                    box(f"{pre}casestick{k}{a}", (0.15, 0.015, 0.10),
+                        (cxr + ox, cyr + d / 2 + 0.005, cz + 0.06), pm)
+            box(f"{pre}casehandle", (0.25, 0.05, 0.05), (cxr, cyr, z0 + 1.225),
+                P["black"])
+            scx, scy = x1 - 1.00, -14.35
+            box(f"{pre}smallcase", (0.60, 0.44, 0.36), (scx, scy, z0 + 0.18),
+                P["dark_steel"], bevel=0.01)
+            box(f"{pre}scstick0", (0.15, 0.015, 0.10), (scx - 0.12, scy + 0.225,
+                z0 + 0.20), P["paper"])
+            box(f"{pre}scstick1", (0.12, 0.15, 0.015), (scx + 0.14, scy,
+                z0 + 0.365), hi_yellow)
+            box(f"{pre}radio", (0.40, 0.17, 0.22), (scx, scy, z0 + 0.47),
+                P["black"], bevel=0.01)
+            box(f"{pre}radiogrille", (0.24, 0.012, 0.14), (scx - 0.05,
+                scy + 0.087, z0 + 0.47), P["dark_steel"])
+            for k in range(2):
+                cyl(f"{pre}radioknob{k}", 0.018, 0.025, (scx + 0.12 + k * 0.06,
+                    scy + 0.09, z0 + 0.42), P["chrome"],
+                    rot=(math.radians(90), 0, 0))
+            cyl(f"{pre}radioant", 0.01, 0.36, (scx + 0.15, scy - 0.06,
+                z0 + 0.75), P["black"])
+            for k in range(3):
+                cyl(f"{pre}coil{k}", 0.20, 0.03, (xc + 1.0, -16.80,
+                    z0 + 0.015 + k * 0.03), P["black"])
+            cyl(f"{pre}coiltail", 0.018, 1.4, (xc + 1.0, -16.00, z0 + 0.018),
+                P["black"], rot=(math.radians(90), 0, 0))
+            _pcone(f"{pre}pot", 0.10, 0.13, 0.26, (x0 + 1.70, -14.15,
+                   z0 + 0.13), terra)
+            cyl(f"{pre}potsoil", 0.11, 0.03, (x0 + 1.70, -14.15, z0 + 0.25),
+                soil)
+            for k in range(5):
+                lf = _pcone(f"{pre}leaf{k}", 0.05, 0.008, 0.38,
+                            (x0 + 1.70 + (k - 2) * 0.04, -14.15, z0 + 0.48),
+                            leaf if k % 2 else leaf2)
+                lf.rotation_euler = (0.28 * (k - 2), 0.15 * (k % 2 - 0.5), 0)
+            cyl(f"{pre}bin", 0.16, 0.42, (xc + 1.45, -14.20, z0 + 0.21),
+                P["dark_steel"])
+            cyl(f"{pre}binrim", 0.17, 0.04, (xc + 1.45, -14.20, z0 + 0.42),
+                P["steel"])
+            _psphere(f"{pre}binpaper", 0.055, (xc + 1.45, -14.20, z0 + 0.44),
+                     P["paper"])
         bpy.ops.object.light_add(type="POINT", location=(xc, -15.6, z0 + 2.2))
         rl = bpy.context.object
         rl.name = f"{pre}light"
@@ -2359,7 +4409,7 @@ def p_rooms(P):
         rooms[cid] = {
             "floor": floor,
             "seat": [x0 + 3.0, -15.5],
-            "seat_z": round(z0 + 0.5, 2),
+            "seat_z": round(z0 + 0.625, 2),
             "face": 0.0,  # yaw degrees; 0 faces +y (the yard), like the page heading
             "door": [x0 + 1.0, -13.5],
             "front": [x0 + 1.0, -12.5 if floor == 0 else -12.6],
