@@ -43,10 +43,16 @@ def bounds(objs_meshes):
 
 
 # normalise heights and line them up (bounds of the posed, deformed mesh)
+# LEGO_ROWS=2 puts the first half in a back row, staggered so nobody hides behind a front figure
 H = 1.0
 gap = 0.8 * H
-x0 = -gap * (len(cast) - 1) / 2
+ROWS = int(__import__("os").environ.get("LEGO_ROWS", "1"))
+per = math.ceil(len(cast) / ROWS)
 for i, (n, rig, mesh, acts) in enumerate(cast):
+    r, c = divmod(i, per)
+    count = min(per, len(cast) - r * per)
+    x = (c - (count - 1) / 2) * gap + (gap / 2 if ROWS > 1 and r % 2 == 0 else 0)
+    y = (ROWS - 1 - r) * 0.9 * H
     holder = bpy.data.objects[f"{n}_holder"]
     bpy.context.view_layer.update()
     lo, hi = bounds([mesh])
@@ -54,7 +60,7 @@ for i, (n, rig, mesh, acts) in enumerate(cast):
     holder.scale = (s, s, s)
     bpy.context.view_layer.update()
     lo, hi = bounds([mesh])
-    holder.location = (x0 + i * gap - (lo[0] + hi[0]) / 2, -(lo[1] + hi[1]) / 2, -lo[2])
+    holder.location = (x - (lo[0] + hi[0]) / 2, y - (lo[1] + hi[1]) / 2, -lo[2])
 
 # the cast shot doesn't need 300k faces per figure; fewer verts = much faster posing per frame
 DEC = float(__import__("os").environ.get("LEGO_DECIMATE", "0.25"))
@@ -132,6 +138,7 @@ bpy.context.view_layer.update()
 lo, hi = bounds([m for _, _, m, _ in cast])
 target = Vector(((lo[0] + hi[0]) / 2, (lo[1] + hi[1]) / 2, lo[2] + 0.62 * (hi[2] - lo[2])))
 width, height = hi[0] - lo[0], hi[2] - lo[2]
+height += 0.4 * (hi[1] - lo[1])  # the looking-down camera sees row depth as extra height
 cd = bpy.data.cameras.new("cam"); cd.lens = 50; cd.sensor_fit = "HORIZONTAL"
 cam = bpy.data.objects.new("cam", cd); sc.collection.objects.link(cam)
 half = math.atan(cd.sensor_width / (2 * cd.lens))  # horizontal half field of view
