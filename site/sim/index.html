@@ -531,10 +531,10 @@ const PEOPLE = [
   // zone (the side facing the deciding camera), the middle left open for the
   // forklift's approach and the camera's view of the pallet, Kapı at the barrier.
   { id: "spark",   name: "Spark",   job: "reads the note",              b: [-4.7, 0.9], h: 2.40 },
-  { id: "sam",     name: "Sam",     job: "counts the cartons",          b: [1.1, 1.9],  h: 2.40 },
+  { id: "sam",     name: "Sam",     job: "counts the cartons",          b: [1.4, 1.2],  h: 2.40 },
   { id: "voice",   name: "Voice",   job: "hears the receiver",          b: [-4.6, 2.1], h: 2.40 },
   { id: "kapi",    name: "Kapı",    job: "the gate",                    b: [4.4, 2.0],   h: 2.62 },
-  { id: "sef",     name: "Şef",     job: "signs off",                   b: [-1.3, -0.4], h: 2.62 },
+  { id: "sef",     name: "Şef",     job: "signs off",                   b: [-1.6, -0.9], h: 2.62 },
   { id: "wonder",  name: "Wonder",  job: "checks and writes the paperwork", b: [-5.9, 0.4], h: 2.40 },
   { id: "rover",   name: "Rover",   job: "reads the note again",        b: [-0.6, -0.6], h: 2.40 },
   { id: "glimmer", name: "Glimmer", job: "the other open-weight reader", b: [1.0, 0.5],  h: 2.40 },
@@ -1311,7 +1311,8 @@ function dispatchWalkers() {
   const rec = CHAR[solo];
   const hx = rec ? rec.hx : px, hy = rec ? rec.hy : py;
   const west = palletSpot(px, py, -1, fx, fy), east = palletSpot(px, py, 1, fx, fy);
-  const chosen = Math.hypot(west.x - hx, west.y - hy) <= Math.hypot(east.x - hx, east.y - hy) ? west : east;
+  // The deciding camera looks from the left: the east side keeps the pallet in view.
+  const chosen = east;
   startWalkTo(solo, chosen.x, chosen.y, px, py);
 }
 
@@ -1890,6 +1891,9 @@ function rigWorkHands(rec, p) {
   rec.armL = root.getObjectByName("ArmL") || null;
   rec.armR = root.getObjectByName("ArmR") || null;
   rec.body = root.getObjectByName("Body") || null;
+  // Rest pose of the bones the work loops touch: restored every frame before the
+  // mixer runs, since Idle may not key them and the loops add to them.
+  rec._rest = [rec.armL, rec.armR, rec.body].filter(Boolean).map(bn => [bn, bn.quaternion.clone()]);
   if (rec.armL) rec.armLFwd = detectArmFwd(rec, rec.armL);
   if (rec.armR) rec.armRFwd = detectArmFwd(rec, rec.armR);
   if (rec.armL) rec.armLIn = detectArmIn(rec, rec.armL);
@@ -3010,8 +3014,10 @@ function startDeciding() {
         G._react = { type: "ask", t0: G.time };
         const sr = CHAR.sef;
         if (!G._seatedById.sef && sr && sr.loaded && sr.group) {
+          // Step away from the pallet (never in front of it from the deciding camera).
+          const ax = sr.x - G.pallet.x, ay = sr.y - G.pallet.y, al = Math.hypot(ax, ay) || 1;
           G._sefStep = { t: 0, waved: false, fx: sr.x, fy: sr.y,
-            dx: -Math.sin(sr.group.rotation.y) * 0.5, dy: Math.cos(sr.group.rotation.y) * 0.5 };
+            dx: ax / al * 0.5, dy: ay / al * 0.5 };
         } else {
           wave("kapi");
         }
@@ -3299,6 +3305,7 @@ function tick() {
       }
       const d = camera.position.distanceTo(rec.group.position);
       let mixed = false;
+      if (rec._rest && !rec.seated) for (const [bn, q] of rec._rest) bn.quaternion.copy(q);
       if (rec.mixer && (d < 25 || rec.walking)) {
         if (rec.seated && d > 15) {
           rec._mixAcc = (rec._mixAcc || 0) + dt;
