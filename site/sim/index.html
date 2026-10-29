@@ -527,13 +527,16 @@ import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 // ---------- config ----------
 const CASES = ["ok", "wrong", "eksik", "talimat", "hasarli", "belirsiz"];
 const PEOPLE = [
-  { id: "spark",   name: "Spark",   job: "reads the note",              b: [-4.2, 4.5], h: 2.40 },
-  { id: "sam",     name: "Sam",     job: "counts the cartons",          b: [3.5, 6.8],  h: 2.40 },
+  // Floor homes are the six workstations: a gentle arc south of the receiving
+  // zone (the side facing the deciding camera), the middle left open for the
+  // forklift's approach and the camera's view of the pallet, Kapı at the barrier.
+  { id: "spark",   name: "Spark",   job: "reads the note",              b: [-3.3, 2.7], h: 2.40 },
+  { id: "sam",     name: "Sam",     job: "counts the cartons",          b: [1.1, 1.9],  h: 2.40 },
   { id: "voice",   name: "Voice",   job: "hears the receiver",          b: [-4.6, 2.1], h: 2.40 },
-  { id: "kapi",    name: "Kapı",    job: "the gate",                    b: [4.0, 2.0],   h: 2.62 },
-  { id: "sef",     name: "Şef",     job: "signs off",                   b: [-2.6, 2.4],  h: 2.62 },
-  { id: "wonder",  name: "Wonder",  job: "checks and writes the paperwork", b: [-8.2, 1.6], h: 2.40 },
-  { id: "rover",   name: "Rover",   job: "reads the note again",        b: [9.5, 2.5],   h: 2.40 },
+  { id: "kapi",    name: "Kapı",    job: "the gate",                    b: [4.4, 2.0],   h: 2.62 },
+  { id: "sef",     name: "Şef",     job: "signs off",                   b: [-1.6, 2.0],  h: 2.62 },
+  { id: "wonder",  name: "Wonder",  job: "checks and writes the paperwork", b: [-5.0, 2.2], h: 2.40 },
+  { id: "rover",   name: "Rover",   job: "reads the note again",        b: [2.7, 2.7],   h: 2.40 },
   { id: "glimmer", name: "Glimmer", job: "the other open-weight reader", b: [1.0, 0.5],  h: 2.40 },
   { id: "iris",    name: "Iris",    job: "drew the cast",               b: [-6.6, -0.6], h: 2.40 },
   { id: "ada",     name: "Ada",     job: "wrote the code",              b: [-9.6, -0.9], h: 2.40 },
@@ -965,6 +968,7 @@ function drawScreen(decision) {
 
 function setGateLight(action) {
   // action: null (all dim) or post | block | human.
+  G._gateAction = action || null;   // Kapı's post lamp mirrors this
   const want = { post: "lamp_green_True", block: "lamp_red_False", human: "lamp_amber_False" }[action];
   for (const [name, m] of Object.entries(lampMat)) {
     if (name === want) {
@@ -1288,6 +1292,10 @@ function applyRoster(caseId) {
     if (seated) sitCharacter(p.id, true);
     else standCharacter(p.id, true);
   }
+  // Stations of the seated stay out of the way; the floor stays uncluttered.
+  try {
+    for (const id of STATION_IDS) if (ST[id]) ST[id].group.visible = floor.has(id);
+  } catch {}
 }
 function personById(id) {
   return PEOPLE.find(p => p.id === id);
@@ -1401,6 +1409,296 @@ function detectLegSign(rec) {
     rec.group.updateWorldMatrix(true, true);
     return dPlus >= dMinus ? 1 : -1;
   } catch { return 1; }
+}
+
+// ---------- floor stations ----------
+// A workstation for each character who ever works the floor, built from simple
+// meshes in the scene's toy style. The station is the character's home: they
+// stand on its pad and the deciding walk starts and ends there. A few dozen
+// meshes, no shadows.
+const STATION_JOB = {
+  spark: "reads the note", sam: "counts the cartons", kapi: "the gate decides",
+  wonder: "writes the paperwork", sef: "signs off", rover: "reads it a second time",
+};
+const STATION_IDS = ["spark", "sam", "kapi", "wonder", "sef", "rover"];
+const ST = {};   // id -> { group, padMat, faceM, signTex, signTexLit, lit, lampMats }
+const _stMats = {};
+function stMat(color, rough = 0.75, metal = 0.05) {
+  const k = color + "|" + rough + "|" + metal;
+  if (!_stMats[k]) _stMats[k] = new THREE.MeshStandardMaterial({ color, roughness: rough, metalness: metal });
+  return _stMats[k];
+}
+function stBox(parent, w, h, d, material, x, y, z, rx = 0, ry = 0, rz = 0) {
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), material);
+  m.position.set(x, y, z); m.rotation.set(rx, ry, rz);
+  parent.add(m); return m;
+}
+function stCyl(parent, r0, r1, h, material, x, y, z, rx = 0, ry = 0, rz = 0, seg = 14) {
+  const m = new THREE.Mesh(new THREE.CylinderGeometry(r0, r1, h, seg), material);
+  m.position.set(x, y, z); m.rotation.set(rx, ry, rz);
+  parent.add(m); return m;
+}
+let _padGeo = null;
+function padGeo() {
+  if (_padGeo) return _padGeo;
+  const w = 1.6, h = 1.2, r = 0.28, x = -w / 2, y = -h / 2;
+  const s = new THREE.Shape();
+  s.moveTo(x + r, y);
+  s.lineTo(x + w - r, y); s.quadraticCurveTo(x + w, y, x + w, y + r);
+  s.lineTo(x + w, y + h - r); s.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  s.lineTo(x + r, y + h); s.quadraticCurveTo(x, y + h, x, y + h - r);
+  s.lineTo(x, y + r); s.quadraticCurveTo(x, y, x + r, y);
+  _padGeo = new THREE.ShapeGeometry(s, 10);
+  return _padGeo;
+}
+function signTexture(id, lit) {
+  const cv = document.createElement("canvas");
+  cv.width = 512; cv.height = 224;
+  const c = cv.getContext("2d");
+  const col = charColour(id);
+  const p = personById(id) || { name: id };
+  const rr = (x, y, w, h, r) => {
+    c.beginPath();
+    if (c.roundRect) c.roundRect(x, y, w, h, r); else c.rect(x, y, w, h);
+  };
+  rr(4, 4, 504, 216, 36);
+  c.fillStyle = lit ? "#22314f" : "rgba(11,18,38,0.94)";
+  c.fill();
+  if (lit) { c.shadowColor = col; c.shadowBlur = 26; }
+  c.lineWidth = lit ? 12 : 7;
+  c.strokeStyle = col;
+  rr(14, 14, 484, 196, 28);
+  c.stroke();
+  c.shadowBlur = 0;
+  c.textAlign = "center";
+  try {
+    c.fillStyle = "#ffffff";
+    c.font = "800 68px system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif";
+    c.fillText(p.name, 256, 102);
+    c.fillStyle = lit ? "#ffffff" : col;
+    c.font = "600 40px system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif";
+    c.fillText(STATION_JOB[id] || "", 256, 172);
+  } catch {}
+  const t = new THREE.CanvasTexture(cv);
+  t.colorSpace = THREE.SRGBColorSpace;
+  t.anisotropy = 4;
+  return t;
+}
+function samScreenTexture() {
+  // The ceiling camera's view: carton outlines in blue, one doubtful in amber.
+  const cv = document.createElement("canvas");
+  cv.width = 512; cv.height = 320;
+  const c = cv.getContext("2d");
+  c.fillStyle = "#0a1424"; c.fillRect(0, 0, 512, 320);
+  c.strokeStyle = "#1d2c47"; c.lineWidth = 1;
+  for (let x = 64; x < 512; x += 64) { c.beginPath(); c.moveTo(x, 0); c.lineTo(x, 320); c.stroke(); }
+  for (let y = 64; y < 320; y += 64) { c.beginPath(); c.moveTo(0, y); c.lineTo(512, y); c.stroke(); }
+  const boxes = [[70, 60, 90, 64], [175, 60, 90, 64], [280, 60, 90, 64], [385, 60, 60, 64],
+                 [70, 140, 90, 64], [175, 140, 90, 64], [280, 140, 90, 64], [385, 140, 60, 64],
+                 [70, 220, 140, 64], [225, 220, 140, 64]];
+  boxes.forEach((b, i) => {
+    c.lineWidth = 4;
+    c.strokeStyle = i === 6 ? "#fbbf24" : "#38bdf8";
+    c.strokeRect(b[0], b[1], b[2], b[3]);
+  });
+  c.strokeStyle = "rgba(255,255,255,.75)"; c.lineWidth = 2;
+  c.beginPath(); c.moveTo(246, 160); c.lineTo(266, 160); c.moveTo(256, 150); c.lineTo(256, 170); c.stroke();
+  c.fillStyle = "#7dd3fc"; c.font = "700 21px system-ui, sans-serif"; c.textAlign = "left";
+  c.fillText("CEILING CAM", 16, 30);
+  c.fillStyle = "#f87171";
+  c.beginPath(); c.arc(486, 24, 7, 0, 7); c.fill();
+  const t = new THREE.CanvasTexture(cv);
+  t.colorSpace = THREE.SRGBColorSpace;
+  return t;
+}
+function tabletTexture() {
+  const cv = document.createElement("canvas");
+  cv.width = 128; cv.height = 96;
+  const c = cv.getContext("2d");
+  c.fillStyle = "#e8eef7"; c.fillRect(0, 0, 128, 96);
+  c.strokeStyle = "#22c55e"; c.lineWidth = 9; c.lineCap = "round";
+  c.beginPath(); c.moveTo(34, 50); c.lineTo(56, 70); c.lineTo(96, 28); c.stroke();
+  c.fillStyle = "#94a3b8";
+  c.fillRect(18, 80, 92, 6);
+  const t = new THREE.CanvasTexture(cv);
+  t.colorSpace = THREE.SRGBColorSpace;
+  return t;
+}
+function laptopTexture() {
+  const cv = document.createElement("canvas");
+  cv.width = 256; cv.height = 160;
+  const c = cv.getContext("2d");
+  c.fillStyle = "#101826"; c.fillRect(0, 0, 256, 160);
+  c.fillStyle = "#0d9488"; c.fillRect(0, 0, 256, 30);
+  c.fillStyle = "#ffffff"; c.font = "700 17px system-ui, sans-serif"; c.textAlign = "left";
+  c.fillText("second read", 12, 21);
+  c.fillStyle = "#c7d2e4";
+  for (let i = 0; i < 4; i++) c.fillRect(14, 50 + i * 24, 228 - i * 36, 10);
+  const t = new THREE.CanvasTexture(cv);
+  t.colorSpace = THREE.SRGBColorSpace;
+  return t;
+}
+// Station-local frame: the character stands at the origin facing the zone
+// (three -z); furniture sits toward the zone, the sign behind (three +z).
+function buildSparkFurniture(g) {
+  const FZ = -0.45;
+  stBox(g, 0.5, 0.06, 0.4, stMat(0x6b4f2e), 0, 0.03, FZ);
+  stBox(g, 0.12, 0.95, 0.12, stMat(0x6b4f2e), 0, 0.53, FZ);
+  const top = new THREE.Group();
+  top.position.set(0, 1.02, FZ); top.rotation.x = 0.5;
+  g.add(top);
+  stBox(top, 0.62, 0.04, 0.46, stMat(0x8a6134), 0, 0, 0);
+  stBox(top, 0.62, 0.05, 0.03, stMat(0x6b4f2e), 0, 0.02, 0.22);
+  stBox(top, 0.30, 0.012, 0.40, stMat(0xf8fafc, 0.9, 0), -0.14, 0.028, 0);
+  for (let i = 0; i < 3; i++)
+    stBox(top, 0.22, 0.014, 0.028, stMat(0x94a3b8, 0.9, 0), -0.14, 0.03, -0.12 + i * 0.11);
+  stBox(top, 0.24, 0.012, 0.32, stMat(0x7c4a21), 0.17, 0.028, 0.02);
+  stBox(top, 0.09, 0.02, 0.045, stMat(0x9aa0a6, 0.4, 0.7), 0.17, 0.035, -0.13);
+}
+function buildSamFurniture(g) {
+  const FZ = -0.45;
+  stCyl(g, 0.26, 0.30, 0.06, stMat(0x2f3336), 0, 0.03, FZ);
+  stCyl(g, 0.04, 0.04, 1.05, stMat(0x3a3f44), 0, 0.58, FZ);
+  stBox(g, 0.78, 0.50, 0.07, stMat(0x1c1f22, 0.6, 0.2), 0, 1.28, FZ);
+  const scr = new THREE.Mesh(new THREE.PlaneGeometry(0.70, 0.42),
+    new THREE.MeshBasicMaterial({ map: samScreenTexture(), toneMapped: false }));
+  scr.position.set(0, 1.28, FZ + 0.037);
+  g.add(scr);
+  stBox(g, 0.05, 0.025, 0.012, new THREE.MeshStandardMaterial(
+    { color: 0x052e16, emissive: 0x22ff55, emissiveIntensity: 1.6 }), 0.32, 1.06, FZ + 0.037);
+}
+function buildKapiFurniture(g) {
+  // Between Kapı and the barrier pole at (3.4, 2.4).
+  const px = -0.58, pz = -0.23;
+  stBox(g, 0.34, 0.08, 0.34, stMat(0x3a3f44), px, 0.04, pz);
+  stBox(g, 0.16, 1.06, 0.16, stMat(0x52525b), px, 0.61, pz);
+  stBox(g, 0.26, 0.52, 0.22, stMat(0xf2b705, 0.6, 0.2), px, 1.40, pz);
+  const lampMats = {};
+  const defs = [["block", 0xff2222, 1.57], ["human", 0xffaa00, 1.40], ["post", 0x22ff55, 1.23]];
+  for (const [act, col, y] of defs) {
+    const m = new THREE.MeshStandardMaterial({ color: 0x111111, emissive: col, emissiveIntensity: 0.12, roughness: 0.4 });
+    const lamp = new THREE.Mesh(new THREE.SphereGeometry(0.058, 14, 12), m);
+    lamp.position.set(px, y, pz + 0.115);
+    g.add(lamp);
+    lampMats[act] = m;
+  }
+  return lampMats;
+}
+function buildWonderFurniture(g) {
+  const FZ = -0.45;
+  stBox(g, 0.95, 0.05, 0.50, stMat(0xb07a3f), 0, 1.0, FZ);
+  for (const s of [-1, 1]) stBox(g, 0.05, 1.0, 0.46, stMat(0x8a6134), s * 0.45, 0.5, FZ);
+  stBox(g, 0.32, 0.012, 0.42, stMat(0xf8fafc, 0.9, 0), -0.12, 1.032, FZ, 0, 0.1, 0);
+  stCyl(g, 0.012, 0.012, 0.15, stMat(0x1d4ed8, 0.5, 0.2), 0.22, 1.04, FZ + 0.05, 0, 0.3, Math.PI / 2);
+}
+function buildSefFurniture(g) {
+  const FZ = -0.45;
+  stBox(g, 0.56, 0.08, 0.46, stMat(0x374151), 0, 0.04, FZ);
+  stBox(g, 0.50, 1.00, 0.40, stMat(0x4b5563), 0, 0.58, FZ);
+  const top = new THREE.Group();
+  top.position.set(0, 1.12, FZ); top.rotation.x = 0.35;
+  g.add(top);
+  stBox(top, 0.60, 0.05, 0.50, stMat(0x1f2937, 0.6, 0.2), 0, 0, 0);
+  stBox(top, 0.30, 0.02, 0.22, stMat(0x0b1226, 0.5, 0.3), -0.11, 0.035, 0.02);
+  const scr = new THREE.Mesh(new THREE.PlaneGeometry(0.26, 0.18),
+    new THREE.MeshBasicMaterial({ map: tabletTexture(), toneMapped: false }));
+  scr.rotation.x = -Math.PI / 2;
+  scr.position.set(-0.11, 0.047, 0.02);
+  top.add(scr);
+  stBox(top, 0.12, 0.03, 0.12, stMat(0x7f1d1d), 0.19, 0.04, 0.10);
+  stCyl(top, 0.028, 0.028, 0.10, stMat(0xc23b2e, 0.5, 0.1), 0.19, 0.10, 0.10);
+  const knob = new THREE.Mesh(new THREE.SphereGeometry(0.035, 12, 10), stMat(0xc23b2e, 0.5, 0.1));
+  knob.position.set(0.19, 0.16, 0.10); top.add(knob);
+}
+function buildRoverFurniture(g) {
+  const FZ = -0.45;
+  stBox(g, 0.85, 0.05, 0.60, stMat(0x9a8a6a), 0, 0.74, FZ);
+  for (const s of [-1, 1]) stBox(g, 0.05, 0.74, 0.56, stMat(0x7a6c52), s * 0.40, 0.37, FZ);
+  stBox(g, 0.36, 0.025, 0.25, stMat(0x374151, 0.6, 0.2), -0.16, 0.778, FZ + 0.05);
+  const lid = new THREE.Group();
+  lid.position.set(-0.16, 0.79, FZ - 0.07); lid.rotation.x = -0.32;
+  g.add(lid);
+  stBox(lid, 0.36, 0.24, 0.02, stMat(0x1f2937, 0.6, 0.2), 0, 0.12, 0);
+  const scr = new THREE.Mesh(new THREE.PlaneGeometry(0.32, 0.20),
+    new THREE.MeshBasicMaterial({ map: laptopTexture(), toneMapped: false }));
+  scr.position.set(0, 0.12, 0.011);
+  lid.add(scr);
+  stBox(g, 0.28, 0.012, 0.38, stMat(0xf8fafc, 0.9, 0), 0.24, 0.772, FZ + 0.03, 0, -0.12, 0);
+}
+function buildStation(id) {
+  const p = personById(id);
+  if (!p) return;
+  const g = new THREE.Group();
+  g.position.copy(V3(p.b[0], p.b[1], 0));
+  const padMat = new THREE.MeshBasicMaterial({ color: charColour(id), transparent: true, opacity: 0.22, depthWrite: false });
+  const pad = new THREE.Mesh(padGeo(), padMat);
+  pad.rotation.x = -Math.PI / 2;
+  pad.position.y = 0.018;
+  g.add(pad);
+  // Sign on a post at ~1.4 m, facing the deciding camera (south).
+  stCyl(g, 0.035, 0.045, 1.4, stMat(0x3a3f44, 0.6, 0.3), 0, 0.7, 0.55);
+  const signTex = signTexture(id, false), signTexLit = signTexture(id, true);
+  const faceM = new THREE.MeshBasicMaterial({ map: signTex, toneMapped: false });
+  const sideM = stMat(0x1c1f22, 0.6, 0.2);
+  const board = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.45, 0.04),
+    [sideM, sideM, sideM, sideM, faceM, sideM]);
+  board.position.set(0, 1.38, 0.60);
+  g.add(board);
+  let lampMats = null;
+  if (id === "spark") buildSparkFurniture(g);
+  else if (id === "sam") buildSamFurniture(g);
+  else if (id === "kapi") lampMats = buildKapiFurniture(g);
+  else if (id === "wonder") buildWonderFurniture(g);
+  else if (id === "sef") buildSefFurniture(g);
+  else if (id === "rover") buildRoverFurniture(g);
+  g.traverse(o => { if (o.isMesh) { o.castShadow = false; o.receiveShadow = false; } });
+  scene.add(g);
+  ST[id] = { group: g, padMat, faceM, signTex, signTexLit, lit: false, lampMats };
+}
+function buildStations() {
+  for (const id of STATION_IDS) {
+    try { buildStation(id); } catch (e) { if (DEBUG) console.warn("station failed:", id, e); }
+  }
+  try {
+    const floor = floorSetFor(G.caseId);
+    for (const id of STATION_IDS) if (ST[id]) ST[id].group.visible = floor.has(id);
+  } catch {}
+}
+// Whose turn it is: the reading card's step lights that station's pad and sign.
+function setStepHighlight(ids) {
+  for (const id of STATION_IDS) {
+    const st = ST[id];
+    if (!st) continue;
+    st.lit = ids.indexOf(id) >= 0;
+    try {
+      const want = st.lit ? st.signTexLit : st.signTex;
+      if (st.faceM.map !== want) { st.faceM.map = want; st.faceM.needsUpdate = true; }
+    } catch {}
+  }
+}
+function clearStationGlow() { setStepHighlight([]); }
+function updateStations() {
+  for (const id of STATION_IDS) {
+    const st = ST[id];
+    if (!st || !st.group.visible) continue;
+    st.padMat.opacity = st.lit
+      ? (reducedMotion ? 0.62 : 0.50 + 0.22 * Math.sin(G.time * 7))
+      : 0.22;
+  }
+  const kst = ST.kapi;
+  if (kst && kst.lampMats && kst.group.visible) {
+    const a = G._gateAction;
+    for (const act of Object.keys(kst.lampMats)) {
+      const m = kst.lampMats[act];
+      if (a) {
+        m.emissiveIntensity = (act === a)
+          ? (kst.lit && !reducedMotion ? 1.8 + 0.9 * Math.sin(G.time * 7) : 2.4)
+          : 0.12;
+      } else {
+        m.emissiveIntensity = kst.lit ? (reducedMotion ? 1.4 : 1.0 + 0.8 * Math.sin(G.time * 7)) : 0.12;
+      }
+    }
+  }
 }
 
 // Soft pulsing outline over the cartons while Sam counts.
@@ -1905,6 +2203,7 @@ function resetScene() {
   try { updateCarryChip(); } catch {}
   showOutline(false);
   setGateLight(null);
+  clearStationGlow();
   drawScreen(null);
   G.barrierOpen = false;
   barrierMesh.rotation.x = -Math.PI / 2;
@@ -2131,6 +2430,7 @@ function startDeciding() {
   // 1. Spark reads the note.
   later(() => {
     wave("spark");
+    setStepHighlight(["spark"]);
     let line = `The note says <b>${esc(note)}</b>.`;
     if (cs.note.embedded_instructions.length)
       line += ` <span class="flag">It also tells software what to do — set aside, not followed:</span> ` +
@@ -2142,6 +2442,7 @@ function startDeciding() {
   // 2. Sam counts, with a soft outline pulsing over the cartons.
   later(() => {
     wave("sam");
+    setStepHighlight(["sam"]);
     showOutline(true);
     readCard(["sam"], "Sam counts",
       `<p><span class="bignum">${cs.sam.sure}</span> sure, ` +
@@ -2152,6 +2453,7 @@ function startDeciding() {
   // 3. Spark looks at the pallet.
   later(() => {
     wave("spark");
+    setStepHighlight(["spark"]);
     const s = cs.spark;
     const chips = [
       `<span class="chip">Labels: <b>${esc(s.product_on_labels)}</b></span>`,
@@ -2167,6 +2469,7 @@ function startDeciding() {
   // 4. Carton by carton: both models must find the same object.
   later(() => {
     wave("sam"); wave("spark");
+    setStepHighlight(["sam", "spark"]);
     const c = cs.cross;
     readCard(["sam", "spark"], "Carton by carton",
       `<p><b>${c.agreed}</b> agreed, <b>${c.sam_only}</b> only SAM, <b>${c.spark_only}</b> only Spark.</p>`,
@@ -2175,6 +2478,7 @@ function startDeciding() {
   // 5. Kapı decides: the light, the barrier, the screen.
   later(() => {
     wave("kapi");
+    setStepHighlight(["kapi"]);
     const g8 = cs.gate;
     const word = { post: "POST", block: "BLOCK", human: "ASK ŞEF" }[g8.action];
     readCard(["kapi"], "Kapı decides",
@@ -2210,6 +2514,7 @@ function draftDetails(d, fullReason) {
 function showResult() {
   const cs = G.cs;
   G.phase = "done";
+  clearStationGlow();
   G.tries++;
   const g8 = cs.gate;
   const posted = cs.agent.posted || [];
@@ -2321,6 +2626,7 @@ async function boot() {
     // All 221 floor boxes stand, except the open doorway the forklift drives through.
     G.colliders = col.filter(([x0, y0, x1, y1]) =>
       !(x0 === DOOR.x0 && y0 === DOOR.y0 && x1 === DOOR.x1 && y1 === DOOR.y1));
+    try { buildStations(); } catch (e) { console.warn("stations failed:", e); }
     buildIntro();
     progress(0.08, "Loading the dock…");
     await loadDock();
@@ -2482,6 +2788,7 @@ function tick() {
       outline.rotation.y = deliveryGroup.rotation.y;
       outline.material.opacity = 0.45 + 0.45 * Math.sin(G.time * 7);
     }
+    try { updateStations(); } catch {}
     stepCamera(dt);
     updateLabels();
     if (cabGroup && cabGroup.visible) {
@@ -2509,7 +2816,7 @@ function tick() {
 // For our checks only (?test): the game state and the two actions, so a script can play a
 // case to the result card. Nothing is exposed without ?test.
 if (new URLSearchParams(location.search).has("test"))
-  window.__sim = { G, CHAR, pickup: () => pickupPallet(true), drop: dropPallet, DROP, ZONE,
+  window.__sim = { G, CHAR, ST, pickup: () => pickupPallet(true), drop: dropPallet, DROP, ZONE,
     FORK: { pick: PICK_D, set: SET_D } };
 if ("ontouchstart" in window || navigator.maxTouchPoints > 0) document.body.classList.add("touch");
 boot();
