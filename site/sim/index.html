@@ -1172,7 +1172,8 @@ addEventListener("blur", () => { for (const k in keys) keys[k] = false; });
 function pollKeys() {
   if (input.joy) return;
   const f = (keys.ArrowUp || keys.KeyW ? 1 : 0) - (keys.ArrowDown || keys.KeyS ? 1 : 0);
-  const s = (keys.ArrowLeft || keys.KeyA ? 1 : 0) - (keys.ArrowRight || keys.KeyD ? 1 : 0);
+  // Positive steer turns right (heading h grows clockwise seen from above).
+  const s = (keys.ArrowRight || keys.KeyD ? 1 : 0) - (keys.ArrowLeft || keys.KeyA ? 1 : 0);
   input.fwd = f; input.steer = s;
 }
 function onPickKey() {
@@ -1197,7 +1198,7 @@ function onPickKey() {
       if (m > max) { dx *= max / m; dy *= max / m; }
       setKnob(dx, dy);
       input.joy = true;
-      input.steer = Math.abs(dx / max) < 0.15 ? 0 : -dx / max;
+      input.steer = Math.abs(dx / max) < 0.15 ? 0 : dx / max;
       input.fwd = Math.abs(dy / max) < 0.15 ? 0 : -dy / max;
     }
   }, { passive: true });
