@@ -26,6 +26,7 @@ from cbyp.sam import segment_image  # noqa: E402
 MASCOTS = Path(__file__).resolve().parent.parent / "assets" / "mascots"
 OUT = MASCOTS / "portraits"
 SIZE = "1080x1920"
+SAVE_SIZE = (1080, 1920)   # cut() output; None keeps the figure's own box
 
 # hello/<file>.jpg -> a flat backdrop that none of the character's own colours is close to.
 CAST = {"spark": "spark", "sam": "sam", "voice": "voice", "kapi": "kapi", "sef": "sef",
@@ -129,7 +130,10 @@ def cut(name, concept="toy figure"):
     # Soften the mask edge by one pixel so the cut-out does not look jagged.
     im.putalpha(mask.filter(ImageFilter.GaussianBlur(1)))
     # Full HD portrait (1080x1920): Muse Image draws 1152x2048, so this only scales down.
-    im.resize((1080, 1920), Image.LANCZOS).save(dst)
+    if SAVE_SIZE:
+        im.resize(SAVE_SIZE, Image.LANCZOS).save(dst)
+    else:
+        im.crop(im.getbbox()).save(dst)
     print(name, "cut", f"figure conf={conf:.2f}, {len(parts) - 1} prop mask(s)", flush=True)
 
 

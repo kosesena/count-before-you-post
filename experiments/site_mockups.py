@@ -1,6 +1,7 @@
 """Design directions for the top of the demo page, drawn by Muse Image.
 
 Usage: .venv/bin/python experiments/site_mockups.py <screenshot.png> [direction ...]
+       .venv/bin/python experiments/site_mockups.py background [1 2 ...]   # clean hero scene
 Each direction is one images/edits call (muse-image-1.0, 1792x1024) with the current page
 as the reference, plus three character portraits for the look. Writes
 experiments/mockups/hero-<direction>.png. These are directions to choose from, not the page:
@@ -86,6 +87,31 @@ SIM_DIRECTIONS = {
 }
 
 
+def hero_background(dst):
+    """The chosen direction's scene (hero-dock.png) redrawn as a clean background: no text, no
+    interface, so the page's real text and cards sit on it."""
+    if dst.exists():
+        return
+    body = {"model": "muse-image-1.0", "n": 1, "size": "1792x1024", "output_format": "png",
+            "response_format": "b64_json",
+            "prompt": ("The same scene as the reference image, exactly the same warehouse "
+                       "receiving dock, the open truck with cartons inside, the pallet, the "
+                       "traffic light, the lighting, colours and mood, but as a clean "
+                       "background photograph: remove every piece of text, title, button, "
+                       "card, badge and interface element, and remove the characters. Extend "
+                       "the scene naturally where the interface was. Keep the left third "
+                       "darker and calm so white text can sit on it. Cinematic, sharp, high "
+                       "detail."),
+            "images": [{"image_url": _jpeg(OUT / "hero-dock.png", 1536)}]}
+    req = urllib.request.Request(
+        BASE_URL + "/images/edits", data=json.dumps(body).encode(), method="POST",
+        headers={"Authorization": f"Bearer {os.environ['META_API_KEY']}",
+                 "Content-Type": "application/json"})
+    with urllib.request.urlopen(req, timeout=TIMEOUT * 2) as r:
+        dst.write_bytes(base64.b64decode(json.loads(r.read())["data"][0]["b64_json"]))
+    print("background", Image.open(dst).size, flush=True)
+
+
 def _jpeg(path, width=1024):
     im = Image.open(path).convert("RGB")
     im = im.resize((width, round(im.height * width / im.width)))
@@ -115,6 +141,10 @@ def draw(shot, name):
 if __name__ == "__main__":
     _load_env()
     OUT.mkdir(exist_ok=True)
+    if sys.argv[1] == "background":
+        for k in sys.argv[2:] or ["1"]:
+            hero_background(OUT / f"hero-bg-{k}.png")
+        sys.exit()
     for n in sys.argv[2:] or list(DIRECTIONS):
         if n == "sim":
             for m in SIM_DIRECTIONS:

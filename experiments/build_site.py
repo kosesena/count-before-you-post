@@ -335,14 +335,25 @@ def profile(cid):
 
 
 def hero():
-    """The dock with the 3D cast (experiments/blender/dock_cast.py stills) for the top of the
-    page; nothing if it has not been rendered."""
-    src = HERE / "blender" / "out" / "cast" / "cast-genel.png"
+    """The top of the page: the scene Muse Image drew for the chosen design, without text
+    (experiments/site_mockups.py background), and the seven tool characters drawn in its light
+    (experiments/hero_characters.py). Falls back to the Blender dock render."""
+    drawn = HERE / "mockups" / "hero-bg-1.png"
+    src = drawn if drawn.exists() else HERE / "blender" / "out" / "cast" / "cast-genel.png"
     if not src.exists():
         return {}
-    return {"hero": {"src": jpg(src, "hero-dock.jpg", 1920),
-                     "alt": "The receiving dock: the truck at the open door, the pallet in the "
-                            "yellow zone, the gate light, and the cast at their posts."}}
+    tools = {}
+    for cid in ("spark", "sam", "voice", "iris", "ada", "wonder", "spark-open"):
+        fig = ROOT / "assets" / "mascots" / "hero" / f"{'rover' if cid == 'spark-open' else cid}.png"
+        if fig.exists():
+            im = Image.open(fig)
+            im.resize((440, round(440 * im.height / im.width)), Image.LANCZOS).save(
+                SITE / "img" / f"hero-{cid}.webp", "WEBP", quality=88, method=6)
+            tools[cid] = f"img/hero-{cid}.webp"
+    return {"hero": {"src": jpg(src, "hero-dock.jpg", 2016),
+                     "alt": "A warehouse receiving dock at dusk: a truck with cartons at the open "
+                            "door, a wrapped pallet, a traffic light.",
+                     "tools": tools}}
 
 
 def card_colour(hello):
