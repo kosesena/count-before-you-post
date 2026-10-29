@@ -534,9 +534,9 @@ const PEOPLE = [
   { id: "sam",     name: "Sam",     job: "counts the cartons",          b: [1.1, 1.9],  h: 2.40 },
   { id: "voice",   name: "Voice",   job: "hears the receiver",          b: [-4.6, 2.1], h: 2.40 },
   { id: "kapi",    name: "Kapı",    job: "the gate",                    b: [4.4, 2.0],   h: 2.62 },
-  { id: "sef",     name: "Şef",     job: "signs off",                   b: [-1.6, 2.0],  h: 2.62 },
-  { id: "wonder",  name: "Wonder",  job: "checks and writes the paperwork", b: [-2.4, 0.9], h: 2.40 },
-  { id: "rover",   name: "Rover",   job: "reads the note again",        b: [2.75, 1.5],  h: 2.40 },
+  { id: "sef",     name: "Şef",     job: "signs off",                   b: [-1.3, -0.4], h: 2.62 },
+  { id: "wonder",  name: "Wonder",  job: "checks and writes the paperwork", b: [-5.9, 0.4], h: 2.40 },
+  { id: "rover",   name: "Rover",   job: "reads the note again",        b: [-0.6, -0.6], h: 2.40 },
   { id: "glimmer", name: "Glimmer", job: "the other open-weight reader", b: [1.0, 0.5],  h: 2.40 },
   { id: "iris",    name: "Iris",    job: "drew the cast",               b: [-6.6, -0.6], h: 2.40 },
   { id: "ada",     name: "Ada",     job: "wrote the code",              b: [-9.6, -0.9], h: 2.40 },
@@ -573,8 +573,8 @@ const DOOR = { x0: -1.0, x1: 1.0, y0: 9.44, y1: 10.76 };    // doorway volume: t
 const PALLET = { hx: 0.6, hy: 0.52 };                       // half footprint 1.2 x 1.04 m
 const START = { x: 8, y: 0.05, h: 0 };                      // forklift start, heading +y
 const DROP = { x: 0, y: 11.0 };                             // delivery start on the trailer floor
-const PARK = { x: 3.6, y: 3.5, h: Math.PI / 2 };            // forklift park: right of the zone,
-  // behind Kapı/post from the deciding camera (cannot block them), heading +x, forks down.
+const PARK = { x: 7.0, y: 5.6, h: Math.PI / 2 };            // forklift park: in the quarantine
+  // bay right of the zone, behind every station from the deciding camera, heading +x.
 const PARK_DUR = 2.5, PARK_REV_T = 1.0;                     // reverse 0-1 s, roll to park 1-2.5 s
 // The forklift is 1.35x larger than the dock file's model (the cast grew 1.5x).
 // Horizontal geometry scales; the pallet keeps its real size. F.forksY stays a
@@ -1180,8 +1180,9 @@ function faceBlender(rec, fromX, fromY, toX, toY) {
 // side -1 = west, +1 = east. Single walker: 0.35 m to the side; belirsiz: front corners.
 function palletSpot(px, py, side, fx, fy) {
   const caseId = (G.cs && G.cs.id) || G.caseId;
-  if (caseId === "belirsiz") return { x: px + side * 0.92, y: py - 0.92 };
-  return { x: px + side * 0.35, y: py - 1.25 };
+  // Beside the pallet, level with it: from the deciding camera the walker stands next
+  // to the cartons, never in front of them.
+  return { x: px + side * 1.45, y: py + 0.1 };
 }
 function kapiSpot() {
   let bx = 3.4, by = 2.4;
@@ -1192,7 +1193,7 @@ function kapiSpot() {
       if (isFinite(v.x) && isFinite(v.z)) { bx = v.x; by = -v.z; }
     }
   } catch {}
-  return { x: bx - 1.2, y: by - 0.5 };
+  return { x: bx + 0.2, y: by - 1.4 };
 }
 function startWalkTo(id, tx, ty, fx, fy) {
   if (!G._walkerTargets) G._walkerTargets = {};
@@ -1240,7 +1241,7 @@ function updateWalkers(dt) {
     }
   }
 }
-// Scripted park after set-down: reverse 2.5 m straight, then roll to PARK.
+// Scripted park after set-down: reverse 1.2 m straight (clear of Sam's station), then roll to PARK.
 // Uses F.x/F.y/F.h and the group update every frame (no teleport, no colliders).
 function updateParking(dt) {
   const P = G._park;
@@ -2285,7 +2286,7 @@ function stepCamera(dt) {
     // the foreground cast at the pallet, the walker(s), the gate lamp and screen.
     // Portrait phones pull further back so the pallet and walker stay upper-frame.
     if (camera.aspect < 0.9) { px = -1.4; py = -6.8; pz = 6.1; lx = 0.1; ly = 3.4; lz = 0.7; }
-    else { px = -2.0; py = -5.6; pz = 5.2; lx = 0.3; ly = 4.0; lz = 0.9; }
+    else { px = -2.0; py = -6.4; pz = 6.6; lx = 0.3; ly = 3.6; lz = 0.6; }
     k = 1 - Math.exp(-2.2 * dt);
   } else if (G.camMode === "seat" && G.phase === "driving") {
     // Driver's seat: eye 2.05 m up (scaled with the forklift), just behind
@@ -2465,7 +2466,7 @@ function startDeciding() {
     F.v = 0; F.steer = 0; F.steerAngle = 0; F.yawRate = 0; F.pending = null;
     F.forksTarget = F.forksY;   // stay lowered
     G._park = { t: 0, sx: F.x, sy: F.y, sh: F.h,
-      rx: F.x - Math.sin(F.h) * 2.5, ry: F.y - Math.cos(F.h) * 2.5,
+      rx: F.x - Math.sin(F.h) * 1.2, ry: F.y - Math.cos(F.h) * 1.2,
       px: PARK.x, py: PARK.y, ph: PARK.h };
   } catch (e) { if (DEBUG) console.warn("park:", e); }
   try {
