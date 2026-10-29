@@ -1,5 +1,19 @@
 {
  "lang": "de",
+ "dock": [
+  {
+   "src": "img/de/dock-teslimat.jpg",
+   "caption": "The receiving zone: 12 cartons on the pallet, the gate light green, the trailer open behind the dock door."
+  },
+  {
+   "src": "img/de/dock-genel.jpg",
+   "caption": "The warehouse, with the cast at their posts."
+  },
+  {
+   "src": "img/de/dock-disari.jpg",
+   "caption": "Outside: the truck backed up to the dock."
+  }
+ ],
  "voice_source": "synthetic voice, ElevenLabs",
  "rules": [
   "instruction",
