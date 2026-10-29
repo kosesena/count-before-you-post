@@ -17,3 +17,6 @@ experiments/blender/out/*/*.blend*
 
 # Muse Image drawings before SAM cuts them out (experiments/mascot_portraits.py)
 assets/mascots/portraits/*-raw.png
+
+# local comparison links to the full-size models
+site/sim/models/_*.glb

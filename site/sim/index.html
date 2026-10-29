@@ -1,0 +1,1132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Receiving dock simulator · Count Before You Post</title>
+<meta name="description" content="Drive the forklift, bring the pallet to the gate, and see whether the receipt gets written to the ERP.">
+<link rel="icon" href="data:,">
+<style>
+/* Same voice as the demo page: warm paper cards, system type, post/block/human colours. */
+:root {
+  --bg: #f1f4ec; --panel: #fdfffa; --ink: #26211a; --muted: #666d5e; --line: #dde3d0;
+  --post: #15803d; --post-bg: #e2f3e7; --block: #b91c1c; --block-bg: #fbe3e3;
+  --human: #b45309; --human-bg: #fbeed3; --accent: #9a3412; --accent-bg: #fbeedf;
+  --shadow: 0 1px 2px rgba(74, 55, 25, .12), 0 6px 22px rgba(74, 55, 25, .16);
+  --radius: 14px;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; overflow: hidden; overscroll-behavior: none; }
+body {
+  background: #20241f; color: var(--ink);
+  font: 16px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-user-select: none; user-select: none;
+}
+#scene { position: fixed; inset: 0; }
+#scene canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+.mono, code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .82em; }
+/* ---------- overlay cards ---------- */
+.card {
+  background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+  box-shadow: var(--shadow); padding: 18px 20px;
+}
+#introWrap {
+  position: fixed; inset: 0; z-index: 30; display: flex; align-items: center; justify-content: center;
+  padding: 14px; background: rgba(32, 36, 31, .45); overflow-y: auto;
+}
+#intro { width: min(560px, 96vw); max-height: calc(100dvh - 28px); overflow-y: auto; }
+#intro h1 { font-size: clamp(24px, 5vw, 32px); line-height: 1.1; letter-spacing: -.02em; margin: 0 0 8px; }
+#intro .lede { margin: 0 0 4px; }
+#intro .lede p { margin: 0 0 6px; }
+#intro .lede p:last-child { margin-bottom: 0; }
+#intro h2 { font-size: 12.5px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin: 14px 0 8px; }
+#cases { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+#cases button {
+  font: inherit; font-size: 14px; cursor: pointer; color: var(--ink);
+  background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 10px 8px;
+}
+#cases button[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); font-weight: 700; }
+#cases button:focus-visible, #startBtn:focus-visible, .btnrow button:focus-visible, #pickBtn:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 2px;
+}
+#loadbar { height: 8px; border-radius: 99px; background: var(--line); margin-top: 14px; overflow: hidden; }
+#loadbar i { display: block; height: 100%; width: 0%; background: var(--accent); border-radius: 99px; transition: width .2s; }
+#loadmsg { font-size: 13px; color: var(--muted); margin: 6px 0 0; }
+#startRow { display: flex; gap: 10px; align-items: center; margin-top: 14px; flex-wrap: wrap; }
+#startBtn {
+  font: inherit; font-size: 16px; font-weight: 700; cursor: pointer;
+  background: var(--accent); color: #fff; border: 0; border-radius: 10px; padding: 11px 26px;
+}
+#startBtn:disabled { opacity: .45; cursor: wait; }
+#intro .back { font-size: 14px; }
+/* ---------- driving HUD ---------- */
+#hud { position: fixed; inset: 0; z-index: 20; pointer-events: none; display: none; }
+body.playing #hud { display: block; }
+#noteCard {
+  position: absolute; top: 10px; right: 10px; width: 172px; padding: 8px;
+  font-size: 12.5px; pointer-events: auto;
+}
+#noteCard img { width: 100%; height: 96px; object-fit: cover; border-radius: 8px; display: block; background: var(--line); }
+#noteCard p { margin: 6px 2px 2px; font-weight: 700; line-height: 1.35; }
+#noteCard small { display: block; color: var(--muted); font-weight: 400; }
+#hint {
+  position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%);
+  background: rgba(38, 33, 26, .88); color: #f1f4ec; font-size: 14.5px; font-weight: 600;
+  padding: 9px 18px; border-radius: 99px; white-space: nowrap; max-width: 94vw;
+  overflow: hidden; text-overflow: ellipsis;
+}
+#demoLink {
+  position: absolute; top: 10px; left: 10px; pointer-events: auto;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 99px;
+  padding: 6px 14px; font-size: 13.5px; color: var(--ink); text-decoration: none; box-shadow: var(--shadow);
+}
+#tallyChip {
+  position: absolute; top: 52px; left: 10px; pointer-events: none;
+  background: rgba(38, 33, 26, .8); color: #f1f4ec; border-radius: 99px;
+  padding: 5px 13px; font-size: 12.5px;
+}
+#keys { position: absolute; bottom: 12px; left: 12px; font-size: 12px; color: #fff;
+  background: rgba(38, 33, 26, .6); border-radius: 8px; padding: 5px 10px; }
+/* touch controls */
+#joy { position: absolute; left: 18px; bottom: 52px; width: 128px; height: 128px;
+  border-radius: 50%; background: rgba(253, 255, 250, .22); border: 2px solid rgba(253, 255, 250, .55);
+  display: none; pointer-events: auto; touch-action: none; }
+#joyKnob { position: absolute; left: 50%; top: 50%; width: 56px; height: 56px; border-radius: 50%;
+  background: rgba(253, 255, 250, .9); box-shadow: var(--shadow); transform: translate(-50%, -50%); }
+#pickBtn {
+  position: absolute; right: 18px; bottom: 62px; width: 108px; height: 108px; border-radius: 50%;
+  font: inherit; font-weight: 800; font-size: 15px; color: #fff; background: var(--accent);
+  border: 3px solid rgba(255, 255, 255, .7); box-shadow: var(--shadow);
+  display: none; pointer-events: auto; touch-action: none;
+}
+body.touch #joy { display: block; }
+body.touch #pickBtn { display: block; }
+body.touch #keys { display: none; }
+body.touch #hint { bottom: 190px; font-size: 13.5px; }
+/* floating name labels */
+#labels { position: fixed; inset: 0; z-index: 10; pointer-events: none; overflow: hidden; }
+.tag {
+  position: absolute; left: 0; top: 0; transform: translate(-50%, -100%);
+  background: rgba(38, 33, 26, .82); color: #f5f2ea; border-radius: 8px;
+  padding: 3px 9px 4px; font-size: 12px; line-height: 1.3; text-align: center; white-space: nowrap;
+}
+.tag b { display: block; font-size: 12.5px; }
+.tag span { opacity: .8; font-size: 11px; }
+/* ---------- gate readings ---------- */
+#reads {
+  position: fixed; z-index: 25; right: 10px; top: 10px; width: min(340px, calc(100vw - 20px));
+  max-height: calc(100dvh - 20px); overflow-y: auto; display: none;
+  flex-direction: column; gap: 8px;
+}
+body.deciding #reads { display: flex; }
+body.deciding #noteCard, body.deciding #keys, body.deciding #joy, body.deciding #pickBtn { display: none !important; }
+.read {
+  background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
+  box-shadow: var(--shadow); padding: 10px 12px; font-size: 13.5px;
+  animation: pop .3s ease-out;
+}
+@keyframes pop { from { opacity: 0; transform: translateY(8px); } }
+.read .who { display: flex; align-items: center; gap: 8px; font-weight: 800; margin-bottom: 4px; }
+.read .who img { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; border: 2px solid var(--line); }
+.read p { margin: 0; overflow-wrap: anywhere; }
+.read .flag { color: var(--block); font-weight: 700; }
+.read.gate-post { border-left: 6px solid var(--post); }
+.read.gate-block { border-left: 6px solid var(--block); }
+.read.gate-human { border-left: 6px solid var(--human); }
+.dots { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 6px; }
+.dots i { width: 13px; height: 13px; border-radius: 3px; display: block; }
+.dots i.a { background: var(--post); } .dots i.s { background: var(--human); } .dots i.p { background: var(--block); }
+/* ---------- result ---------- */
+#resultWrap {
+  position: fixed; inset: 0; z-index: 40; display: none; align-items: center; justify-content: center;
+  padding: 14px; background: rgba(32, 36, 31, .45); overflow-y: auto;
+}
+body.done #resultWrap { display: flex; }
+#result { width: min(560px, 96vw); max-height: calc(100dvh - 28px); overflow-y: auto; }
+#result h2 { margin: 0 0 6px; font-size: clamp(22px, 5vw, 28px); letter-spacing: -.01em; }
+#result.post h2 { color: var(--post); } #result.block h2 { color: var(--block); } #result.human h2 { color: var(--human); }
+#result .doc { font-size: 15px; font-weight: 700; margin: 0 0 8px; }
+#result .point { background: var(--bg); border: 1px solid var(--line); border-radius: 10px;
+  padding: 10px 12px; font-size: 14px; margin: 10px 0 0; }
+.draft { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; margin-top: 10px; }
+.draft .doc-kind { font-size: 12px; font-weight: 700; color: var(--muted); }
+.draft .doc-title { font-size: 15px; font-weight: 700; margin: 2px 0; }
+.draft .doc-to { font-size: 12.5px; color: var(--muted); margin: 0 0 6px; }
+.draft .doc-body { font-size: 13.5px; margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.btnrow { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+.btnrow button, .btnrow a {
+  font: inherit; font-size: 15px; font-weight: 700; cursor: pointer; text-decoration: none;
+  border-radius: 10px; padding: 10px 18px; border: 1px solid var(--line);
+  background: var(--bg); color: var(--ink);
+}
+.btnrow .primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+#tally { font-size: 13px; color: var(--muted); margin: 12px 0 0; }
+#fps { position: fixed; z-index: 50; left: 10px; bottom: 10px; background: rgba(0,0,0,.7); color: #0f0;
+  font: 12px ui-monospace, monospace; padding: 4px 10px; border-radius: 6px; display: none; }
+#err {
+  position: fixed; z-index: 60; left: 50%; top: 12px; transform: translateX(-50%);
+  background: var(--block-bg); color: var(--block); border: 1px solid var(--block);
+  border-radius: 10px; padding: 10px 16px; font-size: 14px; display: none; max-width: 92vw;
+}
+@media (max-width: 640px) {
+  #cases { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  #noteCard { width: 132px; } #noteCard img { height: 72px; }
+  #keys { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .read { animation: none; }
+}
+</style>
+</head>
+<body>
+<div id="scene"></div>
+<div id="labels"></div>
+
+<div id="introWrap">
+  <div id="intro" class="card" role="dialog" aria-label="Receiving dock simulator">
+    <h1>The receiving dock</h1>
+    <div class="lede">
+      <p>You drive the forklift at a warehouse dock.</p>
+      <p>An AI agent wants to post the delivery note's quantity to the ERP.</p>
+      <p>Bring the pallet to the gate and see whether the receipt gets written.</p>
+    </div>
+    <h2>Pick a delivery</h2>
+    <div id="cases" role="group" aria-label="Deliveries"></div>
+    <div id="loadbar" aria-hidden="true"><i></i></div>
+    <p id="loadmsg">Loading the dock&hellip;</p>
+    <div id="startRow">
+      <button id="startBtn" disabled>Start</button>
+      <a class="back" href="../">Back to the demo</a>
+    </div>
+  </div>
+</div>
+
+<div id="hud">
+  <a id="demoLink" href="../">&lsaquo; demo</a>
+  <div id="tallyChip">wrong receipts that reached the ERP: 0</div>
+  <div id="noteCard" class="card"><img id="noteImg" alt="Delivery note"><p id="noteLine"></p><small>what the paper claims</small></div>
+  <div id="hint"></div>
+  <div id="keys">WASD / arrows drive &middot; Space pick / drop &middot; C camera &middot; R restart</div>
+  <div id="joy"><div id="joyKnob"></div></div>
+  <button id="pickBtn">PICK /<br>DROP</button>
+</div>
+
+<div id="reads" aria-live="polite"></div>
+
+<div id="resultWrap">
+  <div id="result" class="card" role="dialog" aria-label="Result"></div>
+</div>
+
+<div id="fps"></div>
+<div id="err"></div>
+
+<script type="importmap">
+{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+               "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/" } }
+</script>
+<script type="module">
+// =====================================================================
+// The receiving dock: drive the forklift, bring the pallet to the gate,
+// watch the gate check the recorded evidence and decide.
+// Gameplay math is in Blender metres (x right, y into the dock, z up);
+// a Blender point (x, y, z) is three.js (x, z, -y).
+// =====================================================================
+import * as THREE from "three";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
+import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+
+// ---------- config ----------
+const CASES = ["ok", "wrong", "eksik", "talimat", "hasarli", "belirsiz"];
+const PEOPLE = [
+  { id: "spark",   name: "Spark",   job: "reads the note",              b: [-4.2, 4.5], h: 1.60 },
+  { id: "sam",     name: "Sam",     job: "counts the cartons",          b: [2.7, 6.8],  h: 1.60 },
+  { id: "voice",   name: "Voice",   job: "hears the receiver",          b: [-4.6, 2.1], h: 1.60 },
+  { id: "kapi",    name: "Kapı",    job: "the gate",                    b: [4.0, 2.0],   h: 1.75 },
+  { id: "sef",     name: "Şef",     job: "signs off",                   b: [-0.3, 3.0],  h: 1.75 },
+  { id: "wonder",  name: "Wonder",  job: "checks and writes the paperwork", b: [-8.2, 1.6], h: 1.60 },
+  { id: "rover",   name: "Rover",   job: "reads the note again",        b: [9.0, 2.5],   h: 1.60 },
+  { id: "glimmer", name: "Glimmer", job: "the other open-weight reader", b: [1.0, 0.5],  h: 1.60 },
+  { id: "iris",    name: "Iris",    job: "drew the cast",               b: [-6.6, -0.6], h: 1.60 },
+  { id: "ada",     name: "Ada",     job: "wrote the code",              b: [-9.6, -0.9], h: 1.60 },
+];
+const AV = id => `../img/av-${id}.jpg`;
+const ZONE = { x0: -2.48, x1: 2.48, y0: 3.32, y1: 7.68 };   // receiving zone (yellow tape)
+const DOOR = { x0: -1.0, x1: 1.0, y0: 9.44, y1: 10.76 };    // doorway volume: the open dock door,
+  // listed in colliders.json but the forklift drives through it up the leveller.
+const PALLET = { hx: 0.6, hy: 0.52 };                       // half footprint 1.2 x 1.04 m
+const START = { x: 8, y: 0.05, h: 0 };                      // forklift start, heading +y
+const DROP = { x: 0, y: 11.0 };                             // delivery start on the trailer floor
+const DEBUG = new URLSearchParams(location.search).has("debug");
+
+// ---------- state ----------
+const G = {
+  data: null, colliders: [], caseId: null, cs: null,
+  phase: "intro",            // intro | driving | deciding | done
+  fork: { x: START.x, y: START.y, h: START.h, v: 0, steer: 0, carrying: false, forksY: 0.45, forksTarget: 0.45 },
+  pallet: { x: DROP.x, y: DROP.y, yaw: 0, base: 0.54 },
+  wrongCount: 0, tries: 0, camMode: "chase", time: 0, _seqs: [],
+};
+window.stats = { fps: 0, calls: 0, triangles: 0, loadMs: 0 };
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c =>
+  ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+function showErr(msg) { const e = $("err"); e.textContent = msg; e.style.display = "block"; }
+addEventListener("error", e => { if (!DEBUG) return; showErr("Error: " + (e.message || e.error)); });
+addEventListener("unhandledrejection", e => { if (!DEBUG) return; showErr("Error: " + (e.reason?.message || e.reason)); });
+
+// Blender (x, y, z) -> three.js (x, z, -y)
+const V3 = (x, y, z) => new THREE.Vector3(x, z, -y);
+const groundH = (x, y) => {
+  if (y >= 10.25 && Math.abs(x) <= 1.6) return 0.54;                    // trailer floor
+  if (y > 9.4 && y < 10.25 && Math.abs(x) <= 1.6)                       // dock leveller ramp
+    return 0.54 * (y - 9.4) / (10.25 - 9.4);
+  return 0;
+};
+const wrapAngle = a => { while (a > Math.PI) a -= 2 * Math.PI; while (a < -Math.PI) a += 2 * Math.PI; return a; };
+
+// ---------- renderer / scene ----------
+const container = $("scene");
+let renderer;
+try {
+  renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+} catch (e) { showErr("WebGL is not available in this browser."); throw e; }
+renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 1.75));
+renderer.setSize(innerWidth, innerHeight);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 0.85;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+container.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x2a2e28);
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+scene.environmentIntensity = 0.35;
+
+// Warm high-bay key light from above (the only shadow caster), soft grey
+// ambient, and a slightly cool daylight through the dock door.
+scene.add(new THREE.HemisphereLight(0xcfd4d9, 0x6b655a, 0.5));
+const sun = new THREE.DirectionalLight(0xffd9a8, 1.25);
+sun.position.set(4, 14, 2);
+sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048);
+Object.assign(sun.shadow.camera, { left: -16, right: 16, top: 16, bottom: -16, near: 1, far: 40 });
+sun.shadow.bias = -0.0004;
+scene.add(sun);
+scene.add(sun.target);
+const doorLight = new THREE.DirectionalLight(0xbcd0ff, 0.35);   // cool daylight at the door
+doorLight.position.set(0, 4, -16);
+scene.add(doorLight);
+scene.add(doorLight.target);
+const gateGlow = new THREE.PointLight(0xffffff, 0, 7, 2);       // the gate lamp's spill
+gateGlow.position.copy(V3(3.4, 2.4, 2.9));
+scene.add(gateGlow);
+
+const camera = new THREE.PerspectiveCamera(50, innerWidth / innerHeight, 0.05, 200);
+camera.position.set(10.8, 4.8, 9.8);
+camera.lookAt(0, 0.45, -5.3);
+addEventListener("resize", () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+
+// ---------- loading ----------
+const draco = new DRACOLoader().setDecoderPath(
+  "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/libs/draco/gltf/");
+const loader = new GLTFLoader().setDRACOLoader(draco);
+const loadOne = url => new Promise((res, rej) => loader.load(url, res, undefined, rej));
+const t0 = performance.now();
+function progress(frac, msg) {
+  document.querySelector("#loadbar i").style.width = Math.round(frac * 100) + "%";
+  if (msg) $("loadmsg").textContent = msg;
+}
+
+// Dock nodes the page drives.
+let dockGroup, forkGroup, forksMesh, barrierMesh, lampMat = {}, screenMesh;
+let screenCanvas, screenTex, screenCtx;
+const CHAR = {};   // id -> { group, mixer, idle, wave, waveLen, loaded, label }
+
+async function loadDock() {
+  const g = await loadOne("models/dock.glb");
+  dockGroup = g.scene;
+  dockGroup.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
+  scene.add(dockGroup);
+  const need = name => {
+    const o = dockGroup.getObjectByName(name);
+    if (!o) throw new Error("dock.glb has no node " + name);
+    return o;
+  };
+  // Hide the dock's own delivery and jack: the picked case's delivery loads instead.
+  need("delivery").visible = false;
+  need("jack").visible = false;
+
+  // Forklift rig: body + forks under one group parked at the modelled spot.
+  const body = need("forklift"), forks = need("forklift_forks");
+  forkGroup = new THREE.Group();
+  forkGroup.position.copy(V3(START.x, START.y, 0));
+  scene.add(forkGroup);
+  // Node translations are in dock space; re-base them under the group.
+  const rel = (o, gx, gy, gz) => { o.position.set(o.position.x - gx, o.position.y - gy, o.position.z - gz); forkGroup.add(o); };
+  rel(body, forkGroup.position.x, 0, forkGroup.position.z);
+  rel(forks, forkGroup.position.x, 0, forkGroup.position.z);
+  forksMesh = forks;
+  G.fork.forksY = G.fork.forksTarget = forks.position.y;
+
+  // Barrier: the gate's striped primitive gets its own pivot at its base so it
+  // can lie closed across the lane and lift on post. Starts closed.
+  const gate = need("gate");
+  gate.updateWorldMatrix(true, true);
+  const stripe = gate.children.find(c => c.isMesh &&
+    (Array.isArray(c.material) ? c.material[0].name === "stripe" : c.material.name === "stripe"))
+    || gate.children[0];
+  barrierMesh = stripe;
+  stripe.geometry = stripe.geometry.clone();
+  stripe.geometry.translate(0, 1.6, 0);
+  stripe.position.y -= 1.6;
+  // Closed: lying toward the dock door, clear of the forklift's path to the zone.
+  stripe.rotation.x = -Math.PI / 2;
+
+  // Gate lamps: red + amber spheres at the pole, green at the door. All dim until decided.
+  dockGroup.traverse(o => {
+    if (!o.isMesh) return;
+    const m = Array.isArray(o.material) ? o.material[0] : o.material;
+    if (m && m.name && m.name.startsWith("lamp_")) {
+      m.emissive = new THREE.Color(0x000000);
+      m.emissiveIntensity = 0;
+      lampMat[m.name] = m;
+    }
+  });
+
+  // Decision screen: a canvas plane just in front of the baked display.
+  screenMesh = need("screen");
+  screenCanvas = document.createElement("canvas");
+  screenCanvas.width = 512; screenCanvas.height = 304;
+  screenCtx = screenCanvas.getContext("2d");
+  screenTex = new THREE.CanvasTexture(screenCanvas);
+  screenTex.colorSpace = THREE.SRGBColorSpace;
+  const plane = new THREE.Mesh(
+    new THREE.PlaneGeometry(1.38, 0.82),
+    new THREE.MeshBasicMaterial({ map: screenTex, toneMapped: false }));
+  plane.position.copy(V3(-3.6, 2.6, 1.75));
+  plane.position.z += 0.016;   // three +z faces the dock front, like the baked panel
+  scene.add(plane);
+  drawScreen(null);
+}
+
+function drawScreen(decision) {
+  // decision: null (waiting) or { action, reason }.
+  const c = screenCtx, W = screenCanvas.width, H = screenCanvas.height;
+  c.fillStyle = "#10160f"; c.fillRect(0, 0, W, H);
+  c.strokeStyle = "#2b332a"; c.lineWidth = 6; c.strokeRect(3, 3, W - 6, H - 6);
+  c.textAlign = "center";
+  if (!decision) {
+    c.fillStyle = "#8a938a"; c.font = "700 44px system-ui, sans-serif";
+    c.fillText("KAPI", W / 2, 120);
+    c.font = "28px system-ui, sans-serif"; c.fillStyle = "#5c665c";
+    c.fillText("waiting for the pallet", W / 2, 175);
+  } else {
+    const col = { post: "#4ade80", block: "#f87171", human: "#fbbf24" }[decision.action];
+    const word = { post: "POST", block: "BLOCK", human: "ASK ŞEF" }[decision.action];
+    c.fillStyle = col; c.font = "800 64px system-ui, sans-serif";
+    c.fillText(word, W / 2, 105);
+    c.fillStyle = "#d7ded7"; c.font = "25px system-ui, sans-serif";
+    const words = String(decision.reason).split(/\s+/);
+    const lines = [];
+    let line = "";
+    for (const w of words) {
+      if ((line + " " + w).trim().length > 34) { lines.push(line.trim()); line = w; }
+      else line += " " + w;
+    }
+    if (line.trim()) lines.push(line.trim());
+    lines.slice(0, 5).forEach((l, i) => c.fillText(l, W / 2, 160 + i * 32));
+  }
+  screenTex.needsUpdate = true;
+}
+
+function setGateLight(action) {
+  // action: null (all dim) or post | block | human.
+  const want = { post: "lamp_green_True", block: "lamp_red_False", human: "lamp_amber_False" }[action];
+  for (const [name, m] of Object.entries(lampMat)) {
+    if (name === want) {
+      m.emissive = new THREE.Color({ post: 0x22ff55, block: 0xff2222, human: 0xffaa00 }[action]);
+      m.emissiveIntensity = 2.4;
+    } else { m.emissive = new THREE.Color(0x000000); m.emissiveIntensity = 0; }
+  }
+  if (want) {
+    gateGlow.color.set({ post: 0x33ff66, block: 0xff3333, human: 0xffaa22 }[action]);
+    gateGlow.intensity = 9;
+  } else gateGlow.intensity = 0;
+}
+
+// ---------- delivery ----------
+let deliveryGroup = null, deliveryNode = null, palletCenter = { x: 0.45, z: -0.39 };
+async function loadDelivery(caseId) {
+  if (deliveryGroup) {
+    scene.remove(deliveryGroup);
+    deliveryGroup.traverse(o => { if (o.isMesh) o.geometry.dispose(); });
+    deliveryGroup = null;
+  }
+  const g = await loadOne(`models/delivery-${caseId}.glb`);
+  deliveryNode = g.scene.getObjectByName("delivery") || g.scene;
+  deliveryNode.traverse(o => {
+    if (!o.isMesh) return;
+    o.castShadow = true; o.receiveShadow = true;
+    // The file also carries the note prop metres from the pallet; the note
+    // lives in the HUD card instead.
+    const n = o.material && o.material.name;
+    if (n === "paper" || n === "tape" || n === "ink") o.visible = false;
+  });
+  // Centre on the wooden pallet (full-size in every case) with its base at y=0.
+  const box = new THREE.Box3();
+  deliveryNode.traverse(o => {
+    if (o.isMesh && o.visible && o.material.name === "wood") {
+      o.geometry.computeBoundingBox();
+      box.union(o.geometry.boundingBox.clone().applyMatrix4(o.matrixWorld || new THREE.Matrix4()));
+    }
+  });
+  // (geometry bounds are node-local; the node has no rotation/scale.)
+  if (!box.isEmpty()) {
+    const c = box.getCenter(new THREE.Vector3());
+    palletCenter = { x: c.x, z: c.z };
+    deliveryNode.position.set(-c.x, -box.min.y, -c.z);
+  } else {
+    deliveryNode.position.set(-palletCenter.x, 0.295, -palletCenter.z);
+  }
+  deliveryGroup = new THREE.Group();
+  deliveryGroup.add(deliveryNode);
+  scene.add(deliveryGroup);
+  placePallet(DROP.x, DROP.y, 0, groundH(DROP.x, DROP.y));
+}
+function placePallet(x, y, yaw, base) {
+  G.pallet.x = x; G.pallet.y = y; G.pallet.yaw = yaw; G.pallet.base = base;
+  deliveryGroup.position.copy(V3(x, y, base));
+  deliveryGroup.rotation.y = -yaw;
+}
+const palletCorners = (x, y, yaw) => {
+  const pts = [];
+  for (const [sx, sy] of [[1, 1], [1, -1], [-1, 1], [-1, -1]]) {
+    const lx = sx * PALLET.hx, ly = sy * PALLET.hy;
+    pts.push([x + lx * Math.cos(yaw) + ly * Math.sin(yaw),
+              y - lx * Math.sin(yaw) + ly * Math.cos(yaw)]);
+  }
+  return pts;
+};
+
+// ---------- characters ----------
+const labelWrap = $("labels");
+function tagFor(p) {
+  const d = document.createElement("div");
+  d.className = "tag";
+  d.innerHTML = `<b>${esc(p.name)}</b><span>${esc(p.job)}</span>`;
+  d.style.display = "none";
+  labelWrap.appendChild(d);
+  return d;
+}
+async function loadCharacter(p) {
+  const rec = { group: null, mixer: null, idle: null, wave: null, loaded: false,
+                label: tagFor(p), bx: p.b[0], by: p.b[1], pop: 0 };
+  CHAR[p.id] = rec;
+  const g = await loadOne(`models/${p.id}.glb`);
+  const root = g.scene;
+  // Stand h metres tall, feet on the floor, facing the receiving zone.
+  const box = new THREE.Box3().setFromObject(root);
+  const size = box.getSize(new THREE.Vector3());
+  const s = p.h / size.y;
+  const inner = new THREE.Group();
+  inner.add(root);
+  root.position.set(-(box.min.x + box.max.x) / 2, -box.min.y, -(box.min.z + box.max.z) / 2);
+  inner.scale.setScalar(0.001);
+  const grp = new THREE.Group();
+  grp.add(inner);
+  grp.position.copy(V3(p.b[0], p.b[1], 0));
+  const dx = 0 - p.b[0], dy = 5.5 - p.b[1];          // face the zone centre
+  grp.rotation.y = Math.atan2(dx, -dy) + Math.PI;    // models face +z... verified below
+  grp.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = false; } });
+  scene.add(grp);
+  rec.group = grp; rec.inner = inner; rec.targetS = s; rec.loaded = true;
+  rec.mixer = new THREE.AnimationMixer(root);
+  const find = n => g.animations.find(a => a.name === n);
+  if (find("Idle")) { rec.idle = rec.mixer.clipAction(find("Idle")); rec.idle.play(); }
+  if (find("Wave")) {
+    rec.wave = rec.mixer.clipAction(find("Wave"));
+    rec.wave.setLoop(THREE.LoopOnce, 1);
+    rec.wave.clampWhenFinished = true;
+    rec.waveLen = find("Wave").duration * 1000;
+  }
+}
+function wave(id) {
+  const rec = CHAR[id];
+  if (!rec || !rec.loaded || !rec.wave || !rec.idle) return;
+  rec.idle.stop();
+  rec.wave.reset().play();
+  clearTimeout(rec._wt);
+  rec._wt = setTimeout(() => { if (rec.loaded) { rec.wave.stop(); rec.idle.play(); } }, (rec.waveLen || 2000) + 150);
+}
+
+// Soft pulsing outline over the cartons while Sam counts.
+let outline = null;
+function showOutline(on) {
+  if (on && !outline) {
+    const geo = new THREE.EdgesGeometry(new THREE.BoxGeometry(1.3, 1.15, 1.14));
+    outline = new THREE.LineSegments(geo, new THREE.LineBasicMaterial({
+      color: 0x7dd3fc, transparent: true, opacity: 0.9 }));
+    scene.add(outline);
+  }
+  if (outline) outline.visible = on;
+}
+
+// ---------- input ----------
+const input = { fwd: 0, steer: 0, joy: false };
+const keys = {};
+addEventListener("keydown", e => {
+  if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Space"].includes(e.code)) e.preventDefault();
+  if (e.repeat) return;
+  keys[e.code] = true;
+  if (e.code === "Space") onPickKey();
+  if (e.code === "KeyC") { G.camMode = G.camMode === "chase" ? "over" : "chase"; }
+  if (e.code === "KeyR") restartCase();
+});
+addEventListener("keyup", e => { keys[e.code] = false; });
+addEventListener("blur", () => { for (const k in keys) keys[k] = false; });
+function pollKeys() {
+  if (input.joy) return;
+  const f = (keys.ArrowUp || keys.KeyW ? 1 : 0) - (keys.ArrowDown || keys.KeyS ? 1 : 0);
+  const s = (keys.ArrowLeft || keys.KeyA ? 1 : 0) - (keys.ArrowRight || keys.KeyD ? 1 : 0);
+  input.fwd = f; input.steer = s;
+}
+function onPickKey() {
+  if (G.phase !== "driving") return;
+  if (G.fork.carrying) dropPallet();
+  else pickupPallet(true);
+}
+// Touch joystick: up/down drives, left/right steers.
+(function setupTouch() {
+  if (!("ontouchstart" in window) && navigator.maxTouchPoints <= 0) return;
+  document.body.classList.add("touch");
+  const joy = $("joy"), knob = $("joyKnob");
+  let id = null;
+  const setKnob = (dx, dy) => { knob.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`; };
+  joy.addEventListener("touchstart", e => { e.preventDefault(); id = e.changedTouches[0].identifier; }, { passive: false });
+  addEventListener("touchmove", e => {
+    for (const t of e.changedTouches) {
+      if (t.identifier !== id) continue;
+      const r = joy.getBoundingClientRect();
+      let dx = t.clientX - (r.left + r.width / 2), dy = t.clientY - (r.top + r.height / 2);
+      const m = Math.hypot(dx, dy) || 1, max = r.width / 2 - 8;
+      if (m > max) { dx *= max / m; dy *= max / m; }
+      setKnob(dx, dy);
+      input.joy = true;
+      input.steer = Math.abs(dx / max) < 0.15 ? 0 : -dx / max;
+      input.fwd = Math.abs(dy / max) < 0.15 ? 0 : -dy / max;
+    }
+  }, { passive: true });
+  const end = e => {
+    for (const t of e.changedTouches) {
+      if (t.identifier !== id) continue;
+      id = null; input.joy = false; input.fwd = 0; input.steer = 0; setKnob(0, 0);
+    }
+  };
+  addEventListener("touchend", end);
+  addEventListener("touchcancel", end);
+  $("pickBtn").addEventListener("touchstart", e => { e.preventDefault(); onPickKey(); }, { passive: false });
+})();
+
+// ---------- driving ----------
+// Simple kinematics, no physics engine. The forklift steers from the rear:
+// the nose follows the input and the tail swings, and it reverses.
+const SPD_MAX = 3.2, SPD_REV = 2.0, ACCEL = 5.5;
+function stepFork(dt) {
+  const F = G.fork;
+  const want = input.fwd >= 0 ? input.fwd * SPD_MAX : input.fwd * SPD_REV;
+  F.v += Math.sign(want - F.v) * Math.min(Math.abs(want - F.v), ACCEL * dt);
+  if (input.fwd === 0) F.v -= Math.sign(F.v) * Math.min(Math.abs(F.v), 6 * dt);
+  F.steer += (input.steer - F.steer) * Math.min(1, 8 * dt);
+  F.h = wrapAngle(F.h + F.steer * F.v * 0.52 * dt);
+  const fx = Math.sin(F.h), fy = Math.cos(F.h);
+  F.x += fx * F.v * dt;
+  F.y += fy * F.v * dt;
+  collide();
+  // Forks glide toward their target height.
+  F.forksY += (F.forksTarget - F.forksY) * Math.min(1, 5 * dt);
+  forksMesh.position.y = F.forksY;
+  const h = groundH(F.x, F.y);
+  forkGroup.position.set(F.x, h, -F.y);
+  forkGroup.rotation.y = -F.h;
+  if (F.carrying) {
+    // The pallet rides the forks: blade top + 15 cm of lift.
+    placePallet(F.x + fx * 1.19, F.y + fy * 1.19, F.h, h + F.forksY + 0.09);
+  }
+}
+// Forklift footprint: three circles; the carried pallet rides ahead as two more.
+function forkCircles() {
+  const F = G.fork, fx = Math.sin(F.h), fy = Math.cos(F.h);
+  const at = d => [F.x + fx * d, F.y + fy * d];
+  const cs = [];
+  const [ax, ay] = at(0.35); cs.push([ax, ay, 0.62]);
+  const [bx, by] = at(-0.55); cs.push([bx, by, 0.62]);
+  const [cx, cy] = at(-1.35); cs.push([cx, cy, 0.5]);
+  if (F.carrying) {
+    const [dx, dy] = at(0.85); cs.push([dx, dy, 0.5]);
+    const [ex, ey] = at(1.55); cs.push([ex, ey, 0.5]);
+  }
+  return cs;
+}
+function collide() {
+  const F = G.fork;
+  for (let iter = 0; iter < 3; iter++) {
+    for (const [cx, cy, r] of forkCircles()) {
+      for (const [x0, y0, x1, y1] of G.colliders) {
+        const nx = Math.max(x0, Math.min(cx, x1)), ny = Math.max(y0, Math.min(cy, y1));
+        let dx = cx - nx, dy = cy - ny, d = Math.hypot(dx, dy);
+        if (d < r) {
+          if (d < 1e-6) { dx = 0; dy = 1; d = 1; }   // centre inside: push out +y
+          F.x += dx / d * (r - d); F.y += dy / d * (r - d);
+        }
+      }
+      // Characters are solid.
+      for (const p of PEOPLE) {
+        const dx = cx - p.b[0], dy = cy - p.b[1], d = Math.hypot(dx, dy), rr = r + 0.38;
+        if (d < rr && d > 1e-6) { F.x += dx / d * (rr - d); F.y += dy / d * (rr - d); }
+      }
+      // ...and so is the pallet on the ground (the fork tips reach past the body).
+      if (!F.carrying && deliveryGroup) {
+        const px = G.pallet.x, py = G.pallet.y;
+        const ca = Math.cos(-G.pallet.yaw), sa = Math.sin(-G.pallet.yaw);
+        const lx = (cx - px) * ca - (cy - py) * sa, ly = (cx - px) * sa + (cy - py) * ca;
+        const qx = Math.max(-PALLET.hx, Math.min(lx, PALLET.hx));
+        const qy = Math.max(-PALLET.hy, Math.min(ly, PALLET.hy));
+        let dx = lx - qx, dy = ly - qy, d = Math.hypot(dx, dy);
+        if (d < r) {
+          if (d < 1e-6) { dx = 0; dy = 1; d = 1; }
+          // back to world frame
+          const cb = Math.cos(G.pallet.yaw), sb = Math.sin(G.pallet.yaw);
+          F.x += (dx * cb + dy * sb) / d * (r - d);
+          F.y += (-dx * sb + dy * cb) / d * (r - d);
+        }
+      }
+    }
+  }
+  F.x = Math.max(-14.4, Math.min(14.4, F.x));
+  F.y = Math.max(-10.5, Math.min(18.0, F.y));
+}
+
+// Pickup: fork tips under the pallet footprint, heading aligned within ~20°.
+function pickupPallet(manual) {
+  const F = G.fork;
+  if (F.carrying || !deliveryGroup) return false;
+  const fx = Math.sin(F.h), fy = Math.cos(F.h);
+  const aligned = Math.abs(wrapAngle(F.h - G.pallet.yaw)) < 0.36 ||
+                  Math.abs(wrapAngle(F.h - G.pallet.yaw - Math.PI)) < 0.36;
+  let under = false;
+  for (const s of [-0.3, 0.3]) {
+    const tx = F.x + fx * 1.8 - fy * s, ty = F.y + fy * 1.8 + fx * s;
+    const ca = Math.cos(-G.pallet.yaw), sa = Math.sin(-G.pallet.yaw);
+    const lx = (tx - G.pallet.x) * ca - (ty - G.pallet.y) * sa;
+    const ly = (tx - G.pallet.x) * sa + (ty - G.pallet.y) * ca;
+    if (Math.abs(lx) < PALLET.hx + 0.05 && Math.abs(ly) < PALLET.hy + 0.05) under = true;
+  }
+  // Forks meet the pallet, then lift it 15 cm.
+  const h = groundH(F.x, F.y);
+  const target = (G.pallet.base - h) - 0.09 + 0.15;
+  if (under && aligned && Math.abs(target - 0.45) < 0.6) {
+    F.carrying = true;
+    F.forksTarget = target;
+    setHint("Bring it to the yellow zone");
+    return true;
+  }
+  if (manual) setHint(under ? "Straighten up to the pallet" : "Line the forks up with the pallet and press Space");
+  return false;
+}
+function dropPallet() {
+  const F = G.fork;
+  if (!F.carrying) return;
+  const fx = Math.sin(F.h), fy = Math.cos(F.h);
+  const x = F.x + fx * 1.19, y = F.y + fy * 1.19;
+  // No room inside a collider, a character, or the gate hardware.
+  for (const [cx, cy] of palletCorners(x, y, F.h)) {
+    for (const [x0, y0, x1, y1] of G.colliders)
+      if (cx > x0 && cx < x1 && cy > y0 && cy < y1) { setHint("No room to set it down here"); return; }
+    for (const p of PEOPLE)
+      if (Math.hypot(cx - p.b[0], cy - p.b[1]) < 0.45) { setHint("Someone is standing there"); return; }
+  }
+  F.carrying = false;
+  F.forksTarget = 0.45;
+  placePallet(x, y, F.h, groundH(x, y));
+  if (insideZone(x, y, F.h)) startDeciding();
+  else setHint("Bring it to the yellow zone");
+}
+const insideZone = (x, y, yaw) =>
+  palletCorners(x, y, yaw).every(([cx, cy]) =>
+    cx > ZONE.x0 && cx < ZONE.x1 && cy > ZONE.y0 && cy < ZONE.y1);
+function resetScene() {
+  const F = G.fork;
+  F.x = START.x; F.y = START.y; F.h = START.h; F.v = 0; F.carrying = false;
+  F.forksTarget = F.forksY = 0.45;
+  forksMesh.position.y = 0.45;
+  forkGroup.position.copy(V3(START.x, START.y, 0));
+  forkGroup.rotation.y = -START.h;
+  placePallet(DROP.x, DROP.y, 0, groundH(DROP.x, DROP.y));
+  document.body.classList.remove("deciding", "done");
+  $("reads").innerHTML = "";
+  showOutline(false);
+  setGateLight(null);
+  drawScreen(null);
+  G.barrierOpen = false;
+  barrierMesh.rotation.x = -Math.PI / 2;
+  (G._seqs || []).forEach(clearTimeout);
+  G._seqs = [];
+}
+function restartCase() {
+  if (G.phase === "intro" || !G.cs) return;
+  resetScene();
+  document.body.classList.add("playing");
+  G.phase = "driving";
+  setHint("Drive into the trailer");
+}
+function setHint(t) { const h = $("hint"); h.textContent = t; h.style.display = t ? "block" : "none"; }
+
+// ---------- camera ----------
+const camPos = new THREE.Vector3(10.8, 4.8, 9.8);
+const camLook = new THREE.Vector3(0, 0.45, -5.3);
+const _v1 = new THREE.Vector3(), _v2 = new THREE.Vector3();
+const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+function stepCamera(dt) {
+  const F = G.fork;
+  let px, py, pz, lx, ly, lz, k = 1 - Math.exp(-4 * dt);
+  if (G.phase === "deciding" || G.phase === "done") {
+    // Frame the pallet, the gate and the screen.
+    px = -4.6; py = -2.4; pz = 3.3; lx = 0.2; ly = 3.8; lz = 1.0;
+    k = 1 - Math.exp(-2.2 * dt);
+  } else if (G.camMode === "over" || G.phase === "intro") {
+    const drift = (G.phase === "intro" && !reducedMotion) ? Math.sin(G.time * 0.12) * 0.7 : 0;
+    px = 10.8 + drift; py = -9.8; pz = 4.8; lx = 0; ly = 5.3; lz = 0.45;
+    k = G.phase === "intro" ? 1 - Math.exp(-1 * dt) : k;
+  } else {
+    const fx = Math.sin(F.h), fy = Math.cos(F.h);
+    const h = groundH(F.x, F.y);
+    px = F.x - fx * 6.0; py = F.y - fy * 6.0; pz = h + 3.4;
+    lx = F.x + fx * 2.5; ly = F.y + fy * 2.5; lz = h + 1.0;
+    if (py > 9.0 && F.y < 9.6) py = 9.0;    // don't clip the dock wall / trailer
+    if (py < -10.2) py = -10.2;
+    pz = Math.max(pz, 1.1);
+  }
+  _v1.set(px, pz, -py); _v2.set(lx, lz, -ly);
+  camPos.lerp(_v1, k); camLook.lerp(_v2, k);
+  camera.position.copy(camPos);
+  camera.lookAt(camLook);
+}
+
+// ---------- the gate decides ----------
+const later = (fn, ms) => { G._seqs.push(setTimeout(fn, ms)); };
+function readCard(avatars, who, html, cls) {
+  const d = document.createElement("div");
+  d.className = "read" + (cls ? " " + cls : "");
+  d.innerHTML = `<div class="who">${avatars.map(a =>
+    `<img src="${AV(a)}" alt="">`).join("")}${esc(who)}</div><p>${html}</p>`;
+  $("reads").appendChild(d);
+  d.scrollIntoView({ block: "nearest" });
+  return d;
+}
+function startDeciding() {
+  G.phase = "deciding";
+  document.body.classList.add("deciding");
+  setHint("");
+  const cs = G.cs;
+  const note = cs.note.items.map(it => `${it.quantity} × ${it.description}`).join("; ");
+  // 1. Spark reads the note.
+  later(() => {
+    wave("spark");
+    let html = `The note says <b>${esc(note)}</b>.`;
+    if (cs.note.embedded_instructions.length)
+      html += ` <span class="flag">It also tells software what to do — set aside, not followed:</span> ` +
+        cs.note.embedded_instructions.map(t => `<span class="flag">“${esc(t)}”</span>`).join(" ");
+    readCard(["spark"], "Spark reads the note", html);
+  }, 600);
+  // 2. Sam counts, with a soft outline pulsing over the cartons.
+  later(() => {
+    wave("sam");
+    showOutline(true);
+    readCard(["sam"], "Sam counts",
+      `<b>${cs.sam.sure}</b> sure, <b>${cs.sam.doubtful}</b> doubtful.`);
+    later(() => showOutline(false), 2600);
+  }, 1700);
+  // 3. Spark looks at the pallet.
+  later(() => {
+    wave("spark");
+    const s = cs.spark;
+    readCard(["spark"], "Spark looks at the pallet",
+      `Labels: <b>${esc(s.product_on_labels)}</b> · sees <b>${s.cartons_visible}</b> cartons` +
+      (s.damaged_cartons ? ` · <b>${s.damaged_cartons} damaged</b>` : " · no damage") +
+      (s.stacked ? " · <b>stacked</b>" : " · not stacked") +
+      (s.all_cartons_visible ? "" : " · <b>not all visible</b>"));
+  }, 2800);
+  // 4. Carton by carton: both models must find the same object.
+  later(() => {
+    wave("sam"); wave("spark");
+    const c = cs.cross;
+    const d = readCard(["sam", "spark"], "Carton by carton",
+      `<b>${c.agreed}</b> agreed, <b>${c.sam_only}</b> only SAM, <b>${c.spark_only}</b> only Spark.`);
+    const dots = document.createElement("div");
+    dots.className = "dots";
+    const add = (n, cls) => { for (let i = 0; i < n; i++) { const el = document.createElement("i"); el.className = cls; dots.appendChild(el); } };
+    add(c.agreed, "a"); add(c.sam_only, "s"); add(c.spark_only, "p");
+    d.appendChild(dots);
+  }, 3900);
+  // 5. Kapı decides: the light, the barrier, the screen.
+  later(() => {
+    wave("kapi");
+    const g8 = cs.gate;
+    const word = { post: "POST", block: "BLOCK", human: "ASK ŞEF" }[g8.action];
+    readCard(["kapi"], "Kapı decides",
+      `<b>${word}</b> — ${esc(g8.reason)}` +
+      (g8.quantity != null ? ` Quantity: <b>${g8.quantity}</b>.` : ""),
+      "gate-" + g8.action);
+    setGateLight(g8.action);
+    drawScreen({ action: g8.action, reason: g8.reason });
+    if (g8.action === "post") G.barrierOpen = true;   // eased open in the main loop
+  }, 5000);
+  later(showResult, 6800);
+}
+
+// ---------- result ----------
+function showResult() {
+  const cs = G.cs;
+  G.phase = "done";
+  G.tries++;
+  const g8 = cs.gate;
+  const posted = cs.agent.posted || [];
+  const wrong = posted.length > 0 && g8.action !== "post";
+  if (wrong) G.wrongCount++;
+  document.body.classList.add("done");
+  document.body.classList.remove("deciding");
+  const R = $("result");
+  R.className = "card " + g8.action;
+  let h = "";
+  if (g8.action === "post") {
+    const [qty, doc] = posted[0] || [g8.quantity, ""];
+    h += `<h2>Receipt written to the ERP</h2>
+      <p class="doc">${qty} cartons · <span class="mono">${esc(doc)}</span></p>
+      <p>${esc(g8.reason)}</p>`;
+  } else if (g8.action === "block") {
+    h += `<h2>Nothing written</h2><p>${esc(g8.reason)}</p>`;
+    if (cs.draft) h += draftHtml(cs.draft, "Wonder's draft");
+  } else {
+    h += `<h2>Sent to Şef</h2><p>${esc(g8.reason)}</p>`;
+    wave("sef");
+    if (cs.draft) h += draftHtml(cs.draft, "Wonder's draft");
+  }
+  // The point: what the same agent did without the gate, next to what the gate let through.
+  const wg = cs.without_gate.posted || [];
+  const left = wg.length ? `posted ${wg.join(", ")}` : (cs.without_gate.supervisor ? "asked Şef" : "posted nothing");
+  const right = posted.length ? `${posted.map(p => p[0]).join(", ")} reached the ERP${posted[0][1] ? ` as ${posted[0][1]}` : ""}` : "nothing reached the ERP";
+  h += `<p class="point">Without the gate the agent ${esc(left)}; behind the gate, ${esc(right)}.</p>`;
+  h += `<div class="btnrow"><button class="primary" id="againBtn">Try another delivery</button>
+    <a href="../">Back to the demo</a></div>
+    <p id="tally">wrong receipts that reached the ERP: ${G.wrongCount}</p>`;
+  R.innerHTML = h;
+  $("tallyChip").textContent = `wrong receipts that reached the ERP: ${G.wrongCount}`;
+  $("againBtn").addEventListener("click", () => {
+    document.body.classList.remove("done", "deciding", "playing");
+    $("reads").innerHTML = "";
+    G.phase = "intro";
+    $("introWrap").style.display = "flex";
+  });
+}
+const DOC_LABEL = { supplier_dispute: "Dispute to the supplier", damage_report: "Damage report", supervisor_note: "Note to Şef" };
+function draftHtml(d, by) {
+  return `<div class="draft"><div class="doc-kind">${esc(DOC_LABEL[d.document] || d.document)} · ${esc(by)}</div>
+    <div class="doc-title">${esc(d.title)}</div><div class="doc-to">To: ${esc(d.to)}</div>
+    <p class="doc-body">${esc(d.body)}</p></div>`;
+}
+
+// ---------- intro / boot ----------
+function buildIntro() {
+  const wrap = $("cases");
+  for (const c of G.data.cases) {
+    const b = document.createElement("button");
+    b.textContent = c.title;
+    b.setAttribute("aria-pressed", "false");
+    b.addEventListener("click", () => {
+      G.caseId = c.id;
+      wrap.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", "false"));
+      b.setAttribute("aria-pressed", "true");
+    });
+    b.dataset.case = c.id;
+    wrap.appendChild(b);
+  }
+  // Preselect the matching delivery: the full path on the first try.
+  const first = wrap.querySelector('[data-case="ok"]') || wrap.querySelector("button");
+  if (first) first.click();
+  $("startBtn").addEventListener("click", startCase);
+}
+async function startCase() {
+  if (!G.caseId || G.phase !== "intro") return;
+  if (G._loadedCase !== G.caseId) {
+    $("startBtn").disabled = true;
+    $("loadmsg").textContent = "Loading the delivery…";
+    try { await loadDelivery(G.caseId); G._loadedCase = G.caseId; }
+    catch (e) { console.warn("delivery failed:", G.caseId, e); return; }
+    $("startBtn").disabled = false;
+  }
+  G.cs = G.data.cases.find(c => c.id === G.caseId);
+  if (!deliveryGroup || !G.cs) return;
+  resetScene();
+  $("introWrap").style.display = "none";
+  document.body.classList.add("playing");
+  G.phase = "driving";
+  G.camMode = "chase";
+  const it = G.cs.note.items[0] || {};
+  $("noteImg").src = "../" + G.cs.images.note;
+  $("noteLine").textContent = `${it.quantity} × ${it.description}`;
+  setHint("Drive into the trailer");
+  // Snap the chase camera behind the forklift for the start.
+  const F = G.fork;
+  camPos.set(F.x - Math.sin(F.h) * 6, 3.4, -(F.y - Math.cos(F.h) * 6));
+  camLook.set(F.x + Math.sin(F.h) * 2.5, 1.0, -(F.y + Math.cos(F.h) * 2.5));
+}
+async function boot() {
+  try {
+    progress(0.02, "Loading the evidence…");
+    const [data, col] = await Promise.all([
+      fetch("../data-en.json").then(r => { if (!r.ok) throw new Error("data-en.json"); return r.json(); }),
+      fetch("models/dock.glb.colliders.json").then(r => { if (!r.ok) throw new Error("colliders"); return r.json(); }),
+    ]);
+    G.data = data;
+    // All 221 floor boxes stand, except the open doorway the forklift drives through.
+    G.colliders = col.filter(([x0, y0, x1, y1]) =>
+      !(x0 === DOOR.x0 && y0 === DOOR.y0 && x1 === DOOR.x1 && y1 === DOOR.y1));
+    buildIntro();
+    progress(0.08, "Loading the dock…");
+    await loadDock();
+    progress(0.45, "Loading the delivery…");
+    await loadDelivery(G.caseId || "ok");
+    // The picked case may change before Start; reload then if needed.
+    const ready = () => {
+      window.stats.loadMs = Math.round(performance.now() - t0);
+      progress(1, "");
+      $("loadmsg").textContent = "The dock is ready.";
+      $("startBtn").disabled = false;
+    };
+    // If the judge picks another case while the dock loads, swap the delivery.
+    const watchPick = setInterval(async () => {
+      if (G.phase !== "intro" || !G.caseId) return;
+      if (deliveryGroup && G._loadedCase !== G.caseId) await swapIntroDelivery();
+    }, 400);
+    G._loadedCase = G.caseId || "ok";
+    ready();
+    // Characters after, one by one, nearest the forklift first; they pop in.
+    const order = [...PEOPLE].sort((a, b) =>
+      Math.hypot(a.b[0] - START.x, a.b[1] - START.y) - Math.hypot(b.b[0] - START.x, b.b[1] - START.y));
+    let n = 0;
+    for (const p of order) {
+      try { await loadCharacter(p); } catch (e) { console.warn("character failed:", p.id, e); }
+      n++;
+      if (G.phase === "intro") progress(1, `The dock is ready. Characters arriving… ${n}/${order.length}`);
+    }
+    clearInterval(watchPick);
+  } catch (e) {
+    console.error(e);
+    progress(1, "");
+    $("loadmsg").textContent = "Something failed to load. Check the connection and reload.";
+    showErr("Could not load " + (e.message || e) + ". Reload to try again.");
+  }
+}
+async function swapIntroDelivery() {
+  const id = G.caseId;
+  $("startBtn").disabled = true;
+  $("loadmsg").textContent = "Loading the delivery…";
+  try { await loadDelivery(id); G._loadedCase = id; }
+  catch (e) { console.warn("delivery failed:", id, e); }
+  $("loadmsg").textContent = "The dock is ready.";
+  $("startBtn").disabled = false;
+}
+
+// ---------- HUD hint state ----------
+function updateHint() {
+  if (G.phase !== "driving") return;
+  const F = G.fork;
+  if (F.carrying) {
+    const fx = Math.sin(F.h), fy = Math.cos(F.h);
+    const over = insideZone(F.x + fx * 1.19, F.y + fy * 1.19, F.h);
+    setHint(over ? "Set it down" : "Bring it to the yellow zone");
+  } else {
+    const near = Math.hypot(F.x - G.pallet.x, F.y - G.pallet.y) < 4;
+    if (!near && G.pallet.x === DROP.x && G.pallet.y === DROP.y) setHint("Drive into the trailer");
+    else if (near) setHint("Line the forks up with the pallet and press Space");
+  }
+}
+
+// ---------- labels ----------
+const _pv = new THREE.Vector3();
+function updateLabels() {
+  for (const p of PEOPLE) {
+    const rec = CHAR[p.id];
+    if (!rec || !rec.loaded) continue;
+    _pv.set(p.b[0], 2.05, -p.b[1]).project(camera);
+    if (_pv.z > 1 || _pv.z < -1) { rec.label.style.display = "none"; continue; }
+    rec.label.style.display = "block";
+    rec.label.style.transform =
+      `translate(${(_pv.x * 0.5 + 0.5) * innerWidth}px, ${(-_pv.y * 0.5 + 0.5) * innerHeight}px) translate(-50%, -100%)`;
+  }
+}
+
+// ---------- main loop ----------
+const clock = new THREE.Clock();
+let frames = 0, lastFps = performance.now();
+const fpsEl = $("fps");
+if (DEBUG) fpsEl.style.display = "block";
+function tick() {
+  requestAnimationFrame(tick);
+  const dt = Math.min(clock.getDelta(), 0.05);
+  G.time += dt;
+  try {
+    if (G.phase === "driving") { pollKeys(); stepFork(dt); updateHint(); }
+    else if (G.phase === "intro") { /* camera drift only */ }
+    // Barrier eases open on post.
+    if (G.barrierOpen && barrierMesh && barrierMesh.rotation.x < -0.02) {
+      barrierMesh.rotation.x = Math.min(0, barrierMesh.rotation.x + dt * 1.4);
+    }
+    // Characters pop in, then idle; animate only near the camera.
+    for (const p of PEOPLE) {
+      const rec = CHAR[p.id];
+      if (!rec || !rec.loaded) continue;
+      if (rec.pop < 1) {
+        rec.pop = Math.min(1, rec.pop + dt * 3);
+        const s = rec.targetS * (0.3 + 0.7 * (1 - Math.pow(1 - rec.pop, 3)));
+        rec.inner.scale.setScalar(s);
+      }
+      const d = camera.position.distanceTo(rec.group.position);
+      if (d < 25 && rec.mixer) rec.mixer.update(dt);
+    }
+    if (outline && outline.visible) {
+      outline.position.copy(deliveryGroup.position);
+      outline.position.y += 0.62;
+      outline.rotation.y = deliveryGroup.rotation.y;
+      outline.material.opacity = 0.45 + 0.45 * Math.sin(G.time * 7);
+    }
+    stepCamera(dt);
+    updateLabels();
+    renderer.render(scene, camera);
+  } catch (e) {
+    if (DEBUG) { console.error(e); showErr("Frame error: " + e.message); }
+  }
+  frames++;
+  const now = performance.now();
+  if (now - lastFps > 1000) {
+    window.stats.fps = frames;
+    window.stats.calls = renderer.info.render.calls;
+    window.stats.triangles = renderer.info.render.triangles;
+    if (DEBUG) fpsEl.textContent = `${frames} fps · ${renderer.info.render.calls} calls`;
+    frames = 0; lastFps = now;
+  }
+}
+/*__TEST_HOOK__*/
+if ("ontouchstart" in window || navigator.maxTouchPoints > 0) document.body.classList.add("touch");
+boot();
+tick();
+</script>
+</body>
+</html>
