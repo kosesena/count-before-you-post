@@ -538,6 +538,17 @@ const PEOPLE = [
   { id: "iris",    name: "Iris",    job: "drew the cast",               b: [-6.6, -0.6], h: 2.40 },
   { id: "ada",     name: "Ada",     job: "wrote the code",              b: [-9.6, -0.9], h: 2.40 },
 ];
+// Who stands on the floor per delivery (recorded runs; nothing invented).
+// Everyone else sits in their glass room. Intro with no case: only Kapı.
+const FLOOR_BY_CASE = {
+  ok: ["spark", "sam", "kapi", "rover"],
+  wrong: ["spark", "sam", "kapi", "wonder"],
+  eksik: ["spark", "sam", "kapi", "wonder"],
+  talimat: ["spark", "sam", "kapi", "wonder", "sef"],
+  hasarli: ["spark", "sam", "kapi", "wonder", "sef"],
+  belirsiz: ["spark", "sam", "kapi", "wonder", "sef"],
+};
+const INTRO_FLOOR = ["kapi"];
 const AV = id => `../img/av-${id}.jpg`;
 // Ring colours for the reading-card avatars (site/data-en.json; rover reads as spark-open).
 const CHAR_COL_FALLBACK = { spark: "#f97316", sam: "#3b82f6", voice: "#1e3a8a", kapi: "#a16207",
@@ -575,7 +586,8 @@ const CHAR_URL = id => (LITE ? "models/lite/" : "models/") + id + ".glb";
 
 // ---------- state ----------
 const G = {
-  data: null, colliders: [], caseId: null, cs: null,
+  data: null, colliders: [], rooms: null, caseId: null, cs: null,
+  _seatedById: {}, _introT: 0, _introDone: false,
   phase: "intro",            // intro | driving | deciding | done
   fork: { x: START.x, y: START.y, h: START.h, v: 0, steer: 0, steerAngle: 0, yawRate: 0,
           carrying: false, forksY: 0.45, forksTarget: 0.45, pending: null,
@@ -678,7 +690,7 @@ let screenCanvas, screenTex, screenCtx;
 // Driver's-seat cab, built from simple meshes (visible in seat view only).
 let cabGroup = null, wheelSpinner = null;
 let dashCanvas = null, dashCtx = null, dashTex = null, dashAt = 0;
-const CHAR = {};   // id -> { group, mixer, idle, walk, wave, waveLen, loaded, label, hx, hy, x, y, walking }
+const CHAR = {};   // id -> { group, mixer, idle, walk, wave, waveLen, loaded, label, hx, hy, x, y, walking, seated }
 // Soft round sprite: dark for contact shadows, white (tinted) for light pools.
 let contactTex = null, poolTex = null, gatePool = null;
 function radialTex(stops) {
@@ -1041,7 +1053,9 @@ async function loadCharacter(p) {
   const rec = { group: null, mixer: null, idle: null, walk: null, wave: null, loaded: false,
                 label: tagFor(p), bx: p.b[0], by: p.b[1], hx: p.b[0], hy: p.b[1],
                 x: p.b[0], y: p.b[1], walking: false, tx: p.b[0], ty: p.b[1],
-                faceX: 0, faceY: 5.5, hasFace: false, pendingWave: false, pop: 0 };
+                faceX: 0, faceY: 5.5, hasFace: false, pendingWave: false, pop: 0,
+                seated: !!G._seatedById[p.id], _mixAcc: 0, _nextSitWave: null,
+                legL: null, legR: null, sitSign: 1, hipH: p.h * 0.5, blob: null, root: null };
   CHAR[p.id] = rec;
   const g = await loadOne(CHAR_URL(p.id));
   const root = g.scene;
@@ -1071,6 +1085,26 @@ async function loadCharacter(p) {
   grp.add(blob);
   scene.add(grp);
   rec.group = grp; rec.inner = inner; rec.targetS = s; rec.loaded = true;
+  rec.blob = blob; rec.root = root;
+  try {
+    rec.legL = root.getObjectByName("LegL") || null;
+    rec.legR = root.getObjectByName("LegR") || null;
+  } catch { rec.legL = rec.legR = null; }
+  // Hip height above the feet in the standing rest pose, for the sit drop,
+  // and the leg-bend sign from the same rest pose (feet forward).
+  try {
+    inner.scale.setScalar(s);
+    grp.updateWorldMatrix(true, true);
+    if (rec.legL) {
+      const hv = new THREE.Vector3();
+      rec.legL.getWorldPosition(hv);
+      const hh = hv.y - grp.position.y;
+      if (isFinite(hh) && hh > 0.5 && hh < p.h) rec.hipH = hh;
+    }
+    try { rec.sitSign = detectLegSign(rec); } catch { rec.sitSign = 1; }
+    inner.scale.setScalar(0.001);
+    grp.updateWorldMatrix(true, true);
+  } catch {}
   rec.mixer = new THREE.AnimationMixer(root);
   const find = n => g.animations.find(a => a.name === n);
   if (find("Idle")) { rec.idle = rec.mixer.clipAction(find("Idle")); rec.idle.play(); }
@@ -1084,6 +1118,11 @@ async function loadCharacter(p) {
     rec.wave.clampWhenFinished = true;
     rec.waveLen = find("Wave").duration * 1000;
   }
+  // Place by the current roster (floor home or room seat).
+  try {
+    if (G._seatedById[p.id]) sitCharacter(p.id, true);
+    else { rec.seated = false; rec._nextSitWave = null; }
+  } catch {}
   // If the deciding walk was dispatched while this character still loaded,
   // start it now (same spot, no teleport during play).
   try {
@@ -1204,17 +1243,8 @@ function sendAllHome() {
   for (const p of PEOPLE) {
     const rec = CHAR[p.id];
     if (!rec) continue;
-    rec.walking = false; rec.pendingWave = false; rec.hasFace = false;
-    rec.tx = rec.hx; rec.ty = rec.hy; rec.x = rec.hx; rec.y = rec.hy;
-    if (!rec.loaded || !rec.group) continue;
-    rec.group.position.set(rec.hx, 0, -rec.hy);
-    faceBlender(rec, rec.hx, rec.hy, 0, 5.5);
-    try {
-      if (rec.walk) rec.walk.stop();
-      if (rec.wave) rec.wave.stop();
-      if (rec.idle) { rec.idle.reset().setEffectiveWeight(1).setEffectiveTimeScale(1).play(); }
-    } catch {}
-    clearTimeout(rec._wt);
+    if (G._seatedById[p.id]) { try { sitCharacter(p.id, true); } catch {} continue; }
+    try { standCharacter(p.id, true); } catch {}
   }
 }
 function dispatchWalkers() {
@@ -1238,6 +1268,139 @@ function dispatchWalkers() {
   const west = palletSpot(px, py, -1, fx, fy), east = palletSpot(px, py, 1, fx, fy);
   const chosen = Math.hypot(west.x - hx, west.y - hy) <= Math.hypot(east.x - hx, east.y - hy) ? west : east;
   startWalkTo(solo, chosen.x, chosen.y, px, py);
+}
+
+// ---------- rooms roster ----------
+// Floor per delivery (FLOOR_BY_CASE); intro with no case: only Kapı.
+// The roster changes at pick time, before driving starts. No walking
+// between floor and rooms during play.
+function floorSetFor(caseId) {
+  if (!caseId) return new Set(INTRO_FLOOR);
+  return new Set(FLOOR_BY_CASE[caseId] || INTRO_FLOOR);
+}
+function applyRoster(caseId) {
+  const floor = floorSetFor(caseId);
+  for (const p of PEOPLE) {
+    const seated = !floor.has(p.id);
+    G._seatedById[p.id] = seated;
+    const rec = CHAR[p.id];
+    if (!rec) continue;
+    if (seated) sitCharacter(p.id, true);
+    else standCharacter(p.id, true);
+  }
+}
+function personById(id) {
+  return PEOPLE.find(p => p.id === id);
+}
+function standCharacter(id, instant) {
+  const rec = CHAR[id];
+  if (!rec) return;
+  rec.seated = false;
+  rec._nextSitWave = null;
+  rec._mixAcc = 0;
+  rec.walking = false; rec.pendingWave = false; rec.hasFace = false;
+  rec.tx = rec.hx; rec.ty = rec.hy; rec.x = rec.hx; rec.y = rec.hy;
+  if (!rec.loaded || !rec.group) return;
+  rec.group.position.set(rec.hx, 0, -rec.hy);
+  faceBlender(rec, rec.hx, rec.hy, 0, 5.5);
+  if (rec.blob) rec.blob.position.y = 0.02;
+  try {
+    if (rec.legL) rec.legL.rotation.x = 0;
+    if (rec.legR) rec.legR.rotation.x = 0;
+  } catch {}
+  try {
+    if (rec.walk) rec.walk.stop();
+    if (rec.wave) rec.wave.stop();
+    if (rec.idle) { rec.idle.reset().setEffectiveWeight(1).setEffectiveTimeScale(1).play(); }
+  } catch {}
+  clearTimeout(rec._wt);
+}
+function sitCharacter(id, instant) {
+  const rec = CHAR[id];
+  if (!rec) return;
+  rec.seated = true;
+  rec.walking = false; rec.pendingWave = false; rec.hasFace = false;
+  rec._mixAcc = 0;
+  const room = G.rooms && G.rooms[id];
+  if (!room) {
+    // rooms.json missing: keep the flag for the roster check, stay home.
+    rec._nextSitWave = G.time + 1 + Math.random() * 4;
+    return;
+  }
+  const sx = room.seat[0], sy = room.seat[1];
+  rec.x = sx; rec.y = sy; rec.tx = sx; rec.ty = sy;
+  rec._nextSitWave = G.time + 1 + Math.random() * 4;
+  if (!rec.loaded || !rec.group) return;
+  const p = personById(id);
+  const hipH = rec.hipH || (p ? p.h * 0.5 : 1.2);
+  const sitY = room.seat_z - hipH;
+  rec.group.position.copy(V3(sx, sy, sitY));
+  try {
+    const fr = (room.face || 0) * Math.PI / 180;
+    const dx = Math.sin(fr), dy = Math.cos(fr);
+    faceBlender(rec, sx, sy, sx + dx, sy + dy);
+  } catch {}
+  const floorY = (room.front_z != null) ? room.front_z : (room.floor ? 3.2 : 0);
+  if (rec.blob) rec.blob.position.y = floorY - sitY + 0.02;
+  try {
+    if (rec.walk) rec.walk.stop();
+    if (rec.wave) rec.wave.stop();
+    if (rec.idle) { rec.idle.reset().setEffectiveWeight(1).setEffectiveTimeScale(1).play(); }
+  } catch {}
+  clearTimeout(rec._wt);
+  // Bend the legs now; the tick re-applies after every mixer update.
+  try { applySitBend(rec); } catch {}
+}
+function applySitBend(rec) {
+  if (!rec || !rec.seated || !rec.legL || !rec.legR) return;
+  const bend = (rec.sitSign || 1) * Math.PI / 2;
+  rec.legL.rotation.x = bend;
+  rec.legR.rotation.x = bend;
+}
+// Rest-pose check: which local-X sign sends the feet forward (under the
+// desk) instead of backward through the chair. Tests +90° vs -90° on LegL
+// and keeps the one whose foot lands forward of the hip.
+function detectLegSign(rec) {
+  try {
+    const leg = rec.legL || rec.legR;
+    if (!leg || !rec.group) return 1;
+    rec.group.updateWorldMatrix(true, true);
+    let foot = null;
+    try {
+      if (rec.root) {
+        foot = rec.root.getObjectByName("FootL") || rec.root.getObjectByName("FootR")
+          || rec.root.getObjectByName("footL") || rec.root.getObjectByName("footR");
+      }
+    } catch {}
+    if (!foot) {
+      let lowestY = Infinity;
+      const v = new THREE.Vector3();
+      leg.traverse(o => {
+        if (!o.isBone) return;
+        if (o === leg) return;
+        o.getWorldPosition(v);
+        if (v.y < lowestY) { lowestY = v.y; foot = o; }
+      });
+    }
+    if (!foot) foot = leg.children[0];
+    if (!foot) return 1;
+    const fx = 0 - rec.hx, fy = 5.5 - rec.hy;
+    const fl = Math.hypot(fx, fy) || 1;
+    const Fx = fx / fl, Fz = -fy / fl;
+    const restX = leg.rotation.x;
+    const hip = new THREE.Vector3(), fp = new THREE.Vector3();
+    const test = sign => {
+      leg.rotation.x = sign * Math.PI / 2;
+      rec.group.updateWorldMatrix(true, true);
+      leg.getWorldPosition(hip);
+      foot.getWorldPosition(fp);
+      return (fp.x - hip.x) * Fx + (fp.z - hip.z) * Fz;
+    };
+    const dPlus = test(1), dMinus = test(-1);
+    leg.rotation.x = restX;
+    rec.group.updateWorldMatrix(true, true);
+    return dPlus >= dMinus ? 1 : -1;
+  } catch { return 1; }
 }
 
 // Soft pulsing outline over the cartons while Sam counts.
@@ -1613,9 +1776,12 @@ function collide() {
           F.x += dx / d * (r - d); F.y += dy / d * (r - d);
         }
       }
-      // Characters are solid.
+      // Floor characters are solid; the seated ones are behind glass.
       for (const p of PEOPLE) {
-        const dx = cx - p.b[0], dy = cy - p.b[1], d = Math.hypot(dx, dy), rr = r + 0.38;
+        const rec = CHAR[p.id];
+        if (rec && rec.seated) continue;
+        const px = rec ? rec.x : p.b[0], py = rec ? rec.y : p.b[1];
+        const dx = cx - px, dy = cy - py, d = Math.hypot(dx, dy), rr = r + 0.38;
         if (d < rr && d > 1e-6) { F.x += dx / d * (rr - d); F.y += dy / d * (rr - d); }
       }
       // ...and so is the pallet on the ground (the fork tips reach past the body).
@@ -1686,12 +1852,16 @@ function dropSpot() {
   const F = G.fork;
   const fx = Math.sin(F.h), fy = Math.cos(F.h);
   const x = F.x + fx * SET_D, y = F.y + fy * SET_D;
-  // No room inside a collider, a character, or the gate hardware.
+  // No room inside a collider, a floor character, or the gate hardware.
   for (const [cx, cy] of palletCorners(x, y, F.h)) {
     for (const [x0, y0, x1, y1] of G.colliders)
       if (cx > x0 && cx < x1 && cy > y0 && cy < y1) return null;
-    for (const p of PEOPLE)
-      if (Math.hypot(cx - p.b[0], cy - p.b[1]) < 0.45) return null;
+    for (const p of PEOPLE) {
+      const rec = CHAR[p.id];
+      if (rec && rec.seated) continue;
+      const px = rec ? rec.x : p.b[0], py = rec ? rec.y : p.b[1];
+      if (Math.hypot(cx - px, cy - py) < 0.45) return null;
+    }
   }
   return { x, y, h: F.h };
 }
@@ -1758,10 +1928,20 @@ function cycleCam() {
   G.camMode = G.camMode === "chase" ? "seat" : G.camMode === "seat" ? "over" : "chase";
 }
 $("camBtn").addEventListener("click", cycleCam);
+// Intro glide: start facing the glass rooms from the middle of the yard
+// (both storeys in view), then glide ~5 s to today's dock view.
+const INTRO_CAM_START = { px: 0, py: 0.5, pz: 2.8, lx: 0, ly: -15.5, lz: 2.0 };
+const INTRO_CAM_END = { px: 10.8, py: -9.8, pz: 4.8, lx: 0, ly: 5.3, lz: 0.45 };
 const camPos = new THREE.Vector3(10.8, 4.8, 9.8);
 const camLook = new THREE.Vector3(0, 0.45, -5.3);
 const _v1 = new THREE.Vector3(), _v2 = new THREE.Vector3();
 const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+if (!reducedMotion) {
+  camPos.set(INTRO_CAM_START.px, INTRO_CAM_START.pz, -INTRO_CAM_START.py);
+  camLook.set(INTRO_CAM_START.lx, INTRO_CAM_START.lz, -INTRO_CAM_START.ly);
+  camera.position.copy(camPos);
+  camera.lookAt(camLook);
+}
 function stepCamera(dt) {
   const F = G.fork;
   let px, py, pz, lx, ly, lz, k = 1 - Math.exp(-4 * dt);
@@ -1787,8 +1967,23 @@ function stepCamera(dt) {
     k = 1;
   } else if (G.camMode === "over" || G.phase === "intro") {
     const drift = (G.phase === "intro" && !reducedMotion) ? Math.sin(G.time * 0.12) * 0.7 : 0;
-    px = 10.8 + drift; py = -9.8; pz = 4.8; lx = 0; ly = 5.3; lz = 0.45;
-    k = G.phase === "intro" ? 1 - Math.exp(-1 * dt) : k;
+    if (G.phase === "intro" && !reducedMotion && !G._introDone) {
+      G._introT = Math.min(5, (G._introT || 0) + dt);
+      const t = Math.min(1, G._introT / 5);
+      const e = t * t * (3 - 2 * t);
+      const S = INTRO_CAM_START, E = INTRO_CAM_END;
+      px = S.px + (E.px - S.px) * e;
+      py = S.py + (E.py - S.py) * e;
+      pz = S.pz + (E.pz - S.pz) * e;
+      lx = S.lx + (E.lx - S.lx) * e;
+      ly = S.ly + (E.ly - S.ly) * e;
+      lz = S.lz + (E.lz - S.lz) * e;
+      if (t >= 1) { px += drift; }
+      k = 1;
+    } else {
+      px = 10.8 + drift; py = -9.8; pz = 4.8; lx = 0; ly = 5.3; lz = 0.45;
+      k = G.phase === "intro" ? 1 - Math.exp(-1 * dt) : k;
+    }
   } else {
     const fx = Math.sin(F.h), fy = Math.cos(F.h);
     const h = groundH(F.x, F.y);
@@ -2074,13 +2269,16 @@ function buildIntro() {
       G.caseId = c.id;
       wrap.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", "false"));
       b.setAttribute("aria-pressed", "true");
+      try { applyRoster(c.id); } catch (e) { if (DEBUG) console.warn("roster:", e); }
     });
     b.dataset.case = c.id;
     wrap.appendChild(b);
   }
-  // Preselect the matching delivery: the full path on the first try.
-  const first = wrap.querySelector('[data-case="ok"]') || wrap.querySelector("button");
-  if (first) first.click();
+  // No preselect: the intro starts with no case chosen (Kapı at the gate,
+  // everyone else in their rooms). The roster changes as soon as a delivery
+  // is picked, before driving starts.
+  G.caseId = null;
+  try { applyRoster(null); } catch {}
   $("startBtn").addEventListener("click", startCase);
 }
 async function startCase() {
@@ -2094,10 +2292,12 @@ async function startCase() {
   }
   G.cs = G.data.cases.find(c => c.id === G.caseId);
   if (!deliveryGroup || !G.cs) return;
+  try { applyRoster(G.caseId); } catch {}
   resetScene();
   $("introWrap").style.display = "none";
   document.body.classList.add("playing");
   G.phase = "driving";
+  G._introDone = true;
   G.camMode = "chase";
   const it = G.cs.note.items[0] || {};
   $("noteImg").src = "../" + G.cs.images.note;
@@ -2111,11 +2311,13 @@ async function startCase() {
 async function boot() {
   try {
     progress(0.02, "Loading the evidence…");
-    const [data, col] = await Promise.all([
+    const [data, col, rooms] = await Promise.all([
       fetch("../data-en.json").then(r => { if (!r.ok) throw new Error("data-en.json"); return r.json(); }),
       fetch("models/dock.glb.colliders.json").then(r => { if (!r.ok) throw new Error("colliders"); return r.json(); }),
+      fetch("models/rooms.json").then(r => { if (!r.ok) throw new Error("rooms.json"); return r.json(); }).catch(e => { console.warn("rooms.json failed:", e); return null; }),
     ]);
     G.data = data;
+    G.rooms = rooms;
     // All 221 floor boxes stand, except the open doorway the forklift drives through.
     G.colliders = col.filter(([x0, y0, x1, y1]) =>
       !(x0 === DOOR.x0 && y0 === DOOR.y0 && x1 === DOOR.x1 && y1 === DOOR.y1));
@@ -2198,7 +2400,10 @@ function updateLabels() {
     const rec = CHAR[p.id];
     if (!rec || !rec.loaded) continue;
     if (showSet && !showSet.has(p.id)) { rec.label.style.display = "none"; continue; }
-    _pv.set(rec.x, 3.075, -rec.y).project(camera);
+    // During driving the seated ones are behind glass (name plates on rooms).
+    if (G.phase === "driving" && rec.seated) { rec.label.style.display = "none"; continue; }
+    const ly = rec.group ? rec.group.position.y + 3.075 : 3.075;
+    _pv.set(rec.x, ly, -rec.y).project(camera);
     if (_pv.z > 1 || _pv.z < -1 || Math.abs(_pv.x) > 1.05 || Math.abs(_pv.y) > 1.05) {
       rec.label.style.display = "none"; continue;
     }
@@ -2220,13 +2425,14 @@ function updateLabels() {
 
 // ---------- main loop ----------
 const clock = new THREE.Clock();
-let frames = 0, lastFps = performance.now();
+let frames = 0, lastFps = performance.now(), _frame = 0;
 const fpsEl = $("fps");
 if (DEBUG) fpsEl.style.display = "block";
 function tick() {
   requestAnimationFrame(tick);
   const dt = Math.min(clock.getDelta(), 0.05);
   G.time += dt;
+  _frame++;
   try {
     if (G.phase === "driving") { pollKeys(); stepFork(dt); updateHint(); }
     else if (G.phase === "intro") { /* camera drift only */ }
@@ -2236,7 +2442,9 @@ function tick() {
       barrierMesh.rotation.x = Math.min(0, barrierMesh.rotation.x + dt * 1.4);
     }
     // Characters pop in, then idle; animate only near the camera.
-    for (const p of PEOPLE) {
+    // Seated ones farther than 15 m update every third frame (staggered).
+    for (let i = 0; i < PEOPLE.length; i++) {
+      const p = PEOPLE[i];
       const rec = CHAR[p.id];
       if (!rec || !rec.loaded) continue;
       if (rec.pop < 1) {
@@ -2245,7 +2453,28 @@ function tick() {
         rec.inner.scale.setScalar(s);
       }
       const d = camera.position.distanceTo(rec.group.position);
-      if ((d < 25 || rec.walking) && rec.mixer) rec.mixer.update(dt);
+      if (rec.mixer && (d < 25 || rec.walking)) {
+        if (rec.seated && d > 15) {
+          rec._mixAcc = (rec._mixAcc || 0) + dt;
+          if ((_frame + i) % 3 === 0) {
+            try { rec.mixer.update(rec._mixAcc); } catch {}
+            rec._mixAcc = 0;
+          }
+        } else {
+          try {
+            if (rec._mixAcc) { rec.mixer.update(rec._mixAcc + dt); rec._mixAcc = 0; }
+            else rec.mixer.update(dt);
+          } catch {}
+        }
+      }
+      if (rec.seated) {
+        try { applySitBend(rec); } catch {}
+        if (rec._nextSitWave != null && G.time >= rec._nextSitWave) {
+          rec._nextSitWave = G.time + 2.5 + Math.random() * 4;
+          try { waveImmediate(p.id); } catch {}
+          try { applySitBend(rec); } catch {}
+        }
+      }
     }
     if (outline && outline.visible) {
       outline.position.copy(deliveryGroup.position);
