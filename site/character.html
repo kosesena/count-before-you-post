@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cast ID &middot; Count Before You Post</title>
+<meta name="description" content="Cast ID card: the character's tool, model, jobs and record at the dock.">
+<style>
+:root {
+  --bg: #f1f4ec; --panel: #fdfffa; --ink: #26211a; --muted: #666d5e; --line: #dde3d0;
+  --post: #15803d; --post-bg: #e2f3e7; --block: #b91c1c; --block-bg: #fbe3e3;
+  --human: #b45309; --human-bg: #fbeed3; --accent: #9a3412; --accent-bg: #fbeedf;
+  --code: #e9eee0; --bubble: #e9eee0;
+  --shadow: 0 1px 2px rgba(74, 55, 25, .08), 0 3px 10px rgba(74, 55, 25, .06);
+  --radius: 14px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #14110c; --panel: #1f1a13; --ink: #f1e9da; --muted: #b6a996; --line: #3a3227;
+    --post: #4ade80; --post-bg: #0f2b1a; --block: #f87171; --block-bg: #331313;
+    --human: #fbbf24; --human-bg: #33230e; --accent: #fdba74; --accent-bg: #2b2113;
+    --code: #292219; --bubble: #292219; --shadow: none;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #14110c; --panel: #1f1a13; --ink: #f1e9da; --muted: #b6a996; --line: #3a3227;
+  --post: #4ade80; --post-bg: #0f2b1a; --block: #f87171; --block-bg: #331313;
+  --human: #fbbf24; --human-bg: #33230e; --accent: #fdba74; --accent-bg: #2b2113;
+  --code: #292219; --bubble: #292219; --shadow: none;
+}
+* { box-sizing: border-box; }
+html, body { overflow-x: hidden; overflow-x: clip; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font: 16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+.mono, code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .82em; }
+a { color: var(--accent); }
+img { max-width: 100%; }
+.wrap { max-width: 1120px; margin: 0 auto; padding: 0 16px 12px; }
+#theme {
+  position: absolute; top: 10px; right: 10px; z-index: 10;
+  border: 1px solid var(--line); background: var(--panel); color: var(--ink);
+  border-radius: 99px; padding: 6px 12px; font: inherit; font-size: 13px; cursor: pointer;
+}
+#theme:focus-visible, button:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.back { margin: 20px 0 10px; }
+.back a { font-weight: 600; }
+.back.bottom { margin: 26px 0 0; }
+/* The ID card, in the character's own colour. */
+.id-grid { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr); gap: 24px;
+  align-items: start; margin-top: 6px; }
+.idcard {
+  --cardbg: var(--panel);
+  background: var(--cardbg); color: #221d15;
+  border: 1px solid rgba(31, 27, 20, .12);
+  border-radius: 22px; padding: 26px 26px 24px; min-width: 0;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .45),
+    0 1px 2px rgba(74, 55, 25, .08), 0 10px 26px rgba(74, 55, 25, .10);
+}
+.idcard.dark {
+  color: #f5f2ea;
+  border-color: rgba(255, 255, 255, .16);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .22),
+    0 1px 2px rgba(0, 0, 0, .3), 0 10px 26px rgba(0, 0, 0, .35);
+}
+.idcard .badge {
+  font-size: 11.5px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase;
+  opacity: .72; margin: 0 0 16px;
+}
+.idcard .photo {
+  width: min(220px, 56vw); aspect-ratio: 1; border-radius: 50%; object-fit: cover; display: block;
+  border: 6px solid var(--c); background: #fff;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, .55), 0 12px 28px rgba(0, 0, 0, .25);
+}
+.idcard h1 { font-size: clamp(32px, 4.6vw, 46px); line-height: 1.05; letter-spacing: -.02em; margin: 16px 0 4px; }
+.idcard .meta { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 10px; margin: 6px 0 0; }
+.idcard .model { font-size: 13px; margin: 0; opacity: .85; }
+.idcard .pill {
+  font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
+  white-space: nowrap; border-radius: 99px; padding: 3px 10px; color: inherit;
+  border: 1px solid rgba(255, 255, 255, .55); background: rgba(255, 255, 255, .32);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .55);
+}
+.idcard.dark .pill { border-color: rgba(255, 255, 255, .35); background: rgba(255, 255, 255, .14);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25); }
+.fields { width: 100%; border-collapse: collapse; margin: 18px 0 0; font-size: 14.5px; }
+.fields th {
+  text-align: left; font-weight: 700; font-size: 13px; text-transform: uppercase;
+  letter-spacing: .04em; opacity: .68;
+  padding: 8px 14px 8px 0; vertical-align: top; white-space: nowrap;
+}
+.fields td { padding: 8px 0; overflow-wrap: anywhere; word-break: break-word; }
+.fields tr + tr th, .fields tr + tr td { border-top: 1px solid rgba(128, 128, 128, .28); }
+.fields td.mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .85em; }
+.cutout { margin: 0; display: flex; justify-content: center; align-items: flex-start; min-width: 0; }
+.cutout img { max-width: 100%; width: auto; height: auto; max-height: 620px;
+  filter: drop-shadow(0 18px 24px rgba(0, 0, 0, .25)); }
+/* Their line sits directly on the colour, as on the cast cards. */
+.words {
+  --cardbg: var(--panel);
+  background: var(--cardbg); color: #221d15;
+  border: 1px solid rgba(31, 27, 20, .12); border-radius: 18px;
+  padding: 20px 22px; margin-top: 22px;
+}
+.words.dark { color: #f5f2ea; border-color: rgba(255, 255, 255, .16); }
+.words h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .08em; opacity: .7; margin: 0 0 8px; }
+.words .line {
+  font-size: 19px; line-height: 1.6; font-weight: 500; margin: 0; padding-left: 14px;
+  border-left: 3px solid var(--c); overflow-wrap: anywhere;
+}
+.lists { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; margin-top: 16px; }
+.panel {
+  background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 16px 18px; min-width: 0;
+}
+.panel h2 { font-size: 18px; margin: 0 0 6px; letter-spacing: -.01em; }
+.jobs { margin: 8px 0 0; padding-left: 20px; font-size: 14.5px; }
+.jobs li { margin: 0 0 8px; overflow-wrap: anywhere; }
+.record { list-style: none; margin: 8px 0 0; padding: 0; font-size: 14.5px; }
+.record li { position: relative; padding-left: 26px; margin: 0 0 8px; overflow-wrap: anywhere; }
+.record li::before {
+  content: "\2713"; position: absolute; left: 2px; top: 0;
+  color: var(--post); font-weight: 800;
+}
+.castnav { margin: 36px 0 8px; }
+.castnav h2 { font-size: 18px; margin: 0 0 10px; }
+.castnav ul { list-style: none; display: flex; flex-wrap: wrap; gap: 12px 14px; margin: 0; padding: 0; }
+.castnav li { margin: 0; }
+.castnav a, .castnav .cur {
+  display: flex; flex-direction: column; align-items: center; gap: 4px; width: 74px;
+  text-align: center; text-decoration: none; color: var(--ink); font-size: 12.5px; line-height: 1.3;
+}
+.castnav img {
+  width: 60px; height: 60px; border-radius: 50%; object-fit: cover; display: block;
+  border: 3px solid var(--line); background: var(--code);
+}
+.castnav a:hover img { border-color: var(--c); }
+.castnav .cur { font-weight: 700; }
+.castnav .cur img { border-color: var(--c); box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--c); }
+.card {
+  background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 16px;
+}
+footer { color: var(--muted); font-size: 13px; padding: 32px 0 56px; }
+footer p { margin: 4px 0; }
+@media (max-width: 760px) {
+  .id-grid { grid-template-columns: minmax(0, 1fr); }
+  .lists { grid-template-columns: minmax(0, 1fr); }
+  .cutout img { max-height: 420px; }
+}
+@media (max-width: 480px) {
+  body { font-size: 15px; }
+  .idcard { padding: 20px 18px; }
+  .fields th { white-space: normal; }
+}
+</style>
+</head>
+<body>
+<button id="theme" type="button" aria-label="Toggle colour theme">Dark</button>
+<div class="wrap">
+  <p class="back"><a href="index.html#h-cast">&larr; Back to the cast</a></p>
+  <main id="main">
+    <noscript><div class="card"><p>This page loads its cast data with JavaScript.</p></div></noscript>
+    <div class="card" id="loading"><p>Loading&hellip;</p></div>
+  </main>
+  <nav class="castnav" id="castnav" aria-label="The rest of the cast" hidden></nav>
+  <p class="back bottom"><a href="index.html#h-cast">&larr; Back to the cast</a></p>
+  <footer>
+    <p>Built during the Meta Global AI Developer Hackathon, 26 Oct &ndash; 4 Nov 2026, by Sena K&ouml;se.</p>
+    <p>Characters: Sena's concepts, drawn with Muse Image. Fan-made, not official Meta mascots.</p>
+    <p>This page was written by Muse Code.</p>
+  </footer>
+</div>
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c =>
+  ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c]));
+const MONTHS = ["January", "February", "March", "April", "May", "June", "July",
+  "August", "September", "October", "November", "December"];
+const STATUS_TEXT = { "on duty": "On duty", done: "Built part of it", coming: "Coming soon" };
+
+const themeBtn = $("theme");
+function paintTheme() {
+  const dark = document.documentElement.dataset.theme === "dark" ||
+    (!document.documentElement.dataset.theme && matchMedia("(prefers-color-scheme: dark)").matches);
+  themeBtn.textContent = dark ? "Light" : "Dark";
+}
+themeBtn.addEventListener("click", () => {
+  const cur = document.documentElement.dataset.theme ||
+    (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  document.documentElement.dataset.theme = cur === "dark" ? "light" : "dark";
+  paintTheme();
+});
+paintTheme();
+
+const q = new URLSearchParams(location.search);
+const ID = q.get("id") || "";
+const LANG = q.get("lang") || "";
+
+function lum(hex) {
+  const n = String(hex || "").replace("#", "");
+  const v = [0, 2, 4].map(i => {
+    const c = parseInt(n.substr(i, 2), 16) / 255;
+    return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+  });
+  return 0.2126 * v[0] + 0.7152 * v[1] + 0.0722 * v[2];
+}
+function longDate(iso) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(iso || ""));
+  if (!m || +m[2] < 1 || +m[2] > 12) return String(iso || "");
+  return `${parseInt(m[3], 10)} ${MONTHS[+m[2] - 1]} ${m[1]}`;
+}
+const cutoutOf = c => c.cutout || (c.profile || {}).cutout || "";
+
+function renderChar(c) {
+  document.title = `${c.name} \u00b7 Cast ID \u00b7 Count Before You Post`;
+  const p = c.profile || {};
+  const dark = lum(c.bg) < 0.25;
+  const jobs = (p.jobs || []).map(j => `<li>${esc(j)}</li>`).join("");
+  const rec = (p.record || []).map(r => `<li>${esc(r)}</li>`).join("");
+  $("main").innerHTML =
+    `<div class="id-grid">` +
+    `<section class="idcard${dark ? " dark" : ""}" style="--c:${esc(c.colour)};--cardbg:${esc(c.bg)}" aria-label="${esc(c.name)}, cast ID">` +
+    `<p class="badge">Count before you post &middot; Cast ID</p>` +
+    `<img class="photo" src="${esc(c.avatar_large)}" alt="${esc(c.name)}">` +
+    `<h1>${esc(c.name)}</h1>` +
+    `<p class="meta"><span class="model">${esc(c.model || "")}</span>` +
+    `<span class="pill">${esc(STATUS_TEXT[c.status] || c.status || "")}</span></p>` +
+    `<table class="fields"><tbody>` +
+    `<tr><th scope="row">Tool</th><td>${esc(p.tool || "")}</td></tr>` +
+    `<tr><th scope="row">Model</th><td class="mono">${esc(p.model_id || "")}</td></tr>` +
+    `<tr><th scope="row">Runs on</th><td>${esc(p.where || "")}</td></tr>` +
+    `<tr><th scope="row">First day on the job</th><td>${esc(longDate(p.first_day))}</td></tr>` +
+    `</tbody></table></section>` +
+    `<figure class="cutout"><img src="${esc(cutoutOf(c))}" alt="${esc(c.name)}, full figure"></figure>` +
+    `</div>` +
+    `<section class="words${dark ? " dark" : ""}" style="--c:${esc(c.colour)};--cardbg:${esc(c.bg)}" aria-label="In their own words">` +
+    `<h2>In their own words</h2><p class="line">${esc(c.line || "")}</p></section>` +
+    `<div class="lists">` +
+    `<section class="panel" aria-label="What they did"><h2>What they did</h2><ul class="jobs">${jobs}</ul></section>` +
+    `<section class="panel" aria-label="On the record"><h2>On the record</h2><ul class="record">${rec}</ul></section>` +
+    `</div>`;
+}
+
+function renderNav(list, suffix) {
+  const nav = $("castnav");
+  if (!list.length) { nav.hidden = true; return; }
+  nav.hidden = false;
+  nav.innerHTML = `<h2>The rest of the cast</h2><ul>` + list.map(m => {
+    const img = `<img src="${esc(m.avatar)}" alt="${esc(m.name)}" loading="lazy">`;
+    if (m.id === ID) {
+      return `<li><span class="cur" style="--c:${esc(m.colour)}" aria-current="page">${img}<span>${esc(m.name)}</span></span></li>`;
+    }
+    return `<li><a style="--c:${esc(m.colour)}" href="character.html?id=${encodeURIComponent(m.id)}${suffix}">` +
+      `${img}<span>${esc(m.name)}</span></a></li>`;
+  }).join("") + `</ul>`;
+}
+
+function renderUnknown() {
+  document.title = `Unknown cast member \u00b7 Count Before You Post`;
+  $("main").innerHTML = `<div class="card"><p><b>No cast member found.</b> ` +
+    (ID ? `There is no one with id \u201c${esc(ID)}\u201d.` : `No character id was given.`) + `</p>` +
+    `<p><a href="index.html#h-cast">&larr; Back to the cast</a></p></div>`;
+}
+
+fetch("data.json").then(r => {
+  if (!r.ok) throw new Error("data.json not found");
+  return r.json();
+}).then(base => {
+  const langs = base.languages || [];
+  const entry = langs.find(l => l.code === LANG);
+  const suffix = entry ? `&lang=${encodeURIComponent(LANG)}` : "";
+  const useLang = entry && entry.file && entry.file !== "data.json";
+  const lp = useLang
+    ? fetch(entry.file).then(r => (r.ok ? r.json() : null)).catch(() => null)
+    : Promise.resolve(null);
+  return lp.then(ld => {
+    const list = (ld && ld.characters && ld.characters.length ? ld : base).characters || [];
+    const c = list.find(x => x.id === ID) ||
+      (ld ? (base.characters || []).find(x => x.id === ID) : null);
+    if (c) renderChar(c);
+    else renderUnknown();
+    renderNav(list, suffix);
+  });
+}).catch(err => {
+  $("main").innerHTML = `<div class="card"><p><b>Could not load the cast data.</b></p>` +
+    `<p>${esc(err.message)}. Serve this folder over HTTP so <span class="mono">fetch("data.json")</span> works.</p>` +
+    `<p><a href="index.html#h-cast">&larr; Back to the cast</a></p></div>`;
+});
+</script>
+</body>
+</html>

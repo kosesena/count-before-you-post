@@ -61,8 +61,53 @@ img { max-width: 100%; }
 .hero-cta { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 22px; margin: 0 0 30px; }
 .btn-primary { display: inline-block; color: #fff; text-decoration: none; font-weight: 800; font-size: 17px;
   padding: 13px 30px; border-radius: 99px; background: linear-gradient(92deg, #2f6bff 0%, #7c3aed 100%);
-  box-shadow: 0 10px 26px rgba(47,107,255,.40), inset 0 1px 0 rgba(255,255,255,.35); }
+  box-shadow: 0 10px 26px rgba(47,107,255,.40), inset 0 1px 0 rgba(255,255,255,.35);
+  position: relative; overflow: hidden; }
 .btn-primary:hover { filter: brightness(1.1); }
+.btn-primary.drive { display: inline-flex; align-items: center; gap: 10px; }
+/* Soft shine sweeping across every few seconds. */
+.btn-primary.drive::after { content: ""; position: absolute; top: 0; bottom: 0; left: 0; width: 56px;
+  background: linear-gradient(100deg, transparent, rgba(255,255,255,.45), transparent);
+  transform: translateX(-110px) skewX(-20deg); pointer-events: none;
+  animation: drive-shine 5.5s ease-in-out infinite; }
+@keyframes drive-shine { 0% { transform: translateX(-110px) skewX(-20deg); } 32% { transform: translateX(340px) skewX(-20deg); } 100% { transform: translateX(340px) skewX(-20deg); } }
+.btn-primary .truck { width: 28px; height: 19px; flex: 0 0 auto; transition: transform .3s ease; }
+.btn-primary:hover .truck { transform: translateX(6px); }
+.btn-primary .truck .ww { transform-box: fill-box; transform-origin: center; }
+.btn-primary:hover .truck .ww { animation: truck-spin .5s linear infinite; }
+@keyframes truck-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .btn-primary.drive::after { animation: none; }
+  .btn-primary:hover .truck { transform: none; }
+  .btn-primary:hover .truck .ww { animation: none; }
+}
+/* Full-screen overlay: the truck drives from the left to the middle, then the page goes to sim/. */
+.dock-overlay { position: fixed; inset: 0; z-index: 100; display: none;
+  flex-direction: column; align-items: center; justify-content: center; gap: 20px;
+  background: radial-gradient(ellipse at 50% 125%, rgba(245,158,11,.28), transparent 60%), #0b0e14;
+  overflow: hidden; }
+.dock-overlay.show { display: flex; animation: overlay-in .25s ease forwards; }
+@keyframes overlay-in { from { opacity: 0; } to { opacity: 1; } }
+.dock-rig { position: relative; width: min(420px, 72vw); }
+.dock-overlay.show .dock-rig { animation: dock-drive 1.05s cubic-bezier(.25,.7,.3,1) forwards; }
+@keyframes dock-drive {
+  0% { transform: translateX(calc(-50vw - 240px)); filter: blur(3px); }
+  35% { filter: blur(1.5px); }
+  100% { transform: translateX(0); filter: blur(0); }
+}
+.dock-rig svg.rig { display: block; width: 100%; height: auto; }
+.dock-rig .dw { transform-box: fill-box; transform-origin: center; }
+.dock-overlay.show .dock-rig .dw { animation: truck-spin .45s linear infinite; }
+.dock-speed { position: absolute; right: 100%; top: 50%; transform: translateY(-50%);
+  width: 90px; margin-right: 6px; opacity: 0; }
+.dock-overlay.show .dock-speed { opacity: 1; transition: opacity .2s ease .15s; }
+.dock-speed i { display: block; height: 4px; border-radius: 2px; margin: 9px 0;
+  background: linear-gradient(90deg, transparent, rgba(245,166,35,.85)); }
+.dock-speed i:nth-child(2) { width: 75%; margin-left: auto; }
+.dock-speed i:nth-child(3) { width: 55%; margin-left: auto; }
+.dock-msg { color: #fff; font-size: 18px; font-weight: 600; margin: 0;
+  opacity: 0; }
+.dock-overlay.show .dock-msg { animation: overlay-in .3s ease .15s forwards; }
 .btn-quiet { color: #fff; font-weight: 600; text-decoration: underline;
   text-underline-offset: 3px; text-decoration-color: rgba(255,255,255,.6); }
 .btn-quiet:hover { text-decoration-color: #fff; }
@@ -72,19 +117,36 @@ img { max-width: 100%; }
 .muse-head b { font-size: 22px; letter-spacing: -.01em; }
 .muse-head span { font-size: 13.5px; opacity: .9; }
 .muse-tools { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 10px; margin: 0; padding: 0; list-style: none; }
-.muse-tools li { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px;
+.muse-tools li { position: relative; margin-top: 104px; padding: 30px 8px 12px; min-width: 0;
   background: rgba(255,255,255,.12);
   -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
-  border: 1px solid rgba(255,255,255,.28); border-radius: 14px; padding: 14px 8px 12px; min-width: 0;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.35); }
-.muse-tools img { width: 54px; height: 54px; border-radius: 50%; flex: 0 0 auto; object-fit: cover;
-  box-shadow: 0 0 0 2px rgba(255,255,255,.85); }
+  border: 1px solid rgba(255,255,255,.28); border-radius: 14px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.35);
+  transition: background .25s ease; }
+.muse-tools li:hover, .muse-tools li:focus-within { background: rgba(255,255,255,.21); }
+.muse-tools a.tool { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px;
+  color: #fff; text-decoration: none; border-radius: 10px; }
+.muse-tools a.tool:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+/* The full-figure cutout stands on the card's top edge and rises out of the glass. */
+.muse-tools .fig { position: absolute; left: 0; right: 0; bottom: calc(100% - 26px); height: 128px;
+  display: flex; align-items: flex-end; justify-content: center; pointer-events: none; }
+.muse-tools .fig img { width: auto; height: 100%; max-width: 96%; object-fit: contain; flex: 0 0 auto;
+  border-radius: 0; box-shadow: none;
+  filter: drop-shadow(0 10px 14px rgba(0,0,0,.35));
+  transform-origin: 50% 100%; transition: transform .3s ease; }
+.muse-tools li:hover .fig img, .muse-tools li:focus-within .fig img { transform: scale(1.15); }
 .muse-tools b { display: block; font-size: 13.5px; line-height: 1.2; }
 .muse-tools small { display: block; font-size: 11.5px; line-height: 1.35; opacity: .9; margin-top: 3px; }
+@media (prefers-reduced-motion: reduce) {
+  .muse-tools li { transition: none; }
+  .muse-tools .fig img { transition: none; }
+  .muse-tools li:hover .fig img, .muse-tools li:focus-within .fig img { transform: none; }
+}
 @media (max-width: 1080px) {
   .muse-tools { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; overscroll-behavior-x: contain;
     margin: 0 -16px; padding: 2px 16px 10px; scrollbar-width: thin; }
-  .muse-tools li { flex: 0 0 196px; scroll-snap-align: start; }
+  .muse-tools li { flex: 0 0 196px; scroll-snap-align: start; margin-top: 88px; }
+  .muse-tools .fig { height: 110px; }
 }
 @media (max-width: 420px) { .muse-head b { font-size: 19px; } .hero-inner { padding-top: 56px; } }
 .posthero { padding-top: 22px; }
@@ -131,7 +193,7 @@ h2 { font-size: 24px; letter-spacing: -.01em; margin: 42px 0 4px; }
 .crew { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px; }
 .member {
   --cardbg: var(--panel);
-  background: var(--cardbg); color: #221d15;
+  background: var(--cardbg); color: #221d15; text-decoration: none;
   border: 1px solid rgba(31, 27, 20, .12);
   border-radius: 22px; overflow: hidden;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, .45),
@@ -374,17 +436,17 @@ footer p { margin: 4px 0; }
     <p class="lede"><b>A verification gate between AI agents and the ERP.</b>
       Before a goods receipt is written, the delivery note, the camera, the receiver's voice
       and a second model must agree. If they don't, nothing is written and a person decides.</p>
-    <p class="hero-cta"><a class="btn-primary" href="sim/">Drive the dock &rarr;</a><a class="btn-quiet" href="#h-dock">See the six deliveries</a></p>
+    <p class="hero-cta"><a class="btn-primary drive" id="driveBtn" href="sim/"><svg class="truck" viewBox="0 0 28 18" aria-hidden="true"><rect x="1" y="3" width="15" height="9" rx="1.5" fill="rgba(255,255,255,.92)"/><path d="M16 6h4.6L25 10.4V12h-9z" fill="rgba(255,255,255,.92)"/><rect x="17.5" y="7.2" width="3.4" height="2.6" fill="#2f6bff"/><g class="ww"><circle cx="7.5" cy="13.6" r="2.8" fill="#1c2430"/><rect x="6.7" y="11.4" width="1.6" height="4.4" rx=".8" fill="#fff"/></g><g class="ww"><circle cx="21" cy="13.6" r="2.8" fill="#1c2430"/><rect x="20.2" y="11.4" width="1.6" height="4.4" rx=".8" fill="#fff"/></g></svg><span>Drive the dock &rarr;</span></a><a class="btn-quiet" href="#h-dock">See the six deliveries</a></p>
     <section class="muse" aria-label="Built with Muse">
       <p class="muse-head"><b>Built with Muse</b><span>Meta's models, on the Meta Model API and on open weights, do every step that needs AI.</span></p>
       <ul class="muse-tools">
-        <li><img src="img/av-spark.jpg" alt=""><span><b>Muse Spark</b><small>reads the note, looks at the pallet, runs the agent</small></span></li>
-        <li><img src="img/av-sam.jpg" alt=""><span><b>SAM 3.1</b><small>finds and outlines every carton</small></span></li>
-        <li><img src="img/av-voice.jpg" alt=""><span><b>Muse Voice</b><small>writes down the receiver's spoken count</small></span></li>
-        <li><img src="img/av-iris.jpg" alt=""><span><b>Muse Image</b><small>drew every character on this page</small></span></li>
-        <li><img src="img/av-ada.jpg" alt=""><span><b>Muse Code</b><small>wrote the ERPNext client and this page</small></span></li>
-        <li><img src="img/av-wonder.jpg" alt=""><span><b>Muse Wonder</b><small>checks Spark's reading against the note; writes the dispute, the damage report or the note to Şef</small></span></li>
-        <li><img src="img/av-spark-open.jpg" alt=""><span><b>Muse Spark Open</b><small>reads the note a second time on open weights before any receipt</small></span></li>
+        <li><a class="tool" href="character.html?id=spark"><span class="fig" aria-hidden="true"><img src="img/cut-spark.webp" alt=""></span><span><b>Muse Spark</b><small>reads the note, looks at the pallet, runs the agent</small></span></a></li>
+        <li><a class="tool" href="character.html?id=sam"><span class="fig" aria-hidden="true"><img src="img/cut-sam.webp" alt=""></span><span><b>SAM 3.1</b><small>finds and outlines every carton</small></span></a></li>
+        <li><a class="tool" href="character.html?id=voice"><span class="fig" aria-hidden="true"><img src="img/cut-voice.webp" alt=""></span><span><b>Muse Voice</b><small>writes down the receiver's spoken count</small></span></a></li>
+        <li><a class="tool" href="character.html?id=iris"><span class="fig" aria-hidden="true"><img src="img/cut-iris.webp" alt=""></span><span><b>Muse Image</b><small>drew every character on this page</small></span></a></li>
+        <li><a class="tool" href="character.html?id=ada"><span class="fig" aria-hidden="true"><img src="img/cut-ada.webp" alt=""></span><span><b>Muse Code</b><small>wrote the ERPNext client and this page</small></span></a></li>
+        <li><a class="tool" href="character.html?id=wonder"><span class="fig" aria-hidden="true"><img src="img/cut-wonder.webp" alt=""></span><span><b>Muse Wonder</b><small>checks Spark's reading against the note; writes the dispute, the damage report or the note to Şef</small></span></a></li>
+        <li><a class="tool" href="character.html?id=spark-open"><span class="fig" aria-hidden="true"><img src="img/cut-spark-open.webp" alt=""></span><span><b>Muse Spark Open</b><small>reads the note a second time on open weights before any receipt</small></span></a></li>
       </ul>
     </section>
   </div>
@@ -449,6 +511,27 @@ footer p { margin: 4px 0; }
     <p>This page was written by Muse Code.</p>
   </footer>
 </div>
+<div class="dock-overlay" id="dockOverlay" aria-hidden="true">
+  <div class="dock-rig">
+    <div class="dock-speed" aria-hidden="true"><i></i><i></i><i></i></div>
+    <svg class="rig" viewBox="0 0 320 150" aria-hidden="true">
+      <rect x="8" y="16" width="172" height="88" rx="6" fill="#f5a623"/>
+      <rect x="8" y="16" width="172" height="14" rx="6" fill="#f7bc55"/>
+      <rect x="8" y="24" width="172" height="6" fill="#f7bc55"/>
+      <g fill="#d98a12"><rect x="40" y="34" width="5" height="70"/><rect x="72" y="34" width="5" height="70"/><rect x="104" y="34" width="5" height="70"/><rect x="136" y="34" width="5" height="70"/></g>
+      <rect x="8" y="94" width="172" height="10" fill="#d98a12"/>
+      <path d="M180 44h40l32 32v28h-72z" fill="#2f6bff"/>
+      <path d="M186 50h30l26 26v10h-56z" fill="#bcd2ff"/>
+      <rect x="180" y="96" width="72" height="8" fill="#1c2430"/>
+      <rect x="252" y="78" width="10" height="10" rx="2" fill="#ffe9a8"/>
+      <rect x="20" y="104" width="220" height="7" rx="3" fill="#1c2430"/>
+      <g class="dw"><circle cx="58" cy="118" r="17" fill="#141a24" stroke="#39424f" stroke-width="3"/><rect x="55.5" y="104" width="5" height="28" rx="2.5" fill="#8b95a5"/><circle cx="58" cy="118" r="4" fill="#e8ecf1"/></g>
+      <g class="dw"><circle cx="150" cy="118" r="17" fill="#141a24" stroke="#39424f" stroke-width="3"/><rect x="147.5" y="104" width="5" height="28" rx="2.5" fill="#8b95a5"/><circle cx="150" cy="118" r="4" fill="#e8ecf1"/></g>
+      <g class="dw"><circle cx="216" cy="118" r="17" fill="#141a24" stroke="#39424f" stroke-width="3"/><rect x="213.5" y="104" width="5" height="28" rx="2.5" fill="#8b95a5"/><circle cx="216" cy="118" r="4" fill="#e8ecf1"/></g>
+    </svg>
+  </div>
+  <p class="dock-msg">Opening the dock&hellip;</p>
+</div>
 <script>
 "use strict";
 const $ = id => document.getElementById(id);
@@ -503,6 +586,28 @@ themeBtn.addEventListener("click", () => {
 });
 paintTheme();
 
+/* "Drive the dock": a truck drives across a dark overlay, then the page goes to sim/.
+   About 1.2 s in all; reduced motion (or no overlay) goes straight there.
+   pageshow clears the overlay so Back from the simulator returns to a normal page. */
+(function () {
+  const btn = $("driveBtn"), overlay = $("dockOverlay");
+  if (!btn || !overlay) return;
+  let driving = false;
+  btn.addEventListener("click", e => {
+    if (driving || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    e.preventDefault();
+    driving = true;
+    overlay.classList.add("show");
+    overlay.setAttribute("aria-hidden", "false");
+    setTimeout(() => { location.href = btn.getAttribute("href"); }, 1200);
+  });
+  window.addEventListener("pageshow", () => {
+    driving = false;
+    overlay.classList.remove("show");
+    overlay.setAttribute("aria-hidden", "true");
+  });
+})();
+
 function renderStats(s) {
   $("stats").innerHTML =
     `<div class="stat"><b><span class="sdot bad"></span>${esc(s.wrong_without_gate)}/${esc(s.cases)}</b>` +
@@ -539,13 +644,13 @@ function renderCrew(list) {
   };
   $("crew").innerHTML = list.map(m => {
     const dark = lum(m.bg) < 0.25;
-    return `<article class="member${dark ? " dark" : ""}" data-fx="${esc(m.id)}" style="--c:${esc(m.colour)};--cardbg:${esc(m.bg)}">` +
+    return `<a class="member${dark ? " dark" : ""}" data-fx="${esc(m.id)}" style="--c:${esc(m.colour)};--cardbg:${esc(m.bg)}" href="character.html?id=${esc(m.id)}">` +
     `<div class="body"><p class="name"><span class="cdot"></span>${esc(m.name)}</p>` +
     `<p class="meta"><span class="model">${esc(m.model)}</span>` +
     `<span class="pill ${STATUS_CLASS[m.status] || ""}">${esc(STATUS_TEXT[m.status] || m.status)}</span></p>` +
     `<p class="bubble">${esc(m.line)}</p></div>` +
     `<div class="shot"><img class="portrait" src="${esc(m.portrait)}" alt="${esc(m.name)} portrait" loading="lazy"></div>` +
-    `<canvas class="fx" aria-hidden="true"></canvas></article>`;
+    `<canvas class="fx" aria-hidden="true"></canvas></a>`;
   }).join("");
   $("roles").textContent =
     "On duty = working at the dock. Built part of it = made part of this project.";
