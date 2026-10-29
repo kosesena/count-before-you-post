@@ -1006,14 +1006,17 @@ async function loadDelivery(caseId) {
     if (n === "paper" || n === "tape" || n === "ink") o.visible = false;
   });
   // Centre on the wooden pallet (full-size in every case) with its base at y=0.
+  // Bounds in the node's own frame: the file's node carries a translation (where the
+  // pallet stood in the measured scene), which the position set below replaces.
   const box = new THREE.Box3();
+  g.scene.updateMatrixWorld(true);
+  const toNode = deliveryNode.matrixWorld.clone().invert();
   deliveryNode.traverse(o => {
     if (o.isMesh && o.visible && o.material.name === "wood") {
       o.geometry.computeBoundingBox();
-      box.union(o.geometry.boundingBox.clone().applyMatrix4(o.matrixWorld || new THREE.Matrix4()));
+      box.union(o.geometry.boundingBox.clone().applyMatrix4(toNode.clone().multiply(o.matrixWorld)));
     }
   });
-  // (geometry bounds are node-local; the node has no rotation/scale.)
   if (!box.isEmpty()) {
     const c = box.getCenter(new THREE.Vector3());
     palletCenter = { x: c.x, z: c.z };
@@ -2819,7 +2822,7 @@ function tick() {
 // case to the result card. Nothing is exposed without ?test.
 if (new URLSearchParams(location.search).has("test"))
   window.__sim = { G, CHAR, ST, pickup: () => pickupPallet(true), drop: dropPallet, DROP, ZONE,
-    FORK: { pick: PICK_D, set: SET_D } };
+    FORK: { pick: PICK_D, set: SET_D }, camera, get delivery() { return deliveryGroup; } };
 if ("ontouchstart" in window || navigator.maxTouchPoints > 0) document.body.classList.add("touch");
 boot();
 tick();
