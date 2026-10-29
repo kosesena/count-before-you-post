@@ -196,95 +196,120 @@ h2 { font-size: 24px; letter-spacing: -.01em; margin: 42px 0 4px; }
   padding: 10px 12px; font-size: 13.5px; color: var(--muted);
 }
 .how div b { color: var(--ink); }
-.crew { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px; }
+/* Meet the cast: each row is a free-standing figure beside a frosted-glass
+   panel, alternating sides. The figure has no box behind it: only a soft
+   floor shadow and a faint glow of its colour. Dark glass in both themes. */
+.crew { display: flex; flex-direction: column; gap: 56px; }
 .member {
-  --cardbg: var(--panel);
-  background: var(--cardbg); color: #221d15; text-decoration: none;
-  border: 1px solid rgba(31, 27, 20, .12);
-  border-radius: 22px; overflow: hidden;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .45),
-    0 1px 2px rgba(74, 55, 25, .08), 0 10px 26px rgba(74, 55, 25, .10);
-  display: flex; flex-direction: column; min-width: 0; position: relative;
-  transition: transform .25s ease, box-shadow .25s ease;
+  --c: #8fa8ff;
+  position: relative; display: flex; min-width: 0;
+  background: none; border: 0; border-radius: 0; box-shadow: none;
+  color: #f2f5ff; text-decoration: none;
 }
-.member.dark {
-  color: #f5f2ea;
-  border-color: rgba(255, 255, 255, .16);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .22),
-    0 1px 2px rgba(0, 0, 0, .3), 0 10px 26px rgba(0, 0, 0, .35);
+.member:nth-child(even) { flex-direction: row-reverse; }
+.member .pic {
+  flex: 0 0 38%; min-width: 0; position: relative; z-index: 1;
+  display: flex; align-items: flex-end; justify-content: center;
+  background: none; border: 0; padding: 0;
 }
-.member:hover {
-  transform: translateY(-4px);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .45),
-    0 2px 4px rgba(74, 55, 25, .10), 0 16px 34px rgba(74, 55, 25, .16);
+.member:nth-child(odd) .pic { margin-right: -56px; }
+.member:nth-child(even) .pic { margin-left: -56px; }
+/* Very faint glow of the character's colour behind the figure. */
+.member .pic::before {
+  content: ""; position: absolute; left: 6%; right: 6%; top: 10%; bottom: 4%;
+  background: radial-gradient(ellipse 62% 52% at 50% 58%,
+    color-mix(in srgb, var(--c) 18%, transparent), transparent 70%);
+  pointer-events: none;
 }
-.member.dark:hover {
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .22),
-    0 2px 4px rgba(0, 0, 0, .3), 0 16px 34px rgba(0, 0, 0, .45);
+/* Soft floor shadow under the feet. */
+.member .pic::after {
+  content: ""; position: absolute; left: 20%; right: 20%; bottom: 0; height: 26px;
+  background: radial-gradient(ellipse 50% 50% at 50% 50%, rgba(0, 0, 0, .45), transparent 70%);
+  filter: blur(6px); pointer-events: none;
 }
-@media (prefers-reduced-motion: reduce) {
-  .member { transition: none; }
-  .member:hover { transform: none; }
-  .member canvas.fx { display: none; }
-  .member.sheen::after { animation: none; opacity: 0; }
+.member img.cutout {
+  position: relative; z-index: 1; display: block;
+  max-height: 420px; width: auto; max-width: 100%; object-fit: contain;
+  filter: drop-shadow(0 14px 18px rgba(0, 0, 0, .30));
+  transition: transform .25s ease;
 }
-.member .body { padding: 22px 20px 0; }
+.member:hover img.cutout { transform: translateY(-6px); }
+.member .body {
+  flex: 1 1 auto; min-width: 0; align-self: center; position: relative;
+  border-radius: 24px; padding: 28px 30px 26px; overflow: hidden;
+  color: #f2f5ff;
+  background: rgba(255, 255, 255, .07);
+  background:
+    linear-gradient(115deg, color-mix(in srgb, var(--c) 24%, transparent) 0%, transparent 62%),
+    rgba(255, 255, 255, .07);
+  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, .20);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .22);
+  transition: border-color .25s ease, box-shadow .25s ease;
+}
+.member:nth-child(even) .body {
+  background: rgba(255, 255, 255, .07);
+  background:
+    linear-gradient(245deg, color-mix(in srgb, var(--c) 24%, transparent) 0%, transparent 62%),
+    rgba(255, 255, 255, .07);
+}
+.member:hover .body, .member:focus-visible .body {
+  border-color: rgba(255, 255, 255, .45);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .30), 0 8px 30px rgba(0, 0, 0, .35);
+}
+.member .eyebrow {
+  margin: 0 0 8px; font-size: 12.5px; font-weight: 800;
+  letter-spacing: .09em; text-transform: uppercase;
+  color: var(--c);
+  color: color-mix(in srgb, var(--c) 55%, white);
+}
 .member .name {
-  display: flex; align-items: center; align-self: flex-start;
-  font-size: 23px; font-weight: 800; margin: 0; letter-spacing: -.01em;
-  background: rgba(255, 255, 255, .16);
-  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, .30); border-radius: 12px; padding: 2px 12px 2px 10px;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .35);
+  margin: 0; font-size: clamp(28px, 3.4vw, 38px); font-weight: 800;
+  letter-spacing: -.01em; line-height: 1.1; color: #fff;
 }
-.member.dark .name { background: rgba(0, 0, 0, .20); border-color: rgba(255, 255, 255, .24); }
-.member .cdot {
-  width: 12px; height: 12px; border-radius: 50%; flex: 0 0 auto;
-  margin-right: 10px; background: var(--c); box-shadow: 0 0 0 3px rgba(255, 255, 255, .35);
+.member .model { margin: 4px 0 0; font-size: 14.5px; color: rgba(235, 240, 255, .72); }
+.member .line {
+  margin: 14px 0 0; font-size: 16px; line-height: 1.6;
+  color: rgba(255, 255, 255, .92); overflow-wrap: anywhere;
 }
-.member.dark .cdot { box-shadow: 0 0 0 3px rgba(255, 255, 255, .2); }
-.member .meta { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 10px; margin: 6px 0 0; }
-.member .model { font-size: 13px; margin: 0; opacity: .85; }
-.member .pill {
-  font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
-  white-space: nowrap; border-radius: 99px; padding: 3px 10px; color: inherit;
-  border: 1px solid rgba(255, 255, 255, .55); background: rgba(255, 255, 255, .32);
-  -webkit-backdrop-filter: blur(10px) saturate(1.3); backdrop-filter: blur(10px) saturate(1.3);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .55);
+.member .job0 {
+  margin: 14px 0 0; font-size: 16px; font-weight: 800; line-height: 1.5;
+  overflow-wrap: anywhere;
+  color: var(--c);
+  color: color-mix(in srgb, var(--c) 60%, white);
 }
-.member.dark .pill { border-color: rgba(255, 255, 255, .35); background: rgba(255, 255, 255, .14);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25); }
-.member .bubble {
-  /* The line sits right on the card's colour (Sena: no bubble). Colour follows the card:
-     dark text on light cards, light text on dark ones. */
-  margin: 14px 0 18px; padding: 0 0 0 14px;
-  font-size: 15.5px; line-height: 1.6; font-weight: 500; overflow-wrap: anywhere;
-  color: rgba(34, 29, 21, .9); border-left: 3px solid var(--c);
-}
-.member.dark .bubble { color: rgba(246, 243, 236, .94); }
-.member .shot {
-  /* .shot is also the dock camera image's class: drop its frame here. The image's mask
-     does the fade into the card. */
-  position: relative; margin-top: auto; border: 0; border-radius: 0; background: none;
-}
-.member img.portrait {
-  width: 100%; aspect-ratio: 1; object-fit: cover; display: block; margin: 0; background: var(--cardbg);
-  /* The picture's own top edge fades out, so no line shows where it meets the card. */
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 26%);
-  mask-image: linear-gradient(to bottom, transparent 0, #000 26%);
+.member .open {
+  display: inline-block; margin-top: 16px; font-weight: 700; font-size: 14.5px;
+  text-decoration: underline; text-underline-offset: 3px;
+  color: var(--c);
+  color: color-mix(in srgb, var(--c) 55%, white);
 }
 .member canvas.fx {
   position: absolute; inset: 0; width: 100%; height: 100%;
   pointer-events: none; opacity: 0; transition: opacity .35s ease; z-index: 2;
 }
 .member canvas.fx.on { opacity: 1; }
-.member::after {
+.member .body::after {
   content: ""; position: absolute; inset: 0; z-index: 3; pointer-events: none; opacity: 0;
   background: linear-gradient(115deg, transparent 42%, rgba(255, 255, 255, .28) 50%, transparent 58%);
   transform: translateX(-130%);
 }
-.member.sheen::after { opacity: 1; animation: fx-sheen 1s ease-out 1; }
+.member.sheen .body::after { opacity: 1; animation: fx-sheen 1s ease-out 1; }
 @keyframes fx-sheen { from { transform: translateX(-130%); } to { transform: translateX(130%); } }
+@media (prefers-reduced-motion: reduce) {
+  .member img.cutout { transition: none; }
+  .member .body { transition: none; }
+  .member:hover img.cutout { transform: none; }
+  .member canvas.fx { display: none; }
+  .member.sheen .body::after { animation: none; opacity: 0; }
+}
+@media (max-width: 720px) {
+  .crew { gap: 48px; }
+  .member, .member:nth-child(even) { flex-direction: column; }
+  .member:nth-child(odd) .pic, .member:nth-child(even) .pic { margin: 0 0 -30px; flex: none; width: 100%; }
+  .member img.cutout { max-height: 300px; }
+  .member .body { width: 100%; padding: 48px 22px 24px; }
+}
 .roles { font-size: 13px; color: var(--muted); margin: 14px 0 0; max-width: 46rem; }
 .langrow { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: 0 0 4px; }
 .langrow label { font-size: 13.5px; font-weight: 700; }
@@ -542,26 +567,10 @@ footer p { margin: 4px 0; }
   .ch-fig.multi img.small { max-height: 130px; }
   .count-views { grid-template-columns: minmax(0, 1fr); }
 }
-/* Cast: video + horizontal alternating cards. */
+/* Cast: video + zigzag figure/panel rows (row styles live with .member above). */
 .cast-section { padding-top: 26px; }
 .castshot video { display: block; width: 100%; height: auto; border-radius: 18px;
   border: 1px solid var(--line); box-shadow: var(--shadow); background: #000; }
-.crew { display: flex; flex-direction: column; gap: 18px; }
-.member { flex-direction: row; align-items: stretch; }
-.member:nth-child(even) { flex-direction: row-reverse; }
-.member .pic { flex: 0 0 300px; min-width: 0; display: flex; align-items: flex-end; justify-content: center;
-  padding: 18px 18px 0; }
-.member img.cutout { width: 100%; max-height: 340px; object-fit: contain; display: block;
-  filter: drop-shadow(0 12px 16px rgba(0,0,0,.25)); }
-.member .body { flex: 1 1 auto; min-width: 0; padding: 28px 26px 24px; display: flex; flex-direction: column; }
-.member .job0 { font-weight: 800; font-size: 15.5px; line-height: 1.5; margin: 12px 0 0; overflow-wrap: anywhere; }
-.member .open { display: inline-block; margin-top: auto; padding-top: 14px; font-weight: 700; font-size: 14px;
-  text-decoration: underline; text-underline-offset: 3px; color: inherit; }
-@media (max-width: 680px) {
-  .member, .member:nth-child(even) { flex-direction: column; }
-  .member .pic { flex: none; }
-  .member img.cutout { max-height: 300px; }
-}
 </style>
 </head>
 <body>
@@ -853,27 +862,19 @@ function renderHow() {
 }
 
 function renderCrew(list) {
-  const lum = hex => {
-    const n = String(hex || "").replace("#", "");
-    const v = [0, 2, 4].map(i => {
-      const c = parseInt(n.substr(i, 2), 16) / 255;
-      return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
-    });
-    return 0.2126 * v[0] + 0.7152 * v[1] + 0.0722 * v[2];
-  };
+  const figs = (DATA && DATA.hero && DATA.hero.figures) || {};
   $("crew").innerHTML = list.map(m => {
-    const dark = lum(m.bg) < 0.25;
-    const cutout = (m.profile && m.profile.cutout) || m.portrait;
+    const src = figs[m.id] || (m.profile && m.profile.cutout) || m.portrait;
     const job0 = (m.profile && m.profile.jobs && m.profile.jobs[0]) || "";
-    return `<a class="member${dark ? " dark" : ""}" data-fx="${esc(m.id)}" style="--c:${esc(m.colour)};--cardbg:${esc(m.bg)}" href="character.html?id=${esc(m.id)}">` +
-    `<div class="pic"><img class="cutout" src="${esc(cutout)}" alt="${esc(m.name)}" loading="lazy"></div>` +
-    `<div class="body"><p class="name"><span class="cdot"></span>${esc(m.name)}</p>` +
-    `<p class="meta"><span class="model">${esc(m.model)}</span>` +
-    `<span class="pill ${STATUS_CLASS[m.status] || ""}">${esc(STATUS_TEXT[m.status] || m.status)}</span></p>` +
-    `<p class="bubble">${esc(m.line)}</p>` +
+    return `<a class="member" data-fx="${esc(m.id)}" style="--c:${esc(m.colour)}" href="character.html?id=${esc(m.id)}">` +
+    `<div class="pic"><img class="cutout" src="${esc(src)}" alt="${esc(m.name)}" loading="lazy" decoding="async"></div>` +
+    `<div class="body"><p class="eyebrow">${esc(STATUS_TEXT[m.status] || m.status)}</p>` +
+    `<p class="name">${esc(m.name)}</p>` +
+    `<p class="model">Model  · ${esc(m.model)}</p>` +
+    `<p class="line"> ${esc(m.line)} </p>` +
     (job0 ? `<p class="job0">${esc(job0)}</p>` : "") +
-    `<span class="open">Open profile &rarr;</span></div>` +
-    `<canvas class="fx" aria-hidden="true"></canvas></a>`;
+    `<span class="open">Open profile &rarr;</span>` +
+    `<canvas class="fx" aria-hidden="true"></canvas></div></a>`;
   }).join("");
   $("roles").textContent =
     "On duty = working at the dock. Built part of it = made part of this project.";
@@ -1784,12 +1785,10 @@ function startFx(card) {
   if (fxActive && fxActive.card === card) return;
   stopFx();
   const canvas = card.querySelector("canvas.fx");
-  const img = card.querySelector("img.cutout");
-  if (!canvas || !img) return;
-  const rc = card.getBoundingClientRect();
-  const ri = img.getBoundingClientRect();
-  const S = { w: rc.width, h: rc.height,
-    px: ri.left - rc.left, py: ri.top - rc.top, pw: ri.width, ph: ri.height };
+  const panel = card.querySelector(".body");
+  if (!canvas || !panel) return;
+  const rp = panel.getBoundingClientRect();
+  const S = { w: rp.width, h: rp.height, px: 0, py: 0, pw: rp.width, ph: rp.height };
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
   canvas.width = Math.max(1, Math.round(S.w * dpr));
   canvas.height = Math.max(1, Math.round(S.h * dpr));
