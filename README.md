@@ -114,6 +114,15 @@ Fixes by hand are always separate commits.
 | 29 Oct | Character profile pages, hero cards that open them, the driving button; the simulator's cinematic intro | [site-profiles.md](docs/muse-code/site-profiles.md), [sim-cinematic.md](docs/muse-code/sim-cinematic.md) | `819f3ab` |
 | 29 Oct | The hero with the scene and characters Muse Image drew for it | [site-hero-2.md](docs/muse-code/site-hero-2.md) | `245a959` |
 | 29 Oct | Simulator realism: rear-wheel steering, inertia, synthesised sound, a driver's-seat view | [sim-realism.md](docs/muse-code/sim-realism.md) | `9297f00` |
+| 29 Oct | The page as a story in five chapters, the character beside each; the cast video | [site-story.md](docs/muse-code/site-story.md) | `8e7fa2c` |
+| 29 Oct | The receiver's voice clips as one glass tile with waveforms; a favicon | [site-voice-clips.md](docs/muse-code/site-voice-clips.md) | `7a1b259` |
+| 29 Oct | Simulator realism, round 2: lighter shadows, a cleaner driver's seat, warmer light | [sim-realism-2.md](docs/muse-code/sim-realism-2.md) | `652a66e` |
+| 29 Oct | The cast as free-standing figures beside tinted glass panels, all ten | [site-cast-glass.md](docs/muse-code/site-cast-glass.md) | `b7827c2` |
+| 29 Oct | In the simulator, the character the delivery tests walks to the pallet and acts | [sim-actors.md](docs/muse-code/sim-actors.md) | `191fb0f` |
+| 29 Oct | A clear deciding view, the gate's screen showing the real decision, a verdict panel | [sim-decision-view.md](docs/muse-code/sim-decision-view.md) | `b4522eb` |
+| 29 Oct | Reading cards that show each character at work, a bigger forklift, a clear pickup | [sim-reading-cards.md](docs/muse-code/sim-reading-cards.md) | `b5bb614` |
+| 29 Oct | The warehouse grown to a closed front wall; ten character rooms on two storeys | [dock-rooms.md](docs/muse-code/dock-rooms.md) | `15b8d9c` |
+| 29 Oct | The rooms furnished after the concepts Sena chose from Muse Image's drawings | [interiors](docs/muse-code/dock-rooms-interiors.md), [2](docs/muse-code/dock-rooms-interiors-2.md) | `fd66551` |
 
 How the work was split. Muse Code cannot run Blender in its sandbox, so we rendered its scene
 scripts and told it what we saw. In headless runs it stopped to ask for approval before
