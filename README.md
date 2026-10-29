@@ -87,13 +87,39 @@ Every step that needs AI runs on Meta's models through the Meta Model API.
 | **Muse Voice Transcribe** | Voice | The receiver's spoken count (Turkish, English, German, Chinese), with supplier and product as keywords; diarization keeps the driver's claim apart from the receiver's count | `cbyp/voice.py` |
 | **Muse Wonder** (`muse-wonder-1.0`) | Wonder | Audits Spark's reading against the note before a write; drafts the dispute, the damage report or the note to Şef, in the note's language | `cbyp/wonder.py` |
 | **Muse Spark Open** (open weights, on Baseten) | Rover | Reads the note a second time, independently; if the two readings differ, Şef decides | `cbyp/second_reader.py` |
-| **Muse Code** | Ada | Wrote the ERPNext client and the demo page; and, through the gate's MCP server, worked the dock as an outside agent | `cbyp/erpnext.py`, `site/index.html`, `cbyp/mcp_server.py` |
+| **Muse Code** | Ada | Wrote the ERPNext client, the demo page, the character pages, the 3D simulator and the dock scenes; and, through the gate's MCP server, worked the dock as an outside agent | see [What Muse Code built](#what-muse-code-built) |
 | **Muse Image** | Iris | Drew every character in this repository and on the demo page | `experiments/mascots_from_ref.py`, `assets/mascots/` |
 
-Muse Code's work is committed under its own name, so the history shows exactly what it wrote.
-The ERPNext client was committed unchanged, 13/13 tests passing as delivered. The demo page was
-committed as delivered, with three small fixes by hand in a separate commit. Every task it
-was given is in [`docs/muse-code/`](docs/muse-code/), verbatim.
+### What Muse Code built
+
+Muse Code (`muse exec`, model `muse-spark-1.3`) wrote much of this repository. Every task it
+was given is in [`docs/muse-code/`](docs/muse-code/), verbatim, and its work is committed under
+its own name (`git log --author="Muse Code"`), so the history shows exactly what it wrote.
+Fixes by hand are always separate commits.
+
+| Day | What Muse Code built | Task | Commit |
+|---|---|---|---|
+| 27 Oct | The ERPNext client and its tests (13/13 passing as delivered, committed unchanged) | [erpnext-client.md](docs/muse-code/erpnext-client.md) | `6a9f3ea` |
+| 27 Oct | The live demo page, from scratch | [demo-site.md](docs/muse-code/demo-site.md) | `e031178` |
+| 27 Oct | The page in four languages, Wonder's paperwork on it | [demo-site-languages.md](docs/muse-code/demo-site-languages.md) | with `18e72c6` |
+| 27 Oct | A read-only review of the page against the repository; we fixed what it found | [site-audit.md](docs/muse-code/site-audit.md), [answer](docs/muse-code/site-audit-answer.md) | fixes `0619ffd` |
+| 28 Oct | The dressed-up dock scene in Blender (truck, racks, light), two rounds | [dock-polish.md](docs/muse-code/dock-polish.md), [2](docs/muse-code/dock-polish-2.md) | `1ff09e0` |
+| 28 Oct | **Worked the dock itself** as an outside agent through the gate's MCP server: 5 sessions, 0 receipts | [mcp-dock.md](docs/muse-code/mcp-dock.md) | results in `experiments/results/mcp/` |
+| 29 Oct | Three new sections: itself at the dock, driver and receiver, the second reader | [site-new-results.md](docs/muse-code/site-new-results.md) | `263e98c` |
+| 29 Oct | The rigged Lego cast in the Blender dock, and a 10 s camera move | [dock-cast.md](docs/muse-code/dock-cast.md) | `1dcb77e` |
+| 29 Oct | Round 2: nobody hidden from the camera (it checks by ray casts), a name and job sign by each figure | [dock-cast-2.md](docs/muse-code/dock-cast-2.md) | `887c404` |
+| 29 Oct | Cast cards in each character's colour | [site-cast-cards.md](docs/muse-code/site-cast-cards.md) | `0130bcd` |
+| 29 Oct | **The 3D simulator**: drive the forklift, bring the delivery to the gate, see the recorded decision | [simulator.md](docs/muse-code/simulator.md) | `ad9d3eb` |
+| 29 Oct | The dock hero Sena chose, glass tool cards, a touch of life on each cast card | [site-hero-dock.md](docs/muse-code/site-hero-dock.md) | `a7067df` |
+| 29 Oct | Character profile pages, hero cards that open them, the driving button; the simulator's cinematic intro | [site-profiles.md](docs/muse-code/site-profiles.md), [sim-cinematic.md](docs/muse-code/sim-cinematic.md) | `819f3ab` |
+| 29 Oct | The hero with the scene and characters Muse Image drew for it | [site-hero-2.md](docs/muse-code/site-hero-2.md) | `245a959` |
+| 29 Oct | Simulator realism: rear-wheel steering, inertia, synthesised sound, a driver's-seat view | [sim-realism.md](docs/muse-code/sim-realism.md) | `9297f00` |
+
+How the work was split. Muse Code cannot run Blender in its sandbox, so we rendered its scene
+scripts and told it what we saw. In headless runs it stopped to ask for approval before
+starting a test server; we then ran the checks ourselves (`experiments/web/sim_test.mjs` plays
+all six simulator cases to their decision). The designs it built from were drawn by Muse
+Image and chosen by Sena (`experiments/mockups/`).
 
 ## Meet the cast
 
@@ -113,7 +139,7 @@ gate and the supervisor.
 <td align="center" valign="top" width="20%"><img src="assets/mascots/portraits/rover.png" alt="Rover" width="170"><br><b>Rover</b><br><sub>Muse Spark Open</sub><br><br>Reads the note a second time, on his own, with open weights. If he reads it differently, Şef decides.</td>
 <td align="center" valign="top" width="20%"><img src="assets/mascots/portraits/glimmer.png" alt="Glimmer" width="170"><br><b>Glimmer</b><br><sub>Muse Glimmer</sub><br><br>The other open-weight reader we measured. Kept in the comparison.</td>
 <td align="center" valign="top" width="20%"><img src="assets/mascots/portraits/iris.png" alt="Iris" width="170"><br><b>Iris</b><br><sub>Muse Image</sub><br><br>Drew everyone on this page, and the whole cast on the demo site.</td>
-<td align="center" valign="top" width="20%"><img src="assets/mascots/portraits/ada.png" alt="Ada" width="170"><br><b>Ada</b><br><sub>Muse Code</sub><br><br>Wrote the ERPNext client and the demo page, then worked the dock herself through the gate's MCP server.</td>
+<td align="center" valign="top" width="20%"><img src="assets/mascots/portraits/ada.png" alt="Ada" width="170"><br><b>Ada</b><br><sub>Muse Code</sub><br><br>Wrote the ERPNext client, the demo page and the 3D simulator, then worked the dock herself through the gate's MCP server.</td>
 </tr>
 </table>
 
@@ -381,7 +407,7 @@ Every experiment, with its numbers and its failures, is in **[docs/JOURNAL.md](d
 | `experiments/results/` | Raw JSON from every run |
 | `demo/muse-dock/` | Muse Code at the dock, started with the gate's MCP server |
 | `docs/muse-code/` | Every task given to Muse Code, verbatim |
-| `site/`, `experiments/build_site.py` | The live demo page (written by Muse Code) and its data |
+| `site/`, `experiments/build_site.py` | The live demo page, character pages and 3D simulator `site/sim/` (written by Muse Code) and their data |
 | `assets/mascots/` | The cast, drawn with Muse Image |
 
 ## Setup
