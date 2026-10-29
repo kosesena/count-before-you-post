@@ -601,7 +601,27 @@ def flycam():
     return cam
 
 
+def lighten(max_verts=150_000, samples=16):
+    """For the camera move only: the Lego meshes are 3M+ vertices each, and deforming them
+    made a 1080p frame take one to four minutes. The figures pass at a distance, so each mesh
+    is decimated on its rest shape (before the armature, applied once) and EEVEE takes fewer
+    samples. The stills keep the full meshes."""
+    for ob in [o for o in bpy.data.objects if o.type == "MESH" and len(o.data.vertices) > max_verts]:
+        if ob.data.shape_keys:
+            continue
+        dec = ob.modifiers.new("lighten", "DECIMATE")
+        dec.ratio = max_verts / len(ob.data.vertices)
+        with bpy.context.temp_override(object=ob, active_object=ob, selected_objects=[ob]):
+            bpy.ops.object.modifier_move_to_index(modifier=dec.name, index=0)
+            bpy.ops.object.modifier_apply(modifier=dec.name)
+        log(f"lighten {ob.name}: {len(ob.data.vertices)} vertices")
+    eevee = bpy.context.scene.eevee
+    if hasattr(eevee, "taa_render_samples"):
+        eevee.taa_render_samples = samples
+
+
 def do_move(out):
+    lighten()
     scene = bpy.context.scene
     scene.render.resolution_x, scene.render.resolution_y = 1920, 1080
     scene.render.resolution_percentage = 100
@@ -611,28 +631,14 @@ def do_move(out):
         scene.render.fps_base = 1.0
     except (TypeError, AttributeError):
         pass
-    fmt = pick_enum(scene.render.image_settings, "file_format", ["FFMPEG"])
-    if fmt:
-        try:
-            scene.render.image_settings.file_format = fmt
-        except (TypeError, AttributeError):
-            pass
-    ff = scene.render.ffmpeg
-    container = pick_enum(ff, "format", ["MPEG4"])
-    if container:
-        try:
-            ff.format = container
-        except (TypeError, AttributeError):
-            pass
-    codec = pick_enum(ff, "codec", ["H264"])
-    if codec:
-        try:
-            ff.codec = codec
-        except (TypeError, AttributeError):
-            pass
-    log(f"video container={container} codec={codec} engine={scene.render.engine}")
+    # This Blender build has no FFmpeg output: frames go out as PNG and are joined with
+    # ffmpeg afterwards (`ffmpeg -framerate 24 -i <out>/move/f_%04d.png -c:v libx264
+    # -pix_fmt yuv420p -crf 18 <out>/cast-move.mp4`).
+    scene.render.image_settings.file_format = "PNG"
+    (out / "move").mkdir(parents=True, exist_ok=True)
+    log(f"frames as PNG, engine={scene.render.engine}")
     scene.camera = flycam()
-    scene.render.filepath = str(out / "cast-move.mp4")
+    scene.render.filepath = str(out / "move" / "f_")
     bpy.ops.render.render(animation=True)
     log(f"wrote {scene.render.filepath}")
 
