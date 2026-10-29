@@ -530,7 +530,7 @@ const PEOPLE = [
   // Floor homes are the six workstations: a gentle arc south of the receiving
   // zone (the side facing the deciding camera), the middle left open for the
   // forklift's approach and the camera's view of the pallet, Kapı at the barrier.
-  { id: "spark",   name: "Spark",   job: "reads the note",              b: [-3.3, 2.7], h: 2.40 },
+  { id: "spark",   name: "Spark",   job: "reads the note",              b: [-4.7, 0.9], h: 2.40 },
   { id: "sam",     name: "Sam",     job: "counts the cartons",          b: [1.1, 1.9],  h: 2.40 },
   { id: "voice",   name: "Voice",   job: "hears the receiver",          b: [-4.6, 2.1], h: 2.40 },
   { id: "kapi",    name: "Kapı",    job: "the gate",                    b: [4.4, 2.0],   h: 2.62 },
@@ -1635,14 +1635,17 @@ function buildStation(id) {
   pad.rotation.x = -Math.PI / 2;
   pad.position.y = 0.018;
   g.add(pad);
-  // Sign on a post at ~1.4 m, facing the deciding camera (south).
-  stCyl(g, 0.035, 0.045, 1.4, stMat(0x3a3f44, 0.6, 0.3), 0, 0.7, 0.55);
+  // Desk-plate sign beside the character, on the side away from the pallet
+  // (never between the character and the camera); top edge at ~1.1 m.
+  const signSide = (p.b[0] < 0 ? -1 : 1);
+  const signX = signSide * 0.95, signZ = 0.12;
+  stCyl(g, 0.035, 0.045, 0.95, stMat(0x3a3f44, 0.6, 0.3), signX, 0.475, signZ);
   const signTex = signTexture(id, false), signTexLit = signTexture(id, true);
   const faceM = new THREE.MeshBasicMaterial({ map: signTex, toneMapped: false });
   const sideM = stMat(0x1c1f22, 0.6, 0.2);
-  const board = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.45, 0.04),
+  const board = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.35, 0.04),
     [sideM, sideM, sideM, sideM, faceM, sideM]);
-  board.position.set(0, 1.38, 0.60);
+  board.position.set(signX, 0.925, signZ);
   g.add(board);
   let lampMats = null;
   if (id === "spark") buildSparkFurniture(g);
@@ -2700,14 +2703,13 @@ function decidingLabels() {
 }
 function updateLabels() {
   const quiet = G.phase === "deciding" || G.phase === "done";
-  const showSet = quiet ? decidingLabels() : null;
   const placed = [];
   for (const p of PEOPLE) {
     const rec = CHAR[p.id];
     if (!rec || !rec.loaded) continue;
-    if (showSet && !showSet.has(p.id)) { rec.label.style.display = "none"; continue; }
-    // During driving the seated ones are behind glass (name plates on rooms).
-    if (G.phase === "driving" && rec.seated) { rec.label.style.display = "none"; continue; }
+    // The station sign replaces the floating label; seated characters use room plates.
+    if (STATION_IDS.indexOf(p.id) >= 0) { rec.label.style.display = "none"; continue; }
+    if (rec.seated) { rec.label.style.display = "none"; continue; }
     const ly = rec.group ? rec.group.position.y + 3.075 : 3.075;
     _pv.set(rec.x, ly, -rec.y).project(camera);
     if (_pv.z > 1 || _pv.z < -1 || Math.abs(_pv.x) > 1.05 || Math.abs(_pv.y) > 1.05) {
