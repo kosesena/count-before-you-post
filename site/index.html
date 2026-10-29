@@ -428,6 +428,103 @@ footer p { margin: 4px 0; }
   .readings { grid-template-columns: minmax(0, 1fr); }
   body { font-size: 15px; }
 }
+/* Story chapters: always dark cinematic, both themes. */
+.story {
+  --bg: #0b1226; --panel: rgba(255,255,255,.08); --ink: #f2f5ff; --muted: rgba(235,240,255,.74);
+  --line: rgba(255,255,255,.18);
+  --post: #4ade80; --post-bg: rgba(74,222,128,.14); --block: #f87171; --block-bg: rgba(248,113,113,.14);
+  --human: #fbbf24; --human-bg: rgba(251,191,36,.14); --accent: #b8ccff; --accent-bg: rgba(184,204,255,.14);
+  --code: rgba(255,255,255,.10); --bubble: rgba(255,255,255,.10);
+  --shadow: none;
+  background: #0b1226; color: var(--ink);
+}
+.story a { color: #b8ccff; }
+.story-wrap { padding-top: 8px; }
+.chapter { padding: 52px 0 36px; border-top: 1px solid rgba(255,255,255,.12); scroll-margin-top: 12px; }
+.chapter:first-child { border-top: 0; }
+.ch-head { display: flex; gap: 24px; align-items: flex-end; margin: 0 0 22px; }
+.ch-text { flex: 1 1 auto; min-width: 0; }
+.ch-kicker { font-size: 12.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  color: #9fb4ff; margin: 0 0 6px; }
+.ch-title-row { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+.ch-num { font-size: clamp(48px, 7vw, 76px); font-weight: 800; letter-spacing: -.03em; line-height: 1;
+  color: rgba(255,255,255,.94); }
+.chapter h2 { font-size: clamp(26px, 4vw, 36px); margin: 0; color: #fff; }
+.ch-intro { font-size: 17px; color: rgba(255,255,255,.86); max-width: 42rem; margin: 10px 0 0; }
+.ch-fig { flex: 0 0 210px; display: flex; align-items: flex-end; justify-content: center; gap: 6px; min-width: 0; }
+.ch-fig img { max-height: 250px; width: auto; max-width: 100%; object-fit: contain; min-width: 0;
+  filter: drop-shadow(0 10px 14px rgba(0,0,0,.45)); }
+.ch-fig.multi { flex-basis: 340px; }
+.ch-fig.multi img { max-height: 220px; flex: 0 1 auto; }
+.ch-fig.multi img.small { max-height: 150px; }
+.glass {
+  background: rgba(255,255,255,.08);
+  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+  border: 1px solid rgba(255,255,255,.20); border-radius: 16px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.20);
+  padding: 16px; margin: 0 0 16px; min-width: 0;
+}
+.glass h3, .panel-title { font-size: 12.5px; text-transform: uppercase; letter-spacing: .07em;
+  color: rgba(255,255,255,.78); margin: 0 0 10px; }
+.panel-title { margin: 22px 0 10px; }
+.glass h3[id] { scroll-margin-top: 12px; }
+.story .card, .story .stat, .story .reading {
+  background: rgba(255,255,255,.08);
+  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+  border: 1px solid rgba(255,255,255,.20);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.20);
+  color: var(--ink);
+}
+.story .badge { color: #10141b; }
+.story .tab[aria-selected="true"] { outline-color: #fff; }
+.story .seg button[aria-pressed="true"] { background: #f2f5ff; color: #0b1226; }
+.story select option { color: #111; }
+.count-views { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.count-views figure { margin: 0; min-width: 0; }
+.count-views figcaption { font-size: 12.5px; color: var(--muted); margin-top: 4px; }
+.ch-cta { margin: 22px 0 0; }
+/* Progress line down the left edge (desktop only). */
+.progress { position: fixed; left: 0; top: 0; bottom: 0; width: 52px; z-index: 5; pointer-events: none; }
+.progress-track { position: absolute; left: 25px; top: 0; bottom: 0; width: 2px;
+  background: rgba(255,255,255,.14); }
+.progress-fill { width: 100%; height: 0; background: #8fa8ff; display: block; }
+.progress-dots { position: absolute; inset: 0; margin: 0; padding: 0; list-style: none;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 26px; }
+.progress-dots a { pointer-events: auto; display: flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px; border-radius: 50%; text-decoration: none;
+  background: #0b1226; border: 1px solid rgba(255,255,255,.3);
+  color: rgba(255,255,255,.65); font-size: 10px; font-weight: 700; }
+.progress-dots a.active { background: #8fa8ff; border-color: #8fa8ff; color: #0b1226; }
+@media (max-width: 1100px) { .story-wrap { padding-left: 60px; } }
+@media (max-width: 900px) { .progress { display: none; } .story-wrap { padding-left: 16px; } }
+@media (max-width: 700px) {
+  .ch-head { flex-direction: column; align-items: flex-start; }
+  .ch-fig { flex: none; width: 100%; justify-content: flex-start; }
+  .ch-fig img { max-height: 190px; }
+  .ch-fig.multi img { max-height: 170px; }
+  .ch-fig.multi img.small { max-height: 130px; }
+  .count-views { grid-template-columns: minmax(0, 1fr); }
+}
+/* Cast: video + horizontal alternating cards. */
+.cast-section { padding-top: 26px; }
+.castshot video { display: block; width: 100%; height: auto; border-radius: 18px;
+  border: 1px solid var(--line); box-shadow: var(--shadow); background: #000; }
+.crew { display: flex; flex-direction: column; gap: 18px; }
+.member { flex-direction: row; align-items: stretch; }
+.member:nth-child(even) { flex-direction: row-reverse; }
+.member .pic { flex: 0 0 300px; min-width: 0; display: flex; align-items: flex-end; justify-content: center;
+  padding: 18px 18px 0; }
+.member img.cutout { width: 100%; max-height: 340px; object-fit: contain; display: block;
+  filter: drop-shadow(0 12px 16px rgba(0,0,0,.25)); }
+.member .body { flex: 1 1 auto; min-width: 0; padding: 28px 26px 24px; display: flex; flex-direction: column; }
+.member .job0 { font-weight: 800; font-size: 15.5px; line-height: 1.5; margin: 12px 0 0; overflow-wrap: anywhere; }
+.member .open { display: inline-block; margin-top: auto; padding-top: 14px; font-weight: 700; font-size: 14px;
+  text-decoration: underline; text-underline-offset: 3px; color: inherit; }
+@media (max-width: 680px) {
+  .member, .member:nth-child(even) { flex-direction: column; }
+  .member .pic { flex: none; }
+  .member img.cutout { max-height: 300px; }
+}
 </style>
 </head>
 <body>
@@ -456,42 +553,73 @@ footer p { margin: 4px 0; }
     </section>
   </div>
 </header>
-<div class="wrap">
-  <div class="posthero">
-    <figure class="castshot">
-      <img id="castImg" alt="Group picture of the project characters">
-      <figcaption id="castCap">The whole crew at the dock.</figcaption>
-    </figure>
-    <div class="stats" id="stats"></div>
-  </div>
-
+<div class="story" id="story">
+  <nav class="progress" aria-label="Chapters">
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <ul class="progress-dots">
+      <li><a href="#ch-01" data-ch="ch-01" aria-label="Chapter 01: The note"><span>01</span></a></li>
+      <li><a href="#ch-02" data-ch="ch-02" aria-label="Chapter 02: The count"><span>02</span></a></li>
+      <li><a href="#ch-03" data-ch="ch-03" aria-label="Chapter 03: The receiver"><span>03</span></a></li>
+      <li><a href="#ch-04" data-ch="ch-04" aria-label="Chapter 04: The gate"><span>04</span></a></li>
+      <li><a href="#ch-05" data-ch="ch-05" aria-label="Chapter 05: An agent we did not write"><span>05</span></a></li>
+    </ul>
+  </nav>
+  <div class="wrap story-wrap">
   <main>
-    <section aria-labelledby="h-cast">
-      <h2 id="h-cast">Meet the cast</h2>
-      <p class="sub">Every worker in this project has a character. Here they are, in their own words.</p>
-      <div class="how" id="how"></div>
-      <div class="crew" id="crew"></div>
-      <p class="roles" id="roles"></p>
+    <section class="chapter" id="ch-01" aria-labelledby="h-note">
+      <div class="ch-head">
+        <div class="ch-text">
+          <p class="ch-kicker">Chapter 01</p>
+          <div class="ch-title-row"><span class="ch-num" aria-hidden="true">01</span><h2 id="h-note">The note</h2></div>
+          <p class="ch-intro">Spark reads the note into strict JSON, and sets aside any line that instructs software.</p>
+        </div>
+        <div class="ch-fig multi" aria-hidden="true">
+          <img id="fig-spark" src="img/hero-spark.webp" alt="">
+          <img id="fig-wonder" class="small" src="img/hero-wonder.webp" alt="">
+          <img id="fig-rover" class="small" src="img/hero-spark-open.webp" alt="">
+        </div>
+      </div>
+      <div class="glass">
+        <h3>The injected instruction, as the deliveries show it</h3>
+        <div id="noteSlice"></div>
+      </div>
+      <div class="glass">
+        <h3>The PDF&rsquo;s invisible text, as the deliveries show it</h3>
+        <div id="invisiblePanel"></div>
+      </div>
+      <div class="glass">
+        <h3 id="h-second">The second reader on two hosts</h3>
+        <p class="sub" id="secondSub"></p>
+        <div class="srwrap"><table class="srtable" id="secondTable"></table></div>
+        <p class="quiet" id="secondNote"></p>
+      </div>
     </section>
 
-    <section aria-labelledby="h-dock">
-      <h2 id="h-dock">Deliveries at the dock</h2>
-      <p class="sub" id="dockSub">Pick a delivery to see what each model read, which gate rule decided, and what the Spark agent did with and without the gate.</p>
-      <div class="langrow"><label for="langSel">Language of the delivery</label><select id="langSel"></select></div>
-      <p class="langnote">Each language is a separate recorded run, not a translation of the Turkish results.</p>
-      <div class="dockshots" id="dockShots"></div>
-      <div class="tabs" role="tablist" id="tabs" aria-label="Deliveries"></div>
-      <div id="case"></div>
+    <section class="chapter" id="ch-02" aria-labelledby="h-count">
+      <div class="ch-head">
+        <div class="ch-text">
+          <p class="ch-kicker">Chapter 02</p>
+          <div class="ch-title-row"><span class="ch-num" aria-hidden="true">02</span><h2 id="h-count">The count</h2></div>
+          <p class="ch-intro">Sam counts the dock camera: every &ldquo;cardboard box&rdquo;, sure or doubtful.</p>
+        </div>
+        <div class="ch-fig" aria-hidden="true"><img id="fig-sam" src="img/hero-sam.webp" alt=""></div>
+      </div>
+      <div class="glass">
+        <h3>SAM&rsquo;s masks and the carton-by-carton check</h3>
+        <div id="countSlice"></div>
+      </div>
     </section>
 
-    <section aria-labelledby="h-outside">
-      <h2 id="h-outside">An agent we did not write</h2>
-      <p class="sub" id="outsideSub"></p>
-      <div class="card" id="outside"></div>
-    </section>
-
-    <section aria-labelledby="h-voice">
-      <h2 id="h-voice">The receiver's own count</h2>
+    <section class="chapter" id="ch-03" aria-labelledby="h-voice">
+      <div class="ch-head">
+        <div class="ch-text">
+          <p class="ch-kicker">Chapter 03</p>
+          <div class="ch-title-row"><span class="ch-num" aria-hidden="true">03</span><h2 id="h-voice">The receiver</h2></div>
+          <p class="ch-intro">Voice writes down what the receiver says at the dock, and notices when they are not sure.</p>
+        </div>
+        <div class="ch-fig" aria-hidden="true"><img id="fig-voice" src="img/hero-voice.webp" alt=""></div>
+      </div>
+      <h3 class="panel-title">The receiver&rsquo;s own count</h3>
       <p class="sub" id="voiceSub">Voice writes down what the receiver says at the dock, and notices when they are not sure.
         An unsure receiver sends the delivery to the supervisor.</p>
       <div class="voicegrid" id="voice"></div>
@@ -499,15 +627,58 @@ footer p { margin: 4px 0; }
       <div class="voicegrid" id="dialogue"></div>
     </section>
 
-    <section aria-labelledby="h-second">
-      <h2 id="h-second">The second reader on two hosts</h2>
-      <p class="sub" id="secondSub"></p>
-      <div class="card">
-        <div class="srwrap"><table class="srtable" id="secondTable"></table></div>
-        <p class="quiet" id="secondNote"></p>
+    <section class="chapter" id="ch-04" aria-labelledby="h-dock">
+      <div class="ch-head">
+        <div class="ch-text">
+          <p class="ch-kicker">Chapter 04</p>
+          <div class="ch-title-row"><span class="ch-num" aria-hidden="true">04</span><h2 id="h-dock">The gate</h2></div>
+          <p class="ch-intro">Kap&#305; decides: 12 plain-code rules in order. Unsure means the supervisor.</p>
+        </div>
+        <div class="ch-fig multi" aria-hidden="true">
+          <img id="fig-kapi" src="img/cut-kapi.webp" alt="">
+          <img id="fig-sef" class="small" src="img/cut-sef.webp" alt="">
+        </div>
       </div>
+      <div class="stats" id="stats"></div>
+      <div class="glass">
+        <h3>Deliveries at the dock</h3>
+        <p class="sub" id="dockSub">Pick a delivery to see what each model read, which gate rule decided, and what the Spark agent did with and without the gate.</p>
+        <div class="langrow"><label for="langSel">Language of the delivery</label><select id="langSel"></select></div>
+        <p class="langnote">Each language is a separate recorded run, not a translation of the Turkish results.</p>
+        <div class="dockshots" id="dockShots"></div>
+      </div>
+      <div class="tabs" role="tablist" id="tabs" aria-label="Deliveries"></div>
+      <div id="case"></div>
+      <p class="ch-cta"><a class="btn-primary drive" href="sim/"><svg class="truck" viewBox="0 0 28 18" aria-hidden="true"><rect x="1" y="3" width="15" height="9" rx="1.5" fill="rgba(255,255,255,.92)"/><path d="M16 6h4.6L25 10.4V12h-9z" fill="rgba(255,255,255,.92)"/><rect x="17.5" y="7.2" width="3.4" height="2.6" fill="#2f6bff"/><g class="ww"><circle cx="7.5" cy="13.6" r="2.8" fill="#1c2430"/><rect x="6.7" y="11.4" width="1.6" height="4.4" rx=".8" fill="#fff"/></g><g class="ww"><circle cx="21" cy="13.6" r="2.8" fill="#1c2430"/><rect x="20.2" y="11.4" width="1.6" height="4.4" rx=".8" fill="#fff"/></g></svg><span>Drive the dock &rarr;</span></a></p>
+    </section>
+
+    <section class="chapter" id="ch-05" aria-labelledby="h-outside">
+      <div class="ch-head">
+        <div class="ch-text">
+          <p class="ch-kicker">Chapter 05</p>
+          <div class="ch-title-row"><span class="ch-num" aria-hidden="true">05</span><h2 id="h-outside">An agent we did not write</h2></div>
+          <p class="ch-intro">The same tools and the same gate, an agent we did not write.</p>
+        </div>
+        <div class="ch-fig" aria-hidden="true"><img id="fig-ada" src="img/hero-ada.webp" alt=""></div>
+      </div>
+      <p class="sub" id="outsideSub"></p>
+      <div class="card" id="outside"></div>
     </section>
   </main>
+  </div>
+</div>
+<div class="wrap">
+  <section class="cast-section" aria-labelledby="h-cast">
+    <figure class="castshot">
+      <video id="castVideo" autoplay muted loop playsinline preload="metadata"></video>
+      <figcaption id="castCap">The whole crew at the dock.</figcaption>
+    </figure>
+    <h2 id="h-cast">Meet the cast</h2>
+    <p class="sub">Every worker in this project has a character. Here they are, in their own words.</p>
+    <div class="how" id="how"></div>
+    <div class="crew" id="crew"></div>
+    <p class="roles" id="roles"></p>
+  </section>
 
   <footer>
     <p>Built during the Meta Global AI Developer Hackathon, 26 Oct &ndash; 4 Nov 2026, by Sena K&ouml;se.</p>
@@ -595,17 +766,18 @@ paintTheme();
    About 1.2 s in all; reduced motion (or no overlay) goes straight there.
    pageshow clears the overlay so Back from the simulator returns to a normal page. */
 (function () {
-  const btn = $("driveBtn"), overlay = $("dockOverlay");
-  if (!btn || !overlay) return;
+  const overlay = $("dockOverlay");
+  const btns = Array.from(document.querySelectorAll("a.btn-primary.drive"));
+  if (!overlay || !btns.length) return;
   let driving = false;
-  btn.addEventListener("click", e => {
+  btns.forEach(btn => btn.addEventListener("click", e => {
     if (driving || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     e.preventDefault();
     driving = true;
     overlay.classList.add("show");
     overlay.setAttribute("aria-hidden", "false");
     setTimeout(() => { location.href = btn.getAttribute("href"); }, 1200);
-  });
+  }));
   window.addEventListener("pageshow", () => {
     driving = false;
     overlay.classList.remove("show");
@@ -649,12 +821,16 @@ function renderCrew(list) {
   };
   $("crew").innerHTML = list.map(m => {
     const dark = lum(m.bg) < 0.25;
+    const cutout = (m.profile && m.profile.cutout) || m.portrait;
+    const job0 = (m.profile && m.profile.jobs && m.profile.jobs[0]) || "";
     return `<a class="member${dark ? " dark" : ""}" data-fx="${esc(m.id)}" style="--c:${esc(m.colour)};--cardbg:${esc(m.bg)}" href="character.html?id=${esc(m.id)}">` +
+    `<div class="pic"><img class="cutout" src="${esc(cutout)}" alt="${esc(m.name)}" loading="lazy"></div>` +
     `<div class="body"><p class="name"><span class="cdot"></span>${esc(m.name)}</p>` +
     `<p class="meta"><span class="model">${esc(m.model)}</span>` +
     `<span class="pill ${STATUS_CLASS[m.status] || ""}">${esc(STATUS_TEXT[m.status] || m.status)}</span></p>` +
-    `<p class="bubble">${esc(m.line)}</p></div>` +
-    `<div class="shot"><img class="portrait" src="${esc(m.portrait)}" alt="${esc(m.name)} portrait" loading="lazy"></div>` +
+    `<p class="bubble">${esc(m.line)}</p>` +
+    (job0 ? `<p class="job0">${esc(job0)}</p>` : "") +
+    `<span class="open">Open profile &rarr;</span></div>` +
     `<canvas class="fx" aria-hidden="true"></canvas></a>`;
   }).join("");
   $("roles").textContent =
@@ -889,10 +1065,42 @@ function shotAlt(c) {
   return `${c.title}: ${VIEWS[view][0]}`;
 }
 
+function renderInvisible() {
+  const el = $("invisiblePanel");
+  if (!el) return;
+  const rules = LANG_DATA.rules || [];
+  const idx = rules.indexOf("invisible_text");
+  const label = RULE_LABEL.invisible_text || "invisible_text";
+  const arrow = ACTION[RULE_ARROW.invisible_text] || RULE_ARROW.invisible_text || "human";
+  el.innerHTML =
+    `<p class="what">${esc(label)} &rarr; ${esc(arrow)}</p>` +
+    `<p class="legend">Rule ${idx >= 0 ? idx + 1 : "?"} of ${esc(rules.length)}, ` +
+    `as the gate rules list it in every delivery in chapter 04.</p>`;
+}
+
+function renderSlices(c) {
+  const note = $("noteSlice"), count = $("countSlice");
+  if (note) {
+    note.innerHTML =
+      `<p class="what">${esc(c.title)}: ${esc(c.what)}</p>` +
+      `<img class="note-img" src="${esc(c.images.note)}" alt="Delivery note for ${esc(c.title)}" loading="lazy">` +
+      `<div class="readings" style="margin-top:10px">${noteReading(c)}</div>`;
+  }
+  if (count) {
+    count.innerHTML =
+      `<p class="what">${esc(c.title)}: ${esc(c.what)}</p>` +
+      `<div class="count-views">${Object.keys(VIEWS).map(k =>
+        `<figure><img class="shot" src="${esc(c.images[k])}" alt="${esc(c.title)}: ${esc(VIEWS[k][0])}" loading="lazy">` +
+        `<figcaption><b>${esc(VIEWS[k][0])}</b> &mdash; ${esc(VIEWS[k][1])}</figcaption></figure>`).join("")}</div>` +
+      `<div class="readings" style="margin-top:10px">${samReading(c)}${crossReading(c)}</div>`;
+  }
+}
+
 function show(id, push) {
   const c = LANG_DATA.cases.find(x => x.id === id) || LANG_DATA.cases[0];
   if (!c) return;
   CASE = c.id;
+  renderSlices(c);
   document.querySelectorAll(".tab").forEach(t =>
     t.setAttribute("aria-selected", String(t.dataset.id === c.id)));
   $("case").innerHTML =
@@ -962,6 +1170,7 @@ function renderDock(kase) {
   renderOutside(d.outside_agent);
   renderDialogue(d.dialogue);
   renderSecond(d.second_reader);
+  renderInvisible();
   const n = (d.cases || []).length;
   $("dockSub").textContent =
     `${n} recorded dock cases. Pick a delivery to see what each model read, ` +
@@ -1000,10 +1209,38 @@ function start(data) {
         const img = li.querySelector(".fig img");
         if (src && img) img.src = src;
       });
+      const figSrc = id => (data.hero.tools[id] || ((byId(id) || {}).profile || {}).cutout);
+      const setFig = (el, id) => {
+        const s = figSrc(id);
+        if (s && $(el)) $(el).src = s;
+      };
+      setFig("fig-spark", "spark");
+      setFig("fig-wonder", "wonder");
+      setFig("fig-rover", "spark-open");
+      setFig("fig-sam", "sam");
+      setFig("fig-voice", "voice");
+      setFig("fig-ada", "ada");
     }
   }
-  $("castImg").src = data.cast;
-  $("castImg").alt = "Group picture: " + (data.characters || []).map(m => m.name).join(", ");
+  const cutSrc = id => (((byId(id) || {}).profile || {}).cutout);
+  if (cutSrc("kapi") && $("fig-kapi")) $("fig-kapi").src = cutSrc("kapi");
+  if (cutSrc("sef") && $("fig-sef")) $("fig-sef").src = cutSrc("sef");
+  const cv = $("castVideo");
+  if (cv && data.cast_video) {
+    cv.poster = data.cast_video.poster;
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      const img = document.createElement("img");
+      img.src = data.cast_video.poster;
+      img.alt = "Group picture: " + (data.characters || []).map(m => m.name).join(", ");
+      cv.replaceWith(img);
+    } else {
+      cv.src = data.cast_video.src;
+      cv.autoplay = true;
+      const pr = cv.play && cv.play();
+      if (pr && pr.catch) pr.catch(() => {});
+    }
+  }
+  armProgress();
   $("langSel").addEventListener("change", e => switchLang(e.target.value, CASE));
   const p = parseHash();
   switchLang(p.lang, p.kase);
@@ -1282,7 +1519,7 @@ function startFx(card) {
   if (fxActive && fxActive.card === card) return;
   stopFx();
   const canvas = card.querySelector("canvas.fx");
-  const img = card.querySelector("img.portrait");
+  const img = card.querySelector("img.cutout");
   if (!canvas || !img) return;
   const rc = card.getBoundingClientRect();
   const ri = img.getBoundingClientRect();
@@ -1318,9 +1555,36 @@ function armFx() {
   if (fxReduce.addEventListener) fxReduce.addEventListener("change", () => { if (fxReduce.matches) stopFx(); });
 }
 
+function armProgress() {
+  const fill = $("progressFill");
+  const story = $("story");
+  const links = Array.from(document.querySelectorAll(".progress-dots a"));
+  if (!fill || !story || !links.length) return;
+  let ticking = false;
+  const paint = () => {
+    ticking = false;
+    const r = story.getBoundingClientRect();
+    const total = Math.max(1, r.height - innerHeight);
+    const done = Math.min(1, Math.max(0, -r.top / total));
+    fill.style.height = (done * 100).toFixed(2) + "%";
+  };
+  addEventListener("scroll", () => {
+    if (!ticking) { ticking = true; requestAnimationFrame(paint); }
+  }, { passive: true });
+  addEventListener("resize", paint);
+  paint();
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(en => {
+      if (!en.isIntersecting) return;
+      links.forEach(a => a.classList.toggle("active", a.dataset.ch === en.target.id));
+    });
+  }, { rootMargin: "-40% 0px -50% 0px" });
+  document.querySelectorAll(".chapter").forEach(ch => io.observe(ch));
+}
+
 window.addEventListener("hashchange", () => {
   if (!DATA) return;
-  if (/^#h-/.test(location.hash)) return; // section links (e.g. the hero's "See the six deliveries")
+  if (/^#(?:h-|ch-)/.test(location.hash)) return; // section links (e.g. the hero's "See the six deliveries")
   const p = parseHash();
   if (p.lang !== CUR_LANG) switchLang(p.lang, p.kase);
   else if ((LANG_DATA.cases || []).some(c => c.id === p.kase)) show(p.kase, false);
