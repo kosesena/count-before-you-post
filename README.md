@@ -313,6 +313,12 @@ clean PDF that isn't there, so that delivery would wait for Şef instead of post
 a supervisor's look, not a wrong receipt. Baseten takes no file parts, so a PDF goes to it as
 the page image. The last column is still OpenRouter.
 
+**Live, both checks in the agent's run** (`run_agent.py --second`,
+`experiments/results/agent_second_opinions.json`): on the six dock cases the agent behind the
+gate wrote one receipt, the `ok` case, after Spark Open (on Baseten) read 12 and Wonder confirmed
+quantity and product from the note: MAT-PRE-2026-00010. In the other five the gate was not
+about to post, so nobody was asked; the agent's three tries to write (11, 12, 12) were refused.
+
 The first OpenRouter run was much noisier (`second_reader_v1.json`), until we pinned providers
 that honour the JSON schema and gave Glimmer Meta's recommended sampling. One reading shows why
 no single model is trusted: on the Turkish injected note, Spark Open via OpenRouter returned the
