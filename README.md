@@ -1,18 +1,51 @@
+<div align="center">
+
 # Count Before You Post
 
-**A verification gate between AI agents and the ERP.** Before a goods receipt is written, the
-delivery note, the camera, the receiver's voice and a second model must agree. If they don't,
-nothing is written and a person decides.
+### A verification gate between AI agents and the ERP
+
+**Before a goods receipt is written, the delivery note, the camera, the receiver's voice and a
+second model must agree. If they don't, nothing is written and a person decides.**
+
+[![Live demo](https://img.shields.io/badge/Live_demo-count--before--you--post.vercel.app-0866FF?style=for-the-badge)](https://count-before-you-post.vercel.app)
+[![Drive the dock](https://img.shields.io/badge/Drive_the_dock-3D_simulator-F97316?style=for-the-badge)](https://count-before-you-post.vercel.app/sim/)
+
+![Built with Muse](https://img.shields.io/badge/Built_with-Muse_Spark_·_SAM_3.1_·_Voice_·_Wonder_·_Spark_Open_·_Code_·_Image-1C2B33?style=flat-square)
+![Meta Global AI Developer Hackathon](https://img.shields.io/badge/Meta_Global_AI_Developer_Hackathon-26_Oct_–_4_Nov_2026-0866FF?style=flat-square)
+![Wrong receipts behind the gate](https://img.shields.io/badge/wrong_receipts_behind_the_gate-0-4ADE80?style=flat-square)
 
 ![The receiving dock: the gate's light, the screen, the pallet under the ceiling camera, and the cast](assets/readme/dock.jpg)
+
+</div>
 
 **Live demo: [count-before-you-post.vercel.app](https://count-before-you-post.vercel.app)**:
 the six dock cases in four languages, the gate's decision on each, SAM's masks, the
 carton-by-carton cross-check and the agent's step-by-step trace, with and without the gate.
 The page replays recorded runs (real Meta API, real ERPNext) and makes no API calls.
+**[Drive the dock](https://count-before-you-post.vercel.app/sim/)**: drive the forklift, bring a
+delivery to the gate, and watch the characters work the case.
 
 Built during the Meta Global AI Developer Hackathon (26 Oct – 4 Nov 2026), theme *Build for
 Your World*. Everything in this repository was written during the event.
+
+## In 30 seconds
+
+> **The problem.** At a warehouse dock, the goods receipt is typed from the delivery note. Give
+> that job to an AI agent and it trusts the paper too: whatever the note says, even a line telling
+> "automatic systems" to post 100 without counting, becomes stock and money owed.
+>
+> **The fix.** The agent may still do the work, but the one write it cannot skip, the ERP
+> receipt, goes through a gate in plain code. The gate posts only when the note, the camera
+> (SAM 3.1 and Muse Spark, carton by carton), the receiver's voice and a second reader agree.
+>
+> **The proof.** 24/24 gate decisions right across six dock cases in four languages; **0** wrong
+> receipts from any agent behind the gate, including Meta's own Muse Code working the dock
+> through MCP (5 sessions, 5 refused writes, 0 receipts).
+
+| | |
+|---|---|
+| [Why](#why) · [What it does](#what-it-does) · [Results](#results-at-a-glance) · [Built with Muse](#built-with-muse) | [The 3D simulator](#drive-the-dock-the-3d-simulator) · [Meet the cast](#meet-the-cast) · [The evidence](#the-evidence) |
+| [How the gate decides](#how-the-gate-decides) · [Honest limits](#honest-limits) · [Next](#next) | [Repository map](#repository-map) · [Setup](#setup) · [Run](#run) |
 
 ## Why
 
@@ -123,12 +156,51 @@ Fixes by hand are always separate commits.
 | 29 Oct | Reading cards that show each character at work, a bigger forklift, a clear pickup | [sim-reading-cards.md](docs/muse-code/sim-reading-cards.md) | `b5bb614` |
 | 29 Oct | The warehouse grown to a closed front wall; ten character rooms on two storeys | [dock-rooms.md](docs/muse-code/dock-rooms.md) | `15b8d9c` |
 | 29 Oct | The rooms furnished after the concepts Sena chose from Muse Image's drawings | [interiors](docs/muse-code/dock-rooms-interiors.md), [2](docs/muse-code/dock-rooms-interiors-2.md) | `fd66551` |
+| 29 Oct | The rooms as full as the concepts: furniture to the characters' scale, lit name plates | [dock-rooms-density.md](docs/muse-code/dock-rooms-density.md) | `b23aee5` |
+| 29 Oct | Each delivery's characters on the floor, the rest at work in their rooms | [sim-rooms-roster.md](docs/muse-code/sim-rooms-roster.md) | `f1bde1a` |
+| 29 Oct | A workstation, floor pad and job sign for every character on the floor, two rounds | [sim-stations.md](docs/muse-code/sim-stations.md), [2](docs/muse-code/sim-stations-2.md) | `8b2e5c4`, `7561e01` |
+| 30 Oct | The forklift parks when the gate decides, so the pallet stays in view | [sim-layout.md](docs/muse-code/sim-layout.md) | `0a483e1` |
+| 30 Oct | Characters at work at their stations, following what happens, reacting to the decision | [sim-at-work.md](docs/muse-code/sim-at-work.md) | `628fedd` |
 
 How the work was split. Muse Code cannot run Blender in its sandbox, so we rendered its scene
 scripts and told it what we saw. In headless runs it stopped to ask for approval before
 starting a test server; we then ran the checks ourselves (`experiments/web/sim_test.mjs` plays
 all six simulator cases to their decision). The designs it built from were drawn by Muse
 Image and chosen by Sena (`experiments/mockups/`).
+
+## Drive the dock: the 3D simulator
+
+**[count-before-you-post.vercel.app/sim](https://count-before-you-post.vercel.app/sim/)**: pick
+one of the six deliveries, drive the forklift into the trailer, bring the pallet to the yellow
+zone and set it down. Then the recorded run plays out at the dock: Spark reads the note, Sam
+counts, the two compare carton by carton, and Kapı decides, with the light, the barrier and the
+screen. The result shows what the same agent did without the gate, next to what the gate let
+through. Arrows or WASD drive, Space picks up and sets down, C changes the camera (chase,
+driver's seat, overview); on a phone, a touch joystick.
+
+![The gate decides a wrong-product delivery: Spark beside the pallet reading the labels, Sam's ceiling camera scanning, Kapı at the barrier, Wonder at her desk, the reading cards on the right](assets/readme/sim-decision.jpg)
+
+- **Who works the case.** Only the characters a delivery actually needs are on the floor, each
+  at a workstation with a job sign: Spark at the reading lectern, Sam under the ceiling camera,
+  Kapı at the barrier, and, where the recorded run used them, Wonder at her writing desk, Şef at
+  the sign-off podium, Rover at the second-reading table. They work while you drive (pages
+  turn, Wonder writes, Şef stamps, Rover types), turn to follow the forklift, walk to the pallet
+  when it is their turn, and react to the decision: a wave for *post*, a "no" for *block*, everyone
+  turning to Şef for *ask Şef*.
+- **Everyone else is at work in their room.** The warehouse has a room for each character, on
+  two storeys against the front wall, furnished after concepts Muse Image drew and Sena chose
+  (`experiments/room_concepts.py`, `experiments/mockups/room-choices.json`). The intro opens on
+  the rooms before it turns to the dock.
+- **Measured, not eyeballed.** `experiments/web/sim_test.mjs` plays all six cases to the gate's
+  decision in headless Chrome (ALL OK), and the layout was checked from the deciding camera with
+  projected screen boxes, so no character covers the pallet, the gate's screen or another
+  character.
+
+![The ten character rooms on two storeys, seen from the yard](assets/readme/sim-rooms.jpg)
+
+Written by Muse Code over many rounds (see [What Muse Code built](#what-muse-code-built)); the
+dock and the rooms are Blender scenes (`experiments/blender/warehouse.py`, `CBYP_POLISH=1`)
+exported for the browser by `experiments/web/export_dock.py`.
 
 ## Meet the cast
 
@@ -423,6 +495,8 @@ Every experiment, with its numbers and its failures, is in **[docs/JOURNAL.md](d
 | `docs/muse-code/` | Every task given to Muse Code, verbatim |
 | `site/`, `experiments/build_site.py` | The live demo page, character pages and 3D simulator `site/sim/` (written by Muse Code) and their data |
 | `assets/mascots/` | The cast, drawn with Muse Image |
+| `experiments/web/` | `sim_test.mjs` (plays the six simulator cases), `export_dock.py` (the Blender dock for the browser), page checks |
+| `experiments/room_concepts.py`, `site_mockups.py` | Muse Image design concepts Sena chose from (`experiments/mockups/`) |
 
 ## Setup
 
