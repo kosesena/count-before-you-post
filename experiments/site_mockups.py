@@ -121,6 +121,26 @@ REST_DIRECTIONS = {
 }
 
 
+# The cast section (first image: the hero above it; the others: four of the characters).
+CAST_BASE = (
+    "Design the 'Meet the cast' section of this premium landing page; the first image is the "
+    "page's hero, continue its look exactly: deep navy dusk background, frosted glass. The "
+    "other images are four of the toy characters (Spark orange, Sam blue, Voice navy and "
+    "black, Kapi the gate in a cardboard body). Show three characters as horizontal rows that "
+    "alternate sides: the character large and free-standing, with NO box, card or colour "
+    "behind the figure (it stands on the page with a soft floor shadow and a faint glow of "
+    "its colour); beside it a frosted-glass panel, lightly tinted with the character's own "
+    "colour, holding its name, model, a short quote and one bold line, and a small 'Open "
+    "profile' link. Elegant, very high quality, generous spacing, crisp typography, tall "
+    "desktop page, no device frame. Direction: ")
+CAST_DIRECTIONS = {
+    "cast-glass": "large glowing glass panels with a fine bright edge and a soft colour "
+                  "gradient inside; the characters overlap the panel's edge a little.",
+    "cast-minimal": "quieter: slim glass panels, thin coloured accent line on the panel's "
+                    "edge, more empty space, the characters a bit larger.",
+}
+
+
 def hero_background(dst):
     """The chosen direction's scene (hero-dock.png) redrawn as a clean background: no text, no
     interface, so the page's real text and cards sit on it."""
@@ -158,11 +178,14 @@ def draw(shot, name):
     dst = OUT / f"hero-{name}.png"
     if dst.exists():
         return
-    refs = ([shot, LOWER] if name in REST_DIRECTIONS else
+    refs = ([shot] + [HERE.parent / "assets" / "mascots" / "hero" / f"{c}.png" for c in ("spark", "sam", "voice")]
+            + [HELLO / "kapi.jpg"] if name in CAST_DIRECTIONS else
+            [shot, LOWER] if name in REST_DIRECTIONS else
             [shot] + [HELLO / f"{c}.jpg" for c in ("spark", "sam", "voice")])
-    prompt = (SIM_BASE + SIM_DIRECTIONS[name] if name in SIM_DIRECTIONS else
+    prompt = (CAST_BASE + CAST_DIRECTIONS[name] if name in CAST_DIRECTIONS else
+              SIM_BASE + SIM_DIRECTIONS[name] if name in SIM_DIRECTIONS else
               REST_BASE + REST_DIRECTIONS[name] if name in REST_DIRECTIONS else BASE + DIRECTIONS[name])
-    size = "1024x1536" if name in REST_DIRECTIONS else "1792x1024"
+    size = "1024x1536" if name in REST_DIRECTIONS or name in CAST_DIRECTIONS else "1792x1024"
     body = {"model": "muse-image-1.0", "n": 1, "size": size, "output_format": "png",
             "response_format": "b64_json", "prompt": prompt,
             "images": [{"image_url": _jpeg(p)} for p in refs]}
@@ -183,6 +206,10 @@ if __name__ == "__main__":
             hero_background(OUT / f"hero-bg-{k}.png")
         sys.exit()
     for n in sys.argv[2:] or list(DIRECTIONS):
+        if n == "cast":
+            for m in CAST_DIRECTIONS:
+                draw(Path(sys.argv[1]), m)
+            continue
         if n == "rest":
             for m in REST_DIRECTIONS:
                 draw(Path(sys.argv[1]), m)
