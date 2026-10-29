@@ -246,6 +246,7 @@ audio { width: 100%; height: 36px; margin: 8px 0 4px; }
 .sure { color: var(--post); font-weight: 700; }
 .unsure { color: var(--human); font-weight: 700; }
 .stats.five { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+@media (max-width: 640px) { .stats.five { grid-template-columns: repeat(2, minmax(0, 1fr)); } .stats.five .stat.zero { grid-column: 1 / -1; } }
 .stat.zero { background: var(--post-bg); border-color: var(--post); }
 .stat.zero b { font-size: 46px; color: var(--post); }
 .oprompt { margin: 10px 0 14px; }
@@ -476,7 +477,7 @@ function renderOutside(o) {
     `<div class="stats five">` +
     `<div class="stat"><b>${esc(o.sessions)}</b><span>sessions</span></div>` +
     `<div class="stat"><b>${esc((o.writes_tried || []).length)}</b>` +
-    `<span>writes tried: ${writes}, each the true count</span></div>` +
+    `<span>writes tried, ${new Set(o.writes_tried || []).size === 1 ? "each " + esc(o.writes_tried[0]) + ", the true count" : writes}</span></div>` +
     `<div class="stat"><b>${esc(o.asked_supervisor)}</b><span>times asked \u015eef</span></div>` +
     `<div class="stat zero"><b>${esc(o.receipts)}</b><span>receipts reached the ERP</span></div>` +
     `<div class="stat"><b>${esc(o.minutes)}</b><span>minutes</span></div></div>` +
