@@ -245,6 +245,18 @@ audio { width: 100%; height: 36px; margin: 8px 0 4px; }
 .vmeta b { color: var(--ink); }
 .sure { color: var(--post); font-weight: 700; }
 .unsure { color: var(--human); font-weight: 700; }
+.stats.five { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.stat.zero { background: var(--post-bg); border-color: var(--post); }
+.stat.zero b { font-size: 46px; color: var(--post); }
+.oprompt { margin: 10px 0 14px; }
+.chat { margin: 6px 0; font-size: 14px; overflow-wrap: anywhere; }
+.chat.rec { margin-left: 14px; }
+.card.differs { border-color: var(--human); box-shadow: 0 0 0 1px var(--human); }
+.srwrap { overflow-x: auto; }
+.srtable { border-collapse: collapse; width: 100%; min-width: 560px; font-size: 14px; }
+.srtable th, .srtable td { border: 1px solid var(--line); padding: 8px 10px; text-align: center; }
+.srtable thead th { background: var(--code); font-size: 13px; }
+.srtable tbody th { text-align: left; font-weight: 600; font-size: 13.5px; }
 footer { color: var(--muted); font-size: 13px; padding: 40px 0 56px; }
 footer p { margin: 4px 0; }
 @media (max-width: 900px) {
@@ -305,11 +317,28 @@ footer p { margin: 4px 0; }
       <div id="case"></div>
     </section>
 
+    <section aria-labelledby="h-outside">
+      <h2 id="h-outside">An agent we did not write</h2>
+      <p class="sub" id="outsideSub"></p>
+      <div class="card" id="outside"></div>
+    </section>
+
     <section aria-labelledby="h-voice">
       <h2 id="h-voice">The receiver's own count</h2>
       <p class="sub" id="voiceSub">Voice writes down what the receiver says at the dock, and notices when they are not sure.
         An unsure receiver sends the delivery to the supervisor.</p>
       <div class="voicegrid" id="voice"></div>
+      <p class="sub" id="dialogueSub"></p>
+      <div class="voicegrid" id="dialogue"></div>
+    </section>
+
+    <section aria-labelledby="h-second">
+      <h2 id="h-second">The second reader on two hosts</h2>
+      <p class="sub" id="secondSub"></p>
+      <div class="card">
+        <div class="srwrap"><table class="srtable" id="secondTable"></table></div>
+        <p class="quiet" id="secondNote"></p>
+      </div>
     </section>
   </main>
 
@@ -432,6 +461,85 @@ function renderVoice(clips, source) {
       `<p class="vmeta">${counts}${sup} \u00b7 ${conf}${gate}</p></div>`;
   }).join("");
 }
+function renderOutside(o) {
+  if (!o) { $("outsideSub").textContent = ""; $("outside").innerHTML = ""; return; }
+  const kapi = byId("kapi");
+  $("outsideSub").textContent =
+    `${o.agent} worked the \u201c${o.delivery}\u201d delivery through the gate\u2019s MCP server: ` +
+    `the same tools and the same gate, an agent we did not write.`;
+  const writes = (o.writes_tried || []).map(v => esc(v)).join(", ");
+  $("outside").innerHTML =
+    `<div class="who">${av("ada")}${av("kapi")}<span><b>${esc(o.agent)}</b> at the dock, ` +
+    `<b>${esc(kapi ? kapi.name : "Kap\u0131")}</b> on the gate</span></div>` +
+    `<p class="vmeta">The task, verbatim:</p>` +
+    `<div class="quote oprompt">\u201c${esc(o.task)}\u201d</div>` +
+    `<div class="stats five">` +
+    `<div class="stat"><b>${esc(o.sessions)}</b><span>sessions</span></div>` +
+    `<div class="stat"><b>${esc((o.writes_tried || []).length)}</b>` +
+    `<span>writes tried: ${writes}, each the true count</span></div>` +
+    `<div class="stat"><b>${esc(o.asked_supervisor)}</b><span>times asked \u015eef</span></div>` +
+    `<div class="stat zero"><b>${esc(o.receipts)}</b><span>receipts reached the ERP</span></div>` +
+    `<div class="stat"><b>${esc(o.minutes)}</b><span>minutes</span></div></div>` +
+    `<p class="vmeta">${esc(o.agent)} never followed the note\u2019s \u201cpost 100\u201d; ` +
+    `the gate refused every write because the note gives orders to software.</p>` +
+    `<div class="answer">${esc(o.refusal)}</div>`;
+}
+
+const WHO_LABEL = { driver: "Driver", receiver: "Receiver" };
+
+function renderDialogue(clips) {
+  clips = clips || [];
+  const n = clips.length;
+  const p = clips.filter(c => c.plain_ok).length;
+  const d = clips.filter(c => c.diarized_ok).length;
+  $("dialogueSub").textContent =
+    `At a real dock two people talk: the driver says what they brought, the receiver says what they counted, ` +
+    `and only the receiver\u2019s count is evidence. One plain transcript got ${p} of ${n} right; ` +
+    `speaker turns got ${d} of ${n} right. The clips are Turkish in every language.`;
+  $("dialogue").innerHTML = clips.map(c => {
+    const differs = c.plain_ok !== c.diarized_ok;
+    const mark = ok => ok ? `<span class="sure">right</span>` : `<span class="misheard">wrong</span>`;
+    const lines = (c.lines || []).map(l =>
+      `<p class="chat${l.who === "receiver" ? " rec" : ""}"><b>${esc(WHO_LABEL[l.who] || l.who)}:</b> ` +
+      `${esc(l.text)}</p>`).join("");
+    return `<div class="card${differs ? " differs" : ""}>` +
+      `<div class="who">${av("voice")}<span>Clip <span class="mono">${esc(c.clip)}</span> ` +
+      `\u00b7 receiver counted <b>${esc(c.receiver_counted)}</b>` +
+      (differs ? ` \u00b7 <span class="flag">the two readings disagree here</span>` : "") + `</span></div>` +
+      `<audio controls preload="none" src="${esc(c.audio)}"></audio>` +
+      lines +
+      `<div class="readings">` +
+      `<div class="reading"><div class="who">One plain transcript</div><div class="val">${esc(c.plain)}</div>` +
+      `<div class="det">${mark(c.plain_ok)} \u00b7 receiver counted ${esc(c.receiver_counted)}</div></div>` +
+      `<div class="reading"><div class="who">Speaker turns</div><div class="val">${esc(c.diarized)}</div>` +
+      `<div class="det">${mark(c.diarized_ok)} \u00b7 receiver counted ${esc(c.receiver_counted)}</div></div>` +
+      `</div></div>`;
+  }).join("");
+}
+
+function renderSecond(sr) {
+  if (!sr) { $("secondSub").textContent = ""; $("secondTable").innerHTML = ""; $("secondNote").textContent = ""; return; }
+  $("secondSub").textContent =
+    `Before the gate lets a receipt through, an open-weight model reads the note again on its own. ` +
+    `A different reading sends the delivery to \u015eef; no second reader can post.`;
+  const cols = [
+    ["baseten", "Spark Open on Baseten", "spark-open"],
+    ["openrouter", "Spark Open via OpenRouter", null],
+    ["glimmer", "Glimmer via OpenRouter", "glimmer"]
+  ];
+  const head = `<thead><tr><th scope="col"></th>` + cols.map(([k, label, avid]) =>
+    `<th scope="col">${avid ? av(avid) : ""}${esc(label)}</th>`).join("") + `</tr></thead>`;
+  const row = (label, fn) => `<tr><th scope="row">${esc(label)}</th>` +
+    cols.map(([k]) => `<td>${fn(k)}</td>`).join("") + `</tr>`;
+  $("secondTable").innerHTML = head + "<tbody>" +
+    row("Usable readings", k => `${esc(sr[k].usable)} of ${esc(sr[k].notes)}`) +
+    row("Quantity right", k => `${esc(sr[k].quantity_right)} of ${esc(sr[k].usable)}`) +
+    row("Median seconds", k => `${esc(sr[k].seconds_median)} s`) +
+    row("Decisions changed", k => esc((sr.decisions_changed || {})[k])) +
+    "</tbody>";
+  $("secondNote").textContent = sr.note || "";
+}
+
 function noteReading(c) {
   const items = (c.note.items || []).map(it =>
     `${esc(it.quantity)} \u00d7 ${esc(it.unit)} \u2014 ${esc(it.description)}${it.legible ? "" : " (not legible)"}`
@@ -631,6 +739,9 @@ function renderDock(kase) {
     `<figcaption>${esc(s.caption)}</figcaption></figure>`).join("");
   renderTabs();
   renderVoice(d.voice || [], d.voice_source);
+  renderOutside(d.outside_agent);
+  renderDialogue(d.dialogue);
+  renderSecond(d.second_reader);
   const n = (d.cases || []).length;
   $("dockSub").textContent =
     `${n} recorded dock cases. Pick a delivery to see what each model read, ` +
