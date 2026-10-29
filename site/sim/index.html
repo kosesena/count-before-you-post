@@ -536,7 +536,7 @@ const PEOPLE = [
   { id: "kapi",    name: "Kapı",    job: "the gate",                    b: [4.4, 2.0],   h: 2.62 },
   { id: "sef",     name: "Şef",     job: "signs off",                   b: [-1.6, 2.0],  h: 2.62 },
   { id: "wonder",  name: "Wonder",  job: "checks and writes the paperwork", b: [-2.4, 0.9], h: 2.40 },
-  { id: "rover",   name: "Rover",   job: "reads the note again",        b: [2.7, 2.7],   h: 2.40 },
+  { id: "rover",   name: "Rover",   job: "reads the note again",        b: [2.75, 1.5],  h: 2.40 },
   { id: "glimmer", name: "Glimmer", job: "the other open-weight reader", b: [1.0, 0.5],  h: 2.40 },
   { id: "iris",    name: "Iris",    job: "drew the cast",               b: [-6.6, -0.6], h: 2.40 },
   { id: "ada",     name: "Ada",     job: "wrote the code",              b: [-9.6, -0.9], h: 2.40 },
@@ -573,6 +573,9 @@ const DOOR = { x0: -1.0, x1: 1.0, y0: 9.44, y1: 10.76 };    // doorway volume: t
 const PALLET = { hx: 0.6, hy: 0.52 };                       // half footprint 1.2 x 1.04 m
 const START = { x: 8, y: 0.05, h: 0 };                      // forklift start, heading +y
 const DROP = { x: 0, y: 11.0 };                             // delivery start on the trailer floor
+const PARK = { x: 3.6, y: 3.5, h: Math.PI / 2 };            // forklift park: right of the zone,
+  // behind Kapı/post from the deciding camera (cannot block them), heading +x, forks down.
+const PARK_DUR = 2.5, PARK_REV_T = 1.0;                     // reverse 0-1 s, roll to park 1-2.5 s
 // The forklift is 1.35x larger than the dock file's model (the cast grew 1.5x).
 // Horizontal geometry scales; the pallet keeps its real size. F.forksY stays a
 // world height above the ground; the group-local blade height divides by FORK_S.
@@ -1144,7 +1147,7 @@ function waveImmediate(id) {
   rec.idle.stop();
   rec.wave.reset().play();
   clearTimeout(rec._wt);
-  rec._wt = setTimeout(() => { if (rec.loaded) { try { rec.wave.stop(); } catch {} rec.idle.play(); } }, (rec.waveLen || 2000) + 150);
+  rec._wt = setTimeout(() => { if (rec.loaded) { try { rec.wave.stop(); } catch {} if (!rec.walking) rec.idle.play(); } }, (rec.waveLen || 2000) + 150);
 }
 function wave(id) {
   const rec = CHAR[id];
@@ -1172,23 +1175,13 @@ function faceBlender(rec, fromX, fromY, toX, toY) {
   if (Math.hypot(dx, dy) < 1e-6) return;
   rec.group.rotation.y = Math.atan2(dx, -dy) + Math.PI;
 }
-// Beside the pallet (~1.4 m), on the deciding-camera side, never the forklift side.
-// side -1 = west of the pallet, +1 = east; both south enough to face the front camera.
+// Front of the pallet (the deciding-camera side, south), 1.3 m out, offset so the
+// walker doesn't cover the pallet. The forklift has parked away, so no avoidance.
+// side -1 = west, +1 = east. Single walker: 0.35 m to the side; belirsiz: front corners.
 function palletSpot(px, py, side, fx, fy) {
-  let ox = side * 1.12, oy = -0.84;
-  try {
-    const fdx = fx - px, fdy = fy - py, fl = Math.hypot(fdx, fdy) || 1;
-    const sl = Math.hypot(ox, oy) || 1;
-    const dot = (ox * fdx + oy * fdy) / (sl * fl);
-    if (dot > 0.643 || Math.hypot(px + ox - fx, py + oy - fy) < 1.0) {
-      ox = side * 1.4; oy = 0;   // pure flank
-      const dot2 = (ox * fdx + oy * fdy) / (1.4 * fl);
-      if (dot2 > 0.643 || Math.hypot(px + ox - fx, py + oy - fy) < 1.0) {
-        ox = side * 0.7; oy = 1.21;   // north fallback, still 1.4 m out
-      }
-    }
-  } catch {}
-  return { x: px + ox, y: py + oy };
+  const caseId = (G.cs && G.cs.id) || G.caseId;
+  if (caseId === "belirsiz") return { x: px + side * 0.92, y: py - 0.92 };
+  return { x: px + side * 0.35, y: py - 1.25 };
 }
 function kapiSpot() {
   let bx = 3.4, by = 2.4;
@@ -1222,6 +1215,8 @@ function startWalkTo(id, tx, ty, fx, fy) {
   rec.tx = tx; rec.ty = ty; rec.faceX = fx; rec.faceY = fy; rec.hasFace = true;
   rec.pendingWave = false; rec.walking = true;
   faceBlender(rec, rec.x, rec.y, tx, ty);
+  try { if (rec.wave) rec.wave.stop(); } catch {}
+  clearTimeout(rec._wt);
   playWalk(rec);
 }
 function updateWalkers(dt) {
@@ -1243,6 +1238,40 @@ function updateWalkers(dt) {
       rec.group.position.x = rec.x; rec.group.position.z = -rec.y;
       rec.group.position.y = 0;
     }
+  }
+}
+// Scripted park after set-down: reverse 2.5 m straight, then roll to PARK.
+// Uses F.x/F.y/F.h and the group update every frame (no teleport, no colliders).
+function updateParking(dt) {
+  const P = G._park;
+  if (!P || !forkGroup) return;
+  P.t += dt;
+  const F = G.fork;
+  const t = Math.min(P.t, PARK_DUR);
+  let nx, ny, nh;
+  if (t <= PARK_REV_T) {
+    const u = t / PARK_REV_T, e = u * u * (3 - 2 * u);
+    nx = P.sx + (P.rx - P.sx) * e;
+    ny = P.sy + (P.ry - P.sy) * e;
+    nh = P.sh;
+  } else {
+    const v = (t - PARK_REV_T) / (PARK_DUR - PARK_REV_T);
+    const ex = 1 - Math.pow(1 - v, 2), ey = v * v, eh = v * v * (3 - 2 * v);
+    nx = P.rx + (P.px - P.rx) * ex;
+    ny = P.ry + (P.py - P.ry) * ey;
+    nh = wrapAngle(P.sh + wrapAngle(P.ph - P.sh) * eh);
+  }
+  F.x = nx; F.y = ny; F.h = nh; F.v = 0;
+  forkGroup.position.set(F.x, groundH(F.x, F.y), -F.y);
+  forkGroup.rotation.y = -F.h;
+  try { forksMesh.position.y = F.forksY / FORK_S; } catch {}
+  renderer.shadowMap.needsUpdate = true;
+  if (P.t >= PARK_DUR) {
+    F.x = P.px; F.y = P.py; F.h = P.ph;
+    forkGroup.position.set(F.x, groundH(F.x, F.y), -F.y);
+    forkGroup.rotation.y = -F.h;
+    G._park = null;
+    renderer.shadowMap.needsUpdate = true;
   }
 }
 function sendAllHome() {
@@ -2195,6 +2224,7 @@ const insideZone = (x, y, yaw) =>
   palletCorners(x, y, yaw).every(([cx, cy]) =>
     cx > ZONE.x0 && cx < ZONE.x1 && cy > ZONE.y0 && cy < ZONE.y1);
 function resetScene() {
+  G._park = null;
   const F = G.fork;
   F.x = START.x; F.y = START.y; F.h = START.h; F.v = 0; F.carrying = false;
   F.steer = 0; F.steerAngle = 0; F.yawRate = 0; F.pending = null; F.prevV = 0;
@@ -2430,7 +2460,19 @@ function startDeciding() {
   G.phase = "deciding";
   document.body.classList.add("deciding");
   setHint("");
-  try { dispatchWalkers(); } catch (e) { if (DEBUG) console.warn("walkers:", e); }
+  try {
+    const F = G.fork;
+    F.v = 0; F.steer = 0; F.steerAngle = 0; F.yawRate = 0; F.pending = null;
+    F.forksTarget = F.forksY;   // stay lowered
+    G._park = { t: 0, sx: F.x, sy: F.y, sh: F.h,
+      rx: F.x - Math.sin(F.h) * 2.5, ry: F.y - Math.cos(F.h) * 2.5,
+      px: PARK.x, py: PARK.y, ph: PARK.h };
+  } catch (e) { if (DEBUG) console.warn("park:", e); }
+  try {
+    const caseId = (G.cs && G.cs.id) || G.caseId;
+    if (caseId === "talimat") later(dispatchWalkers, 2200);
+    else later(dispatchWalkers, 550);
+  } catch (e) { if (DEBUG) console.warn("walkers:", e); }
   const cs = G.cs;
   const note = cs.note.items.map(it => `${it.quantity} × ${it.description}`).join("; ");
   // 1. Spark reads the note.
@@ -2748,6 +2790,7 @@ function tick() {
     if (G.phase === "driving") { pollKeys(); stepFork(dt); updateHint(); }
     else if (G.phase === "intro") { /* camera drift only */ }
     try { updateWalkers(dt); } catch {}
+    try { updateParking(dt); } catch {}
     // Barrier eases open on post.
     if (G.barrierOpen && barrierMesh && barrierMesh.rotation.x < -0.02) {
       barrierMesh.rotation.x = Math.min(0, barrierMesh.rotation.x + dt * 1.4);

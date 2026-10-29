@@ -1,10 +1,11 @@
 # Muse Code task: the pallet in view when the gate decides
 
 The prompt below was given verbatim to Muse Code (`muse exec`, model `muse-spark-1.3`).
-Measured with the test hook (camera projection) during `deciding` in the `ok` case, desktop
-1600×900: the delivery projects to (755, 471) and the forklift to (778, 497): **the pallet the
-whole scene is about is hidden behind the forklift**, and Sam, walking to it, disappears behind
-the forklift too. Rover's station also covers Sam's.
+Measured with the test hook (projected screen boxes) during `deciding` in the `ok` case,
+desktop 1600×900, after two fixes by hand (the delivery was drawn 5.5 m from where it was, and
+Kapı's rule book had landed at the origin): the forklift covers **100 % of the pallet** and
+88 % of Sam, who walks to the pallet's side behind it. The pallet the whole scene is about is
+not visible when the gate decides.
 
 ---
 
