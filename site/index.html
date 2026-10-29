@@ -29,6 +29,7 @@
   --code: #292219; --bubble: #292219; --shadow: none;
 }
 * { box-sizing: border-box; }
+html, body { overflow-x: hidden; overflow-x: clip; }
 body {
   margin: 0; background: var(--bg); color: var(--ink);
   font: 16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -43,21 +44,50 @@ img { max-width: 100%; }
   border-radius: 99px; padding: 6px 12px; font: inherit; font-size: 13px; cursor: pointer;
 }
 #theme:focus-visible, button:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.hero { padding: 44px 0 8px; }
-.muse { position: relative; border-radius: 18px; padding: 18px 18px 16px; margin: 0 0 22px; color: #fff;
-  background: linear-gradient(115deg, #0b5cff 0%, #6d4aff 45%, #c03fd6 75%, #ff5b8a 100%); overflow: hidden; }
-.muse-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; margin: 0 0 12px; }
+/* Full-bleed dock hero (after experiments/mockups/hero-dock.png). */
+.hero { position: relative; color: #fff; overflow: hidden; overflow: clip; background: #10141b; }
+.hero-bg { position: absolute; inset: 0; }
+.hero-bg img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.hero-scrim { position: absolute; inset: 0;
+  background:
+    linear-gradient(to top, rgba(8,10,16,.62) 0%, rgba(8,10,16,.18) 30%, transparent 46%),
+    linear-gradient(99deg, rgba(8,10,16,.82) 0%, rgba(8,10,16,.66) 30%, rgba(8,10,16,.34) 55%, rgba(8,10,16,.10) 78%, rgba(8,10,16,.30) 100%);
+}
+.hero-inner { position: relative; z-index: 1; max-width: 1120px; margin: 0 auto; padding: 64px 16px 30px; }
+.hero .kicker { background: rgba(251,238,223,.96); color: #7c2d12; border-color: transparent; }
+.hero h1 { color: #fff; }
+.hero .lede { color: rgba(255,255,255,.93); }
+.hero .lede b { color: #fff; }
+.hero-cta { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 22px; margin: 0 0 30px; }
+.btn-primary { display: inline-block; color: #fff; text-decoration: none; font-weight: 800; font-size: 17px;
+  padding: 13px 30px; border-radius: 99px; background: linear-gradient(92deg, #2f6bff 0%, #7c3aed 100%);
+  box-shadow: 0 10px 26px rgba(47,107,255,.40), inset 0 1px 0 rgba(255,255,255,.35); }
+.btn-primary:hover { filter: brightness(1.1); }
+.btn-quiet { color: #fff; font-weight: 600; text-decoration: underline;
+  text-underline-offset: 3px; text-decoration-color: rgba(255,255,255,.6); }
+.btn-quiet:hover { text-decoration-color: #fff; }
+.muse { position: relative; margin: 0; padding: 0; color: #fff; }
+.muse-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: center;
+  gap: 4px 12px; margin: 0 0 14px; text-align: center; }
 .muse-head b { font-size: 22px; letter-spacing: -.01em; }
 .muse-head span { font-size: 13.5px; opacity: .9; }
-.muse-tools { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; margin: 0; padding: 0; list-style: none; }
-.muse-tools li { display: flex; gap: 10px; align-items: center; background: rgba(255,255,255,.14);
-  border: 1px solid rgba(255,255,255,.28); border-radius: 12px; padding: 8px 10px; min-width: 0; }
-.muse-tools img { width: 38px; height: 38px; border-radius: 50%; flex: 0 0 auto; box-shadow: 0 0 0 2px rgba(255,255,255,.85); }
-.muse-tools b { display: block; font-size: 14px; line-height: 1.2; }
-.muse-tools small { display: block; font-size: 12px; line-height: 1.3; opacity: .9; }
-@media (max-width: 1100px) { .muse-tools { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-@media (max-width: 700px) { .muse-tools { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (max-width: 420px) { .muse-tools { grid-template-columns: 1fr; } .muse-head b { font-size: 19px; } }
+.muse-tools { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 10px; margin: 0; padding: 0; list-style: none; }
+.muse-tools li { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px;
+  background: rgba(255,255,255,.12);
+  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+  border: 1px solid rgba(255,255,255,.28); border-radius: 14px; padding: 14px 8px 12px; min-width: 0;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.35); }
+.muse-tools img { width: 54px; height: 54px; border-radius: 50%; flex: 0 0 auto; object-fit: cover;
+  box-shadow: 0 0 0 2px rgba(255,255,255,.85); }
+.muse-tools b { display: block; font-size: 13.5px; line-height: 1.2; }
+.muse-tools small { display: block; font-size: 11.5px; line-height: 1.35; opacity: .9; margin-top: 3px; }
+@media (max-width: 1080px) {
+  .muse-tools { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; overscroll-behavior-x: contain;
+    margin: 0 -16px; padding: 2px 16px 10px; scrollbar-width: thin; }
+  .muse-tools li { flex: 0 0 196px; scroll-snap-align: start; }
+}
+@media (max-width: 420px) { .muse-head b { font-size: 19px; } .hero-inner { padding-top: 56px; } }
+.posthero { padding-top: 22px; }
 .kicker {
   display: inline-block; font-size: 12.5px; font-weight: 700; letter-spacing: .08em;
   text-transform: uppercase; color: var(--accent); background: var(--accent-bg);
@@ -106,7 +136,7 @@ h2 { font-size: 24px; letter-spacing: -.01em; margin: 42px 0 4px; }
   border-radius: 22px; overflow: hidden;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, .45),
     0 1px 2px rgba(74, 55, 25, .08), 0 10px 26px rgba(74, 55, 25, .10);
-  display: flex; flex-direction: column; min-width: 0;
+  display: flex; flex-direction: column; min-width: 0; position: relative;
   transition: transform .25s ease, box-shadow .25s ease;
 }
 .member.dark {
@@ -127,12 +157,19 @@ h2 { font-size: 24px; letter-spacing: -.01em; margin: 42px 0 4px; }
 @media (prefers-reduced-motion: reduce) {
   .member { transition: none; }
   .member:hover { transform: none; }
+  .member canvas.fx { display: none; }
+  .member.sheen::after { animation: none; opacity: 0; }
 }
 .member .body { padding: 22px 20px 0; }
 .member .name {
-  display: flex; align-items: center;
+  display: flex; align-items: center; align-self: flex-start;
   font-size: 23px; font-weight: 800; margin: 0; letter-spacing: -.01em;
+  background: rgba(255, 255, 255, .16);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, .30); border-radius: 12px; padding: 2px 12px 2px 10px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .35);
 }
+.member.dark .name { background: rgba(0, 0, 0, .20); border-color: rgba(255, 255, 255, .24); }
 .member .cdot {
   width: 12px; height: 12px; border-radius: 50%; flex: 0 0 auto;
   margin-right: 10px; background: var(--c); box-shadow: 0 0 0 3px rgba(255, 255, 255, .35);
@@ -142,10 +179,13 @@ h2 { font-size: 24px; letter-spacing: -.01em; margin: 42px 0 4px; }
 .member .model { font-size: 13px; margin: 0; opacity: .85; }
 .member .pill {
   font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
-  white-space: nowrap; border-radius: 99px; padding: 3px 10px;
-  border: 1px solid rgba(34, 29, 21, .28); background: rgba(255, 255, 255, .45); color: inherit;
+  white-space: nowrap; border-radius: 99px; padding: 3px 10px; color: inherit;
+  border: 1px solid rgba(255, 255, 255, .55); background: rgba(255, 255, 255, .32);
+  -webkit-backdrop-filter: blur(10px) saturate(1.3); backdrop-filter: blur(10px) saturate(1.3);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .55);
 }
-.member.dark .pill { border-color: rgba(255, 255, 255, .35); background: rgba(0, 0, 0, .25); }
+.member.dark .pill { border-color: rgba(255, 255, 255, .35); background: rgba(255, 255, 255, .14);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .25); }
 .member .bubble {
   /* The line sits right on the card's colour (Sena: no bubble). Colour follows the card:
      dark text on light cards, light text on dark ones. */
@@ -165,6 +205,18 @@ h2 { font-size: 24px; letter-spacing: -.01em; margin: 42px 0 4px; }
   -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 26%);
   mask-image: linear-gradient(to bottom, transparent 0, #000 26%);
 }
+.member canvas.fx {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  pointer-events: none; opacity: 0; transition: opacity .35s ease; z-index: 2;
+}
+.member canvas.fx.on { opacity: 1; }
+.member::after {
+  content: ""; position: absolute; inset: 0; z-index: 3; pointer-events: none; opacity: 0;
+  background: linear-gradient(115deg, transparent 42%, rgba(255, 255, 255, .28) 50%, transparent 58%);
+  transform: translateX(-130%);
+}
+.member.sheen::after { opacity: 1; animation: fx-sheen 1s ease-out 1; }
+@keyframes fx-sheen { from { transform: translateX(-130%); } to { transform: translateX(130%); } }
 .roles { font-size: 13px; color: var(--muted); margin: 14px 0 0; max-width: 46rem; }
 .langrow { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: 0 0 4px; }
 .langrow label { font-size: 13.5px; font-weight: 700; }
@@ -313,13 +365,16 @@ footer p { margin: 4px 0; }
 </head>
 <body>
 <button id="theme" type="button" aria-label="Toggle colour theme">Dark</button>
-<div class="wrap">
-  <header class="hero">
+<header class="hero">
+  <div class="hero-bg" aria-hidden="true"><img id="heroImg" alt=""></div>
+  <div class="hero-scrim" aria-hidden="true"></div>
+  <div class="hero-inner">
     <p class="kicker">Live demo &middot; recorded runs, no API calls from this page</p>
     <h1>Count Before You Post</h1>
-    <p class="lede">Count Before You Post is <b>an AI agent that can't write a number into the ERP until a camera has counted it</b>.
-      Muse Spark reads the delivery note, SAM 3.1 counts what actually arrived, and a gate in plain code
-      blocks the goods receipt when the two disagree.</p>
+    <p class="lede"><b>A verification gate between AI agents and the ERP.</b>
+      Before a goods receipt is written, the delivery note, the camera, the receiver's voice
+      and a second model must agree. If they don't, nothing is written and a person decides.</p>
+    <p class="hero-cta"><a class="btn-primary" href="sim/">Drive the dock &rarr;</a><a class="btn-quiet" href="#h-dock">See the six deliveries</a></p>
     <section class="muse" aria-label="Built with Muse">
       <p class="muse-head"><b>Built with Muse</b><span>Meta's models, on the Meta Model API and on open weights, do every step that needs AI.</span></p>
       <ul class="muse-tools">
@@ -332,12 +387,16 @@ footer p { margin: 4px 0; }
         <li><img src="img/av-spark-open.jpg" alt=""><span><b>Muse Spark Open</b><small>reads the note a second time on open weights before any receipt</small></span></li>
       </ul>
     </section>
+  </div>
+</header>
+<div class="wrap">
+  <div class="posthero">
     <figure class="castshot">
       <img id="castImg" alt="Group picture of the project characters">
       <figcaption id="castCap">The whole crew at the dock.</figcaption>
     </figure>
     <div class="stats" id="stats"></div>
-  </header>
+  </div>
 
   <main>
     <section aria-labelledby="h-cast">
@@ -480,12 +539,13 @@ function renderCrew(list) {
   };
   $("crew").innerHTML = list.map(m => {
     const dark = lum(m.bg) < 0.25;
-    return `<article class="member${dark ? " dark" : ""}" style="--c:${esc(m.colour)};--cardbg:${esc(m.bg)}">` +
+    return `<article class="member${dark ? " dark" : ""}" data-fx="${esc(m.id)}" style="--c:${esc(m.colour)};--cardbg:${esc(m.bg)}">` +
     `<div class="body"><p class="name"><span class="cdot"></span>${esc(m.name)}</p>` +
     `<p class="meta"><span class="model">${esc(m.model)}</span>` +
     `<span class="pill ${STATUS_CLASS[m.status] || ""}">${esc(STATUS_TEXT[m.status] || m.status)}</span></p>` +
     `<p class="bubble">${esc(m.line)}</p></div>` +
-    `<div class="shot"><img class="portrait" src="${esc(m.portrait)}" alt="${esc(m.name)} portrait" loading="lazy"></div></article>`;
+    `<div class="shot"><img class="portrait" src="${esc(m.portrait)}" alt="${esc(m.name)} portrait" loading="lazy"></div>` +
+    `<canvas class="fx" aria-hidden="true"></canvas></article>`;
   }).join("");
   $("roles").textContent =
     "On duty = working at the dock. Built part of it = made part of this project.";
@@ -821,6 +881,8 @@ function start(data) {
   langCache[BASE_LANG] = data;
   renderHow();
   renderCrew(data.characters || []);
+  armFx();
+  if (data.hero) { $("heroImg").src = data.hero.src; $("heroImg").alt = data.hero.alt || ""; }
   $("castImg").src = data.cast;
   $("castImg").alt = "Group picture: " + (data.characters || []).map(m => m.name).join(", ");
   $("langSel").addEventListener("change", e => switchLang(e.target.value, CASE));
@@ -828,8 +890,318 @@ function start(data) {
   switchLang(p.lang, p.kase);
 }
 
+/* Cast-card light effects: one small canvas overlay per card (no libraries).
+   At most one card animates at a time; nothing runs while none is hovered;
+   everything stays off under prefers-reduced-motion. */
+const TAU = Math.PI * 2;
+const frnd = (a, b) => a + Math.random() * (b - a);
+function sparkle4(ctx, x, y, r) {
+  ctx.beginPath();
+  ctx.moveTo(x, y - r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.quadraticCurveTo(x, y, x, y + r);
+  ctx.quadraticCurveTo(x, y, x - r, y);
+  ctx.quadraticCurveTo(x, y, x, y - r);
+  ctx.fill();
+}
+const FX = {
+  glimmer: {
+    init(S) {
+      const cols = ["#ffffff", "#f5f3ff", "#ddd6fe", "#c4b5fd", "#8b5cf6"];
+      const ps = [];
+      for (let i = 0; i < 30; i++) ps.push({
+        x: frnd(S.px, S.px + S.pw), y: frnd(S.py, S.py + S.ph),
+        s: frnd(1.6, 5.2), v: frnd(10, 40), ph: frnd(0, TAU), tw: frnd(2, 5.5),
+        c: cols[i % cols.length]
+      });
+      return { ps };
+    },
+    draw(ctx, S, st, t, dt) {
+      for (const p of st.ps) {
+        p.y -= p.v * dt;
+        p.x += Math.sin(t * 1.7 + p.ph) * 14 * dt;
+        if (p.y < S.py - 10) { p.y = S.py + S.ph + 8; p.x = frnd(S.px, S.px + S.pw); }
+        ctx.save();
+        ctx.globalAlpha = 0.3 + 0.7 * (0.5 + 0.5 * Math.sin(t * p.tw + p.ph));
+        ctx.fillStyle = p.c;
+        ctx.shadowColor = p.c === "#ffffff" ? "#c4b5fd" : "#ffffff";
+        ctx.shadowBlur = 9;
+        sparkle4(ctx, p.x, p.y, p.s);
+        ctx.restore();
+      }
+    }
+  },
+  spark: {
+    init(S) {
+      const cols = ["#fff7ed", "#fdba74", "#fb923c", "#f97316"];
+      const ps = [];
+      for (let i = 0; i < 14; i++) ps.push({
+        x: frnd(S.px + 20, S.px + S.pw - 20), y: frnd(S.py + S.ph * 0.4, S.py + S.ph),
+        vy: frnd(60, 150), vx: frnd(-24, 24), s: frnd(1.5, 3.4),
+        c: cols[i % cols.length], ph: frnd(0, TAU)
+      });
+      return { ps };
+    },
+    draw(ctx, S, st, t, dt) {
+      for (const p of st.ps) {
+        p.y -= p.vy * dt;
+        p.x += (p.vx + Math.sin(t * 9 + p.ph) * 18) * dt;
+        if (p.y < S.py - 6) {
+          p.y = frnd(S.py + S.ph * 0.6, S.py + S.ph);
+          p.x = frnd(S.px + 20, S.px + S.pw - 20);
+        }
+        ctx.save();
+        ctx.globalAlpha = 0.55 + 0.45 * Math.sin(t * 22 + p.ph);
+        ctx.fillStyle = p.c;
+        ctx.shadowColor = "#f97316"; ctx.shadowBlur = 10;
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.s, 0, TAU); ctx.fill();
+        ctx.restore();
+      }
+    }
+  },
+  voice: {
+    draw(ctx, S, st, t) {
+      const cx = S.px + S.pw / 2, cy = S.py + S.ph * 0.45;
+      for (let i = 0; i < 4; i++) {
+        const ph = (t * 0.45 + i / 4) % 1;
+        ctx.save();
+        ctx.globalAlpha = 0.55 * (1 - ph);
+        ctx.strokeStyle = i % 2 ? "#e0e7ff" : "#93c5fd";
+        ctx.lineWidth = 2.5;
+        ctx.shadowColor = "#93c5fd"; ctx.shadowBlur = 8;
+        ctx.beginPath(); ctx.arc(cx, cy, 12 + ph * S.pw * 0.55, 0, TAU); ctx.stroke();
+        ctx.restore();
+      }
+    }
+  },
+  sam: {
+    draw(ctx, S, st, t) {
+      const y = S.py + ((t % 1.6) / 1.6) * S.ph;
+      ctx.save();
+      ctx.beginPath(); ctx.rect(S.px, S.py, S.pw, S.ph); ctx.clip();
+      const g = ctx.createLinearGradient(0, y - 26, 0, y);
+      g.addColorStop(0, "rgba(96,165,250,0)");
+      g.addColorStop(1, "rgba(96,165,250,.38)");
+      ctx.fillStyle = g;
+      ctx.fillRect(S.px, y - 26, S.pw, 26);
+      ctx.fillStyle = "#dbeafe";
+      ctx.shadowColor = "#3b82f6"; ctx.shadowBlur = 12;
+      ctx.fillRect(S.px, y - 1, S.pw, 2);
+      ctx.restore();
+    }
+  },
+  kapi: {
+    draw(ctx, S, st, t) {
+      const cx = S.px + S.pw / 2, cy = S.py + S.ph * 0.38, R = S.pw * 0.6;
+      const a = 0.30 + 0.16 * Math.sin(t * 2.4);
+      const g = ctx.createRadialGradient(cx, cy, 4, cx, cy, R);
+      g.addColorStop(0, "rgba(187,247,208," + (a + 0.35).toFixed(3) + ")");
+      g.addColorStop(0.35, "rgba(34,197,94," + a.toFixed(3) + ")");
+      g.addColorStop(1, "rgba(34,197,94,0)");
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(cx, cy, R, 0, TAU); ctx.fill();
+      ctx.save();
+      ctx.fillStyle = "#dcfce7";
+      ctx.shadowColor = "#22c55e"; ctx.shadowBlur = 16;
+      ctx.beginPath(); ctx.arc(cx, cy, 5, 0, TAU); ctx.fill();
+      ctx.restore();
+    }
+  },
+  wonder: {
+    init(S) {
+      const ps = [];
+      for (let i = 0; i < 9; i++) ps.push({
+        x: frnd(S.px, S.px + S.pw), y: frnd(S.py, S.py + S.ph),
+        s: frnd(5, 10), r: frnd(0, TAU), vr: frnd(-1.2, 1.2),
+        v: frnd(8, 26), ph: frnd(0, TAU)
+      });
+      return { ps };
+    },
+    draw(ctx, S, st, t, dt) {
+      for (const p of st.ps) {
+        p.y -= p.v * dt; p.r += p.vr * dt;
+        p.x += Math.sin(t * 1.2 + p.ph) * 10 * dt;
+        if (p.y < S.py - 12) { p.y = S.py + S.ph + 8; p.x = frnd(S.px, S.px + S.pw); }
+        ctx.save();
+        ctx.translate(p.x, p.y); ctx.rotate(p.r);
+        ctx.globalAlpha = 0.92;
+        ctx.fillStyle = "#fffbeb";
+        ctx.shadowColor = "rgba(202,138,4,.65)"; ctx.shadowBlur = 6;
+        ctx.fillRect(-p.s / 2, -p.s / 3, p.s, p.s * 0.66);
+        ctx.fillStyle = "rgba(202,138,4,.5)";
+        ctx.fillRect(-p.s / 2 + 1, -1, p.s - 2, 1);
+        ctx.restore();
+      }
+    }
+  },
+  "spark-open": {
+    draw(ctx, S, st, t) {
+      const x0 = S.px + 12, x1 = S.px + S.pw - 12;
+      const y0 = S.py + S.ph * 0.62, bend = -S.ph * 0.28, mx = (x0 + x1) / 2;
+      ctx.save();
+      ctx.strokeStyle = "rgba(255,255,255,.6)"; ctx.lineWidth = 2;
+      ctx.setLineDash([2, 8]); ctx.lineCap = "round";
+      ctx.beginPath(); ctx.moveTo(x0, y0);
+      ctx.quadraticCurveTo(mx, y0 + bend, x1, y0); ctx.stroke();
+      ctx.setLineDash([]);
+      for (let i = 0; i < 4; i++) {
+        const u = (t * 0.22 + i / 4) % 1, v = 1 - u;
+        const x = v * v * x0 + 2 * v * u * mx + u * u * x1;
+        const y = v * v * y0 + 2 * v * u * (y0 + bend) + u * u * y0;
+        ctx.fillStyle = i === 0 ? "#5eead4" : "#ffffff";
+        ctx.shadowColor = "#0d9488"; ctx.shadowBlur = 9;
+        ctx.beginPath(); ctx.arc(x, y, 3.6, 0, TAU); ctx.fill();
+      }
+      ctx.restore();
+    }
+  },
+  iris: {
+    init(S) {
+      const cols = ["#ef4444", "#f59e0b", "#10b981", "#3b82f6", "#8b5cf6", "#ec4899"];
+      const ps = [];
+      for (let i = 0; i < 14; i++) ps.push({
+        x: frnd(S.px, S.px + S.pw), y: frnd(S.py, S.py + S.ph),
+        r: frnd(2.5, 5.5), c: cols[i % cols.length],
+        ph: frnd(0, TAU), v: frnd(6, 20)
+      });
+      return { ps };
+    },
+    draw(ctx, S, st, t, dt) {
+      for (const p of st.ps) {
+        p.y -= p.v * dt;
+        p.x += Math.cos(t * 1.4 + p.ph) * 10 * dt;
+        if (p.y < S.py - 8) { p.y = frnd(S.py + S.ph * 0.5, S.py + S.ph); p.x = frnd(S.px, S.px + S.pw); }
+        ctx.save();
+        ctx.globalAlpha = 0.88;
+        ctx.fillStyle = p.c;
+        ctx.shadowColor = p.c; ctx.shadowBlur = 6;
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, TAU); ctx.fill();
+        ctx.restore();
+      }
+    }
+  },
+  ada: {
+    init(S) {
+      const ps = [];
+      for (let i = 0; i < 9; i++) ps.push({
+        x: frnd(S.px + 16, S.px + S.pw - 16), y: frnd(S.py, S.py + S.ph),
+        v: frnd(14, 30), s: frnd(11, 16), ph: frnd(0, TAU), g: i % 2 ? ">_" : "</>"
+      });
+      return { ps };
+    },
+    draw(ctx, S, st, t, dt) {
+      ctx.save();
+      ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      for (const p of st.ps) {
+        p.y -= p.v * dt;
+        if (p.y < S.py - 12) { p.y = S.py + S.ph + 8; p.x = frnd(S.px + 16, S.px + S.pw - 16); }
+        ctx.globalAlpha = 0.5 + 0.4 * (0.5 + 0.5 * Math.sin(t * 3 + p.ph));
+        ctx.font = "700 " + p.s + "px ui-monospace, SFMono-Regular, Menlo, monospace";
+        ctx.fillStyle = "#0b3d39";
+        ctx.shadowColor = "rgba(255,255,255,.95)"; ctx.shadowBlur = 6;
+        ctx.fillText(p.g, p.x, p.y);
+      }
+      ctx.restore();
+    }
+  },
+  sef: {
+    draw(ctx, S, st, t) {
+      const cx = S.px + S.pw / 2, cy = S.py + S.ph * 0.45;
+      const s = Math.min(S.pw, S.ph) * 0.20;
+      const p = Math.min(1, ((t % 2.4) / 2.4) / 0.38);
+      const x1 = cx - s, y1 = cy, x2 = cx - s * 0.15, y2 = cy + s * 0.65;
+      const x3 = cx + s, y3 = cy - s * 0.75;
+      ctx.save();
+      ctx.strokeStyle = "#ffffff"; ctx.lineWidth = 7;
+      ctx.lineCap = "round"; ctx.lineJoin = "round";
+      ctx.shadowColor = "#1d4ed8"; ctx.shadowBlur = 16;
+      ctx.beginPath();
+      if (p < 0.45) {
+        const q = p / 0.45;
+        ctx.moveTo(x1, y1); ctx.lineTo(x1 + (x2 - x1) * q, y1 + (y2 - y1) * q);
+      } else {
+        ctx.moveTo(x1, y1); ctx.lineTo(x2, y2);
+        const q = (p - 0.45) / 0.55;
+        ctx.lineTo(x2 + (x3 - x2) * q, y2 + (y3 - y2) * q);
+      }
+      ctx.stroke();
+      ctx.restore();
+    }
+  }
+};
+let fxActive = null, fxClearT = 0, fxTapT = 0;
+const fxReduce = matchMedia("(prefers-reduced-motion: reduce)");
+function stopFx() {
+  clearTimeout(fxTapT);
+  if (!fxActive) return;
+  cancelAnimationFrame(fxActive.raf);
+  const done = fxActive;
+  fxActive = null;
+  done.canvas.classList.remove("on");
+  done.card.classList.remove("sheen");
+  const c = done.canvas;
+  clearTimeout(fxClearT);
+  fxClearT = setTimeout(() => {
+    const x = c.getContext("2d");
+    if (x) x.clearRect(0, 0, c.width, c.height);
+  }, 400);
+}
+function fxFrame(now) {
+  if (!fxActive) return;
+  const A = fxActive;
+  const t = (now - A.t0) / 1000;
+  const dt = Math.min(0.05, Math.max(0.001, (now - A.last) / 1000));
+  A.last = now;
+  A.ctx.clearRect(0, 0, A.S.w, A.S.h);
+  A.fx.draw(A.ctx, A.S, A.st, t, dt);
+  A.raf = requestAnimationFrame(fxFrame);
+}
+function startFx(card) {
+  if (fxReduce.matches) return;
+  const fx = FX[card.dataset.fx];
+  if (!fx) return;
+  if (fxActive && fxActive.card === card) return;
+  stopFx();
+  const canvas = card.querySelector("canvas.fx");
+  const img = card.querySelector("img.portrait");
+  if (!canvas || !img) return;
+  const rc = card.getBoundingClientRect();
+  const ri = img.getBoundingClientRect();
+  const S = { w: rc.width, h: rc.height,
+    px: ri.left - rc.left, py: ri.top - rc.top, pw: ri.width, ph: ri.height };
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  canvas.width = Math.max(1, Math.round(S.w * dpr));
+  canvas.height = Math.max(1, Math.round(S.h * dpr));
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  canvas.classList.add("on");
+  card.classList.remove("sheen");
+  void card.offsetWidth;
+  card.classList.add("sheen");
+  clearTimeout(fxClearT);
+  const now = performance.now();
+  fxActive = { card, canvas, ctx, S, fx, st: fx.init ? fx.init(S) : {}, t0: now, last: now, raf: 0 };
+  fxActive.raf = requestAnimationFrame(fxFrame);
+}
+function armFx() {
+  document.querySelectorAll("#crew .member").forEach(card => {
+    card.addEventListener("pointerenter", () => startFx(card));
+    card.addEventListener("pointerleave", () => stopFx());
+    card.addEventListener("click", () => {
+      if (matchMedia("(hover: none)").matches) {
+        startFx(card);
+        clearTimeout(fxTapT);
+        fxTapT = setTimeout(stopFx, 2600);
+      }
+    });
+  });
+  if (fxReduce.addEventListener) fxReduce.addEventListener("change", () => { if (fxReduce.matches) stopFx(); });
+}
+
 window.addEventListener("hashchange", () => {
   if (!DATA) return;
+  if (/^#h-/.test(location.hash)) return; // section links (e.g. the hero's "See the six deliveries")
   const p = parseHash();
   if (p.lang !== CUR_LANG) switchLang(p.lang, p.kase);
   else if ((LANG_DATA.cases || []).some(c => c.id === p.kase)) show(p.kase, false);
