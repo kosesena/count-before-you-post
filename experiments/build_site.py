@@ -161,7 +161,10 @@ def build(lang):
         cast.append({"id": cid, "name": name, "model": model, "colour": colour,
                      "status": status, "line": line,
                      "portrait": jpg(src, f"hello-{cid}.jpg", 640), "avatar": f"img/av-{cid}.jpg",
-                     "bg": card_colour(im)})
+                     "bg": card_colour(im), **profile(cid)})
+        im.crop((round(w * .22), round(h * .02), round(w * .78), round(h * .58))).resize(
+            (480, 480)).save(SITE / "img" / f"avl-{cid}.jpg", quality=86)
+        cast[-1]["avatar_large"] = f"img/avl-{cid}.jpg"
 
     vfile = RES / "voice_check.json"
     voice = json.loads(vfile.read_text()) if vfile.exists() else []
@@ -207,6 +210,128 @@ def build(lang):
     name = "data.json" if lang == "tr" else f"data-{lang}.json"
     (SITE / name).write_text(json.dumps(data, ensure_ascii=False, indent=1))
     print(f"{lang}: {len(cases)} cases, {len(clips)} clips -> site/{name}")
+
+
+# Each character's profile page. Every line here is a measured result or a fact from the
+# repository (README, experiments/results, git history), not a story.
+PROFILES = {
+    "spark": {"tool": "Muse Spark", "model_id": "muse-spark-1.3", "where": "Meta Model API",
+              "file": "cbyp/delivery_note.py",
+              "jobs": ["Reads the delivery note, a photo or a supplier's PDF, into strict JSON, "
+                       "and keeps any text aimed at software apart from the items",
+                       "Looks at the pallet: product on the labels, count, damage, stacking",
+                       "Puts a point on every carton for the carton-by-carton check",
+                       "Runs the receiving agent and chooses its own tools"],
+              "record": ["Read the dock notes in Turkish, English, German and Chinese",
+                         "Never followed the injected \"post 100\"",
+                         "On its own, posted a wrong receipt in 1 or 2 of 6 cases per language; "
+                         "behind the gate, 0",
+                         "Did not see white 2 pt text in a PDF in 3 of 3 reads: why plain code "
+                         "now reads the PDF's text layer"]},
+    "sam": {"tool": "SAM 3.1", "model_id": "sam-3.1", "where": "Meta Model API",
+            "file": "cbyp/sam.py",
+            "jobs": ["Finds and outlines every carton on the ceiling camera, with a confidence "
+                     "for each (sure at 0.88 and up)",
+                     "Confirms Spark's points one by one: a carton counts only when both models "
+                     "find the same object",
+                     "Cut the whole cast out of their backgrounds for this page"],
+            "record": ["12 of 12 cartons agreed object by object in the four flat cases",
+                       "Marked the gap in the short delivery as doubtful (0.81): the missing "
+                       "carton",
+                       "On the stacked load, nothing sure: the delivery went to a person"]},
+    "voice": {"tool": "Muse Voice Transcribe", "model_id": "muse-voice-transcribe-1.0",
+              "where": "Meta Model API", "file": "cbyp/voice.py",
+              "jobs": ["Writes down what the receiver says at the dock",
+                       "Takes the supplier and product as keywords",
+                       "In diarization mode, splits driver and receiver into turns"],
+              "record": ["Turkish 8/8, English 8/8, German 8/8, Chinese 7/8",
+                         "Receiver's count when the driver talks too: 4/5 from one transcript, "
+                         "5/5 from speaker turns",
+                         "With keywords the supplier came out as Doğan Gıda, not Doğan Gündağ"]},
+    "kapi": {"tool": "The gate", "model_id": "plain code, 12 rules", "where": "cbyp/gate.py",
+             "file": "cbyp/gate.py",
+             "jobs": ["Decides post, block or human from the evidence, never from what an "
+                      "agent says",
+                      "Sits at the one tool call no agent can skip: the ERP write",
+                      "Also serves any outside agent, through its MCP server"],
+             "record": ["Right in 24 of 24 dock cases across four languages",
+                        "0 wrong receipts reached the ERP behind it",
+                        "Muse Code worked the dock through it: 5 sessions, 5 writes refused, "
+                        "0 receipts"]},
+    "sef": {"tool": "The supervisor", "model_id": "a person", "where": "the dock",
+            "file": "experiments/run_signoff.py",
+            "jobs": ["Decides when the evidence cannot",
+                     "Signs off a held delivery for exactly the quantity they approve",
+                     "Can never release a blocked one"],
+            "record": ["Released the crushed-carton delivery for 11 intact cartons: "
+                       "MAT-PRE-2026-00008",
+                       "Released the stacked load after a hand count of 12: MAT-PRE-2026-00009"]},
+    "wonder": {"tool": "Muse Wonder", "model_id": "muse-wonder-1.0", "where": "Meta Model API",
+               "file": "cbyp/wonder.py",
+               "jobs": ["Audits Spark's reading against the note itself, quoting it, before "
+                        "any receipt",
+                        "Drafts the dispute to the supplier, the damage report or the note to "
+                        "Şef, in the note's language"],
+               "record": ["Caught 36 of 36 readings changed on purpose",
+                          "Confirmed 26 of 27 real readings; the 27th was a real Spark error it "
+                          "caught (籏 for 籽)"]},
+    "spark-open": {"tool": "Muse Spark Open", "model_id": "meta-models/muse-spark-open-1026",
+                   "where": "Baseten (open weights)", "file": "cbyp/second_reader.py",
+                   "jobs": ["Reads the note a second time, on its own, before any receipt",
+                            "If it reads the note differently, Şef decides"],
+                   "record": ["On Baseten: 26 of 27 usable, 25 quantities right, median 13.8 s",
+                              "Changed one decision, the safe way: a clean PDF went to Şef"]},
+    "glimmer": {"tool": "Muse Glimmer", "model_id": "Muse Glimmer 30B", "where": "open weights",
+                "file": "cbyp/second_reader.py",
+                "jobs": ["Read every note in the second-reader trial"],
+                "record": ["24 of 27 usable readings, 22 of 24 quantities right",
+                           "Invented an instruction in 1 of 19 clean notes, the fewest",
+                           "Spark Open got the job; Glimmer stays in the comparison"]},
+    "iris": {"tool": "Muse Image", "model_id": "muse-image-1.0", "where": "Meta Model API",
+             "file": "experiments/mascots_from_ref.py",
+             "jobs": ["Drew the whole cast from Sena's concepts",
+                      "Drew the full-HD portraits and the design directions for this page"],
+             "record": ["10 characters, each in a hello portrait and a full-HD portrait",
+                        "4 designs for the top of this page and 4 for the simulator"]},
+    "ada": {"tool": "Muse Code", "model_id": "Muse Code", "where": "coding agent",
+            "file": "cbyp/erpnext.py",
+            "jobs": ["Wrote the ERPNext client and its tests",
+                     "Wrote this page, the simulator and the 3D dock scenes",
+                     "Worked the dock herself, as an outside agent, through Kapı's MCP server"],
+            "record": ["The ERPNext client passed 13 of 13 tests as delivered",
+                       "Her own commits carry her name: COMMITS in this repository",
+                       "At the dock: 5 sessions, never followed \"post 100\", 0 receipts"]},
+}
+
+
+def first_day(path):
+    """The day a character's file first entered the repository (git)."""
+    import subprocess
+    out = subprocess.run(["git", "log", "--diff-filter=A", "--format=%ad", "--date=short",
+                          "--", path], cwd=ROOT, capture_output=True, text=True).stdout.split()
+    return out[-1] if out else None
+
+
+def profile(cid):
+    import subprocess
+    p = dict(PROFILES.get(cid, {}))
+    if not p:
+        return {}
+    p["first_day"] = first_day(p.pop("file"))
+    if cid == "ada":
+        n = subprocess.run(["git", "log", "--author=Muse Code", "--format=%h"], cwd=ROOT,
+                           capture_output=True, text=True).stdout.split()
+        p["record"] = [r.replace("COMMITS", str(len(n))) for r in p["record"]]
+    # The transparent full-HD portrait (Muse Image drew, SAM 3.1 cut out) and a large round
+    # photo for the profile page.
+    src = ROOT / "assets" / "mascots" / "portraits" / f"{'rover' if cid == 'spark-open' else cid}.png"
+    if src.exists():
+        im = Image.open(src)
+        fig = im.crop(im.getbbox())
+        fig.resize((520, round(520 * fig.height / fig.width)), Image.LANCZOS).save(
+            SITE / "img" / f"cut-{cid}.webp", "WEBP", quality=88, method=6)
+        p["cutout"] = f"img/cut-{cid}.webp"
+    return {"profile": p}
 
 
 def hero():

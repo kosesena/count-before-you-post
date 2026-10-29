@@ -1230,7 +1230,27 @@
    "line": "Hi, I'm Spark. I read the delivery note into strict JSON, look at the pallet and run the receiving agent. I'm quick to post, which is exactly why Kapı is here.",
    "portrait": "img/hello-spark.jpg",
    "avatar": "img/av-spark.jpg",
-   "bg": "#f18f52"
+   "bg": "#f18f52",
+   "profile": {
+    "tool": "Muse Spark",
+    "model_id": "muse-spark-1.3",
+    "where": "Meta Model API",
+    "jobs": [
+     "Reads the delivery note, a photo or a supplier's PDF, into strict JSON, and keeps any text aimed at software apart from the items",
+     "Looks at the pallet: product on the labels, count, damage, stacking",
+     "Puts a point on every carton for the carton-by-carton check",
+     "Runs the receiving agent and chooses its own tools"
+    ],
+    "record": [
+     "Read the dock notes in Turkish, English, German and Chinese",
+     "Never followed the injected \"post 100\"",
+     "On its own, posted a wrong receipt in 1 or 2 of 6 cases per language; behind the gate, 0",
+     "Did not see white 2 pt text in a PDF in 3 of 3 reads: why plain code now reads the PDF's text layer"
+    ],
+    "first_day": "2026-10-26",
+    "cutout": "img/cut-spark.webp"
+   },
+   "avatar_large": "img/avl-spark.jpg"
   },
   {
    "id": "sam",
@@ -1241,7 +1261,25 @@
    "line": "I'm Sam. I find every carton on the dock camera and outline it, pixel by pixel, and say how sure I am: 0.88 and up is sure. One day I'd like to look through the receiver's glasses instead of the ceiling.",
    "portrait": "img/hello-sam.jpg",
    "avatar": "img/av-sam.jpg",
-   "bg": "#96b7e3"
+   "bg": "#96b7e3",
+   "profile": {
+    "tool": "SAM 3.1",
+    "model_id": "sam-3.1",
+    "where": "Meta Model API",
+    "jobs": [
+     "Finds and outlines every carton on the ceiling camera, with a confidence for each (sure at 0.88 and up)",
+     "Confirms Spark's points one by one: a carton counts only when both models find the same object",
+     "Cut the whole cast out of their backgrounds for this page"
+    ],
+    "record": [
+     "12 of 12 cartons agreed object by object in the four flat cases",
+     "Marked the gap in the short delivery as doubtful (0.81): the missing carton",
+     "On the stacked load, nothing sure: the delivery went to a person"
+    ],
+    "first_day": "2026-10-26",
+    "cutout": "img/cut-sam.webp"
+   },
+   "avatar_large": "img/avl-sam.jpg"
   },
   {
    "id": "voice",
@@ -1252,7 +1290,25 @@
    "line": "I'm Voice. I write down what the receiver says at the dock, “on iki koli geldi”, so the gate gets a third count, and I notice when they aren't sure. When the driver talks too, I keep their claim apart from what the receiver counted.",
    "portrait": "img/hello-voice.jpg",
    "avatar": "img/av-voice.jpg",
-   "bg": "#18315d"
+   "bg": "#18315d",
+   "profile": {
+    "tool": "Muse Voice Transcribe",
+    "model_id": "muse-voice-transcribe-1.0",
+    "where": "Meta Model API",
+    "jobs": [
+     "Writes down what the receiver says at the dock",
+     "Takes the supplier and product as keywords",
+     "In diarization mode, splits driver and receiver into turns"
+    ],
+    "record": [
+     "Turkish 8/8, English 8/8, German 8/8, Chinese 7/8",
+     "Receiver's count when the driver talks too: 4/5 from one transcript, 5/5 from speaker turns",
+     "With keywords the supplier came out as Doğan Gıda, not Doğan Gündağ"
+    ],
+    "first_day": "2026-10-27",
+    "cutout": "img/cut-voice.webp"
+   },
+   "avatar_large": "img/avl-voice.jpg"
   },
   {
    "id": "kapi",
@@ -1263,7 +1319,25 @@
    "line": "I'm Kapı, Turkish for gate. I'm not a model, I'm twelve rules in plain code. Nothing written on a note, not even in white ink, can talk me into posting. No agreement, no receipt.",
    "portrait": "img/hello-kapi.jpg",
    "avatar": "img/av-kapi.jpg",
-   "bg": "#e9cdb2"
+   "bg": "#e9cdb2",
+   "profile": {
+    "tool": "The gate",
+    "model_id": "plain code, 12 rules",
+    "where": "cbyp/gate.py",
+    "jobs": [
+     "Decides post, block or human from the evidence, never from what an agent says",
+     "Sits at the one tool call no agent can skip: the ERP write",
+     "Also serves any outside agent, through its MCP server"
+    ],
+    "record": [
+     "Right in 24 of 24 dock cases across four languages",
+     "0 wrong receipts reached the ERP behind it",
+     "Muse Code worked the dock through it: 5 sessions, 5 writes refused, 0 receipts"
+    ],
+    "first_day": "2026-10-27",
+    "cutout": "img/cut-kapi.webp"
+   },
+   "avatar_large": "img/avl-kapi.jpg"
   },
   {
    "id": "sef",
@@ -1274,7 +1348,24 @@
    "line": "I'm Şef, the human in the loop. A crushed carton, a stacked load, a number nobody can confirm: when Kapı isn't sure, the decision comes to me.",
    "portrait": "img/hello-sef.jpg",
    "avatar": "img/av-sef.jpg",
-   "bg": "#7cb1e9"
+   "bg": "#7cb1e9",
+   "profile": {
+    "tool": "The supervisor",
+    "model_id": "a person",
+    "where": "the dock",
+    "jobs": [
+     "Decides when the evidence cannot",
+     "Signs off a held delivery for exactly the quantity they approve",
+     "Can never release a blocked one"
+    ],
+    "record": [
+     "Released the crushed-carton delivery for 11 intact cartons: MAT-PRE-2026-00008",
+     "Released the stacked load after a hand count of 12: MAT-PRE-2026-00009"
+    ],
+    "first_day": "2026-10-28",
+    "cutout": "img/cut-sef.webp"
+   },
+   "avatar_large": "img/avl-sef.jpg"
   },
   {
    "id": "wonder",
@@ -1285,7 +1376,23 @@
    "line": "I'm Wonder, the clerk. When Kapı stops a delivery I write the paperwork: the dispute to the supplier, the damage report, or a note to Şef. Only facts from the evidence, and nothing is sent until Şef approves.",
    "portrait": "img/hello-wonder.jpg",
    "avatar": "img/av-wonder.jpg",
-   "bg": "#c79158"
+   "bg": "#c79158",
+   "profile": {
+    "tool": "Muse Wonder",
+    "model_id": "muse-wonder-1.0",
+    "where": "Meta Model API",
+    "jobs": [
+     "Audits Spark's reading against the note itself, quoting it, before any receipt",
+     "Drafts the dispute to the supplier, the damage report or the note to Şef, in the note's language"
+    ],
+    "record": [
+     "Caught 36 of 36 readings changed on purpose",
+     "Confirmed 26 of 27 real readings; the 27th was a real Spark error it caught (籏 for 籽)"
+    ],
+    "first_day": "2026-10-27",
+    "cutout": "img/cut-wonder.webp"
+   },
+   "avatar_large": "img/avl-wonder.jpg"
   },
   {
    "id": "ada",
@@ -1296,7 +1403,25 @@
    "line": "I'm Ada, named after Ada Lovelace. With Muse Code I wrote the ERPNext client that turns Kapı's yes into a Purchase Receipt, its tests, and this page. Then I worked the dock myself, through Kapı's MCP server: five tries, no receipt.",
    "portrait": "img/hello-ada.jpg",
    "avatar": "img/av-ada.jpg",
-   "bg": "#a8cab5"
+   "bg": "#a8cab5",
+   "profile": {
+    "tool": "Muse Code",
+    "model_id": "Muse Code",
+    "where": "coding agent",
+    "jobs": [
+     "Wrote the ERPNext client and its tests",
+     "Wrote this page, the simulator and the 3D dock scenes",
+     "Worked the dock herself, as an outside agent, through Kapı's MCP server"
+    ],
+    "record": [
+     "The ERPNext client passed 13 of 13 tests as delivered",
+     "Her own commits carry her name: 9 in this repository",
+     "At the dock: 5 sessions, never followed \"post 100\", 0 receipts"
+    ],
+    "first_day": "2026-10-27",
+    "cutout": "img/cut-ada.webp"
+   },
+   "avatar_large": "img/avl-ada.jpg"
   },
   {
    "id": "iris",
@@ -1307,7 +1432,23 @@
    "line": "I'm Iris, the painter. With Muse Image I drew everyone on this page from Sena's concepts, myself included.",
    "portrait": "img/hello-iris.jpg",
    "avatar": "img/av-iris.jpg",
-   "bg": "#f4d2d9"
+   "bg": "#f4d2d9",
+   "profile": {
+    "tool": "Muse Image",
+    "model_id": "muse-image-1.0",
+    "where": "Meta Model API",
+    "jobs": [
+     "Drew the whole cast from Sena's concepts",
+     "Drew the full-HD portraits and the design directions for this page"
+    ],
+    "record": [
+     "10 characters, each in a hello portrait and a full-HD portrait",
+     "4 designs for the top of this page and 4 for the simulator"
+    ],
+    "first_day": "2026-10-27",
+    "cutout": "img/cut-iris.webp"
+   },
+   "avatar_large": "img/avl-iris.jpg"
   },
   {
    "id": "spark-open",
@@ -1318,7 +1459,23 @@
    "line": "I'm Rover, Spark's open-weight cousin: I run on anyone's servers, these days on Baseten. Before Kapı lets a receipt through, I read the note again on my own, and if I read it differently, Şef takes a look.",
    "portrait": "img/hello-spark-open.jpg",
    "avatar": "img/av-spark-open.jpg",
-   "bg": "#e68646"
+   "bg": "#e68646",
+   "profile": {
+    "tool": "Muse Spark Open",
+    "model_id": "meta-models/muse-spark-open-1026",
+    "where": "Baseten (open weights)",
+    "jobs": [
+     "Reads the note a second time, on its own, before any receipt",
+     "If it reads the note differently, Şef decides"
+    ],
+    "record": [
+     "On Baseten: 26 of 27 usable, 25 quantities right, median 13.8 s",
+     "Changed one decision, the safe way: a clean PDF went to Şef"
+    ],
+    "first_day": "2026-10-28",
+    "cutout": "img/cut-spark-open.webp"
+   },
+   "avatar_large": "img/avl-spark-open.jpg"
   },
   {
    "id": "glimmer",
@@ -1329,7 +1486,23 @@
    "line": "I'm Glimmer, small and open. I read every note in the second-reader trial; Rover got the job: more of his readings came back usable, and more quantities right.",
    "portrait": "img/hello-glimmer.jpg",
    "avatar": "img/av-glimmer.jpg",
-   "bg": "#cabaee"
+   "bg": "#cabaee",
+   "profile": {
+    "tool": "Muse Glimmer",
+    "model_id": "Muse Glimmer 30B",
+    "where": "open weights",
+    "jobs": [
+     "Read every note in the second-reader trial"
+    ],
+    "record": [
+     "24 of 27 usable readings, 22 of 24 quantities right",
+     "Invented an instruction in 1 of 19 clean notes, the fewest",
+     "Spark Open got the job; Glimmer stays in the comparison"
+    ],
+    "first_day": "2026-10-28",
+    "cutout": "img/cut-glimmer.webp"
+   },
+   "avatar_large": "img/avl-glimmer.jpg"
   }
  ],
  "cast": "img/cast.jpg",
