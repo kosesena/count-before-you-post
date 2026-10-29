@@ -534,6 +534,24 @@ def _pcone(name, r1, r2, h, loc, m, rot=(0, 0, 0)):
     return ob
 
 
+def _psphere(name, r, loc, m):
+    bpy.ops.mesh.primitive_uv_sphere_add(radius=r, location=loc)
+    ob = bpy.context.object
+    ob.name = name
+    ob.data.materials.append(m)
+    return ob
+
+
+def _hex(h):
+    """sRGB hex string to a linear-RGB tuple for Blender colours."""
+    h = h.lstrip("#")
+    out = []
+    for i in (0, 2, 4):
+        c = int(h[i:i + 2], 16) / 255.0
+        out.append(c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4)
+    return tuple(out)
+
+
 def _pdel(*names_or_prefixes):
     """Delete objects by exact name or by name prefix (prefix ends with '*')."""
     for ob in list(bpy.data.objects):
@@ -679,6 +697,7 @@ def p_shell(P):
     fl = bpy.data.objects["floor"]
     fl.data.materials.clear()
     fl.data.materials.append(P["floor"])
+    fl.scale.y, fl.location.y = 33, -1.5  # 7 m longer toward the front: y in [-18, 15]
     for name in ("wall_back_l", "wall_back_r", "wall_back_top"):
         ob = bpy.data.objects[name]
         ob.data.materials.clear()
@@ -692,8 +711,8 @@ def p_shell(P):
         box(f"p_band_back{sgn}", (13.3, 0.06, 1.2), (sgn * 8.35, 9.81, 0.6), P["band"])
         box(f"p_band_back_y{sgn}", (13.3, 0.065, 0.07), (sgn * 8.35, 9.81, 1.235),
             P["yellow"])
-    box("p_band_left", (0.06, 26, 1.2), (-14.81, 2, 0.6), P["band"])
-    box("p_band_left_y", (0.065, 26, 0.07), (-14.81, 2, 1.235), P["yellow"])
+    box("p_band_left", (0.06, 33, 1.2), (-14.81, -1.5, 0.6), P["band"])
+    box("p_band_left_y", (0.065, 33, 0.07), (-14.81, -1.5, 1.235), P["yellow"])
     # Steel columns with yellow guards along the visible walls.
     for x in (-13, -8, -3.5, 3.5, 9.2, 13):
         box(f"p_col_b{x}", (0.28, 0.28, 7.0), (x, 9.66, 3.5), P["column"])
@@ -701,14 +720,21 @@ def p_shell(P):
     for y in (-10, -5, 0, 5, 9):
         box(f"p_col_l{y}", (0.28, 0.28, 7.0), (-14.66, y, 3.5), P["column"])
         box(f"p_colg_l{y}", (0.44, 0.44, 0.5), (-14.66, y, 0.25), P["yellow"])
+    # Front exterior wall at y = -18; the rooms are built against its inside face.
+    box("p_wall_front", (30, 0.3, 7), (0, -18, 3.5), P["wall_back"])
+    box("p_band_front", (30, 0.06, 1.2), (0, -17.81, 0.6), P["band"])
+    box("p_band_front_y", (30, 0.065, 0.07), (0, -17.81, 1.235), P["yellow"])
+    for x in (-13, -8, -3.5, 3.5, 9.2, 13):
+        box(f"p_col_f{x}", (0.28, 0.28, 7.0), (x, -17.66, 3.5), P["column"])
+        box(f"p_colg_f{x}", (0.44, 0.44, 0.5), (x, -17.66, 0.25), P["yellow"])
     # Roof: purlins between the existing beams, plus a ceiling plane.
     # Roof and left wall end at the back wall (y = 10): beyond it is the yard, open to the sky.
     for k, x in enumerate(-13.5 + k * 3.0 for k in range(10)):
-        box(f"p_purlin{k}", (0.15, 21, 0.18), (x, -0.5, 7.28), P["roof_steel"])
-    box("p_ceiling", (30, 21, 0.1), (0, -0.5, 7.5), P["ceil"])
-    box("p_roof", (30.6, 21.4, 0.25), (0, -0.5, 7.7), P["roof_steel"])
+        box(f"p_purlin{k}", (0.15, 28, 0.18), (x, -4, 7.28), P["roof_steel"])
+    box("p_ceiling", (30, 28, 0.1), (0, -4, 7.5), P["ceil"])
+    box("p_roof", (30.6, 28.4, 0.25), (0, -4, 7.7), P["roof_steel"])
     wl = bpy.data.objects["wall_left"]
-    wl.scale.y, wl.location.y = 21 / 26, -0.5
+    wl.scale.y, wl.location.y = 28, -4
     # Tyre scuffs on the floor (thin translucent strips).
     for k, (x, y, yaw, ln) in enumerate(
             [(-1.2, 0.5, 8, 5.0), (-0.4, 0.7, 8, 5.0),
@@ -725,7 +751,7 @@ def p_lights(P):
     into even light instead of bright round pools.
     """
     for ix, x in enumerate((-11, -5.5, 0, 5.5, 11)):
-        for iy, y in enumerate((-6, 0, 6)):
+        for iy, y in enumerate((-12, -6, 0, 6)):
             cyl(f"p_bay_cable{ix}{iy}", 0.02, 0.9, (x, y, 7.0), P["dark_steel"])
             _pcone(f"p_bay_shade{ix}{iy}", 0.44, 0.14, 0.46, (x, y, 6.42), P["shade"])
             cyl(f"p_bay_disc{ix}{iy}", 0.36, 0.03, (x, y, 6.22), P["lamp_warm"])
@@ -1248,6 +1274,283 @@ def p_quality():
         _psetattr(ee, key, val)
 
 
+def p_rooms(P):
+    """Ten character offices on two storeys along the new front edge.
+
+    Five ground-floor rooms and five above them (each 6 m wide, y in
+    [-18, -13.5]), glass fronts with open doorways facing the yard, a balcony
+    with a glass balustrade in front of the upper rooms, and a steel staircase
+    at the right end. Every object is named p_room_<id>_*, so the export keeps
+    them as static meshes joined per material. Writes rooms.json (chair, door
+    and front point per character, plus the stair walking path).
+    """
+    pale = mat("p_room_pale", (0.87, 0.87, 0.84), rough=0.8)
+    txt_white = mat("p_room_txt", (1, 1, 1), emit=3.0)
+    screen_green = mat("p_room_grn", (0.10, 0.85, 0.40), emit=2.0)
+    lamp_green = mat("p_room_lamp_green", (0.05, 1, 0.2), rough=0.3, emit=6.0)
+    lamp_red = mat("p_room_lamp_red", (0.15, 0.01, 0.01), rough=0.3)
+    lamp_amber = mat("p_room_lamp_amber", (0.15, 0.08, 0.0), rough=0.3)
+    orb_mat = mat("p_room_orb", (0.62, 0.55, 1.0), rough=0.2, emit=2.5)
+    # id, name plate, colour, floor (0 ground, 1 upper), room x0.
+    characters = (
+        ("voice", "Voice", "#1e3a8a", 0, -15),
+        ("sef", "Şef", "#1d4ed8", 0, -9),
+        ("spark", "Spark", "#f97316", 0, -3),
+        ("sam", "Sam", "#3b82f6", 0, 3),
+        ("kapi", "Kapı", "#a16207", 0, 9),
+        ("ada", "Ada", "#0f766e", 1, -15),
+        ("iris", "Iris", "#db2777", 1, -9),
+        ("glimmer", "Glimmer", "#8b5cf6", 1, -3),
+        ("wonder", "Wonder", "#ca8a04", 1, 3),
+        ("rover", "Rover", "#0d9488", 1, 9),
+    )
+    for cid, name, hexcol, floor, x0 in characters:
+        x1, xc = x0 + 6.0, x0 + 3.0
+        z0 = 0.0 if floor == 0 else 3.2
+        col = _hex(hexcol)
+        cmat = mat(f"p_room_c_{cid}", col, rough=0.85)
+        cglow = mat(f"p_room_g_{cid}", col, rough=0.5, emit=1.6)
+        pre = f"p_room_{cid}_"
+        # Back wall in the character's colour, proud of the hall band behind it.
+        box(f"{pre}back", (5.98, 0.08, 2.9), (xc, -17.70, z0 + 1.45), cmat)
+        # Pale divider to the east; the westernmost rooms also line the hall wall.
+        if x1 < 15:
+            box(f"{pre}dive", (0.08, 4.2, 2.9), (x1, -15.6, z0 + 1.45), pale)
+        else:
+            box(f"{pre}dive", (0.12, 4.5, 2.9), (15.0, -15.75, z0 + 1.45), pale)
+        if x0 == -15:
+            box(f"{pre}divw", (0.12, 4.2, 2.9), (-14.79, -15.6, z0 + 1.45), pale)
+        # Glass front with an open 1 m doorway (no leaf); name strip above it.
+        xd, yg, gh, zt = x0 + 1.0, -13.5, 2.6, z0 + 2.1
+        xw0 = -14.73 if x0 == -15 else x0 + 0.04
+        xe1 = 14.94 if x1 == 15 else x1 - 0.04
+        xw1, xe0 = xd - 0.5, xd + 0.5
+        box(f"{pre}glassw", (xw1 - xw0, 0.04, gh), ((xw0 + xw1) / 2, yg, z0 + gh / 2),
+            P["glass"])
+        box(f"{pre}glasse", (xe1 - xe0, 0.04, gh), ((xe0 + xe1) / 2, yg, z0 + gh / 2),
+            P["glass"])
+        box(f"{pre}glassd", (1.0, 0.04, gh - 2.1), (xd, yg, zt + (gh - 2.1) / 2),
+            P["glass"])
+        jw = -14.69 if x0 == -15 else x0 + 0.05
+        je = 14.90 if x1 == 15 else x1 - 0.05
+        mullx = [jw, xd - 0.5, xd + 0.5]
+        n = max(1, round((xe1 - xe0) / 1.1))
+        for i in range(1, n):
+            mullx.append(xe0 + (xe1 - xe0) * i / n)
+        mullx.append(je)
+        for k, mx in enumerate(mullx):
+            box(f"{pre}mull{k}", (0.07, 0.09, gh), (mx, yg, z0 + gh / 2),
+                P["dark_steel"])
+        box(f"{pre}head", (x1 - x0 - 0.06, 0.09, 0.09), (xc, yg, z0 + gh),
+            P["dark_steel"])
+        box(f"{pre}sill", (x1 - x0 - 0.06, 0.09, 0.07), (xc, yg, z0 + 0.035),
+            P["dark_steel"])
+        box(f"{pre}dhead", (1.07, 0.09, 0.09), (xd, yg, zt), P["dark_steel"])
+        box(f"{pre}plate", (5.96, 0.08, 0.3), (xc, yg, z0 + 2.75), cglow)
+        text(f"{pre}name", name, (xc, yg + 0.06, z0 + 2.75), 0.24, txt_white,
+             rot=(math.radians(90), 0, math.radians(180)))
+        # Floor slab above (ground rooms) or balcony and roof (upper rooms).
+        if floor == 0:
+            box(f"{pre}ceil", (6.0, 4.5, 0.2), (xc, -15.75, 3.1), P["ceil"])
+            box(f"{pre}fascia", (6.0, 0.1, 0.14), (xc, -13.53, 2.95), pale)
+            box(f"{pre}aisle", (6.0, 0.1, 0.004), (xc, -11.2, 0.003), P["yellow"])
+        else:
+            box(f"{pre}balc", (6.0, 1.6, 0.2), (xc, -12.7, 3.1), P["ceil"])
+            box(f"{pre}roof", (6.0, 4.5, 0.2), (xc, -15.75, 6.2), P["ceil"])
+            runs = [(x0 + 0.03, x1 - 0.03)]
+            if cid == "rover":  # stair opening at x in [13.2, 14.8]
+                runs = [(9.03, 13.2), (14.8, 14.97)]
+            for r, (rx0, rx1) in enumerate(runs):
+                rxc, rw = (rx0 + rx1) / 2, rx1 - rx0
+                box(f"{pre}balg{r}", (rw, 0.04, 1.0), (rxc, -11.92, 3.7), P["glass"])
+                box(f"{pre}balr{r}", (rw + 0.04, 0.1, 0.06), (rxc, -11.92, 4.23),
+                    P["dark_steel"])
+                box(f"{pre}bals{r}", (rw + 0.04, 0.08, 0.08), (rxc, -11.92, 3.24),
+                    P["dark_steel"])
+                npost = max(2, round(rw / 1.5) + 1)
+                for i in range(npost):
+                    px = rx0 + rw * i / (npost - 1)
+                    box(f"{pre}balp{r}_{i}", (0.06, 0.06, 1.06), (px, -11.92, 3.73),
+                        P["dark_steel"])
+            if cid == "rover":  # east end; the west end meets the hall wall
+                box(f"{pre}balend", (0.04, 1.6, 1.0), (14.97, -12.7, 3.7), P["glass"])
+                box(f"{pre}balendr", (0.1, 1.64, 0.06), (14.97, -12.7, 4.23),
+                    P["dark_steel"])
+        # Desk facing the glass, chair behind it facing the yard (+y).
+        yd, yc, dt = -14.7, -15.5, z0 + 0.775
+        box(f"{pre}desk", (1.4, 0.7, 0.05), (xc, yd, z0 + 0.75), P["wood_pale"])
+        for a, lx in enumerate((xc - 0.62, xc + 0.62)):
+            for b, ly in enumerate((yd - 0.27, yd + 0.27)):
+                box(f"{pre}deskleg{a}{b}", (0.05, 0.05, 0.725),
+                    (lx, ly, z0 + 0.3625), P["dark_steel"])
+        box(f"{pre}seat", (0.45, 0.45, 0.06), (xc, yc, z0 + 0.47), P["black"])
+        box(f"{pre}seatback", (0.45, 0.06, 0.5), (xc, yc - 0.25, z0 + 0.75),
+            P["black"])
+        cyl(f"{pre}seatpost", 0.03, 0.45, (xc, yc, z0 + 0.22), P["dark_steel"])
+        cyl(f"{pre}seatbase", 0.26, 0.04, (xc, yc, z0 + 0.02), P["dark_steel"])
+
+        def laptop(tag, px):
+            box(f"{pre}lap{tag}", (0.34, 0.24, 0.025), (px, yd - 0.08, dt + 0.0125),
+                P["black"])
+            lid = box(f"{pre}laplid{tag}", (0.34, 0.02, 0.22),
+                      (px, yd - 0.20, dt + 0.11), P["black"])
+            lid.rotation_euler = (math.radians(-12), 0, 0)
+
+        def sidemon(tag, px, face, screen):
+            box(f"{pre}mon{tag}", (0.05, 0.55, 0.34), (px, yd, dt + 0.28), P["black"])
+            box(f"{pre}mons{tag}", (0.012, 0.50, 0.29), (px + face * 0.030, yd,
+                dt + 0.28), screen)
+            box(f"{pre}monb{tag}", (0.18, 0.22, 0.02), (px, yd, dt + 0.01),
+                P["black"])
+            box(f"{pre}monp{tag}", (0.04, 0.04, 0.12), (px, yd, dt + 0.07),
+                P["dark_steel"])
+
+        if cid == "spark":
+            sidemon("a", xc + 0.25, -1, P["monitor"])
+            for k in range(3):
+                box(f"{pre}note{k}", (0.3, 0.4, 0.012),
+                    (xc - 0.4, yd + 0.1, dt + 0.006 + k * 0.012), P["paper"],
+                    rot_z=0.06 * (k - 1))
+        elif cid == "sam":
+            laptop("a", xc - 0.15)
+            tx, ty = xc + 0.45, yd - 0.1
+            legs = ((0.06, 0.05, 0.25, -0.25), (-0.06, 0.05, 0.25, 0.25),
+                    (0.0, -0.07, -0.3, 0.0))
+            for k, (ox, oy, rx, ry) in enumerate(legs):
+                cyl(f"{pre}tri{k}", 0.008, 0.3,
+                    (tx + ox / 2, ty + oy / 2, dt + 0.14), P["dark_steel"],
+                    rot=(rx, ry, 0))
+            box(f"{pre}cam", (0.12, 0.08, 0.08), (tx, ty, dt + 0.32), P["black"])
+            cyl(f"{pre}camlens", 0.025, 0.05, (tx, ty + 0.06, dt + 0.32), P["black"],
+                rot=(math.radians(90), 0, 0))
+        elif cid == "voice":
+            laptop("a", xc + 0.1)
+            hx = xc - 0.45
+            for sgn in (-1, 1):
+                cyl(f"{pre}cup{sgn}", 0.045, 0.05, (hx + sgn * 0.07, yd - 0.2,
+                    dt + 0.046), P["black"], rot=(0, math.radians(90), 0))
+            box(f"{pre}band", (0.19, 0.04, 0.025), (hx, yd - 0.2, dt + 0.095),
+                P["black"])
+            cyl(f"{pre}micbase", 0.05, 0.02, (xc + 0.45, yd - 0.2, dt + 0.01),
+                P["dark_steel"])
+            cyl(f"{pre}micarm", 0.008, 0.3, (xc + 0.45, yd - 0.2, dt + 0.17),
+                P["dark_steel"])
+            _psphere(f"{pre}mictip", 0.025, (xc + 0.45, yd - 0.2, dt + 0.33),
+                     P["black"])
+        elif cid == "kapi":
+            sidemon("a", xc + 0.25, -1, P["monitor"])
+            lx = xc - 0.45
+            box(f"{pre}tlight", (0.12, 0.09, 0.32), (lx, yd - 0.1, dt + 0.16),
+                P["black"])
+            for k, lm in enumerate((lamp_green, lamp_amber, lamp_red)):
+                _psphere(f"{pre}tlamp{k}", 0.028, (lx, yd - 0.1 + 0.05,
+                         dt + 0.08 + k * 0.08), lm)
+        elif cid == "sef":
+            laptop("a", xc + 0.05)
+            box(f"{pre}clip", (0.24, 0.32, 0.015), (xc - 0.42, yd, dt + 0.008),
+                P["wood"])
+            box(f"{pre}clippaper", (0.2, 0.28, 0.005), (xc - 0.42, yd, dt + 0.0175),
+                P["paper"])
+            box(f"{pre}clipclip", (0.08, 0.03, 0.02), (xc - 0.42, yd - 0.14,
+                dt + 0.02), P["dark_steel"])
+            box(f"{pre}tab", (0.22, 0.16, 0.02), (xc + 0.45, yd + 0.15, dt + 0.01),
+                P["black"])
+            box(f"{pre}tabs", (0.19, 0.13, 0.005), (xc + 0.45, yd + 0.15,
+                dt + 0.022), P["monitor"])
+        elif cid == "wonder":
+            laptop("a", xc + 0.15)
+            tx = xc - 0.42
+            box(f"{pre}tray0", (0.3, 0.22, 0.02), (tx, yd - 0.1, dt + 0.01),
+                P["dark_steel"])
+            box(f"{pre}traypaper", (0.26, 0.18, 0.015), (tx, yd - 0.1, dt + 0.027),
+                P["paper"])
+            for a, ox in enumerate((-0.13, 0.13)):
+                for b, oy in enumerate((-0.09, 0.09)):
+                    box(f"{pre}traypost{a}{b}", (0.02, 0.02, 0.07),
+                        (tx + ox, yd - 0.1 + oy, dt + 0.055), P["dark_steel"])
+            box(f"{pre}tray1", (0.3, 0.22, 0.02), (tx, yd - 0.1, dt + 0.10),
+                P["dark_steel"])
+            cyl(f"{pre}pen", 0.008, 0.14, (xc + 0.42, yd + 0.12, dt + 0.01),
+                P["black"], rot=(math.radians(90), 0, math.radians(15)))
+        elif cid == "ada":
+            sidemon("a", xc - 0.28, 1, screen_green)
+            sidemon("b", xc + 0.28, -1, screen_green)
+            box(f"{pre}kb", (0.4, 0.15, 0.02), (xc, yd + 0.15, dt + 0.01),
+                P["black"])
+        elif cid == "iris":
+            laptop("a", xc - 0.2)
+            ex = xc + 1.7
+            for sgn in (-1, 1):
+                box(f"{pre}leg{sgn}", (0.05, 0.05, 1.6), (ex + sgn * 0.25, -15.3,
+                    z0 + 0.8), P["wood"])
+            rear = box(f"{pre}legr", (0.05, 0.05, 1.6), (ex, -15.55, z0 + 0.75),
+                       P["wood"])
+            rear.rotation_euler = (math.radians(12), 0, 0)
+            box(f"{pre}ledge", (0.6, 0.05, 0.05), (ex, -15.28, z0 + 0.82),
+                P["wood"])
+            box(f"{pre}canvas", (0.55, 0.04, 0.7), (ex, -15.25, z0 + 1.19),
+                P["paper"])
+            box(f"{pre}art", (0.18, 0.012, 0.22), (ex - 0.08, -15.23, z0 + 1.22),
+                cmat)
+        elif cid == "rover":
+            sidemon("a", xc + 0.2, -1, P["monitor"])
+            bx = xc - 1.5
+            box(f"{pre}pack", (0.4, 0.25, 0.55), (bx, -15.2, z0 + 0.275), cmat)
+            box(f"{pre}packpock", (0.3, 0.08, 0.3), (bx, -15.06, z0 + 0.2), cmat)
+            cyl(f"{pre}thermos", 0.045, 0.28, (xc + 0.48, yd - 0.15, dt + 0.14),
+                P["chrome"])
+            cyl(f"{pre}thermcap", 0.03, 0.05, (xc + 0.48, yd - 0.15, dt + 0.305),
+                P["black"])
+        elif cid == "glimmer":
+            laptop("a", xc - 0.1)
+            cyl(f"{pre}orbbase", 0.07, 0.03, (xc + 0.4, yd - 0.1, dt + 0.015),
+                P["dark_steel"])
+            _psphere(f"{pre}orb", 0.075, (xc + 0.4, yd - 0.1, dt + 0.105), orb_mat)
+        bpy.ops.object.light_add(type="POINT", location=(xc, -15.6, z0 + 2.2))
+        rl = bpy.context.object
+        rl.name = f"{pre}light"
+        rl.data.energy, rl.data.color = 40, (1.0, 0.88, 0.75)
+        rl.data.use_shadow = False
+    # Steel staircase at the right end, from the aisle up to the balcony.
+    sxc, yb, yt = 14.0, -7.5, -11.9
+    nsteps = 16
+    run = (yb - yt) / nsteps
+    for i in range(nsteps):
+        box(f"p_room_rover_stair{i}", (1.6, 0.30, 0.06),
+            (sxc, yb - (i + 0.5) * run, (i + 1) * 0.2 - 0.03), P["steel"])
+    ang = math.atan2(3.2, yb - yt)
+    for k, px in enumerate((sxc - 0.76, sxc + 0.76)):
+        st = box(f"p_room_rover_string{k}", (0.08, 5.3, 0.3),
+                 (px, (yb + yt) / 2, 1.48), P["dark_steel"])
+        st.rotation_euler = (-ang, 0, 0)
+        hr = box(f"p_room_rover_handrail{k}", (0.06, 5.3, 0.06),
+                 (px, (yb + yt) / 2, 2.6), P["dark_steel"])
+        hr.rotation_euler = (-ang, 0, 0)
+        for j, py in enumerate((-8.0, -9.3, -10.6, -11.7)):
+            ph = (yb - py) / (yb - yt) * 3.2
+            box(f"p_room_rover_post{k}_{j}", (0.05, 0.05, 1.0), (px, py, ph + 0.5),
+                P["dark_steel"])
+    rooms = {}
+    for cid, _name, _hexcol, floor, x0 in characters:
+        z0 = 0.0 if floor == 0 else 3.2
+        rooms[cid] = {
+            "floor": floor,
+            "seat": [x0 + 3.0, -15.5],
+            "seat_z": round(z0 + 0.5, 2),
+            "face": 0.0,  # yaw degrees; 0 faces +y (the yard), like the page heading
+            "door": [x0 + 1.0, -13.5],
+            "front": [x0 + 1.0, -12.5 if floor == 0 else -12.6],
+            "front_z": round(z0, 2),
+        }
+    rooms["stairs"] = [[14.0, -12.0, 0.0], [14.0, -10.5, 0.0], [14.0, -9.0, 0.0],
+                       [14.0, -7.6, 0.05], [14.0, -8.6, 0.8], [14.0, -9.6, 1.5],
+                       [14.0, -10.6, 2.2], [14.0, -11.5, 2.95], [14.0, -12.2, 3.2],
+                       [14.0, -13.0, 3.2]]
+    outp = REPO / "experiments" / "blender" / "out" / "rooms.json"
+    outp.parent.mkdir(parents=True, exist_ok=True)
+    outp.write_text(json.dumps(rooms, ensure_ascii=False, indent=2))
+
+
 def polish(cams, V):
     rnd = random.Random(99)
     P = p_materials()
@@ -1276,6 +1579,7 @@ def polish(cams, V):
     p_standees(P, V["light"], g.location)
     p_racks(P, rnd)
     p_props(P, rnd)
+    p_rooms(P)
     p_quality()
 
 
