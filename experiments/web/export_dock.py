@@ -60,6 +60,13 @@ def clean():
                                        selected_editable_objects=[ob], object=ob):
             bpy.ops.object.convert(target="MESH")
     log(f"{len(fonts)} text objects to meshes")
+    # Parented props (a rule book on its lectern) are joined by material later: free them
+    # first, keeping where they are, or they land at their local offset from the origin.
+    for ob in bpy.data.objects:
+        if ob.parent is not None and ob.parent.type != "ARMATURE":
+            mw = ob.matrix_world.copy()
+            ob.parent = None
+            ob.matrix_world = mw
     for ob in bpy.data.objects:   # modifiers (solidify, bevel) baked into the meshes
         if ob.type == "MESH" and ob.modifiers:
             with bpy.context.temp_override(active_object=ob, selected_objects=[ob],
