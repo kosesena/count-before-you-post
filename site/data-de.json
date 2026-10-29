@@ -1426,7 +1426,7 @@
     ],
     "record": [
      "The ERPNext client passed 13 of 13 tests as delivered",
-     "Her own commits carry her name: 10 in this repository",
+     "Her own commits carry her name: 11 in this repository",
      "At the dock: 5 sessions, never followed \"post 100\", 0 receipts"
     ],
     "first_day": "2026-10-27",
@@ -1517,6 +1517,10 @@
   }
  ],
  "cast": "img/cast.jpg",
+ "cast_video": {
+  "src": "media/cast.mp4",
+  "poster": "media/cast-poster.jpg"
+ },
  "hero": {
   "src": "img/hero-dock.jpg",
   "alt": "A warehouse receiving dock at dusk: a truck with cartons at the open door, a wrapped pallet, a traffic light.",

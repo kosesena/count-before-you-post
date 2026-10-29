@@ -23,6 +23,7 @@ from cbyp.meta import BASE_URL, TIMEOUT, _load_env  # noqa: E402
 HERE = Path(__file__).parent
 OUT = HERE / "mockups"
 HELLO = HERE.parent / "assets" / "mascots" / "hello"
+LOWER = Path(os.environ.get("CBYP_LOWER_REF", HERE / "mockups" / "lower-ref.png"))
 
 BASE = (
     "A redesign of the top of this web page (the first image is the current page), for a "
@@ -87,6 +88,39 @@ SIM_DIRECTIONS = {
 }
 
 
+# The rest of the page, after the hero (first image: the new hero; second: the sections
+# below it as they are now, in the old style).
+REST_BASE = (
+    "A redesign of the rest of this landing page, below its hero. The first image is the new "
+    "hero (keep it exactly as it is at the top of the mockup, and continue its look); the "
+    "second image shows the sections below it, still in an old plain style. Keep their "
+    "content: four headline numbers (5/6 deliveries a system that trusts the note gets wrong, "
+    "1/6 wrong receipts from the agent alone, 0/6 behind the gate, 6/6 right calls), 'Meet "
+    "the cast' with ten toy characters in their own colours, 'Deliveries at the dock' with six "
+    "cases, a camera view and the gate's decision, 'An agent we did not write' with a big 0, "
+    "and the receiver's voice clips. Show the hero at the top and two or three sections below "
+    "it, as a tall desktop page, crisp realistic web design, no device frame. Direction: ")
+REST_DIRECTIONS = {
+    "rest-night": (
+        "the night continues. The whole page keeps the hero's dusk dock mood: deep navy "
+        "background with soft light from above, every section on frosted-glass panels, the "
+        "four numbers huge and glowing, the cast as tall glass cards in their colours."),
+    "rest-light": (
+        "premium light after a dark hero. A warm off-white page, generous white space, large "
+        "elegant typography, the four numbers as big editorial figures, the cast cards in "
+        "their bright colours, thin dividers, calm and expensive."),
+    "rest-story": (
+        "a story told while scrolling. The sections become numbered chapters (1 The note, 2 "
+        "The count, 3 The gate, 4 The agent we did not write), each with the character who "
+        "does that step standing beside it, big chapter numbers, a thin progress line."),
+    "rest-bento": (
+        "a bento grid. Below the hero, the content as a grid of glass tiles of different "
+        "sizes on a dark background: a large tile with the four numbers, one with the cast, "
+        "one with the six deliveries, one with the big 0 of the outside agent, one with a "
+        "voice waveform."),
+}
+
+
 def hero_background(dst):
     """The chosen direction's scene (hero-dock.png) redrawn as a clean background: no text, no
     interface, so the page's real text and cards sit on it."""
@@ -124,9 +158,12 @@ def draw(shot, name):
     dst = OUT / f"hero-{name}.png"
     if dst.exists():
         return
-    refs = [shot] + [HELLO / f"{c}.jpg" for c in ("spark", "sam", "voice")]
-    prompt = SIM_BASE + SIM_DIRECTIONS[name] if name in SIM_DIRECTIONS else BASE + DIRECTIONS[name]
-    body = {"model": "muse-image-1.0", "n": 1, "size": "1792x1024", "output_format": "png",
+    refs = ([shot, LOWER] if name in REST_DIRECTIONS else
+            [shot] + [HELLO / f"{c}.jpg" for c in ("spark", "sam", "voice")])
+    prompt = (SIM_BASE + SIM_DIRECTIONS[name] if name in SIM_DIRECTIONS else
+              REST_BASE + REST_DIRECTIONS[name] if name in REST_DIRECTIONS else BASE + DIRECTIONS[name])
+    size = "1024x1536" if name in REST_DIRECTIONS else "1792x1024"
+    body = {"model": "muse-image-1.0", "n": 1, "size": size, "output_format": "png",
             "response_format": "b64_json", "prompt": prompt,
             "images": [{"image_url": _jpeg(p)} for p in refs]}
     req = urllib.request.Request(
@@ -146,6 +183,10 @@ if __name__ == "__main__":
             hero_background(OUT / f"hero-bg-{k}.png")
         sys.exit()
     for n in sys.argv[2:] or list(DIRECTIONS):
+        if n == "rest":
+            for m in REST_DIRECTIONS:
+                draw(Path(sys.argv[1]), m)
+            continue
         if n == "sim":
             for m in SIM_DIRECTIONS:
                 draw(Path(sys.argv[1]), m)

@@ -194,6 +194,9 @@ def build(lang):
             "voice_source": "synthetic voice, ElevenLabs",
             "rules": list(RULES), "cases": cases, "voice": clips, "characters": cast,
             "cast": jpg(ROOT / "assets" / "mascots" / "cast.jpg", "cast.jpg", 1600),
+            # The ten as rigged Lego figures, walking then waving (8 s, two rows); site/media
+            # holds a web encode of assets/mascots/3d/lego/video/kadro-1080p.mp4.
+            "cast_video": {"src": "media/cast.mp4", "poster": "media/cast-poster.jpg"},
             **hero(),
             "summary": {"cases": len(cases),
                         # A system that posts whatever the note says.
