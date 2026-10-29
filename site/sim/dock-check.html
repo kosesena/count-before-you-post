@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dock check</title>
+<style>html, body { margin: 0; height: 100%; background: #ccc; } canvas { display: block; width: 100%; height: 100%; }</style>
+</head>
+<body>
+<script type="importmap">
+{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+               "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/" } }
+</script>
+<script type="module">
+// The exported dock from Blender's "genel" camera (Blender z-up -> glTF y-up: (x, y, z) ->
+// (x, z, -y)), to compare with the Blender render. window.stats: load time, fps, draw calls.
+import * as THREE from "three";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
+import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+
+const draco = new DRACOLoader().setDecoderPath("https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/libs/draco/gltf/");
+const loader = new GLTFLoader().setDRACOLoader(draco);
+const r = new THREE.WebGLRenderer({ antialias: true });
+r.setPixelRatio(Math.min(devicePixelRatio, 2));
+r.toneMapping = THREE.ACESFilmicToneMapping;
+r.shadowMap.enabled = true;
+document.body.appendChild(r.domElement);
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xdfe7ee);
+scene.environment = new THREE.PMREMGenerator(r).fromScene(new RoomEnvironment(), 0.04).texture;
+scene.add(new THREE.HemisphereLight(0xffffff, 0x8a8a80, 0.6));
+const sun = new THREE.DirectionalLight(0xfff4e0, 1.4);
+sun.position.set(6, 14, 4);
+sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048);
+Object.assign(sun.shadow.camera, { left: -16, right: 16, top: 16, bottom: -16, far: 40 });
+scene.add(sun);
+const cam = new THREE.PerspectiveCamera(50.6, 16 / 9, 0.05, 200);
+cam.position.set(10.8, 4.8, 9.8);
+cam.lookAt(0, 0.45, -5.3);
+window.stats = { load: {}, fps: 0 };
+const t0 = performance.now();
+loader.load("models/dock.glb", g => {
+  g.scene.traverse(o => { if (o.isMesh) { o.castShadow = o.receiveShadow = true; } });
+  scene.add(g.scene);
+  window.stats.load.dock = Math.round(performance.now() - t0);
+  window.stats.load.ok = 1;
+});
+let frames = 0, last = performance.now();
+(function tick() {
+  const w = innerWidth, h = innerHeight;
+  if (r.domElement.width !== Math.floor(w * r.getPixelRatio())) { r.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix(); }
+  r.render(scene, cam);
+  frames++;
+  const now = performance.now();
+  if (now - last > 1000) { window.stats.fps = frames; window.stats.calls = r.info.render.calls; window.stats.tris = r.info.render.triangles; frames = 0; last = now; }
+  requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>

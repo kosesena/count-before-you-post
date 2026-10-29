@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Model check</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #e9e4dc; font: 14px system-ui, sans-serif; }
+  #wrap { display: grid; grid-template-columns: 1fr 1fr; height: 100%; }
+  .pane { position: relative; }
+  .pane canvas { width: 100%; height: 100%; display: block; }
+  .tag { position: absolute; top: 10px; left: 12px; background: #fff; padding: 4px 10px; border-radius: 8px; }
+  #fps { position: fixed; bottom: 10px; right: 12px; background: #fff; padding: 4px 10px; border-radius: 8px; }
+</style>
+</head>
+<body>
+<div id="wrap">
+  <div class="pane" id="a"><span class="tag" id="ta">original</span></div>
+  <div class="pane" id="b"><span class="tag" id="tb">web</span></div>
+</div>
+<span id="fps"></span>
+<script type="importmap">
+{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+               "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/" } }
+</script>
+<script type="module">
+// Same light, same camera, same pose: the original Lego GLB on the left, the web one on the
+// right. ?a=<url>&b=<url> pick the two files; window.stats reports load times and FPS.
+import * as THREE from "three";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
+import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+
+const q = new URLSearchParams(location.search);
+const files = { a: q.get("a"), b: q.get("b") || "models/spark.glb" };
+const draco = new DRACOLoader().setDecoderPath("https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/libs/draco/gltf/");
+const loader = new GLTFLoader().setDRACOLoader(draco);
+window.stats = { load: {}, fps: 0 };
+const views = [];
+
+function view(id, url) {
+  const el = document.getElementById(id);
+  const r = new THREE.WebGLRenderer({ antialias: true });
+  r.setPixelRatio(Math.min(devicePixelRatio, 2));
+  r.toneMapping = THREE.ACESFilmicToneMapping;
+  el.appendChild(r.domElement);
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0xe9e4dc);
+  scene.environment = new THREE.PMREMGenerator(r).fromScene(new RoomEnvironment(), 0.04).texture;
+  const sun = new THREE.DirectionalLight(0xffffff, 1.6);
+  sun.position.set(2, 4, 3);
+  scene.add(sun);
+  const cam = new THREE.PerspectiveCamera(30, 1, 0.01, 100);
+  const v = { el, r, scene, cam, mixer: null };
+  views.push(v);
+  if (!url) return;
+  const t0 = performance.now();
+  loader.load(url, g => {
+    window.stats.load[id] = Math.round(performance.now() - t0);
+    const box = new THREE.Box3().setFromObject(g.scene);
+    const size = box.getSize(new THREE.Vector3()), c = box.getCenter(new THREE.Vector3());
+    g.scene.position.sub(c);
+    scene.add(g.scene);
+    cam.position.set(0, size.y * 0.1, size.y * 2.1);
+    cam.lookAt(0, 0, 0);
+    v.mixer = new THREE.AnimationMixer(g.scene);
+    const clip = g.animations.find(a => a.name === "Wave") || g.animations[0];
+    if (clip) v.mixer.clipAction(clip).play();
+    document.getElementById("t" + id).textContent = `${id === "a" ? "original" : "web"} · ${url.split("/").pop()}`;
+  });
+}
+view("a", files.a);
+view("b", files.b);
+
+const clock = new THREE.Clock();
+let frames = 0, last = performance.now();
+function tick() {
+  const dt = clock.getDelta();
+  for (const v of views) {
+    const w = v.el.clientWidth, h = v.el.clientHeight;
+    if (v.r.domElement.width !== Math.floor(w * v.r.getPixelRatio())) { v.r.setSize(w, h, false); v.cam.aspect = w / h; v.cam.updateProjectionMatrix(); }
+    if (v.mixer) v.mixer.update(q.has("still") ? 0 : dt);
+    v.r.render(v.scene, v.cam);
+  }
+  frames++;
+  const now = performance.now();
+  if (now - last > 1000) { window.stats.fps = frames; document.getElementById("fps").textContent = frames + " fps"; frames = 0; last = now; }
+  requestAnimationFrame(tick);
+}
+tick();
+</script>
+</body>
+</html>
