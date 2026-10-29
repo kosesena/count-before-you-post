@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Count Before You Post</title>
 <meta name="description" content="An AI agent that can't write a number into the ERP until a camera has counted it. Demo of the gate, the cast and six dock deliveries.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2064%2064'%3E%3Crect%20width='64'%20height='64'%20rx='14'%20fill='%23f97316'/%3E%3Cpath%20d='M20%2033l11%2011%2014-22'%20fill='none'%20stroke='white'%20stroke-width='8'%20stroke-linecap='round'%20stroke-linejoin='round'/%3E%3C/svg%3E">
 <style>
 :root {
   --bg: #f1f4ec; --panel: #fdfffa; --ink: #26211a; --muted: #666d5e; --line: #dde3d0;
@@ -404,6 +405,42 @@ audio { width: 100%; height: 36px; margin: 8px 0 4px; }
 .vmeta b { color: var(--ink); }
 .sure { color: var(--post); font-weight: 700; }
 .unsure { color: var(--human); font-weight: 700; }
+/* Chapter 03: receiver clips as frosted tiles (after experiments/mockups/hero-rest-bento.png). */
+.clip-tile { margin-bottom: 16px; }
+.clip-tile .sub { margin-bottom: 12px; }
+.clip-list { display: flex; flex-direction: column; gap: 10px; }
+.clip-row {
+  display: flex; gap: 12px; align-items: flex-start; min-width: 0;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.14); border-radius: 12px;
+  padding: 10px 12px;
+}
+.clip-row.playing { border-color: rgba(255,255,255,.38); }
+.clip-row.differs { border-color: var(--human); box-shadow: 0 0 0 1px var(--human); }
+.clip-play {
+  flex: 0 0 auto; width: 40px; height: 40px; border-radius: 50%; margin-top: 2px;
+  border: 1px solid rgba(255,255,255,.4); background: rgba(255,255,255,.94); color: #0b1226;
+  display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0;
+}
+.clip-play:hover { background: #fff; }
+.clip-main { flex: 1 1 auto; min-width: 0; }
+.clip-top { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.clip-wave { flex: 1 1 auto; min-width: 0; width: 100%; height: 36px; display: block; }
+.clip-dur {
+  flex: 0 0 auto; font-size: 12px; color: var(--muted);
+  font-variant-numeric: tabular-nums; min-width: 34px; text-align: right;
+}
+.clip-id { font-size: 12.5px; color: var(--muted); margin-top: 6px; overflow-wrap: anywhere; }
+.clip-id b { color: var(--ink); }
+.clip-row .quote { margin-top: 6px; }
+.clip-row .vmeta { margin-top: 4px; }
+.clip-row .chat { margin: 4px 0; }
+.clip-row .readings { margin-top: 8px; }
+.clip-row audio { display: none; }
+@media (max-width: 480px) {
+  .clip-row { gap: 10px; padding: 10px; }
+  .clip-play { width: 36px; height: 36px; }
+}
 .stats.five { grid-template-columns: repeat(5, minmax(0, 1fr)); }
 @media (max-width: 640px) { .stats.five { grid-template-columns: repeat(2, minmax(0, 1fr)); } .stats.five .stat.zero { grid-column: 1 / -1; } }
 .stat.zero { background: var(--post-bg); border-color: var(--post); }
@@ -619,12 +656,17 @@ footer p { margin: 4px 0; }
         </div>
         <div class="ch-fig" aria-hidden="true"><img id="fig-voice" src="img/hero-voice.webp" alt=""></div>
       </div>
-      <h3 class="panel-title">The receiver&rsquo;s own count</h3>
-      <p class="sub" id="voiceSub">Voice writes down what the receiver says at the dock, and notices when they are not sure.
-        An unsure receiver sends the delivery to the supervisor.</p>
-      <div class="voicegrid" id="voice"></div>
-      <p class="sub" id="dialogueSub"></p>
-      <div class="voicegrid" id="dialogue"></div>
+      <div class="glass clip-tile">
+        <h3>The receiver&rsquo;s own count</h3>
+        <p class="sub" id="voiceSub">Voice writes down what the receiver says at the dock, and notices when they are not sure.
+          An unsure receiver sends the delivery to the supervisor.</p>
+        <div class="clip-list" id="voice"></div>
+      </div>
+      <div class="glass clip-tile">
+        <h3>Driver and receiver</h3>
+        <p class="sub" id="dialogueSub"></p>
+        <div class="clip-list" id="dialogue"></div>
+      </div>
     </section>
 
     <section class="chapter" id="ch-04" aria-labelledby="h-dock">
@@ -837,7 +879,217 @@ function renderCrew(list) {
     "On duty = working at the dock. Built part of it = made part of this project.";
 }
 
+/* Chapter 03 clips: compact rows with a round play button, a waveform decoded
+   from the audio with Web Audio (on first play or when the row scrolls into
+   view; a neutral placeholder until then) and the duration. One clip plays at
+   a time; the playing row shows progress over its waveform. Failures keep the
+   placeholder and never log. */
+const CLIP_ICON_PLAY = `<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M4 2.2v11.6L13.2 8z" fill="currentColor"/></svg>`;
+const CLIP_ICON_PAUSE = `<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><rect x="3" y="2" width="3.6" height="12" rx="1.2" fill="currentColor"/><rect x="9.4" y="2" width="3.6" height="12" rx="1.2" fill="currentColor"/></svg>`;
+const clipPeaks = new Map();
+let clipCtx = null, clipObserver = null;
+function pauseAllClips() {
+  document.querySelectorAll(".clip-row audio").forEach(a => {
+    if (!a.paused) { try { a.pause(); } catch (e) { /* keep silent */ } }
+  });
+}
+function fmtDur(s) {
+  s = Math.max(0, Math.round(s || 0));
+  return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0");
+}
+function clipBar(ctx, x, y, w, h) {
+  ctx.beginPath();
+  if (ctx.roundRect) ctx.roundRect(x, y, w, h, Math.min(w / 2, 2));
+  else ctx.rect(x, y, w, h);
+  ctx.fill();
+}
+function sizeWave(canvas) {
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const w = canvas.clientWidth || 200, h = canvas.clientHeight || 36;
+  const W = Math.max(1, Math.round(w * dpr)), H = Math.max(1, Math.round(h * dpr));
+  if (canvas.width !== W || canvas.height !== H) { canvas.width = W; canvas.height = H; }
+  return { W, H };
+}
+function drawPlaceholderWave(canvas) {
+  if (!canvas) return;
+  const { W, H } = sizeWave(canvas);
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = "rgba(255,255,255,.20)";
+  const N = 72, mid = H / 2, amp = Math.max(1.5, H * 0.10);
+  for (let i = 0; i < N; i++) {
+    const bw = Math.max(1, (W / N) * 0.55);
+    clipBar(ctx, i * (W / N) + (W / N - bw) / 2, mid - amp, bw, amp * 2);
+  }
+}
+function drawClipRow(row) {
+  const canvas = row.querySelector(".clip-wave");
+  const audio = row.querySelector("audio");
+  if (!canvas) return;
+  const peaks = row._peaks;
+  if (!peaks || !peaks.length) { drawPlaceholderWave(canvas); return; }
+  const { W, H } = sizeWave(canvas);
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+  ctx.clearRect(0, 0, W, H);
+  const N = peaks.length;
+  const prog = (audio && isFinite(audio.duration) && audio.duration > 0)
+    ? Math.min(1, Math.max(0, audio.currentTime / audio.duration)) : 0;
+  const mid = H / 2, maxAmp = H * 0.46;
+  for (let i = 0; i < N; i++) {
+    ctx.fillStyle = ((i + 0.5) / N <= prog) ? "#ffffff" : "rgba(184,204,255,.55)";
+    const a = Math.max(0.07, peaks[i]) * maxAmp;
+    const bw = Math.max(1, (W / N) * 0.62);
+    clipBar(ctx, i * (W / N) + (W / N - bw) / 2, mid - a, bw, a * 2);
+  }
+}
+function clipAudioCtx() {
+  if (clipCtx) return clipCtx;
+  const OC = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+  if (OC) { try { clipCtx = new OC(1, 1, 44100); return clipCtx; } catch (e) { /* fall through */ } }
+  const AC = window.AudioContext || window.webkitAudioContext;
+  if (AC) { try { clipCtx = new AC(); } catch (e) { clipCtx = null; } }
+  return clipCtx;
+}
+async function decodeClipPeaks(url) {
+  const ctx = clipAudioCtx();
+  if (!ctx || !url) return null;
+  const res = await fetch(url);
+  if (!res.ok) return null;
+  const ab = await res.arrayBuffer();
+  if (!ab || !ab.byteLength) return null;
+  let buf = null;
+  try { buf = await ctx.decodeAudioData(ab); } catch (e) { return null; }
+  if (!buf) return null;
+  const ch = buf.getChannelData(0);
+  if (!ch || !ch.length) return null;
+  const N = 72, peaks = new Float32Array(N);
+  const step = Math.max(1, Math.floor(ch.length / N));
+  const stride = Math.max(1, Math.floor(step / 40));
+  for (let i = 0; i < N; i++) {
+    let m = 0;
+    const end = Math.min(ch.length, (i + 1) * step);
+    for (let j = i * step; j < end; j += stride) {
+      const v = ch[j] < 0 ? -ch[j] : ch[j];
+      if (v > m) m = v;
+    }
+    peaks[i] = m;
+  }
+  let top = 0;
+  for (let i = 0; i < N; i++) if (peaks[i] > top) top = peaks[i];
+  if (top > 0) for (let i = 0; i < N; i++) peaks[i] /= top;
+  return { peaks, duration: buf.duration };
+}
+function peaksForClip(url) {
+  if (!clipPeaks.has(url)) {
+    clipPeaks.set(url, decodeClipPeaks(url).catch(() => null).then(r => {
+      if (!r) clipPeaks.delete(url);
+      return r;
+    }));
+  }
+  return clipPeaks.get(url);
+}
+function decodeClipRow(row) {
+  if (!row || row.dataset.waved === "1" || row.dataset.waving === "1") return;
+  const audio = row.querySelector("audio");
+  const url = audio && (audio.getAttribute("src") || audio.src);
+  if (!url) return;
+  row.dataset.waving = "1";
+  peaksForClip(url).then(r => {
+    row.dataset.waving = "";
+    if (!r || !row.isConnected) return;
+    row.dataset.waved = "1";
+    row._peaks = r.peaks;
+    const dur = row.querySelector(".clip-dur");
+    if (dur && dur.textContent === "--:--" && isFinite(r.duration)) dur.textContent = fmtDur(r.duration);
+    drawClipRow(row);
+  });
+}
+function observeClipRow(row) {
+  if (!("IntersectionObserver" in window)) return;
+  if (!clipObserver) {
+    clipObserver = new IntersectionObserver(entries => {
+      entries.forEach(en => {
+        if (en.isIntersecting) {
+          try { clipObserver.unobserve(en.target); } catch (e) { /* keep silent */ }
+          decodeClipRow(en.target);
+        }
+      });
+    }, { rootMargin: "240px 0px" });
+  }
+  try { clipObserver.observe(row); } catch (e) { /* decode on play instead */ }
+}
+function tickClipRow(row) {
+  const audio = row.querySelector("audio");
+  if (!audio || audio.paused || audio.ended || !row.isConnected) return;
+  drawClipRow(row);
+  requestAnimationFrame(() => tickClipRow(row));
+}
+function setClipIcon(btn, playing) {
+  btn.innerHTML = playing ? CLIP_ICON_PAUSE : CLIP_ICON_PLAY;
+  const cur = btn.getAttribute("aria-label") || "";
+  btn.setAttribute("aria-label", playing
+    ? cur.replace(/^Play/, "Pause")
+    : cur.replace(/^Pause/, "Play"));
+}
+function armClips(container) {
+  if (!container) return;
+  container.querySelectorAll(".clip-row").forEach(row => {
+    const audio = row.querySelector("audio");
+    const btn = row.querySelector(".clip-play");
+    const canvas = row.querySelector(".clip-wave");
+    const dur = row.querySelector(".clip-dur");
+    if (!audio || !btn || !canvas) return;
+    drawPlaceholderWave(canvas);
+    try {
+      if (dur && audio.readyState >= 1 && isFinite(audio.duration)) dur.textContent = fmtDur(audio.duration);
+    } catch (e) { /* keep silent */ }
+    btn.addEventListener("click", () => {
+      decodeClipRow(row);
+      if (audio.paused) {
+        pauseAllClips();
+        let pr = null;
+        try { pr = audio.play(); } catch (e) { pr = null; }
+        if (pr && pr.catch) pr.catch(() => {});
+      } else {
+        try { audio.pause(); } catch (e) { /* keep silent */ }
+      }
+    });
+    audio.addEventListener("play", () => {
+      document.querySelectorAll(".clip-row audio").forEach(a => {
+        if (a !== audio && !a.paused) { try { a.pause(); } catch (e) { /* keep silent */ } }
+      });
+      row.classList.add("playing");
+      setClipIcon(btn, true);
+      tickClipRow(row);
+    });
+    const onStop = () => {
+      row.classList.remove("playing");
+      setClipIcon(btn, false);
+      drawClipRow(row);
+    };
+    audio.addEventListener("pause", onStop);
+    audio.addEventListener("ended", onStop);
+    audio.addEventListener("timeupdate", () => drawClipRow(row));
+    audio.addEventListener("loadedmetadata", () => {
+      try {
+        if (dur && isFinite(audio.duration)) dur.textContent = fmtDur(audio.duration);
+      } catch (e) { /* keep silent */ }
+    });
+    audio.addEventListener("error", () => drawPlaceholderWave(canvas));
+    observeClipRow(row);
+  });
+}
+let clipRedrawT = 0;
+window.addEventListener("resize", () => {
+  clearTimeout(clipRedrawT);
+  clipRedrawT = setTimeout(() => {
+    document.querySelectorAll(".clip-row").forEach(drawClipRow);
+  }, 150);
+});
 function renderVoice(clips, source) {
+  pauseAllClips();
   $("voiceSub").textContent =
     "Voice writes down what the receiver says at the dock, and notices when they are not sure. " +
     "An unsure receiver sends the delivery to the supervisor." +
@@ -851,11 +1103,17 @@ function renderVoice(clips, source) {
       : `said ${esc(v.said)}, heard ${esc(v.quantity)}`;
     const gate = v.ok === false
       ? ` \u00b7 the gate would send it to \u015eef because the spoken number does not match the camera` : "";
-    return `<div class="card"><div class="who">${av("voice")}Voice heard</div>` +
-      `<audio controls preload="none" src="${esc(v.audio)}"></audio>` +
+    const rawLabel = "Play receiver clip " + (v.clip || "");
+    return `<div class="clip-row" data-clip="${esc(v.clip || "")}">` +
+      `<button type="button" class="clip-play" aria-label="${esc(rawLabel)}">${CLIP_ICON_PLAY}</button>` +
+      `<div class="clip-main"><div class="clip-top">` +
+      `<canvas class="clip-wave" aria-hidden="true"></canvas>` +
+      `<span class="clip-dur">--:--</span></div>` +
       `<div class="quote">\u201c${esc(v.transcript)}\u201d</div>` +
-      `<p class="vmeta">${counts}${sup} \u00b7 ${conf}${gate}</p></div>`;
+      `<p class="vmeta">${counts}${sup} \u00b7 ${conf}${gate}</p></div>` +
+      `<audio preload="metadata" src="${esc(v.audio)}"></audio></div>`;
   }).join("");
+  armClips($("voice"));
 }
 function renderOutside(o) {
   if (!o) { $("outsideSub").textContent = ""; $("outside").innerHTML = ""; return; }
@@ -884,6 +1142,7 @@ function renderOutside(o) {
 const WHO_LABEL = { driver: "Driver", receiver: "Receiver" };
 
 function renderDialogue(clips) {
+  pauseAllClips();
   clips = clips || [];
   const n = clips.length;
   const p = clips.filter(c => c.plain_ok).length;
@@ -894,23 +1153,29 @@ function renderDialogue(clips) {
     `speaker turns got ${d} of ${n} right. The clips are Turkish in every language.`;
   $("dialogue").innerHTML = clips.map(c => {
     const differs = c.plain_ok !== c.diarized_ok;
+    const hl = differs || c.clip === "04-sofor-sonda";
     const mark = ok => ok ? `<span class="sure">right</span>` : `<span class="misheard">wrong</span>`;
     const lines = (c.lines || []).map(l =>
       `<p class="chat${l.who === "receiver" ? " rec" : ""}"><b>${esc(WHO_LABEL[l.who] || l.who)}:</b> ` +
       `${esc(l.text)}</p>`).join("");
-    return `<div class="card${differs ? " differs" : ""}>` +
-      `<div class="who">${av("voice")}<span>Clip <span class="mono">${esc(c.clip)}</span> ` +
+    const rawLabel = "Play dialogue clip " + (c.clip || "");
+    return `<div class="clip-row${hl ? " differs" : ""}" data-clip="${esc(c.clip || "")}">` +
+      `<button type="button" class="clip-play" aria-label="${esc(rawLabel)}">${CLIP_ICON_PLAY}</button>` +
+      `<div class="clip-main"><div class="clip-top">` +
+      `<canvas class="clip-wave" aria-hidden="true"></canvas>` +
+      `<span class="clip-dur">--:--</span></div>` +
+      `<div class="clip-id">Clip <span class="mono">${esc(c.clip)}</span> ` +
       `\u00b7 receiver counted <b>${esc(c.receiver_counted)}</b>` +
-      (differs ? ` \u00b7 <span class="flag">the two readings disagree here</span>` : "") + `</span></div>` +
-      `<audio controls preload="none" src="${esc(c.audio)}"></audio>` +
+      (differs ? ` \u00b7 <span class="flag">the two readings disagree here</span>` : "") + `</div>` +
       lines +
       `<div class="readings">` +
       `<div class="reading"><div class="who">One plain transcript</div><div class="val">${esc(c.plain)}</div>` +
       `<div class="det">${mark(c.plain_ok)} \u00b7 receiver counted ${esc(c.receiver_counted)}</div></div>` +
       `<div class="reading"><div class="who">Speaker turns</div><div class="val">${esc(c.diarized)}</div>` +
       `<div class="det">${mark(c.diarized_ok)} \u00b7 receiver counted ${esc(c.receiver_counted)}</div></div>` +
-      `</div></div>`;
+      `</div></div><audio preload="metadata" src="${esc(c.audio)}"></audio></div>`;
   }).join("");
+  armClips($("dialogue"));
 }
 
 function renderSecond(sr) {
