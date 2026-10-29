@@ -191,6 +191,7 @@ def build(lang):
             "voice_source": "synthetic voice, ElevenLabs",
             "rules": list(RULES), "cases": cases, "voice": clips, "characters": cast,
             "cast": jpg(ROOT / "assets" / "mascots" / "cast.jpg", "cast.jpg", 1600),
+            **hero(),
             "summary": {"cases": len(cases),
                         # A system that posts whatever the note says.
                         "wrong_without_gate": sum(c["expected"] != "post" for c in cases),
@@ -206,6 +207,17 @@ def build(lang):
     name = "data.json" if lang == "tr" else f"data-{lang}.json"
     (SITE / name).write_text(json.dumps(data, ensure_ascii=False, indent=1))
     print(f"{lang}: {len(cases)} cases, {len(clips)} clips -> site/{name}")
+
+
+def hero():
+    """The dock with the 3D cast (experiments/blender/dock_cast.py stills) for the top of the
+    page; nothing if it has not been rendered."""
+    src = HERE / "blender" / "out" / "cast" / "cast-genel.png"
+    if not src.exists():
+        return {}
+    return {"hero": {"src": jpg(src, "hero-dock.jpg", 1920),
+                     "alt": "The receiving dock: the truck at the open door, the pallet in the "
+                            "yellow zone, the gate light, and the cast at their posts."}}
 
 
 def card_colour(hello):

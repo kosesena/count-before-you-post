@@ -1123,7 +1123,10 @@ function tick() {
     frames = 0; lastFps = now;
   }
 }
-/*__TEST_HOOK__*/
+// For our checks only (?test): the game state and the two actions, so a script can play a
+// case to the result card. Nothing is exposed without ?test.
+if (new URLSearchParams(location.search).has("test"))
+  window.__sim = { G, pickup: () => pickupPallet(true), drop: dropPallet, DROP, ZONE };
 if ("ontouchstart" in window || navigator.maxTouchPoints > 0) document.body.classList.add("touch");
 boot();
 tick();

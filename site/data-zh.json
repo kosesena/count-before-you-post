@@ -1367,6 +1367,10 @@
   }
  ],
  "cast": "img/cast.jpg",
+ "hero": {
+  "src": "img/hero-dock.jpg",
+  "alt": "The receiving dock: the truck at the open door, the pallet in the yellow zone, the gate light, and the cast at their posts."
+ },
  "summary": {
   "cases": 6,
   "wrong_without_gate": 5,

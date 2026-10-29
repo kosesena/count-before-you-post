@@ -1,6 +1,8 @@
 # Count Before You Post
 
-**An AI agent that can't write a number into an ERP until a camera has counted it.**
+**A verification gate between AI agents and the ERP.** Before a goods receipt is written, the
+delivery note, the camera, the receiver's voice and a second model must agree. If they don't,
+nothing is written and a person decides.
 
 ![The receiving dock: the gate's light, the screen, the pallet under the ceiling camera, and the cast](assets/readme/dock.jpg)
 
