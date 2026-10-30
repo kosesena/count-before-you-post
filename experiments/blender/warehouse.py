@@ -18,8 +18,8 @@ plus depo-truth.json. Run experiments/blender/make_cutouts.py first (mascot stan
 
 CBYP_POLISH=1 builds a dressed-up scene instead: a recognisable semi-truck, an
 obviously open dock door with daylight, life-size character standees, full racking and
-props, glossy LEGO-look ABS plastic throughout (studded baseplate floor, brick walls,
-brick-built racks and cartons), warm high-bay lighting. Only the overview
+props, glossy LEGO-look ABS plastic throughout (fine-stud baseplate texture, white
+brick walls, brick-built racks and cartons), bright pendant lighting. Only the overview
 cameras (genel, kapi, irsaliye, disari, teslimat) are rendered and depo-truth.json is left
 untouched.
 Without CBYP_POLISH the scene is built exactly as before, object for object.
@@ -585,15 +585,20 @@ def _pnode(mat, ntype, name=None):
 
 
 # LEGO module at the cast's scale (a 4 cm minifigure scaled to our 2.4 m cast: x60).
-# Every LEGO dimension below derives from these five constants.
+# Geometric studs (STUD_PITCH) survive only on small things (table top, stools,
+# cartons, cab roof); the floor, apron, ceiling and meeting-platform rim carry
+# fine studs as a texture (STUD_TEX_PITCH).
 STUD_PITCH = 0.48
 STUD_R = 0.144
 STUD_H = 0.10
 PLATE_H = 0.192
 BRICK_H = 0.576
-BRICK_W = 4 * STUD_PITCH       # 2x4 brick footprint: 1.92 m across
-BRICK_TILE_W = 4 * BRICK_W     # brick texture tile: 4 bricks across (7.68 m)
-BRICK_TILE_H = 4 * BRICK_H     # ... and 4 courses up (2.304 m)
+STUD_TEX_PITCH = 0.24          # floor-texture stud pitch: one 4x4-stud tile = 0.96 m
+STUD_TEX_TILE = 4 * STUD_TEX_PITCH
+WALL_BRICK_L = 0.96            # wall bricks: 1x4 at our scale, in running bond
+WALL_BRICK_H = 0.288
+BRICK_TILE_W = 4 * WALL_BRICK_L   # brick texture tile: 4 bricks across (3.84 m)
+BRICK_TILE_H = 4 * WALL_BRICK_H   # ... and 4 courses up (1.152 m)
 # Hall stud grid: LEGO_NX x LEGO_NY points on STUD_PITCH, centred at (0, -0.9),
 # spanning x in [-14.64, 14.64], y in [-11.46, 9.66].
 LEGO_GX0, LEGO_GY0 = -14.64, -11.46
@@ -647,7 +652,7 @@ def _floor_tape_tiles(name, x0, y0, x1, y1, m, w=0.08):
                                 ((x1, y1), (x0, y1)), ((x0, y1), (x0, y0)))):
         cx, cy = (a[0] + b[0]) / 2, (a[1] + b[1]) / 2
         lx, ly = abs(b[0] - a[0]) or w, abs(b[1] - a[1]) or w
-        box(f"{name}_{k}", (lx + w, ly + w, PLATE_H), (cx, cy, 0.002 + PLATE_H / 2),
+        box(f"{name}_{k}", (lx + w, ly + w, PLATE_H), (cx, cy, PLATE_H / 2),
             m)
 
 
@@ -656,36 +661,34 @@ def _hatch_tiles(name, x0, y0, x1, y1, m):
     for k in range(int((x1 - x0) / 0.6)):
         x = x0 + 0.3 + k * 0.6
         box(f"{name}_h{k}", (0.12, (y1 - y0) * 0.95, PLATE_H),
-            (x, (y0 + y1) / 2, 0.002 + PLATE_H / 2), m, rot_z=math.radians(20))
+            (x, (y0 + y1) / 2, PLATE_H / 2), m, rot_z=math.radians(20))
 
 
 def _lego_brick_images():
-    """1024x1024 tileable running-bond 2x4-brick colour + normal images, packed.
+    """1024x1024 tileable running-bond small-brick colour + normal images, packed.
 
     One tile spans 4 bricks across (BRICK_TILE_W) and 4 courses up (BRICK_TILE_H);
-    bricks are light bluish grey jittered +-4 %, ~6 % dark bluish grey, ~2 %
-    medium blue, with a dark grey mortar line. The normal map has bevelled brick
-    edges so Cycles shows relief. Own RNG stream: the layout stream is untouched.
+    bricks are 0.96 x 0.288 m, white/off-white jittered +-3 %, with a faint
+    light-grey mortar line. The normal map has bevelled brick edges so Cycles
+    shows relief. Own RNG stream: the layout stream is untouched.
     """
     S = 1024
     BW = S // 4  # one brick: 256 x 256 px
-    base = _hex("#a0a5a9")
-    dark = _hex("#6c6e68")
-    blue = _hex("#5a93db")
-    mortar = _hex("#4c4f52")
+    white = _hex("#f2f3f2")
+    off = _hex("#e4e6e3")
+    mortar = _hex("#d9dbd8")
     brnd = random.Random(20240501)
     bricks = {}
     for c in range(4):
         for bi in range(4):
-            r = brnd.random()
-            col = dark if r < 0.06 else (blue if r < 0.08 else base)
-            f = 1.0 + brnd.uniform(-0.04, 0.04)
+            col = off if brnd.random() < 0.12 else white
+            f = 1.0 + brnd.uniform(-0.03, 0.03)
             bricks[(c, bi)] = (min(1.0, col[0] * f), min(1.0, col[1] * f),
                                min(1.0, col[2] * f))
     col_px = [0.0] * (S * S * 4)
     nor_px = [0.0] * (S * S * 4)
-    mwx = 0.02 / BRICK_TILE_W * S / 2  # mortar half-width, px (x: 1.33)
-    mwy = 0.02 / BRICK_TILE_H * S / 2  # ... (y: 4.44)
+    mwx = 0.012 / BRICK_TILE_W * S / 2  # mortar half-width, px (x: 1.6)
+    mwy = 0.012 / BRICK_TILE_H * S / 2  # ... (y: 5.3)
     bevx, bevy, nstr = 8.0, 14.0, 2.0
     for j in range(S):  # image rows start at the bottom
         c, ly = j // BW, j % BW
@@ -780,18 +783,217 @@ def _brick_outer_face(name, direction, brick):
     _brick_uvs(ob)
 
 
+def _lego_stud_normal():
+    """512x512 tileable normal map of raised round studs (one 4x4-stud cell).
+
+    The relief depends only on the stud layout, so every base colour shares this
+    one packed `p_stud_normal` image. Computed on a single cell and tiled (the
+    neighbours wrap inside the cell, which is exact for a repeating pattern).
+    """
+    S, cell = 512, 128
+    c, r = cell / 2, 0.3 * cell
+
+    def _h(i, j):
+        t = math.hypot((i % cell) - c, (j % cell) - c) / r
+        return math.sqrt(max(0.0, 1.0 - t * t)) if t < 1.0 else 0.0
+
+    k = 20.0  # stud relief: dome height in px-equivalents
+    nor_cell = [0.0] * (cell * cell * 4)
+    for j in range(cell):
+        jp, jm = (j + 1) % cell, (j - 1) % cell
+        for i in range(cell):
+            ip, im = (i + 1) % cell, (i - 1) % cell
+            nx = (_h(im, j) - _h(ip, j)) * k / 2.0
+            ny = (_h(i, jm) - _h(i, jp)) * k / 2.0
+            inv = 1.0 / math.sqrt(nx * nx + ny * ny + 1.0)
+            p = (j * cell + i) * 4
+            nor_cell[p:p + 4] = (nx * inv * 0.5 + 0.5,
+                                 ny * inv * 0.5 + 0.5, inv, 1.0)
+    nor_px = [0.0] * (S * S * 4)
+    for j in range(S):
+        src = (j % cell) * cell * 4
+        row = nor_cell[src:src + cell * 4]
+        for t in range(S // cell):
+            dst = (j * S + t * cell) * 4
+            nor_px[dst:dst + cell * 4] = row
+    nimg = bpy.data.images.new("p_stud_normal", S, S)
+    nimg.colorspace_settings.name = "Non-Color"
+    nimg.file_format = "PNG"
+    nimg.pixels[:] = nor_px
+    nimg.pack()
+    return nimg
+
+
+def _lego_stud_images(base_hex, tag):
+    """512x512 tileable 4x4-stud colour image (base `base_hex`), packed.
+
+    Round studs (diameter 0.6 x pitch) with a soft top highlight and a soft
+    contact shadow; returns (colour image, shared normal image).
+    """
+    S, cell = 512, 128
+    c, r = cell / 2, 0.3 * cell
+    base = _hex(base_hex)
+    col_cell = [0.0] * (cell * cell * 4)
+    for j in range(cell):
+        ly = j - c
+        for i in range(cell):
+            lx = i - c
+            d = math.hypot(lx, ly)
+            p = (j * cell + i) * 4
+            t = d / r
+            if t < 1.0:
+                dome = math.sqrt(1.0 - t * t)
+                f = 0.94 + 0.10 * (ly / r * 0.5 + 0.5) + 0.04 * dome
+                col_cell[p:p + 3] = (min(1.0, base[0] * f),
+                                     min(1.0, base[1] * f),
+                                     min(1.0, base[2] * f))
+            else:
+                s = max(0.0, 1.0 - (d - r) / 14.0)
+                f = 1.0 - 0.20 * s * s
+                col_cell[p:p + 3] = (base[0] * f, base[1] * f, base[2] * f)
+            col_cell[p + 3] = 1.0
+    col_px = [0.0] * (S * S * 4)
+    for j in range(S):
+        src = (j % cell) * cell * 4
+        row = col_cell[src:src + cell * 4]
+        for t in range(S // cell):
+            dst = (j * S + t * cell) * 4
+            col_px[dst:dst + cell * 4] = row
+    img = bpy.data.images.new(f"p_stud_color_{tag}", S, S)
+    img.colorspace_settings.name = "sRGB"
+    img.file_format = "PNG"
+    img.pixels[:] = col_px
+    img.pack()
+    nimg = bpy.data.images.get("p_stud_normal")
+    if nimg is None:
+        nimg = _lego_stud_normal()
+    return img, nimg
+
+
+def _stud_material(name, color_img, normal_img):
+    """ABS material with packed stud images as base colour (UV-mapped, one tile
+    per STUD_TEX_TILE) plus a normal map."""
+    m = lego_mat(name, "#ffffff")
+    nt = m.node_tree
+    b = next(n for n in nt.nodes if n.type == "BSDF_PRINCIPLED")
+    uv = _pnode(m, "ShaderNodeTexCoord")
+    tex = _pnode(m, "ShaderNodeTexImage")
+    tex.image, tex.extension = color_img, "REPEAT"
+    ntex = _pnode(m, "ShaderNodeTexImage")
+    ntex.image, ntex.extension = normal_img, "REPEAT"
+    nmap = _pnode(m, "ShaderNodeNormalMap")
+    nt.links.new(uv.outputs["UV"], tex.inputs["Vector"])
+    nt.links.new(uv.outputs["UV"], ntex.inputs["Vector"])
+    nt.links.new(tex.outputs["Color"], b.inputs["Base Color"])
+    nt.links.new(ntex.outputs["Color"], nmap.inputs["Color"])
+    nt.links.new(nmap.outputs["Normal"], b.inputs["Normal"])
+    return m
+
+
+def _stud_uvs(ob, tile=STUD_TEX_TILE):
+    """Box-projected world-scale UVs: one stud tile per `tile` metres, so the
+    stud texture exports to glTF at true scale (stud pitch 0.24 m)."""
+    mesh = ob.data
+    if not mesh.uv_layers:
+        mesh.uv_layers.new(name="UVMap")
+    uv = mesh.uv_layers.active
+    sx, sy, sz = ob.scale
+    ox, oy, oz = ob.location
+    for poly in mesh.polygons:
+        n = poly.normal
+        ax = 0 if abs(n.x) >= abs(n.y) and abs(n.x) >= abs(n.z) else \
+            (1 if abs(n.y) >= abs(n.z) else 2)
+        for li in poly.loop_indices:
+            co = mesh.vertices[mesh.loops[li].vertex_index].co
+            x, y, z = co[0] * sx + ox, co[1] * sy + oy, co[2] * sz + oz
+            if ax == 0:
+                u, v = y / tile, z / tile
+            elif ax == 1:
+                u, v = x / tile, z / tile
+            else:
+                u, v = x / tile, y / tile
+            uv.data[li].uv = (u, v)
+
+
+def _annulus(name, cx, cy, r_in, r_out, z0, z1, m, segs=64):
+    """Flat ring mesh (top, bottom, inner and outer faces) with world-scale
+    planar UVs, so a stud texture maps at true pitch. Returns the object."""
+    verts, faces = [], []
+    for s in range(segs):
+        a = 2 * math.pi * s / segs
+        ca, sa = math.cos(a), math.sin(a)
+        verts.append((cx + r_out * ca, cy + r_out * sa, z1))  # 4s: outer top
+        verts.append((cx + r_in * ca, cy + r_in * sa, z1))    # 4s+1: inner top
+        verts.append((cx + r_out * ca, cy + r_out * sa, z0))  # 4s+2: outer base
+        verts.append((cx + r_in * ca, cy + r_in * sa, z0))    # 4s+3: inner base
+    for s in range(segs):
+        n = (s + 1) % segs
+        o0, i0, ob0, ib0 = 4 * s, 4 * s + 1, 4 * s + 2, 4 * s + 3
+        o1, i1, ob1, ib1 = 4 * n, 4 * n + 1, 4 * n + 2, 4 * n + 3
+        faces.append((o0, o1, i1, i0))      # top
+        faces.append((ob0, ib0, ib1, ob1))  # bottom
+        faces.append((o0, ob0, ob1, o1))    # outer skirt
+        faces.append((i0, i1, ib1, ib0))    # inner skirt
+    mesh = bpy.data.meshes.new(name + "_mesh")
+    mesh.from_pydata(verts, [], faces)
+    mesh.update()
+    ob = bpy.data.objects.new(name, mesh)
+    bpy.context.collection.objects.link(ob)
+    ob.data.materials.append(m)
+    uv = mesh.uv_layers.new(name="UVMap")
+    for poly in mesh.polygons:
+        for li in poly.loop_indices:
+            vx, vy, _vz = mesh.vertices[mesh.loops[li].vertex_index].co
+            uv.data[li].uv = (vx / STUD_TEX_TILE, vy / STUD_TEX_TILE)
+    return ob
+
+
+def _lego_grid_image(disc_r):
+    """512x512 orange tile-grid image for the meeting-table overlay disc, packed.
+
+    Dark lines every 0.48 m across the `2 * disc_r` disc (the cap UVs of the
+    overlay cylinder span the full image).
+    """
+    S = 512
+    base = _hex("#e4a149")
+    line = _hex("#8a5a24")
+    step = 0.48 * S / (2 * disc_r)
+    w = 3.0
+    centres = [S / 2 + k * step for k in range(-4, 5)]
+    is_line = [any(abs(p + 0.5 - L) < w / 2 for L in centres)
+               for p in range(S)]
+    col_px = [0.0] * (S * S * 4)
+    for j in range(S):
+        lj = is_line[j]
+        for i in range(S):
+            p = (j * S + i) * 4
+            col_px[p:p + 3] = line if (lj or is_line[i]) else base
+            col_px[p + 3] = 1.0
+    img = bpy.data.images.new("p_meet_grid", S, S)
+    img.colorspace_settings.name = "sRGB"
+    img.file_format = "PNG"
+    img.pixels[:] = col_px
+    img.pack()
+    return img
+
+
 def p_materials():
     """Extra materials for the polished scene (all new names; M[] is untouched).
 
     Glossy ABS plastic in LEGO's palette; emissive materials stay emissive.
     """
     P = {}
-    P["floor"] = lego_mat("p_floor", "#a0a5a9")
+    _floor_col, _floor_nor = _lego_stud_images("#d9dbd8", "floor")
+    P["floor"] = _stud_material("p_floor", _floor_col, _floor_nor)
+    _apron_col, _apron_nor = _lego_stud_images("#6c6e68", "apron")
+    P["apron"] = _stud_material("p_apron", _apron_col, _apron_nor)
+    _rim_col, _rim_nor = _lego_stud_images("#f2cd37", "rim")
+    P["rim"] = _stud_material("p_meet_rim", _rim_col, _rim_nor)
     _brick_col, _brick_nor = _lego_brick_images()
     P["wall_back"] = _brick_material("p_wall_back", _brick_col, _brick_nor)
     P["wall_side"] = _brick_material("p_wall_side", _brick_col, _brick_nor)
-    P["band"] = lego_mat("p_band", "#6c6e68")
-    P["column"] = lego_mat("p_column", "#6c6e68")
+    P["band"] = lego_mat("p_band", "#e4e6e3")
+    P["column"] = lego_mat("p_column", "#e4e6e3")
     P["yellow"] = lego_mat("p_yellow", "#f2cd37")
     P["dark_steel"] = lego_mat("p_dark_steel", "#6c6e68")
     P["steel"] = lego_mat("p_steel", "#a0a5a9")
@@ -800,7 +1002,7 @@ def p_materials():
     P["cab_red"] = lego_mat("p_cab_red", "#c91a09")
     P["tyre"] = lego_mat("p_tyre", "#1b1f23")
     P["hub"] = lego_mat("p_hub", "#a0a5a9")
-    P["trailer_in"] = lego_mat("p_trailer_in", "#a0a5a9")
+    P["trailer_in"] = lego_mat("p_trailer_in", "#e4e6e3")
     P["wood"] = lego_mat("p_wood", "#582a12")
     P["wood_pale"] = lego_mat("p_wood_pale", "#e4cd9e")
     P["tan"] = lego_mat("p_tan", "#e4cd9e")
@@ -811,13 +1013,13 @@ def p_materials():
     P["cone"] = lego_mat("p_cone", "#fe8a18")
     P["cone_white"] = lego_mat("p_cone_white", "#f4f4f4")
     P["rack_blue"] = lego_mat("p_rack_blue", "#0055bf")
-    P["rack_orange"] = lego_mat("p_rack_orange", "#fe8a18")
-    P["ceil"] = lego_mat("p_ceil", "#f4f4f4")
-    P["roof_steel"] = lego_mat("p_roof_steel", "#6c6e68")
+    P["rack_yellow"] = lego_mat("p_rack_yellow", "#f2cd37")
+    P["ceil"] = _stud_material("p_ceil", _floor_col, _floor_nor)
+    P["balc"] = lego_mat("p_balc", "#f4f4f4")
+    P["roof_steel"] = lego_mat("p_roof_steel", "#e4e6e3")
     P["shade"] = lego_mat("p_shade", "#1b1f23")
-    P["lamp_warm"] = mat("p_lamp_warm", (1.0, 0.82, 0.60), emit=6.0)
+    P["lamp_warm"] = mat("p_lamp_warm", (1.0, 0.96, 0.90), emit=6.0)
     P["sky"] = mat("p_sky", (0.72, 0.84, 1.0), emit=5.0)
-    P["asphalt"] = lego_mat("p_asphalt", "#6c6e68")
     P["red"] = lego_mat("p_red", "#c91a09")
     P["black"] = lego_mat("p_black", "#1b1f23")
     # Trans-clear LEGO panels: slight blue tint, low alpha, near-mirror surface.
@@ -855,11 +1057,13 @@ def p_clear():
 
 
 def p_shell(P):
-    """Baseplate floor, brick walls with a dark band, columns, roof, ceiling."""
+    """Baseplate floor, brick walls with a light band, columns, roof, ceiling."""
     fl = bpy.data.objects["floor"]
     fl.data.materials.clear()
     fl.data.materials.append(P["floor"])
     fl.scale.y, fl.location.y = 33, -1.5  # 7 m longer toward the front: y in [-18, 15]
+    fl.location.z = -0.052  # top 2 mm under the LEGO plate (top at z = 0): no z-fight
+    _stud_uvs(fl)  # world-scale like the plate: one continuous stud field
     for name in ("wall_back_l", "wall_back_r", "wall_back_top"):
         ob = bpy.data.objects[name]
         ob.data.materials.clear()
@@ -875,6 +1079,13 @@ def p_shell(P):
             P["yellow"])
     box("p_band_left", (0.06, 33, 1.2), (-14.81, -1.5, 0.6), P["band"])
     box("p_band_left_y", (0.065, 33, 0.07), (-14.81, -1.5, 1.235), P["yellow"])
+    # Right wall, mirroring the left one (brick, band, stripe, columns).
+    box("p_wall_right", (0.3, 28, 7), (15, -4, 3.5), P["wall_side"])
+    box("p_band_right", (0.06, 33, 1.2), (14.81, -1.5, 0.6), P["band"])
+    box("p_band_right_y", (0.065, 33, 0.07), (14.81, -1.5, 1.235), P["yellow"])
+    for y in (-10, -5, 0, 5, 9):
+        box(f"p_col_r{y}", (0.28, 0.28, 7.0), (14.66, y, 3.5), P["column"])
+        box(f"p_colg_r{y}", (0.44, 0.44, 0.5), (14.66, y, 0.25), P["yellow"])
     # Steel columns with yellow guards along the visible walls.
     for x in (-13, -8, -3.5, 3.5, 9.2, 13):
         box(f"p_col_b{x}", (0.28, 0.28, 7.0), (x, 9.66, 3.5), P["column"])
@@ -897,21 +1108,23 @@ def p_shell(P):
     box("p_roof", (30.6, 28.4, 0.25), (0, -4, 7.7), P["roof_steel"])
     wl = bpy.data.objects["wall_left"]
     wl.scale.y, wl.location.y = 28, -4
+    _stud_uvs(bpy.data.objects["p_ceiling"])  # studded grey plates overhead
     # Brick courses at true scale on the hall walls.
     for _wn in ("wall_back_l", "wall_back_r", "wall_back_top", "wall_left",
-                "p_wall_front"):
+                "p_wall_front", "p_wall_right"):
         _brick_uvs(bpy.data.objects[_wn])
     # Tyre scuffs on the floor (thin translucent strips).
     for k, (x, y, yaw, ln) in enumerate(
             [(-1.2, 0.5, 8, 5.0), (-0.4, 0.7, 8, 5.0),
              (6.5, -3.0, -25, 4.0), (7.3, -2.6, -25, 4.0),
              (2.0, 8.6, 3, 2.5), (-4.5, -6.0, 70, 3.5)]):
-        box(f"p_scuff{k}", (0.14, ln, 0.002), (x, y, 0.004), P["tyre_mark"],
+        box(f"p_scuff{k}", (0.14, ln, 0.002), (x, y, 0.002), P["tyre_mark"],
             rot_z=math.radians(yaw))
 
 
 def p_lights(P):
-    """Warm high-bay spots plus daylight sun through the door.
+    """Bright pendant rows (black cone shades, warm-white undersides) plus
+    daylight sun through the door.
 
     Many wide, low-power cones with soft edges and soft shadows overlap
     into even light instead of bright round pools.
@@ -924,8 +1137,8 @@ def p_lights(P):
             bpy.ops.object.light_add(type="SPOT", location=(x, y, 6.15))
             L = bpy.context.object
             L.name = f"p_bay{ix}{iy}"
-            L.data.energy = 467.5  # bright like the concepts' warehouse
-            L.data.color = (1.0, 0.78, 0.55)
+            L.data.energy = 748.0  # 467.5 x 1.6: bright and airy, no dark corners
+            L.data.color = (1.0, 0.96, 0.9)
             _psetattr(L.data, "spot_size", 1.15)
             _psetattr(L.data, "spot_blend", 0.8)
             _psetattr(L.data, "shadow_soft_size", 0.5)
@@ -943,7 +1156,8 @@ def p_lights(P):
 
 def p_sky(P):
     """Bright exterior: apron, sky backdrop, parking guide lines."""
-    box("p_apron", (44, 24, 0.1), (0, 22, -0.06), P["asphalt"])
+    box("p_apron", (44, 24, 0.1), (0, 22, -0.06), P["apron"])
+    _stud_uvs(bpy.data.objects["p_apron"])  # dark stud field, pitch 0.24 m
     bpy.ops.mesh.primitive_plane_add(size=1, location=(0, 34, 9),
                                      rotation=(math.radians(90), 0, 0))
     sky = bpy.context.object
@@ -973,9 +1187,9 @@ def p_pallet(name, x, y, z0, P):
 
 
 def p_truck(P, rnd):
-    """LEGO City semi-truck at the dock: light-bluish-grey brick trailer, red cab."""
+    """LEGO City semi-truck at the dock: white brick-built trailer, red cab."""
     cab_red = P["cab_red"]
-    trailer = lego_mat("p_trailer", "#a0a5a9")
+    trailer = lego_mat("p_trailer", "#f2f3f2")
     dark = P["dark_steel"]
     white = P["paper"]
     black = P["black"]
@@ -1021,14 +1235,6 @@ def p_truck(P, rnd):
             box(f"p_tf_refl{sgn}_{i}", (0.02, 0.38, 0.08),
                 (sgn * 1.26, ry, 0.68), rmat)
     box("p_tf_roof", (2.5, tl, 0.08), (0, yc, 2.90), trailer, bevel=0.005)
-    roof_top = 2.94
-    roof_stud_top = roof_top + STUD_H
-    x_edge = 1.25 - STUD_R - 0.05
-    ny = int((tl - 1.2) // STUD_PITCH) + 1
-    for sgn in (-1, 1):
-        for i in range(ny):
-            sy = y0 + 0.6 + i * STUD_PITCH
-            _stud(f"p_tf_topstud{sgn}_{i}", sgn * x_edge, sy, roof_top, trailer)
     box("p_tf_front", (2.5, 0.08, 2.28), (0, y0 + tl - 0.04, 1.68), trailer)
     for c in range(1, 4):
         gz = 0.54 + c * BRICK_H
@@ -1138,11 +1344,6 @@ def p_forklift(P):
         bevel=0.04)
     box("p_fl_counter", (1.05, 0.50, 0.62), (x, y - 0.95, 0.66), yellow,
         bevel=0.08)
-    counter_top = 0.97
-    counter_stud_top = counter_top + STUD_H
-    edge = 1.05 / 2 - STUD_R
-    for i, dx in enumerate((-STUD_PITCH / 2, STUD_PITCH / 2)):
-        _stud(f"p_fl_counter_stud{i}", x + dx, y - 0.95, counter_top, yellow)
     box("p_fl_floor", (0.90, 0.70, 0.04), (x, y + 0.15, 0.90), black)
     for sgn in (-1, 1):
         p_wheel(f"p_fl_wf{sgn}", x + sgn * 0.55, y + 0.55, 0.30, 0.24, P)
@@ -1289,10 +1490,10 @@ def p_standees(P, light, cam_pos):
 
 
 def p_racks(P, rnd):
-    """Pallet-rack runs against the walls, nearly every slot holding a loaded pallet.
+    """Pallet-rack runs against the walls, every slot holding a loaded pallet.
 
     Left wall run (L1..L7): backs against the left wall (depth along x),
-    loads facing +x into the hall. Back wall run (B1..B3): backs against
+    loads facing +x into the hall. Back wall run (B1..B4): backs against
     the back wall west of the dock door (depth along y), loads facing -y.
     The middle of the hall stays open floor.
     """
@@ -1373,7 +1574,7 @@ def p_racks(P, rnd):
 
     # (letter, turned 90 deg, fixed centre, first bay centre, bays, pitch)
     runs = [("L", True, -14.25, -9.51, 7, 2.7),
-            ("B", False, 9.25, -12.31, 3, 2.7)]
+            ("B", False, 9.25, -12.31, 4, 2.7)]
     for letter, rot90, fixed, start, count, pitch in runs:
         for bi in range(count):
             bc = start + bi * pitch
@@ -1385,29 +1586,19 @@ def p_racks(P, rnd):
                               by + (sl if rot90 else sd))
                     box(f"p_rk{letter}{bi}_up{sl}{sd}", (0.48, 0.48, 5.4),
                         (ux, uy, 2.7), P["rack_blue"])
-                    _stud(f"p_rk{letter}{bi}_up{sl}{sd}_stud", ux, uy, 5.4,
-                          P["rack_blue"])
             for lv, zb in enumerate((1.6, 3.0, 4.4)):
-                # Orange 1x2 plate beams: 0.48 deep, PLATE_H thick, tops flush
-                # with the pallet levels; light-grey deck plate between them.
+                # Yellow 1x2 plate beams: 0.48 deep, PLATE_H thick, tops flush
+                # with the pallet levels; yellow deck plate between them.
                 zc = zb + 0.07 - PLATE_H / 2
                 for sd in (-0.49, 0.49):
                     box(f"p_rk{letter}{bi}_beam{lv}{sd}",
                         (0.48, 2.58, PLATE_H) if rot90 else
                         (2.58, 0.48, PLATE_H),
                         (bx + (sd if rot90 else 0),
-                         by + (0 if rot90 else sd), zc), P["rack_orange"])
+                         by + (0 if rot90 else sd), zc), P["rack_yellow"])
                 box(f"p_rk{letter}{bi}_deck{lv}",
                     (0.50, 2.58, PLATE_H) if rot90 else (2.58, 0.50, PLATE_H),
-                    (bx, by, zc), P["floor"])
-                for i in range(5):  # shelf stud grid: beam rows + deck row
-                    along = (i - 2) * STUD_PITCH
-                    for j, across in enumerate((-0.49, 0.0, 0.49)):
-                        sx = bx + (across if rot90 else along)
-                        syy = by + (along if rot90 else across)
-                        sm = P["rack_orange"] if j != 1 else P["floor"]
-                        _stud(f"p_rk{letter}{bi}_shelf{lv}_st{i}{j}", sx, syy,
-                              zb + 0.07, sm)
+                    (bx, by, zc), P["rack_yellow"])
                 # Location label on the beam face, readable from the aisle.
                 off = rnd.uniform(-0.5, 0.5)
                 if rot90:
@@ -1417,8 +1608,6 @@ def p_racks(P, rnd):
                     box(f"p_rk{letter}{bi}_beam{lv}_lbl", (0.5, 0.012, 0.12),
                         (bx + off, by - 0.736, zb), P["paper"])
             for lv, z0 in enumerate((0.02, 1.67, 3.07, 4.47)):
-                if rnd.random() < 0.05:
-                    continue
                 j = rnd.uniform(-0.1, 0.1)
                 px, py = (bx, by + j) if rot90 else (bx + j, by)
                 _load(f"p_rk{letter}{bi}l{lv}", px, py, z0, rot90)
@@ -1444,10 +1633,10 @@ def p_racks(P, rnd):
 def p_props(P, rnd):
     """Floor props: walkways, cones, pallets, hand truck, extinguisher."""
     for k, x in enumerate((-4.2, -2.8)):
-        box(f"p_walk{k}", (0.10, 11.5, PLATE_H), (x, -4.25, 0.002 + PLATE_H / 2),
+        box(f"p_walk{k}", (0.10, 11.5, PLATE_H), (x, -4.25, PLATE_H / 2),
             P["yellow"])
     for k, y in enumerate((-8.5, -9.1)):
-        box(f"p_lane{k}", (21.5, 0.10, PLATE_H), (-2.5, y, 0.002 + PLATE_H / 2),
+        box(f"p_lane{k}", (21.5, 0.10, PLATE_H), (-2.5, y, PLATE_H / 2),
             P["yellow"])
     _floor_tape_tiles("p_dhatch_o", -2.2, 7.9, 2.2, 9.3, P["yellow"])
     _hatch_tiles("p_dhatch", -2.2, 7.9, 2.2, 9.3, P["yellow"])
@@ -1495,11 +1684,11 @@ def p_props(P, rnd):
 
 
 def p_quality():
-    """Warmer ambient plus the best EEVEE offers (all version-guarded)."""
+    """Bright even ambient plus the best EEVEE offers (all version-guarded)."""
     nt = bpy.context.scene.world.node_tree
     bg = nt.nodes["Background"]
     bg.inputs["Color"].default_value = (0.32, 0.32, 0.33, 1)
-    bg.inputs["Strength"].default_value = 0.4
+    bg.inputs["Strength"].default_value = 0.8
     try:
         bpy.context.scene.view_settings.view_transform = "Standard"
     except TypeError:
@@ -1509,7 +1698,7 @@ def p_quality():
     except TypeError:
         pass
     try:
-        bpy.context.scene.view_settings.exposure = -0.9
+        bpy.context.scene.view_settings.exposure = 0.0
     except (TypeError, AttributeError):
         pass
     # The camera sees a daylight sky outside; everything else keeps the soft grey ambient.
@@ -1813,22 +2002,13 @@ def p_rooms(P):
         box(f"{pre}sill", (x1 - x0 - 0.06, 0.09, 0.07), (xc, yg, z0 + 0.035),
             _framem)
         box(f"{pre}dhead", (1.07, 0.09, 0.09), (xd, yg, zt), _framem)
-        # Name plate: all rooms are light boxes (dark frame + emissive face).
+        # Name band: a full-width strip in the room's colour, white name on it.
         if cid in ("voice", "sef", "spark", "sam", "kapi",
                    "ada", "iris", "glimmer", "wonder", "rover"):
-            _pf = {"voice": plate_navy, "sef": plate_cream,
-                   "spark": plate_cream, "sam": plate_white,
-                   "kapi": plate_cream, "ada": plate_cream,
-                   "iris": plate_cream, "glimmer": plate_white,
-                   "wonder": plate_cream, "rover": plate_grey}[cid]
-            _pt = {"voice": txt_white, "glimmer": plate_viol,
-                   "wonder": plate_gold, "rover": plate_creamtxt}.get(
-                       cid, plate_ink)
-            box(f"{pre}plateframe", (1.86, 0.08, 0.46), (xc, yg - 0.01, z0 + 2.76),
-                P["dark_steel"])
-            box(f"{pre}plate", (1.80, 0.10, 0.40), (xc, yg + 0.01, z0 + 2.76), _pf)
-            text(f"{pre}name", name, (xc, yg + 0.075, z0 + 2.76), 0.34, _pt,
-                 rot=(math.radians(90), 0, math.radians(180)))
+            box(f"{pre}plate", (x1 - x0 - 0.1, 0.10, 0.40),
+                (xc, yg + 0.01, z0 + 2.76), cmat)
+            text(f"{pre}name", name, (xc, yg + 0.075, z0 + 2.76), 0.34,
+                 txt_white, rot=(math.radians(90), 0, math.radians(180)))
             if cid == "spark":
                 for _bi in range(7):
                     _bx = xc - 0.80 + _bi * (1.60 / 6)
@@ -1853,9 +2033,9 @@ def p_rooms(P):
             box(f"{pre}ceil", (6.0, 4.5, 0.2), (xc, -15.75, 3.1), _ceilmat)
             box(f"{pre}fascia", (6.0, 0.1, 0.14), (xc, -13.53, 2.95), pale)
             box(f"{pre}aisle", (6.0, 0.1, PLATE_H), (xc, -11.2,
-                0.002 + PLATE_H / 2), P["yellow"])
+                PLATE_H / 2), P["yellow"])
         else:
-            box(f"{pre}balc", (6.0, 1.6, 0.2), (xc, -12.7, 3.1), P["ceil"])
+            box(f"{pre}balc", (6.0, 1.6, 0.2), (xc, -12.7, 3.1), P["balc"])
             box(f"{pre}roof", (6.0, 4.5, 0.2), (xc, -15.75, 6.2), ceilwarm)
             box(f"{pre}panelframe", (1.3, 0.7, 0.05), (xc, -15.6, z0 + 2.885),
                 P["dark_steel"])
@@ -1866,20 +2046,26 @@ def p_rooms(P):
                 runs = [(9.03, 13.2), (14.8, 14.97)]
             for r, (rx0, rx1) in enumerate(runs):
                 rxc, rw = (rx0 + rx1) / 2, rx1 - rx0
-                box(f"{pre}balg{r}", (rw, 0.04, 1.0), (rxc, -11.92, 3.7), P["glass"])
+                nbar = max(2, round(rw / 0.28) + 1)
+                for i in range(nbar):
+                    px = rx0 + rw * i / (nbar - 1)
+                    box(f"{pre}balbar{r}_{i}", (0.035, 0.035, 1.0),
+                        (px, -11.92, 3.7), P["black"])
                 box(f"{pre}balr{r}", (rw + 0.04, 0.1, 0.06), (rxc, -11.92, 4.23),
-                    P["dark_steel"])
+                    P["black"])
                 box(f"{pre}bals{r}", (rw + 0.04, 0.08, 0.08), (rxc, -11.92, 3.24),
-                    P["dark_steel"])
+                    P["black"])
                 npost = max(2, round(rw / 1.5) + 1)
                 for i in range(npost):
                     px = rx0 + rw * i / (npost - 1)
                     box(f"{pre}balp{r}_{i}", (0.06, 0.06, 1.06), (px, -11.92, 3.73),
-                        P["dark_steel"])
+                        P["black"])
             if cid == "rover":  # east end; the west end meets the hall wall
-                box(f"{pre}balend", (0.04, 1.6, 1.0), (14.97, -12.7, 3.7), P["glass"])
+                for i in range(7):
+                    box(f"{pre}balendbar{i}", (0.035, 0.035, 1.0),
+                        (14.97, -13.4 + i * (1.4 / 6), 3.7), P["black"])
                 box(f"{pre}balendr", (0.1, 1.64, 0.06), (14.97, -12.7, 4.23),
-                    P["dark_steel"])
+                    P["black"])
         # Desk facing the glass, chair behind it facing the yard (+y).
         # Every room builds its own desk below; the chair is shared.
         yd, yc, dt = -14.7, -15.5, z0 + 0.775 * S  # desk top ~0.97
@@ -4615,25 +4801,25 @@ def p_rooms(P):
     for _cid, _dir in (("voice", -1), ("ada", -1), ("kapi", 1), ("rover", 1)):
         _brick_outer_face(f"p_room_{_cid}_" + ("divw" if _dir < 0 else "dive"),
                           _dir, P["wall_back"])
-    # Steel staircase at the right end, from the aisle up to the balcony.
+    # Yellow staircase at the right end, from the aisle up to the balcony.
     sxc, yb, yt = 14.0, -7.5, -11.9
     nsteps = 16
     run = (yb - yt) / nsteps
     for i in range(nsteps):
         box(f"p_room_rover_stair{i}", (1.6, 0.30, 0.06),
-            (sxc, yb - (i + 0.5) * run, (i + 1) * 0.2 - 0.03), P["steel"])
+            (sxc, yb - (i + 0.5) * run, (i + 1) * 0.2 - 0.03), P["yellow"])
     ang = math.atan2(3.2, yb - yt)
     for k, px in enumerate((sxc - 0.76, sxc + 0.76)):
         st = box(f"p_room_rover_string{k}", (0.08, 5.3, 0.3),
-                 (px, (yb + yt) / 2, 1.48), P["dark_steel"])
+                 (px, (yb + yt) / 2, 1.48), P["yellow"])
         st.rotation_euler = (-ang, 0, 0)
         hr = box(f"p_room_rover_handrail{k}", (0.06, 5.3, 0.06),
-                 (px, (yb + yt) / 2, 2.6), P["dark_steel"])
+                 (px, (yb + yt) / 2, 2.6), P["yellow"])
         hr.rotation_euler = (-ang, 0, 0)
         for j, py in enumerate((-8.0, -9.3, -10.6, -11.7)):
             ph = (yb - py) / (yb - yt) * 3.2
             box(f"p_room_rover_post{k}_{j}", (0.05, 0.05, 1.0), (px, py, ph + 0.5),
-                P["dark_steel"])
+                P["yellow"])
     rooms = {}
     for cid, _name, _hexcol, floor, x0 in characters:
         z0 = 0.0 if floor == 0 else 3.2
@@ -4657,7 +4843,8 @@ def p_rooms(P):
 
 MEET_X = 1.0
 MEET_Y = -7.0
-MEET_RUG_R = 3.4    # meeting rug radius (floor studs skip this circle)
+MEET_RUG_R = 3.4    # meeting platform radius
+MEET_PLAT = 0.19    # navy platform thickness; table and stools stand on it
 MEET_R = 1.8        # table top radius
 MEET_TOP = 1.35     # table top height (a standing table for the 2.4 m cast)
 MEET_STOOL_R = 2.4  # stools on this circle; the simulator stands the cast 0.5 m behind
@@ -4683,9 +4870,9 @@ def _meshy_place(fname, name, xy, yaw, scale):
     return ob
 
 
-def _meshy(fname, name, xy, radius, height, tint=None):
-    """Import a Meshy model from assets/meshy, sized to radius x height at xy (origin at
-    its base), optionally tinted (a Multiply node the glTF export reads as a colour factor)."""
+def _meshy(fname, name, xy, radius, height, tint=None, z0=0.0):
+    """Import a Meshy model from assets/meshy, sized to radius x height at xy (base at
+    z0), optionally tinted (a Multiply node the glTF export reads as a colour factor)."""
     path = REPO / "assets" / "meshy" / fname
     if not path.exists():
         return None
@@ -4700,7 +4887,7 @@ def _meshy(fname, name, xy, radius, height, tint=None):
     bpy.context.view_layer.update()
     w, h = max(ob.dimensions.x, ob.dimensions.y), ob.dimensions.z
     ob.scale = (2 * radius / w, 2 * radius / w, height / h)
-    ob.location = (xy[0], xy[1], 0.0)
+    ob.location = (xy[0], xy[1], z0)
     if tint is not None:
         m = ob.data.materials[0].copy()
         ob.data.materials[0] = m
@@ -4718,125 +4905,19 @@ def _meshy(fname, name, xy, radius, height, tint=None):
 
 
 def p_lego_floor(P, V):
-    """LEGO hall floor: baseplate slab, geometry-node studs, tile markings, room
-    stud rows, and the delivery dressed as tan bricks (same count/positions)."""
-    # Baseplate slab: PLATE_H thick, top 2 mm above the floor (no z-fighting).
-    box("p_lego_plate", (29.6, 21.4, PLATE_H), (0, -0.9, 0.002 - PLATE_H / 2),
+    """LEGO hall floor: stud-textured baseplate slab, tile markings, and the
+    delivery dressed as tan bricks (same count/positions)."""
+    # Baseplate slab: PLATE_H thick, top surface exactly at z = 0.
+    box("p_lego_plate", (29.6, 21.4, PLATE_H), (0, -0.9, -PLATE_H / 2),
         P["floor"])
-    # Stud template: one bevelled 16-sided cylinder, origin at its base, parked
-    # under the floor (the export deletes it after realizing the instances).
-    bpy.ops.mesh.primitive_cylinder_add(radius=STUD_R, depth=STUD_H, vertices=16,
-                                        location=(0, 0, -5 + STUD_H / 2))
-    tpl = bpy.context.object
-    tpl.name = "p_lego_stud_template"
-    for v in tpl.data.vertices:
-        v.co.z += STUD_H / 2
-    tpl.data.materials.append(P["floor"])
-    tpl.hide_viewport = True
-    tpl.hide_render = True
-    bevel = tpl.modifiers.new("bevel", "BEVEL")
-    bevel.width, bevel.segments = 0.01, 2
-    with bpy.context.temp_override(active_object=tpl, selected_objects=[tpl],
-                                   selected_editable_objects=[tpl], object=tpl):
-        bpy.ops.object.modifier_apply(modifier=bevel.name)
-    # Studs as instances: Mesh Grid -> delete the skipped rectangles/circle ->
-    # Instance on Points. Rectangles are in holder space (holder at (0, -0.9)).
-    grp = bpy.data.node_groups.new("p_lego_studs", "GeometryNodeTree")
-    try:
-        grp.interface.new_socket("Geometry", in_out="OUTPUT",
-                                 socket_type="NodeSocketGeometry")
-    except (TypeError, AttributeError):
-        grp.outputs.new("NodeSocketGeometry", "Geometry")
-    out = grp.nodes.new("NodeGroupOutput")
-    grid = grp.nodes.new("GeometryNodeMeshGrid")
-    grid.inputs["Vertices X"].default_value = LEGO_NX
-    grid.inputs["Vertices Y"].default_value = LEGO_NY
-    grid.inputs["Size X"].default_value = (LEGO_NX - 1) * STUD_PITCH
-    grid.inputs["Size Y"].default_value = (LEGO_NY - 1) * STUD_PITCH
-    pos = grp.nodes.new("GeometryNodeInputPosition")
-    sep = grp.nodes.new("ShaderNodeSeparateXYZ")
-    grp.links.new(pos.outputs["Position"], sep.inputs["Vector"])
-
-    def _gt(op, a, b):
-        c = grp.nodes.new("FunctionNodeCompare")
-        c.data_type = "FLOAT"
-        c.operation = op
-        grp.links.new(a, c.inputs[0])
-        c.inputs[1].default_value = b
-        return c.outputs["Result"]
-
-    def _and(a, b):
-        m = grp.nodes.new("FunctionNodeBooleanMath")
-        m.operation = "AND"
-        grp.links.new(a, m.inputs[0])
-        grp.links.new(b, m.inputs[1])
-        return m.outputs["Boolean"]
-
-    def _or(a, b):
-        m = grp.nodes.new("FunctionNodeBooleanMath")
-        m.operation = "OR"
-        grp.links.new(a, m.inputs[0])
-        grp.links.new(b, m.inputs[1])
-        return m.outputs["Boolean"]
-
-    skip_a = _and(_and(_gt("GREATER_THAN", sep.outputs["X"], -2.55),
-                       _gt("LESS_THAN", sep.outputs["X"], 2.55)),
-                  _and(_gt("GREATER_THAN", sep.outputs["Y"], 4.15),
-                       _gt("LESS_THAN", sep.outputs["Y"], 8.65)))
-    skip_b = _and(_and(_gt("GREATER_THAN", sep.outputs["X"], 4.85),
-                       _gt("LESS_THAN", sep.outputs["X"], 9.15)),
-                  _and(_gt("GREATER_THAN", sep.outputs["Y"], 4.15),
-                       _gt("LESS_THAN", sep.outputs["Y"], 8.65)))
-    dist = grp.nodes.new("ShaderNodeVectorMath")
-    dist.operation = "DISTANCE"
-    grp.links.new(pos.outputs["Position"], dist.inputs[0])
-    dist.inputs[1].default_value = (MEET_X, MEET_Y + 0.9, 0.0)
-    skip_rug = _gt("LESS_THAN", dist.outputs["Value"], MEET_RUG_R + STUD_R)
-    dele = grp.nodes.new("GeometryNodeDeleteGeometry")
-    dele.domain = "POINT"
-    grp.links.new(grid.outputs["Mesh"], dele.inputs["Geometry"])
-    grp.links.new(_or(_or(skip_a, skip_b), skip_rug), dele.inputs["Selection"])
-    info = grp.nodes.new("GeometryNodeObjectInfo")
-    info.inputs["Object"].default_value = tpl
-    inst = grp.nodes.new("GeometryNodeInstanceOnPoints")
-    grp.links.new(dele.outputs["Geometry"], inst.inputs["Points"])
-    grp.links.new(info.outputs["Geometry"], inst.inputs["Instance"])
-    grp.links.new(inst.outputs["Instances"], out.inputs[0])
-    bpy.ops.mesh.primitive_plane_add(size=1, location=(0, -0.9, 0.002))
-    holder = bpy.context.object
-    holder.name = "p_lego_floorstuds"
-    holder.data.materials.append(P["floor"])
-    mod = holder.modifiers.new("studs", "NODES")
-    mod.node_group = grp
+    _stud_uvs(bpy.data.objects["p_lego_plate"])  # fine studs, pitch 0.24 m
     # Yellow and red floor markings become flat tiles (same names/footprints).
     _pdel("zone_kabul_*", "zone_karantina_*")
     _floor_tape_tiles("zone_kabul", -2.4, 3.4, 2.4, 7.6, P["yellow"])
     _floor_tape_tiles("zone_karantina", 5.0, 3.4, 9.0, 7.6, P["red"])
     _hatch_tiles("zone_karantina", 5.0, 3.4, 9.0, 7.6, P["red"])
-    # Room floors keep their finishes; one stud row along a 0.48 m border inside
-    # the glass, plus a row on each balcony inside the balustrade.
-    gxs = [LEGO_GX0 + k * STUD_PITCH for k in range(LEGO_NX)]
-    for cid, floor, x0 in (("voice", 0, -15), ("sef", 0, -9), ("spark", 0, -3),
-                           ("sam", 0, 3), ("kapi", 0, 9), ("ada", 1, -15),
-                           ("iris", 1, -9), ("glimmer", 1, -3),
-                           ("wonder", 1, 3), ("rover", 1, 9)):
-        x1, z0 = x0 + 6.0, 0.0 if floor == 0 else 3.2
-        xw = -14.70 if x0 == -15 else x0 + 0.06
-        xe = 14.92 if x1 == 15 else x1 - 0.06
-        fmat = bpy.data.objects[f"p_room_{cid}_floor"].data.materials[0]
-        k = 0
-        for x in gxs:
-            if xw + 0.02 + STUD_R <= x <= xe - 0.02 - STUD_R:
-                _stud(f"p_room_{cid}_stud{k}", x, -13.74, z0 + 0.01, fmat)
-                k += 1
-        if floor == 1:
-            # Rover's stair opening (x in [13.2, 14.8]) stays clear of studs.
-            runs = [(x0 + 0.2, x1 - 0.2)] if cid != "rover" else [(9.23, 13.0)]
-            k = 0
-            for x in gxs:
-                if any(rx0 <= x <= rx1 for rx0, rx1 in runs):
-                    _stud(f"p_room_{cid}_balstud{k}", x, -12.16, 3.2, P["ceil"])
-                    k += 1
+    # Room floors keep their finishes; geometric studs live only on small
+    # things now (table top, stools, cartons, cab roof).
     # The delivery pallet keeps its slats; only the look turns to LEGO.
     for suffix in [f"_top{k}" for k in range(5)] + [f"_blk{k}" for k in range(3)] \
             + [f"_bot{k}" for k in range(3)]:
@@ -4879,40 +4960,49 @@ def p_lego_floor(P, V):
 
 
 def p_meeting(P):
-    """Meeting corner in the open hall: round table, stools, rug, lamp, sign.
+    """Meeting corner in the open hall: platform, round table, stools, lamp, sign.
 
     Centred at (MEET_X, MEET_Y) on the floor, between the rooms and the
     receiving stations. Sized for the 2.4 m cast. Every mesh is named p_meet_*.
     """
     dark = P["dark_steel"]
-    oak = lego_mat("p_meet_oak", "#582a12")
-    rug_navy = lego_mat("p_meet_rugmat", "#2b3a55")
-    ring_yellow = lego_mat("p_meet_ring", "#ffd21f")
+    top_orange = lego_mat("p_meet_top", "#e4a149")
+    plat_navy = lego_mat("p_meet_rugmat", "#1f3a73")
     sign_navy = lego_mat("p_meet_navy", "#1e2a5a")
     screen_pale = mat("p_meet_screen", _hex("#dbeafe"), emit=2.0)
     top = MEET_TOP
-    # Rug: navy disc with a yellow ring near the edge, wider than the stools.
-    cyl("p_meet_rug", MEET_RUG_R, 0.012, (MEET_X, MEET_Y, 0.006), rug_navy,
+    plat = MEET_PLAT
+    # Raised navy platform with a yellow stud-textured rim ring, wider than
+    # the stools; the table and the stools stand on it.
+    cyl("p_meet_rug", MEET_RUG_R, plat, (MEET_X, MEET_Y, plat / 2), plat_navy,
         verts=64)
-    bpy.ops.mesh.primitive_torus_add(location=(_mx(MEET_X), MEET_Y, 0.018),
-                                     major_radius=3.22, minor_radius=0.07,
-                                     major_segments=64)
-    rring = bpy.context.object
-    rring.name = "p_meet_rug_ring"
-    rring.scale = (1.0, 1.0, 0.12)
-    rring.data.materials.append(ring_yellow)
+    _annulus("p_meet_rug_ring", MEET_X, MEET_Y, MEET_RUG_R - 0.25, MEET_RUG_R,
+             plat, plat + 0.02, P["rim"])
     # Round table: top surface at MEET_TOP, dark edge band, pedestal on base plate.
     # The table and the stools are Meshy models (assets/meshy, generated 30 Oct);
     # without them the scene falls back to simple primitives.
     table = _meshy("meet_table.glb", "p_meet_table", (MEET_X, MEET_Y), MEET_R,
-                     top, tint=_hex("#582a12"))
+                   top - plat, tint=_hex("#e4a149"), z0=plat)
     if table is None:
-        cyl("p_meet_tabletop", MEET_R, 0.09, (MEET_X, MEET_Y, top - 0.045), oak, verts=64)
-        cyl("p_meet_edge", MEET_R + 0.01, 0.04, (MEET_X, MEET_Y, top - 0.045), dark,
-            verts=64)
-        cyl("p_meet_pedestal", 0.24, top - 0.15,
-            (MEET_X, MEET_Y, (top - 0.09) / 2 + 0.03), dark)
-        cyl("p_meet_base", 0.85, 0.06, (MEET_X, MEET_Y, 0.03), dark, verts=48)
+        cyl("p_meet_tabletop", MEET_R, 0.09, (MEET_X, MEET_Y, top - 0.045),
+            top_orange, verts=64)
+        cyl("p_meet_edge", MEET_R + 0.01, 0.04, (MEET_X, MEET_Y, top - 0.045),
+            dark, verts=64)
+        cyl("p_meet_pedestal", 0.24, top - plat - 0.15,
+            (MEET_X, MEET_Y, plat + 0.06 + (top - plat - 0.15) / 2), dark)
+        cyl("p_meet_base", 0.85, 0.06, (MEET_X, MEET_Y, plat + 0.03), dark,
+            verts=48)
+    # Thin tile grid: overlay disc 2 mm above the top, dark lines 0.48 m apart.
+    grid_m = lego_mat("p_meet_gridmat", "#e4a149")
+    _gnt = grid_m.node_tree
+    _gb = next(n for n in _gnt.nodes if n.type == "BSDF_PRINCIPLED")
+    _guv = _pnode(grid_m, "ShaderNodeTexCoord")
+    _gtex = _pnode(grid_m, "ShaderNodeTexImage")
+    _gtex.image, _gtex.extension = _lego_grid_image(MEET_R), "CLIP"
+    _gnt.links.new(_guv.outputs["UV"], _gtex.inputs["Vector"])
+    _gnt.links.new(_gtex.outputs["Color"], _gb.inputs["Base Color"])
+    cyl("p_meet_grid", MEET_R, 0.002, (MEET_X, MEET_Y, top + 0.002), grid_m,
+        verts=64)
     # Studs on the table top: pitch grid inside the radius, a 0.3 m clear ring
     # at the edge and the props' spots (offsets from the table centre) clear.
     _props = [(-0.55, 0.25, 0.35), (0.55, -0.30, 0.35), (0.25, 0.55, 0.20),
@@ -4926,24 +5016,26 @@ def p_meeting(P):
             if _dx * _dx + _dy * _dy < (MEET_R - 0.3) ** 2 and all(
                     (_dx - _px) ** 2 + (_dy - _py) ** 2 > (_pr + STUD_R) ** 2
                     for _px, _py, _pr in _props):
-                _stud(f"p_meet_stud{_k}", _gx, _gy, top, P["wood"])
+                _stud(f"p_meet_stud{_k}", _gx, _gy, top, top_orange)
                 _k += 1
     # Six stools (1.4x) on the MEET_STOOL_R circle (0 deg = +x); seat top 0.87.
-    for i, col in enumerate(("#f97316", "#3b82f6", "#a16207", "#1d4ed8",
-                             "#ca8a04", "#0d9488")):
+    for i in range(6):
+        col = ("#00a3a3", "#fe8a18", "#f2cd37", "#0055bf")[i % 4]
         ang = math.radians(i * 60)
         sx = MEET_X + MEET_STOOL_R * math.cos(ang)
         sy = MEET_Y + MEET_STOOL_R * math.sin(ang)
-        if _meshy("meet_stool.glb", f"p_meet_stool{i}", (sx, sy), 0.34, 0.87,
-                  tint=_hex(col)) is not None:
+        if _meshy("meet_stool.glb", f"p_meet_stool{i}", (sx, sy), 0.34,
+                  0.87 - plat, tint=_hex(col), z0=plat) is not None:
             _stud(f"p_meet_stool{i}_stud", sx, sy, 0.87,
                   lego_mat(f"p_meet_stoolm{i}", col))
             continue
         sm = lego_mat(f"p_meet_seat{i}", col)
         cyl(f"p_meet_stool{i}_seat", 0.34, 0.10, (sx, sy, 0.82), sm, verts=32)
-        cyl(f"p_meet_stool{i}_post", 0.05, 0.77, (sx, sy, 0.385), dark)
-        cyl(f"p_meet_stool{i}_foot", 0.26, 0.03, (sx, sy, 0.015), dark, verts=32)
-        bpy.ops.mesh.primitive_torus_add(location=(_mx(sx), sy, 0.28),
+        cyl(f"p_meet_stool{i}_post", 0.05, 0.77 - plat,
+            (sx, sy, plat + (0.77 - plat) / 2), dark)
+        cyl(f"p_meet_stool{i}_foot", 0.26, 0.03, (sx, sy, plat + 0.015), dark,
+            verts=32)
+        bpy.ops.mesh.primitive_torus_add(location=(_mx(sx), sy, plat + 0.28),
                                          major_radius=0.22, minor_radius=0.02)
         fring = bpy.context.object
         fring.name = f"p_meet_stool{i}_ring"

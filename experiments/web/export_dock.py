@@ -9,9 +9,9 @@ page loads the one the player picked. The first also writes <out>.colliders.json
 footprint of everything a forklift can hit, as [x0, y0, x1, y1] boxes in Blender metres.
 
 From the saved polish scene: standees, cameras and lights go (the page lights the scene
-itself), text objects become meshes, the floor-stud instances are realized, and any
+itself), text objects become meshes, the removed stud instancers are dropped, and any
 still-procedural material (floor, walls) is baked to a 2K texture so it looks the same
-outside Blender; the packed brick images stay as the glTF textures. The parts the player
+outside Blender; the packed stud/brick images stay as the glTF textures. The parts the player
 touches stay separate nodes, named for the page:
   forklift   every p_fl_* part (the page drives it and moves its forks)
   delivery   the pallet with its cartons and labels (picked up by the forks)
@@ -31,7 +31,7 @@ from mathutils import Vector
 ARGS = sys.argv[sys.argv.index("--") + 1:]
 out = Path(ARGS[0]).resolve()
 DELIVERY_ONLY = len(ARGS) > 1 and ARGS[1] == "delivery"
-BAKE = ("p_floor", "p_wall_back", "p_wall_side")
+BAKE = ("p_floor", "p_wall_back", "p_wall_side", "p_apron", "p_ceil")
 GROUPS = {"forklift": ("p_fl_",), "jack": ("jack_",), "gate": ("gate_", "barrier_"),
           "screen": ("screen_",)}
 PALLET, REACH = Vector((0.0, 5.5)), 1.1   # the delivery: anything on the pallet's footprint
@@ -51,29 +51,18 @@ def group_of(ob):
     return None
 
 
-def realize_lego_studs():
-    """Realize the p_lego_floorstuds geometry-node instances into real mesh
-    (convert, then make duplicates real), before anything is joined. The hidden
-    stud template goes once the instances no longer need it."""
-    ob = bpy.data.objects.get("p_lego_floorstuds")
-    if ob is not None:
-        with bpy.context.temp_override(active_object=ob, selected_objects=[ob],
-                                       selected_editable_objects=[ob], object=ob):
-            bpy.ops.object.convert(target="MESH")
-        bpy.ops.object.select_all(action="DESELECT")
-        ob.select_set(True)
-        with bpy.context.temp_override(active_object=ob, selected_objects=[ob],
-                                       selected_editable_objects=[ob], object=ob):
-            bpy.ops.object.duplicates_make_real()
-        bpy.ops.object.select_all(action="DESELECT")
-        log("realized p_lego_floorstuds instances")
-    tpl = bpy.data.objects.get("p_lego_stud_template")
-    if tpl is not None:
-        bpy.data.objects.remove(tpl, do_unlink=True)
+def drop_stud_instancers():
+    """Drop the removed stud instancers (floor, apron) and the stud template, if
+    an older scene still has them; new scenes carry studs as textures only."""
+    for name in ("p_lego_floorstuds", "p_lego_apronstuds", "p_lego_stud_template"):
+        ob = bpy.data.objects.get(name)
+        if ob is not None:
+            bpy.data.objects.remove(ob, do_unlink=True)
+            log(f"dropped {name}")
 
 
 def clean():
-    realize_lego_studs()
+    drop_stud_instancers()
     for ob in list(bpy.data.objects):
         if ob.type in ("CAMERA", "LIGHT") or ob.name.startswith(("p_stand_", "p_standft_", "p_station_")):
             bpy.data.objects.remove(ob, do_unlink=True)
