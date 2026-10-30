@@ -474,10 +474,11 @@ body.done #demoLink, body.done #tallyChip { display: none !important; }
 @media (max-width: 640px) {
   #feed { left: 10px; right: 10px; top: 10px; width: auto; max-height: none; }
   #feedToggle { display: block; }
-  .feed-head-top { flex-wrap: nowrap; align-items: center; }
-  .feed-head-left { flex: 0 1 auto; }
+  .feed-head-top { flex-wrap: wrap; align-items: center; }
+  .feed-head-left { flex: 1 1 0; min-width: 0; }
   .feed-head-left .feed-sub { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .feed-tabs { flex: 1 1 auto; margin-top: 0; margin-left: 4px; min-width: 0; }
+  /* Tabs on their own full-width line, so both names read in full. */
+  .feed-tabs { order: 3; flex: 1 1 100%; margin-top: 8px; margin-left: 0; min-width: 0; }
   .feed-tabs button { font-size: 12.5px; padding: 0 6px; min-height: 36px; min-width: 36px; }
   .feed-list { overflow: hidden; max-height: none; }
   #feed .feed-list .feed-row { display: none; }
@@ -776,9 +777,10 @@ function charColour(id) {
 const ZONE = { x0: -2.48, x1: 2.48, y0: 3.32, y1: 7.68 };   // receiving zone (yellow tape)
 // The gathering table: a point on the floor in Blender/sim coordinates (the same
 // frame as PEOPLE[].b). The mesh may not be in dock.glb yet, so nothing here may
-// look it up by name. Standing spots ring it at 1.7 m; 0 deg = +x.
+// look it up by name. The stools ring it at 1.7 m, so the standing spots are just behind
+// them at 2.2 m; 0 deg = +x.
 const MEET = { x: -4.0, y: -6.5 };
-const MEET_R = 1.7;
+const MEET_R = 2.2;
 const MEET_SPOT_ANGLE = { sef: 240, kapi: 300, spark: 180, sam: 0 };
 const DOOR = { x0: -1.0, x1: 1.0, y0: 9.44, y1: 10.76 };    // doorway volume: the open dock door,
   // listed in colliders.json but the forklift drives through it up the leveller.
@@ -2609,7 +2611,9 @@ function updateAttention(rec, id, dt) {
   // toward the one addressed.
   const mm = G._meet;
   if (mm && !mm.returning && rec._atTable && mm.ids.indexOf(id) >= 0) {
-    let des = faceYawOf(MEET.x - rec.x, MEET.y - rec.y);
+    // The rigs face the other way from faceYawOf's heading here (they stood with their
+    // backs to the table), so the vector is taken from the table to the character.
+    let des = faceYawOf(rec.x - MEET.x, rec.y - MEET.y);
     try {
       const sp = mm.speak;
       if (sp && sp.from === id && sp.to) {
@@ -2617,7 +2621,7 @@ function updateAttention(rec, id, dt) {
         const tx = rt ? rt.x : (tp ? tp.b[0] : MEET.x);
         const ty = rt ? rt.y : (tp ? tp.b[1] : MEET.y);
         if (Math.hypot(tx - rec.x, ty - rec.y) > 0.5) {
-          const want = faceYawOf(tx - rec.x, ty - rec.y);
+          const want = faceYawOf(rec.x - tx, rec.y - ty);
           des = des + clampN(wrapAngle(want - des), -0.4, 0.4);
         }
       }
@@ -3229,8 +3233,8 @@ function stepCamera(dt) {
       // Desktop: the table sits slightly below the middle, left of the result
       // card; phones: the table rides in the upper half, above the result sheet.
       let tpx, tpy, tpz, tlx, tly, tlz;
-      if (camera.aspect < 0.9) { tpx = -4.0; tpy = 1.5; tpz = 6.5; tlx = -4.0; tly = -5.5; tlz = 0.6; }
-      else { tpx = -4.0; tpy = -0.6; tpz = 4.6; tlx = -5.0; tly = -7.2; tlz = 0.9; }
+      if (camera.aspect < 0.9) { tpx = -4.0; tpy = 7.5; tpz = 6.0; tlx = -4.0; tly = -6.4; tlz = 0.5; }
+      else { tpx = -4.0; tpy = 3.0; tpz = 7.0; tlx = -4.0; tly = -6.9; tlz = 0.8; }
       if (reducedMotion) { px = tpx; py = tpy; pz = tpz; lx = tlx; ly = tly; lz = tlz; k = 1; }
       else {
         mc.t += dt;
