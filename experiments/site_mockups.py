@@ -100,6 +100,63 @@ REST_BASE = (
     "cases, a camera view and the gate's decision, 'An agent we did not write' with a big 0, "
     "and the receiver's voice clips. Show the hero at the top and two or three sections below "
     "it, as a tall desktop page, crisp realistic web design, no device frame. Direction: ")
+RESULT_BASE = (
+    "A redesign of the result card on the right of this browser 3D simulator (the first "
+    "image is the current screen: the warehouse dock in 3D, a chat feed on the left, and on "
+    "the right a dark card titled 'Sent to Şef' with a badge 'ASK ŞEF'). Redesign only that "
+    "card; keep the 3D dock and the left feed as they are. Its content: the gate's decision "
+    "ASK ŞEF; the reason 'SAM and Spark disagree on which objects are cartons: 11 agreed, 1 "
+    "only SAM, 1 only Spark'; 'Without the gate: the agent asked Şef'; 'Behind the gate: "
+    "nothing reached the ERP'; then 'Şef approved 12 cartons, receipt MAT-PRE-2026-00009'; a "
+    "link to Wonder's note to Şef; the buttons 'Try another delivery' and 'Back to the demo'. "
+    "Use photos: the second image is Kapı (the gate, a toy figure with a striped barrier), the "
+    "third is Şef (the supervisor), the fourth is the real ceiling-camera photo of the pallet "
+    "that was counted. Polished, premium game UI, 16:9 desktop, crisp, no device frame. "
+    "Direction: ")
+RESULT_DIRECTIONS = {
+    "result-photo-hero": (
+        "the pallet's camera photo fills the top of the card like a hero image with a soft "
+        "dark fade, the amber 'ASK ŞEF' stamp over it, Kapı's portrait in a round frame "
+        "overlapping the photo's lower edge; below, the reason and two clean tiles (without "
+        "the gate / behind the gate); at the bottom Şef's portrait with a green 'approved 12' "
+        "line."),
+    "result-conversation": (
+        "the card tells the ending as a short conversation: Kapı's portrait with a speech "
+        "bubble 'ASK ŞEF' and the reason, then Şef's portrait answering 'Approved: 12 "
+        "cartons', with the pallet photo as a small attached image in Kapı's bubble; the "
+        "without/behind the gate comparison as a slim strip under them."),
+    "result-polaroid": (
+        "playful and warm: the pallet photo as a tilted polaroid pinned to the card with a "
+        "piece of tape, a big amber rubber-stamp 'ASK ŞEF' half over it, handwritten-style "
+        "small note 'counts disagree'; Kapı and Şef as two round sticker portraits; the "
+        "without/behind the gate result as two ticket stubs."),
+    "result-split": (
+        "a bold split card: left half the pallet photo with the cartons outlined, right half "
+        "the verdict in large type with Kapı's portrait, and across the bottom a full-width "
+        "band 'Without the gate' versus 'Behind the gate' with big numbers, then Şef's "
+        "approval as a green receipt line with the document number."),
+    # Round 2 (Sena: too busy, wants it more premium and elegant): far fewer elements.
+    "result-quiet-luxury": (
+        "quiet luxury, extremely minimal: a deep near-black card with generous empty space, one "
+        "thin hairline border, a single small round portrait of Kapı, the word 'Held for Şef' "
+        "in large elegant light-weight type with one amber accent dot, one short line of grey "
+        "reason text, one thin divider, a single line 'Without the gate: asked Şef · Behind "
+        "the gate: nothing posted', a small green line 'Şef approved 12 · MAT-PRE-2026-00009', "
+        "and two understated buttons. No icons, no stamps, no extra badges, no photo collage."),
+    "result-editorial": (
+        "editorial and premium like a luxury magazine: a calm card with one wide, softly "
+        "graded photo strip of the pallet at the top (the fourth image), below it the verdict "
+        "'Held for Şef' in a refined serif headline, a single sentence of reason in small sans "
+        "text, a hairline, Şef's tiny round portrait with 'Approved 12 cartons', and one "
+        "primary button. Lots of whitespace, restrained amber accent, nothing else."),
+    "result-glass-mono": (
+        "premium frosted glass, monochrome with one accent colour: a translucent dark glass "
+        "card over the 3D scene, a big thin amber number '0' with the caption 'posted to the "
+        "ERP' as the hero, under it 'Kapı held it for Şef' and one grey sentence of reason, then "
+        "a slim green pill 'Şef approved 12'. Two small buttons at the bottom. Minimal, Apple-"
+        "like, perfectly aligned, no clutter."),
+}
+
 REST_DIRECTIONS = {
     "rest-night": (
         "the night continues. The whole page keeps the hero's dusk dock mood: deep navy "
@@ -181,9 +238,12 @@ def draw(shot, name):
     refs = ([shot] + [HERE.parent / "assets" / "mascots" / "hero" / f"{c}.png" for c in ("spark", "sam", "voice")]
             + [HELLO / "kapi.jpg"] if name in CAST_DIRECTIONS else
             [shot, LOWER] if name in REST_DIRECTIONS else
+            [shot, HELLO / "kapi.jpg", HELLO / "sef.jpg",
+             HERE.parent / "site" / "img" / "en" / "belirsiz-camera.jpg"] if name in RESULT_DIRECTIONS else
             [shot] + [HELLO / f"{c}.jpg" for c in ("spark", "sam", "voice")])
     prompt = (CAST_BASE + CAST_DIRECTIONS[name] if name in CAST_DIRECTIONS else
               SIM_BASE + SIM_DIRECTIONS[name] if name in SIM_DIRECTIONS else
+              RESULT_BASE + RESULT_DIRECTIONS[name] if name in RESULT_DIRECTIONS else
               REST_BASE + REST_DIRECTIONS[name] if name in REST_DIRECTIONS else BASE + DIRECTIONS[name])
     size = "1024x1536" if name in REST_DIRECTIONS or name in CAST_DIRECTIONS else "1792x1024"
     body = {"model": "muse-image-1.0", "n": 1, "size": size, "output_format": "png",
@@ -212,6 +272,10 @@ if __name__ == "__main__":
             continue
         if n == "rest":
             for m in REST_DIRECTIONS:
+                draw(Path(sys.argv[1]), m)
+            continue
+        if n == "result":
+            for m in RESULT_DIRECTIONS:
                 draw(Path(sys.argv[1]), m)
             continue
         if n == "sim":
