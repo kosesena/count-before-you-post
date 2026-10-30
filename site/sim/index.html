@@ -6,6 +6,9 @@
 <title>Receiving dock simulator · Count Before You Post</title>
 <meta name="description" content="Drive the forklift, bring the pallet to the gate, and see whether the receipt gets written to the ERP.">
 <link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800&display=swap" rel="stylesheet">
 <style>
 /* Same voice as the demo page: warm paper cards, system type, post/block/human colours. */
 :root {
@@ -672,6 +675,202 @@ button.v-tile:focus-visible { outline: 2px solid #7dd3fc; outline-offset: 2px; }
   .dots i { animation: none !important; }
   #truck .wheel { animation: none; }
   #truck { transition: none; }
+}
+/* ---------- LEGO plates (look only) ---------- */
+:root {
+  --plate: #3a3f47;
+  --plate-edge: #2a2e35;
+  --tile: #4a505a;
+  --tile-edge: #2f343d;
+  --light-frame: #cbd5e1;
+  --stud-hi: rgba(255,255,255,.30);
+  --stud-mid: #616a7b;
+  --stud-base: #4b525f;
+  --stud-shadow: rgba(0,0,0,.40);
+}
+h1, h2, h3, .feed-title, .verdict-word, .v-doc, .v-badge, .who-name, .who-title {
+  font-family: "Nunito", "Arial Rounded MT Bold", system-ui, sans-serif;
+}
+.card, #feed, .read, #result, .pickPanel, .bottombar, #noteCard,
+#hint, #tallyChip, #carryChip, #demoLink, #keys, #focusChip, .bubble {
+  background-color: var(--plate);
+  border: 2px solid var(--plate-edge);
+  border-radius: 14px;
+  box-shadow: 0 12px 40px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.12);
+  color: #fff;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+.read, .pickPanel, .bottombar, #noteCard,
+#hint, #tallyChip, #carryChip, #demoLink, #keys, #focusChip {
+  background-image:
+    radial-gradient(circle 5px at 8px 5px, var(--stud-hi) 0 1px, var(--stud-mid) 1.5px 3px, var(--stud-base) 4px 4.7px, var(--stud-shadow) 5px, transparent 5.3px),
+    radial-gradient(circle 5px at 8px 5px, var(--stud-hi) 0 1px, var(--stud-mid) 1.5px 3px, var(--stud-base) 4px 4.7px, var(--stud-shadow) 5px, transparent 5.3px);
+  background-size: 16px 10px, 16px 10px;
+  background-position: center top 6px, center bottom 6px;
+  background-repeat: repeat-x, repeat-x;
+}
+#feed, #result {
+  background-image:
+    radial-gradient(circle 5px at 8px 5px, var(--stud-hi) 0 1px, var(--stud-mid) 1.5px 3px, var(--stud-base) 4px 4.7px, var(--stud-shadow) 5px, transparent 5.3px),
+    radial-gradient(circle 5px at 8px 5px, var(--stud-hi) 0 1px, var(--stud-mid) 1.5px 3px, var(--stud-base) 4px 4.7px, var(--stud-shadow) 5px, transparent 5.3px),
+    radial-gradient(circle 5px at 5px 8px, var(--stud-hi) 0 1px, var(--stud-mid) 1.5px 3px, var(--stud-base) 4px 4.7px, var(--stud-shadow) 5px, transparent 5.3px),
+    radial-gradient(circle 5px at 5px 8px, var(--stud-hi) 0 1px, var(--stud-mid) 1.5px 3px, var(--stud-base) 4px 4.7px, var(--stud-shadow) 5px, transparent 5.3px);
+  background-size: 16px 10px, 16px 10px, 10px 16px, 10px 16px;
+  background-position: center top 6px, center bottom 6px, left 6px center, right 6px center;
+  background-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
+}
+#feed { padding: 26px 22px 24px; }
+#result { padding: 30px 28px 28px; }
+.read { padding-top: 24px; padding-bottom: 22px; }
+.pickPanel { padding-top: 26px; padding-bottom: 24px; }
+.bottombar { padding-top: 24px; padding-bottom: 24px; }
+#noteCard { padding: 22px 12px 20px; }
+#hint { padding: 22px 18px 20px; }
+#tallyChip { padding: 20px 13px 18px; }
+#carryChip { padding: 22px 16px 20px; }
+#demoLink { padding: 20px 14px 18px; }
+#keys { padding: 20px 10px 18px; }
+#focusChip { padding: 20px 16px 18px; }
+.feed-row:not(.feed-divider), .v-tile, .v-draft, .feed-tabs {
+  background-color: var(--tile);
+  background-image: none;
+  border: 1px solid var(--tile-edge);
+  border-radius: 10px;
+}
+.v-tile, .v-tile.behind, .v-tile.without, .v-tile.bad { box-shadow: none; }
+.feed-row.gate-post, .read.gate-post { border: 4px solid var(--dpost); }
+.feed-row.gate-block, .read.gate-block { border: 4px solid var(--dblock); }
+.feed-row.gate-human, .read.gate-human { border: 4px solid var(--dhuman); }
+.read.gate-post, .read.gate-block, .read.gate-human {
+  box-shadow: 0 10px 30px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.12);
+}
+.v-tile.behind.post { border: 4px solid var(--dpost); }
+.v-tile.behind.block { border: 4px solid var(--dblock); }
+.v-tile.behind.human { border: 4px solid var(--dhuman); }
+.v-tile.without { border: 4px solid var(--light-frame); }
+.v-tile.without.bad, .v-tile.bad { border: 4px solid var(--dblock); }
+.feed-row.feed-summary.red { border: 4px solid var(--dblock); }
+.feed-row.feed-summary.green { border: 4px solid var(--dpost); }
+.feed-row.feed-summary.grey { border: 4px solid #9ca3af; }
+.feed-tabs button { color: rgba(255,255,255,.78); }
+.feed-tabs button[aria-selected="true"] { background: #6b7280; color: #fff; }
+.v-draft .letter {
+  background-color: var(--plate);
+  border: 1px solid var(--plate-edge);
+  border-radius: 10px;
+}
+#startBtn, .btnrow .primary, #cases button[aria-pressed="true"] {
+  background: linear-gradient(180deg, #ff9a4d 0 50%, #f97316 50% 100%);
+  border: 2px solid #9a3412;
+  border-radius: 10px;
+  box-shadow: 0 2px 0 #7c2d12, inset 0 1px 0 rgba(255,255,255,.45), 0 6px 24px rgba(249,106,14,.45);
+  color: #1c1917;
+  text-shadow: none;
+}
+#startBtn:active, .btnrow .primary:active, #cases button[aria-pressed="true"]:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 0 #7c2d12, inset 0 1px 0 rgba(255,255,255,.45);
+}
+#cases button:not([aria-pressed="true"]),
+.btnrow button:not(.primary), .btnrow a,
+#intro .back, #feedToggle, #fctl button:not(.fdot), .fraw-copy, .fnew {
+  background-color: var(--tile);
+  background-image: none;
+  border: 1px solid var(--tile-edge);
+  border-radius: 10px;
+  box-shadow: 0 2px 0 var(--plate-edge), inset 0 1px 0 rgba(255,255,255,.12);
+  color: #fff;
+}
+#cases button:not([aria-pressed="true"]):active,
+.btnrow button:not(.primary):active, .btnrow a:active,
+#intro .back:active, #feedToggle:active,
+#fctl button:not(.fdot):not(:disabled):active, .fraw-copy:active, .fnew:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 0 var(--plate-edge), inset 0 1px 0 rgba(255,255,255,.12);
+}
+#cases button:not([aria-pressed="true"]):hover,
+.btnrow button:not(.primary):hover, .btnrow a:hover,
+#intro .back:hover, #feedToggle:hover,
+#fctl button:not(.fdot):not(:disabled):hover,
+.fraw-copy:hover, .fnew:hover, button.v-tile.without:hover {
+  background-color: #5b6270;
+}
+.v-badge { position: relative; border-radius: 6px; border: 2px solid; padding: 12px 10px 6px; }
+.v-badge.post { background: var(--dpost); border-color: #15803d; color: #0b1226; }
+.v-badge.block { background: var(--dblock); border-color: #991b1b; color: #0b1226; }
+.v-badge.human { background: var(--dhuman); border-color: #92400e; color: #0b1226; }
+.v-badge::before {
+  content: ""; position: absolute; top: 3px; left: 50%; transform: translateX(-50%);
+  width: 28px; height: 6px; pointer-events: none;
+  background-size: 14px 6px, 14px 6px;
+  background-position: 0 0, 14px 0;
+  background-repeat: no-repeat, no-repeat;
+}
+.v-badge.post::before {
+  background-image:
+    radial-gradient(circle 3px at 7px 3px, rgba(255,255,255,.8) 0 1px, #4ade80 1.5px 2.2px, #15803d 2.8px 3px, transparent 3.2px),
+    radial-gradient(circle 3px at 7px 3px, rgba(255,255,255,.8) 0 1px, #4ade80 1.5px 2.2px, #15803d 2.8px 3px, transparent 3.2px);
+}
+.v-badge.block::before {
+  background-image:
+    radial-gradient(circle 3px at 7px 3px, rgba(255,255,255,.8) 0 1px, #f87171 1.5px 2.2px, #991b1b 2.8px 3px, transparent 3.2px),
+    radial-gradient(circle 3px at 7px 3px, rgba(255,255,255,.8) 0 1px, #f87171 1.5px 2.2px, #991b1b 2.8px 3px, transparent 3.2px);
+}
+.v-badge.human::before {
+  background-image:
+    radial-gradient(circle 3px at 7px 3px, rgba(255,255,255,.8) 0 1px, #fbbf24 1.5px 2.2px, #92400e 2.8px 3px, transparent 3.2px),
+    radial-gradient(circle 3px at 7px 3px, rgba(255,255,255,.8) 0 1px, #fbbf24 1.5px 2.2px, #92400e 2.8px 3px, transparent 3.2px);
+}
+.ftick { color: #cbd5e1; }
+.ftick.seen {
+  display: inline-block;
+  background: var(--dpost);
+  color: #0b1226 !important;
+  border: 1px solid #15803d;
+  border-radius: 999px;
+  padding: 1px 6px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.4), 0 1px 2px rgba(0,0,0,.3);
+  font-weight: 800;
+}
+.bubble { border-left: 3px solid #fff; background-image: none; }
+.bubble::after {
+  background: var(--plate);
+  border-right: 2px solid var(--plate-edge);
+  border-bottom: 2px solid var(--plate-edge);
+}
+.read .flag, .read.gate-block .verdict-word, .feed-msg .verdict-word.block,
+.feed-reply.red, .feed-summary.red .sum-text, #result.block h2 {
+  color: #fca5a5;
+}
+.fraw-src, .fraw-note { color: rgba(255,255,255,.78); }
+.feed-step, .feed-names .arrow { color: #e2e8f0; }
+.read .who-name, .read .who-name span,
+.feed-names span:not(.arrow):not(.thinks-label) {
+  color: #fff !important;
+}
+@media (max-width: 640px) {
+  #feed, #result, .read, .pickPanel, .bottombar, #noteCard,
+  #hint, #tallyChip, #carryChip, #demoLink, #keys, #focusChip {
+    background-image:
+      radial-gradient(circle 4px at 6.5px 4px, var(--stud-hi) 0 1px, var(--stud-mid) 1px 2.5px, var(--stud-base) 3px 3.7px, var(--stud-shadow) 4px, transparent 4.3px);
+    background-size: 13px 8px;
+    background-position: center top 5px;
+    background-repeat: repeat-x;
+  }
+  #feed { padding: 20px 12px 10px; }
+  #result { padding: 22px 20px 18px; border-radius: 14px 14px 0 0; }
+  .read { padding: 20px 14px 12px; }
+  #reads .read:not(:nth-last-child(-n+2)) { padding: 18px 12px 8px; }
+  .pickPanel { padding: 20px 16px 16px; }
+  .bottombar { padding-top: 20px; padding-bottom: 14px; }
+  #noteCard { padding: 18px 8px 8px; }
+  #hint { padding: 18px 18px 9px; }
+  #tallyChip { padding: 18px 13px 5px; }
+  #carryChip { padding: 18px 16px 8px; }
+  #demoLink { padding: 18px 14px 6px; }
+  #keys { padding: 18px 10px 5px; }
+  #focusChip { padding: 18px 16px 8px; }
 }
 </style>
 </head>
