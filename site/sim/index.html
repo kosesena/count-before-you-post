@@ -507,6 +507,66 @@ body.done #demoLink, body.done #tallyChip { display: none !important; }
   .feed-reply, .feed-reply.fflash { animation: none; }
   .freplay i { animation: none; }
 }
+/* ---------- feed focus / raw / playback ---------- */
+.feed-row:not(.feed-divider):not(.feed-summary) { cursor: pointer; }
+.feed-row[role="button"]:focus-visible { outline: 2px solid #7dd3fc; outline-offset: 2px; }
+.feed-list.paused .ftyping-dots i { animation-play-state: paused; }
+.feed-list.paused .fcaret { animation-play-state: paused; }
+.feed-list.paused .feed-reply-typing .ftyping-dots i { animation-play-state: paused; }
+#feed.paused .freplay i { animation-play-state: paused; }
+.fraw { margin-top: 8px; background: rgba(0,0,0,.35); border: 1px solid rgba(255,255,255,.12);
+  border-radius: 10px; padding: 8px 10px; cursor: default; }
+.fraw-label { font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase;
+  color: rgba(255,255,255,.6); display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.ftag { font-size: 11px; font-weight: 800; letter-spacing: 0; text-transform: none;
+  border-radius: 99px; padding: 1px 8px; border: 1px solid; }
+.ftag-refused { background: rgba(248,113,113,.15); border-color: rgba(248,113,113,.5); color: #fca5a5; }
+.ftag-posted { background: rgba(74,222,128,.15); border-color: rgba(74,222,128,.5); color: #86efac; }
+.fraw-mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px;
+  line-height: 1.5; color: #fff; margin-top: 6px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.fraw-note { font-size: 11.5px; color: rgba(255,255,255,.55); margin-top: 4px; }
+.fraw-src { font-size: 11px; color: rgba(255,255,255,.5); margin-top: 6px; overflow-wrap: anywhere; }
+.fraw-actions { margin-top: 6px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.fraw-copy { font: inherit; font-size: 12px; font-weight: 700; color: #fff; cursor: pointer;
+  background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.22);
+  border-radius: 8px; padding: 4px 10px; min-height: 28px; }
+.fraw-link { font: inherit; font-size: 12.5px; font-weight: 700; color: #7dd3fc; cursor: pointer;
+  background: none; border: 0; padding: 4px 0; text-align: left; }
+#fctl { display: flex; align-items: center; gap: 8px; height: 36px; min-height: 36px;
+  margin-top: 8px; padding: 0 2px; flex: none; }
+#fctl button { font: inherit; color: #fff; cursor: pointer; background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.22); border-radius: 10px; min-width: 36px; min-height: 36px;
+  height: 36px; padding: 0 10px; display: inline-flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 800; }
+#fctl button:focus-visible { outline: 2px solid #7dd3fc; outline-offset: 2px; }
+#fctl button:disabled { opacity: .45; cursor: default; }
+#fspeed { min-width: 52px; }
+#ftimeline { flex: 1 1 auto; min-width: 0; height: 36px; display: flex; align-items: center; }
+.ftrack { position: relative; flex: 1 1 auto; height: 4px; border-radius: 99px;
+  background: rgba(255,255,255,.16); min-width: 0; }
+.ffill { position: absolute; left: 0; top: 0; bottom: 0; width: 0%; border-radius: 99px;
+  background: #38bdf8; }
+.fdots { position: absolute; inset: -8px 0; display: flex; align-items: center; }
+.fdot { flex: 1 1 0; min-width: 0; background: none !important; border: 0 !important; padding: 0 !important;
+  height: 36px !important; min-height: 36px !important; border-radius: 6px !important; cursor: pointer; }
+.fdot i { display: block; width: 8px; height: 8px; border-radius: 50%; margin: 0 auto;
+  background: rgba(255,255,255,.35); border: 1px solid rgba(255,255,255,.4); }
+.fdot.landed i { background: #38bdf8; border-color: #38bdf8; }
+.fdot:focus-visible { outline: 2px solid #7dd3fc; outline-offset: -2px; }
+#focusChip { position: fixed; z-index: 26; top: 10px; left: 50%; transform: translateX(-50%);
+  font: inherit; font-size: 12.5px; font-weight: 700; color: #fff; cursor: pointer;
+  background: rgba(11,18,38,.82); border: 1px solid rgba(255,255,255,.22); border-radius: 99px;
+  padding: 8px 16px; min-height: 36px; max-width: calc(100vw - 20px);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  box-shadow: 0 8px 24px rgba(0,0,0,.4); }
+#focusChip[hidden] { display: none; }
+@media (max-width: 640px) {
+  #feed .feed-head-top { order: 0; }
+  #feed .feed-team { order: 1; }
+  #feed .feed-status { order: 2; }
+  #fctl { order: 3; }
+  #feed .feed-list { order: 4; }
+}
 /* ---------- result ---------- */
 #resultWrap {
   position: fixed; inset: 0; z-index: 40; display: none;
@@ -705,8 +765,15 @@ button.v-tile:focus-visible { outline: 2px solid #7dd3fc; outline-offset: 2px; }
   <div class="feed-status" aria-live="polite"></div>
   <div class="feed-list" data-thread="with"></div>
   <div class="feed-list feed-list-nogate" data-thread="nogate" hidden></div>
+  <div id="fctl" role="group" aria-label="Replay controls">
+    <button id="fplay" type="button" aria-label="Pause">⏸</button>
+    <button id="fspeed" type="button" aria-label="Playback speed">1×</button>
+    <button id="fnext" type="button" aria-label="Next row">Next</button>
+    <div id="ftimeline" role="group" aria-label="Timeline"><div class="ftrack"><div class="ffill"></div><div class="fdots"></div></div></div>
+  </div>
   <button class="fnew" type="button" hidden></button>
 </div>
+<button id="focusChip" type="button" hidden></button>
 
 <div id="resultWrap">
   <div id="result" class="card" role="dialog" aria-label="Result"></div>
@@ -1692,16 +1759,17 @@ function maybeMeetingReturn() {
   const m = G._meet;
   if (!m || m.returning || m._retSched || !m.arrived) return;
   const nF = (G._feedFollowupRows && G._feedFollowupRows.length) || 0;
+  const sp = G._feedSpeed || 1;
   if (nF > 0) {
     if (!G._feedWithDone) return;
     m._retSched = true;
     if (reducedMotion) meetingReturn();
-    else later(meetingReturn, 2500);
+    else later(meetingReturn, Math.round(2500 / sp));
   } else {
     if (reducedMotion && !G._feedWithDone) return;
     m._retSched = true;
     if (reducedMotion) meetingReturn();
-    else later(meetingReturn, 8500);
+    else later(meetingReturn, Math.round(8500 / sp));
   }
 }
 function meetingReturn() {
@@ -3299,6 +3367,19 @@ function stepCamera(dt) {
     if (py < -10.2) py = -10.2;
     pz = Math.max(pz, 1.1);
   }
+  if ((G.phase === "deciding" || G.phase === "done") && G._focus) {
+    try {
+      if (focusStep(dt, { px, py, pz, lx, ly, lz })) {
+        camera.position.copy(camPos);
+        camera.lookAt(camLook);
+        const seatViewF = false;
+        if (camera.fov !== 50) { camera.fov = 50; camera.updateProjectionMatrix(); }
+        if (cabGroup) cabGroup.visible = false;
+        document.body.classList.toggle("seat", false);
+        return;
+      }
+    } catch {}
+  }
   _v1.set(px, pz, -py); _v2.set(lx, lz, -ly);
   camPos.lerp(_v1, k); camLook.lerp(_v2, k);
   camera.position.copy(camPos);
@@ -3312,6 +3393,13 @@ function stepCamera(dt) {
 
 // ---------- the gate decides ----------
 const later = (fn, ms) => { const id = setTimeout(fn, ms); G._seqs.push(id); return id; };
+// Feed replay scheduler (pausable, speed-scaled) + row focus. Feed timing uses
+// virtual clocks advanced in tick(); later() stays for everything else.
+G._feedSpeed = 1;
+G._feedPlayers = { with: null, nogate: null };
+G._focus = null;
+G._focusHiId = null;
+G._focusHiT = 0;
 function hexGlow(col) {
   try {
     if (/^#[0-9a-fA-F]{6}$/.test(col)) {
@@ -4007,6 +4095,7 @@ function feedSetTab(tab) {
   if (tab === "nogate" && !G._feedNoGateStarted && !G._feedNoGateDone && !reducedMotion) {
     try { scheduleNoGateThread(); } catch (e) { if (DEBUG) console.warn("feednogate:", e); }
   }
+  try { feedUpdateControls(); } catch {}
 }
 function feedEdgeFlash(colour) {
   try {
@@ -4057,6 +4146,30 @@ function feedClear() {
   G._feedNoGateStarted = false;
   G._feedWithSlot = 0;
   G._feedUnread = 0;
+  G._feedSpeed = 1;
+  G._feedPlayers = { with: null, nogate: null };
+  try { clearFocusNow(); } catch {}
+  try { G._focusHiId = null; clearTimeout(G._focusHiT); } catch {}
+  try {
+    const wl = feedListFor("with");
+    if (wl) wl.classList.remove("paused");
+    const nl = feedListFor("nogate");
+    if (nl) nl.classList.remove("paused");
+    const f = document.getElementById("feed");
+    if (f) f.classList.remove("paused");
+  } catch {}
+  try {
+    const box = document.querySelector("#fctl .fdots");
+    if (box) box.innerHTML = "";
+    const fill = document.querySelector("#fctl .ffill");
+    if (fill) fill.style.width = "0%";
+    const play = document.getElementById("fplay");
+    if (play) { play.textContent = "⏸"; play.setAttribute("aria-label", "Pause"); play.disabled = true; }
+    const nxt = document.getElementById("fnext");
+    if (nxt) nxt.disabled = true;
+    const spd = document.getElementById("fspeed");
+    if (spd) spd.textContent = "1×";
+  } catch {}
   feedClearBubbles();
   feedClearBeams();
 }
@@ -4174,6 +4287,8 @@ function feedTypingEl(row, num) {
   const d = document.createElement("div");
   d.className = "feed-row typing";
   d.dataset.num = num;
+  d.setAttribute("role", "button");
+  d.setAttribute("tabindex", "0");
   const fromCol = feedColour(row.from);
   const fromName = esc(feedName(row.from));
   const label = row.isThinking ? "is thinking" : "is typing";
@@ -4275,6 +4390,8 @@ function feedRowEl(row, num) {
   d.className = "feed-row";
   if (row.isGate && row.gateAction) d.classList.add("gate-" + row.gateAction);
   d.dataset.num = num;
+  d.setAttribute("role", "button");
+  d.setAttribute("tabindex", "0");
   const fromCol = feedColour(row.from);
   const fromName = esc(feedName(row.from));
   let namesHTML = "";
@@ -4423,7 +4540,7 @@ function feedShowBubbleTyping(charId) {
     el.style.color = feedColour(charId);
     el.dataset.char = charId;
     labelWrap.appendChild(el);
-    _feedBubbles[charId] = { el, timeout: 0, fadeTimeout: 0 };
+    _feedBubbles[charId] = { el, typing: true, timeout: 0, fadeTimeout: 0 };
   } catch {}
 }
 function feedShowBubble(charId, text) {
@@ -4449,28 +4566,28 @@ function feedShowBubble(charId, text) {
     el.style.borderLeftColor = feedColour(charId);
     el.dataset.char = charId;
     labelWrap.appendChild(el);
-    const rec2 = { el, timeout: 0, fadeTimeout: 0 };
-    rec2.timeout = later(() => {
-      try { el.classList.add("fade"); } catch {}
-      rec2.fadeTimeout = later(() => {
-        try { if (el.parentNode) el.parentNode.removeChild(el); } catch {}
-        try { if (_feedBubbles[charId] && _feedBubbles[charId].el === el) delete _feedBubbles[charId]; } catch {}
-      }, 350);
-    }, 1600);
-    _feedBubbles[charId] = rec2;
+    let nowMs = (G.time || 0) * 1000;
+    try {
+      const pw = G._feedPlayers && G._feedPlayers.with;
+      if (pw) nowMs = pw.t || 0;
+    } catch {}
+    _feedBubbles[charId] = { el, t0: nowMs, fadeAt: nowMs + 1600, removeAt: nowMs + 1950,
+      fading: false, timeout: 0, fadeTimeout: 0 };
   } catch {}
 }
 function feedFadeAllBubbles() {
   try {
+    let nowMs = (G.time || 0) * 1000;
+    try {
+      const pw = G._feedPlayers && G._feedPlayers.with;
+      if (pw) nowMs = pw.t || 0;
+    } catch {}
     for (const k of Object.keys(_feedBubbles)) {
       const b = _feedBubbles[k];
-      try { clearTimeout(b.timeout); } catch {}
+      try { clearTimeout(b.timeout); clearTimeout(b.fadeTimeout); } catch {}
       try { b.el.classList.add("fade"); } catch {}
-      const el = b.el, key = k;
-      b.fadeTimeout = later(() => {
-        try { if (el.parentNode) el.parentNode.removeChild(el); } catch {}
-        try { if (_feedBubbles[key] && _feedBubbles[key].el === el) delete _feedBubbles[key]; } catch {}
-      }, 350);
+      b.fading = true;
+      b.removeAt = nowMs + 350;
     }
   } catch {}
 }
@@ -4509,7 +4626,12 @@ function feedShowBeam(row) {
     sprite.position.copy(a);
     sprite.renderOrder = 6;
     scene.add(sprite);
-    _feedBeams.push({ line, sprite, t0: G.time, a: a.clone(), b: b.clone() });
+    let t0ms = (G.time || 0) * 1000;
+    try {
+      const pw = G._feedPlayers && G._feedPlayers.with;
+      if (pw) t0ms = pw.t || 0;
+    } catch {}
+    _feedBeams.push({ line, sprite, t0: G.time, t0ms, a: a.clone(), b: b.clone() });
   } catch (e) { if (DEBUG) console.warn("beam:", e); }
 }
 function updateFeedBubbles() {
@@ -4536,17 +4658,26 @@ const _beamV = new THREE.Vector3();
 function updateFeedBeams() {
   if (!_feedBeams.length) return;
   try {
+    let nowMs = (G.time || 0) * 1000;
+    try {
+      const pw = G._feedPlayers && G._feedPlayers.with;
+      if (pw) nowMs = pw.t || 0;
+    } catch {}
     const keep = [];
     for (const b of _feedBeams) {
-      const t = G.time - b.t0;
-      if (t >= 0.9) {
-        try { scene.remove(b.line); scene.remove(b.sprite); } catch {}
-        try { b.line.geometry.dispose(); b.line.material.dispose(); b.sprite.material.dispose(); } catch {}
-        continue;
+      const t0 = (b.t0ms != null) ? b.t0ms : (b.t0 || 0) * 1000;
+      const t = (nowMs - t0) / 1000;
+      if (t < 0 || t >= 0.9) {
+        if (t >= 0.9 || t < -5) {
+          try { scene.remove(b.line); scene.remove(b.sprite); } catch {}
+          try { b.line.geometry.dispose(); b.line.material.dispose(); b.sprite.material.dispose(); } catch {}
+          continue;
+        }
       }
       try {
-        b.line.material.opacity = Math.sin(Math.PI * Math.min(1, t / 0.9)) * 0.9;
-        const u = Math.min(1, t / 0.6);
+        const tc = Math.max(0, t);
+        b.line.material.opacity = Math.sin(Math.PI * Math.min(1, tc / 0.9)) * 0.9;
+        const u = Math.min(1, tc / 0.6);
         _beamV.lerpVectors(b.a, b.b, u);
         b.sprite.position.copy(_beamV);
         const s = 0.35 * (1 - 0.3 * u);
@@ -4664,47 +4795,1276 @@ function feedWireTabsOnce() {
     }
   } catch {}
 }
+// ---------- row tap: raw record + focus ----------
+function feedWireRow(rowEl, row, thread) {
+  try {
+    if (!rowEl || rowEl._feedWired) {
+      try { if (rowEl) { rowEl._feedRow = row; rowEl._feedThread = thread; } } catch {}
+      return;
+    }
+    rowEl._feedWired = true;
+    rowEl._feedRow = row;
+    rowEl._feedThread = thread;
+    rowEl.addEventListener("click", ev => {
+      try {
+        if (ev.target && ev.target.closest) {
+          if (ev.target.closest(".fraw")) return;
+          if (ev.target.closest("button") || ev.target.closest("a")) return;
+        }
+        const r = rowEl._feedRow, th = rowEl._feedThread;
+        if (r) feedRowTap(rowEl, r, th || "with");
+      } catch {}
+    });
+    rowEl.addEventListener("keydown", ev => {
+      try {
+        if (ev.key === "Enter" || ev.key === " ") {
+          ev.preventDefault();
+          const r = rowEl._feedRow, th = rowEl._feedThread;
+          if (r) feedRowTap(rowEl, r, th || "with");
+        }
+      } catch {}
+    });
+  } catch {}
+}
+function feedRowTap(rowEl, row, thread) {
+  try {
+    if (!rowEl || rowEl.classList.contains("typing")) return;
+    if (rowEl.classList.contains("feed-divider") || rowEl.classList.contains("feed-summary")) return;
+    try { feedToggleRaw(rowEl, row, thread); } catch (e) { if (DEBUG) console.warn("raw:", e); }
+    try {
+      if (G.phase === "driving" || G.phase === "intro") return;
+      const from = row.from;
+      if (!from || from === "erp") return;
+      const rec = CHAR[from];
+      if (!rec || !rec.loaded || !rec.group) return;
+      startFocus(from);
+    } catch (e) { if (DEBUG) console.warn("focus:", e); }
+  } catch {}
+}
+function feedCloseAllRaw(exceptEl) {
+  try {
+    document.querySelectorAll("#feed .fraw").forEach(el => {
+      try {
+        const row = el.closest ? el.closest(".feed-row") : null;
+        if (row && row === exceptEl) return;
+        if (el.parentNode) el.parentNode.removeChild(el);
+      } catch {}
+    });
+  } catch {}
+}
+function feedRawForRow(row, thread) {
+  // Returns { first, second, tags, note, source, isDraft } or null.
+  try {
+    if (row.isGate) {
+      let json = "";
+      try {
+        const g = G.cs && G.cs.gate;
+        json = JSON.stringify({ action: g.action, rule: g.rule, reason: g.reason, quantity: g.quantity });
+      } catch { json = "{}"; }
+      return { first: "decide()", second: "→ " + json, tags: [], note: null,
+        source: "cbyp/gate.py", isDraft: false };
+    }
+    if (row.isDraft) {
+      let json = "";
+      try {
+        const d = Object.assign({}, G.cs && G.cs.draft);
+        delete d.body;
+        json = JSON.stringify(d);
+      } catch { json = "{}"; }
+      return { first: json, second: null, tags: [], note: null,
+        source: "experiments/results/en/wonder_drafts.json", isDraft: true };
+    }
+    if (row.isSefDecision) {
+      let json = "";
+      try { json = JSON.stringify(G.cs.signoff.decision); } catch { json = "{}"; }
+      return { first: "signoff", second: "→ " + json, tags: [], note: null,
+        source: "experiments/results/signoff.json (Turkish note)", isDraft: false };
+    }
+    let step = null, source = "";
+    if (row.isFollowup) {
+      source = "experiments/results/signoff.json (Turkish note)";
+      try { step = (G.cs.signoff.steps || [])[row.fIdx]; } catch {}
+    } else if (thread === "nogate") {
+      source = "experiments/results/en/agent_warehouse_cross.json, via site/data-en.json";
+      try { step = (G.cs.without_gate.steps || [])[row.stepIdx]; } catch {}
+    } else {
+      source = "experiments/results/en/agent_warehouse_cross.json, via site/data-en.json";
+      try { step = (G.cs.agent.steps || [])[row.stepIdx]; } catch {}
+    }
+    if (!step || typeof step !== "object") {
+      return { first: String(row.text || ""), second: null, tags: [], note: null, source, isDraft: false };
+    }
+    if (step.kind === "thinking") {
+      let t = "";
+      try { t = JSON.stringify(step.text); } catch { t = '"' + String(step.text || "") + '"'; }
+      return { first: "thinking: " + t, second: null, tags: [], note: null, source, isDraft: false };
+    }
+    if (step.kind === "cross") {
+      let j = "";
+      try { j = JSON.stringify(step.data); } catch { j = "{}"; }
+      return { first: "gate_cross_check", second: j, tags: [], note: null, source, isDraft: false };
+    }
+    if (step.kind === "tool") {
+      const first = String(step.tool || "") + "(" + String(step.args ?? "") + ")";
+      const second = "→ " + String(step.result ?? "");
+      const tags = [];
+      try { if (step.refused) tags.push({ text: "refused by the gate", kind: "refused" }); } catch {}
+      try { if (step.posted) tags.push({ text: "posted", kind: "posted" }); } catch {}
+      let note = null;
+      try { if (String(step.result || "").endsWith("…")) note = "cut at 160 characters in the site data"; } catch {}
+      return { first, second, tags, note, source, isDraft: false };
+    }
+    return { first: String(row.text || ""), second: null, tags: [], note: null, source, isDraft: false };
+  } catch { return null; }
+}
+function feedToggleRaw(rowEl, row, thread) {
+  try {
+    const body = rowEl.querySelector(".feed-body");
+    if (!body) return;
+    const open = body.querySelector(":scope > .fraw");
+    if (open) {
+      try { body.removeChild(open); } catch {}
+      return;
+    }
+    feedCloseAllRaw(rowEl);
+    const raw = feedRawForRow(row, thread);
+    if (!raw) return;
+    const wrap = document.createElement("div");
+    wrap.className = "fraw";
+    wrap.addEventListener("click", ev => { try { ev.stopPropagation(); } catch {} });
+    const lab = document.createElement("div");
+    lab.className = "fraw-label";
+    const labT = document.createElement("span");
+    labT.textContent = "Recorded step";
+    lab.appendChild(labT);
+    for (const tg of (raw.tags || [])) {
+      const s = document.createElement("span");
+      s.className = "ftag " + (tg.kind === "refused" ? "ftag-refused" : "ftag-posted");
+      s.textContent = tg.text;
+      lab.appendChild(s);
+    }
+    wrap.appendChild(lab);
+    const mono = document.createElement("div");
+    mono.className = "fraw-mono";
+    mono.textContent = raw.first + (raw.second != null ? "\n" + raw.second : "");
+    wrap.appendChild(mono);
+    if (raw.note) {
+      const n = document.createElement("div");
+      n.className = "fraw-note";
+      n.textContent = raw.note;
+      wrap.appendChild(n);
+    }
+    if (raw.isDraft) {
+      const link = document.createElement("button");
+      link.className = "fraw-link";
+      link.type = "button";
+      link.textContent = "Read the draft";
+      link.addEventListener("click", ev => {
+        try {
+          ev.stopPropagation();
+          const det = document.querySelector("#result .v-draft");
+          if (det) {
+            det.open = true;
+            try { det.scrollIntoView({ block: "nearest" }); } catch {}
+          }
+        } catch {}
+      });
+      wrap.appendChild(link);
+    }
+    const acts = document.createElement("div");
+    acts.className = "fraw-actions";
+    const copy = document.createElement("button");
+    copy.className = "fraw-copy";
+    copy.type = "button";
+    copy.textContent = "Copy";
+    copy.addEventListener("click", ev => {
+      try {
+        ev.stopPropagation();
+        const txt = mono.textContent || "";
+        const done = () => {
+          try {
+            copy.textContent = "Copied";
+            setTimeout(() => { try { copy.textContent = "Copy"; } catch {} }, 1200);
+          } catch {}
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(txt).then(done, () => feedCopyFallback(txt, done));
+        } else feedCopyFallback(txt, done);
+      } catch {}
+    });
+    acts.appendChild(copy);
+    wrap.appendChild(acts);
+    const src = document.createElement("div");
+    src.className = "fraw-src";
+    src.textContent = raw.source;
+    wrap.appendChild(src);
+    body.appendChild(wrap);
+    try { rowEl.scrollIntoView({ block: "nearest" }); } catch {}
+  } catch {}
+}
+function feedCopyFallback(txt, done) {
+  try {
+    const ta = document.createElement("textarea");
+    ta.value = txt;
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand("copy"); } catch {}
+    try { document.body.removeChild(ta); } catch {}
+    if (done) done();
+  } catch {}
+}
+// ---------- row focus: camera + highlight + chip ----------
+function focusViewFor(id) {
+  try {
+    const rec = CHAR[id], p = personById(id);
+    if (!rec || !rec.loaded || !rec.group || !p) return null;
+    const cx = rec.x, cy = rec.y;
+    const h = p.h || 2.4;
+    let headY = 2.0;
+    try { headY = rec.group.position.y + h * 0.92; } catch { headY = h * 0.92; }
+    const portrait = camera.aspect < 0.9;
+    const dist = rec.seated ? 4.0 : (portrait ? 3.4 : 2.6);
+    const sideMag = portrait ? 1.35 : 1.1;
+    let side = 1;
+    try { side = cx < -0.3 ? 1 : cx > 0.3 ? -1 : 1; } catch { side = 1; }
+    const px = cx + side * sideMag;
+    const py = cy + dist;
+    const pz = headY + 0.4;
+    let lx = cx, ly = cy, lz = headY - 0.28;
+    try {
+      if (camera.aspect >= 0.9 && document.body.classList.contains("done")) lx = cx + 0.6;
+    } catch {}
+    return { px, py, pz, lx, ly, lz };
+  } catch { return null; }
+}
+function startFocus(id) {
+  try {
+    if (G.phase === "driving" || G.phase === "intro") return;
+    const rec = CHAR[id];
+    if (!rec || !rec.loaded || !rec.group) return;
+    const v = focusViewFor(id);
+    if (!v) return;
+    const toPos = new THREE.Vector3(v.px, v.pz, -v.py);
+    const toLook = new THREE.Vector3(v.lx, v.lz, -v.ly);
+    G._focus = { id, phase: reducedMotion ? "hold" : "to", tPh: 0,
+      fromPos: camPos.clone(), fromLook: camLook.clone(),
+      toPos, toLook, backPos: null, backLook: null };
+    if (reducedMotion) { camPos.copy(toPos); camLook.copy(toLook); }
+    try { setStepHighlight([id]); } catch {}
+    try {
+      G._focusHiId = id;
+      clearTimeout(G._focusHiT);
+      G._focusHiT = setTimeout(() => {
+        try {
+          if (G._focusHiId !== id) return;
+          const st = ST[id];
+          if (st && st.lit) setStepHighlight([]);
+          else if (!st) {
+            let any = false;
+            for (const k of STATION_IDS) { if (ST[k] && ST[k].lit) { any = true; break; } }
+            if (!any) setStepHighlight([]);
+          }
+        } catch {}
+      }, 3000);
+    } catch {}
+    try {
+      const chip = document.getElementById("focusChip");
+      if (chip) {
+        chip.textContent = "Focused on " + feedName(id) + " · tap to return";
+        chip.hidden = false;
+        updateFocusChipPos();
+      }
+    } catch {}
+  } catch (e) { if (DEBUG) console.warn("focus:", e); }
+}
+function clearFocusNow() {
+  try {
+    G._focus = null;
+    const chip = document.getElementById("focusChip");
+    if (chip) chip.hidden = true;
+  } catch {}
+}
+function focusReturnAtOnce() {
+  try {
+    const f = G._focus;
+    if (!f) return;
+    if (reducedMotion) { clearFocusNow(); return; }
+    f.phase = "back";
+    f.tPh = 0;
+    f.backPos = camPos.clone();
+    f.backLook = camLook.clone();
+    try { const chip = document.getElementById("focusChip"); if (chip) chip.hidden = true; } catch {}
+  } catch {}
+}
+function updateFocusChipPos() {
+  try {
+    const chip = document.getElementById("focusChip");
+    if (!chip || chip.hidden) return;
+    const isPhone = matchMedia("(max-width: 640px)").matches;
+    if (isPhone) {
+      let bottom = 120;
+      try {
+        const f = document.getElementById("feed");
+        if (f) bottom = f.getBoundingClientRect().bottom + 8;
+      } catch {}
+      chip.style.top = Math.round(bottom) + "px";
+      chip.style.left = "50%";
+      chip.style.transform = "translateX(-50%)";
+    } else {
+      let cx = innerWidth / 2;
+      try {
+        const f = document.getElementById("feed");
+        const r = document.getElementById("result");
+        let fr = 340, rl = innerWidth;
+        if (f) fr = f.getBoundingClientRect().right;
+        if (r && document.body.classList.contains("done")) rl = r.getBoundingClientRect().left;
+        cx = (fr + rl) / 2;
+        cx = Math.max(120, Math.min(innerWidth - 120, cx));
+      } catch { cx = innerWidth / 2; }
+      chip.style.top = "10px";
+      chip.style.left = Math.round(cx) + "px";
+      chip.style.transform = "translateX(-50%)";
+    }
+  } catch {}
+}
+function feedKeyFor(thread, idx, mainCount) {
+  try {
+    if (thread === "nogate") return "n" + idx;
+    if (idx < mainCount) return "m" + idx;
+    return "fup" + (idx - mainCount);
+  } catch { return "r" + idx; }
+}
+function feedMeetingReady() {
+  try {
+    const m = G._meet;
+    if (!m) return false;
+    if (m.arrived) return true;
+    const sp = G._feedSpeed || 1;
+    if ((G.time - m.t0) >= 9 / sp) return true;
+    return false;
+  } catch { return false; }
+}
+function feedWithT() {
+  try {
+    const p = G._feedPlayers && G._feedPlayers.with;
+    if (p) return p.t || 0;
+  } catch {}
+  return (G.time || 0) * 1000;
+}
+function feedBubbleTick() {
+  try {
+    const wt = feedWithT();
+    for (const k of Object.keys(_feedBubbles)) {
+      const b = _feedBubbles[k];
+      if (!b || !b.el || !b.el.isConnected) continue;
+      if (b.typing && b.removeAt == null) continue;
+      if (!b.fading && b.fadeAt != null && wt >= b.fadeAt) {
+        b.fading = true;
+        try { b.el.classList.add("fade"); } catch {}
+      }
+      if (b.removeAt != null && wt >= b.removeAt) {
+        try { if (b.el.parentNode) b.el.parentNode.removeChild(b.el); } catch {}
+        try { if (_feedBubbles[k] && _feedBubbles[k].el === b.el) delete _feedBubbles[k]; } catch {}
+      }
+    }
+  } catch {}
+}
+function feedBuildPlayer(thread) {
+  try {
+    if (thread === "with") {
+      const mainRows = G._feedWithRows || [];
+      const followRows = G._feedFollowupRows || [];
+      const R = mainRows.length, F = followRows.length;
+      const slot = G._feedWithSlot || (R > 12 ? 650 : 900);
+      const rows = [...mainRows, ...followRows];
+      const total = rows.length;
+      const hasFollowup = F > 0;
+      let gated = false;
+      try { gated = hasFollowup && meetingIds().length > 0; } catch { gated = false; }
+      const gateTime = hasFollowup ? Math.round(300 + R * slot) : null;
+      const events = [];
+      const pushTypewrites = (row, key, idx, atMsg) => {
+        try {
+          if (reducedMotion) return;
+          if (row.isGate) {
+            if (!row.gateReason) return;
+            const full = "· " + row.gateReason;
+            const tot = Math.min(full.length * 2, 350);
+            const steps = Math.min(full.length, 18) || 1;
+            const chunk = Math.ceil(full.length / steps);
+            const iv = Math.max(8, tot / steps);
+            for (let s = 0; s < steps; s++) {
+              const pos = Math.min(full.length, (s + 1) * chunk);
+              events.push({ time: Math.round(atMsg + iv * (s + 1)), ord: 3, kind: "typewrite",
+                thread, key, idx, row, pos, full });
+            }
+            return;
+          }
+          const full = String(row.text ?? "");
+          if (!full) return;
+          const tot = Math.min(full.length * 2, 350);
+          const steps = Math.min(full.length, 18) || 1;
+          const chunk = Math.ceil(full.length / steps);
+          const iv = Math.max(8, tot / steps);
+          for (let s = 0; s < steps; s++) {
+            const pos = Math.min(full.length, (s + 1) * chunk);
+            events.push({ time: Math.round(atMsg + iv * (s + 1)), ord: 3, kind: "typewrite",
+              thread, key, idx, row, pos, full });
+          }
+        } catch {}
+      };
+      rows.forEach((row, idx) => {
+        const isF = idx >= R;
+        const k = isF ? idx - R : idx;
+        const base = isF ? Math.round(gateTime + k * slot) : Math.round(300 + idx * slot);
+        const key = feedKeyFor("with", idx, R);
+        const atMsg = Math.round(base + slot * 0.35);
+        events.push({ time: base, ord: 1, kind: "typing", thread: "with", key, idx, row });
+        events.push({ time: atMsg, ord: 2, kind: "message", thread: "with", key, idx, row });
+        pushTypewrites(row, key, idx, atMsg);
+        if (row.reply != null) {
+          const atRT = Math.round(base + slot * 0.60);
+          const atR = Math.round(atRT + 200);
+          events.push({ time: atRT, ord: 4, kind: "replyTyping", thread: "with", key, idx, row });
+          events.push({ time: atR, ord: 5, kind: "reply", thread: "with", key, idx, row });
+        }
+      });
+      if (hasFollowup) events.push({ time: gateTime, ord: 0, kind: "divider", thread: "with" });
+      let finishTime = 300;
+      if (total > 0) {
+        const li = total - 1, last = rows[li];
+        const isF = li >= R, k = isF ? li - R : li;
+        const base = isF ? Math.round(gateTime + k * slot) : Math.round(300 + li * slot);
+        const atMsg = Math.round(base + slot * 0.35);
+        if (last.reply != null) finishTime = Math.round(base + slot * 0.60 + 200 + 300);
+        else finishTime = Math.round(atMsg + 400);
+      }
+      events.push({ time: finishTime, ord: 6, kind: "finish", thread: "with" });
+      events.sort((a, b) => (a.time - b.time) || (a.ord - b.ord));
+      const mainCount = ((G.cs && G.cs.agent && G.cs.agent.steps) || []).length;
+      const withFinal = hasFollowup
+        ? `Run replayed · ${mainCount} steps · Şef answered <span class="fcheck">✓</span>`
+        : `Run replayed · ${mainCount} steps <span class="fcheck">✓</span>`;
+      return { thread: "with", rows, mainCount: R, total, slot, t: 0, playing: true,
+        done: false, started: true, evIdx: 0, events, landed: 0, dividerShown: false,
+        gateTime, hasFollowup, gated, finishTime, useBubbles: true, withFinal };
+    }
+    const rows = G._feedNoGateRows || [];
+    const total = rows.length;
+    const slot = G._feedWithSlot || (total > 12 ? 650 : 900);
+    const events = [];
+    rows.forEach((row, idx) => {
+      const base = Math.round(300 + idx * slot);
+      const key = "n" + idx;
+      const atMsg = Math.round(base + slot * 0.35);
+      events.push({ time: base, ord: 1, kind: "typing", thread: "nogate", key, idx, row });
+      events.push({ time: atMsg, ord: 2, kind: "message", thread: "nogate", key, idx, row });
+      try {
+        if (!reducedMotion) {
+          const full = String(row.text ?? "");
+          if (full) {
+            const tot = Math.min(full.length * 2, 350);
+            const steps = Math.min(full.length, 18) || 1;
+            const chunk = Math.ceil(full.length / steps);
+            const iv = Math.max(8, tot / steps);
+            for (let s = 0; s < steps; s++) {
+              const pos = Math.min(full.length, (s + 1) * chunk);
+              events.push({ time: Math.round(atMsg + iv * (s + 1)), ord: 3, kind: "typewrite",
+                thread: "nogate", key, idx, row, pos, full });
+            }
+          }
+        }
+      } catch {}
+      if (row.reply != null) {
+        const atRT = Math.round(base + slot * 0.60);
+        const atR = Math.round(atRT + 200);
+        events.push({ time: atRT, ord: 4, kind: "replyTyping", thread: "nogate", key, idx, row });
+        events.push({ time: atR, ord: 5, kind: "reply", thread: "nogate", key, idx, row });
+      }
+    });
+    let finishTime = 300;
+    if (total > 0) {
+      const last = rows[total - 1];
+      const base = Math.round(300 + (total - 1) * slot);
+      const atMsg = Math.round(base + slot * 0.35);
+      if (last.reply != null) finishTime = Math.round(base + slot * 0.60 + 200 + 300);
+      else finishTime = Math.round(atMsg + 400);
+    }
+    events.push({ time: finishTime, ord: 6, kind: "finish", thread: "nogate" });
+    events.sort((a, b) => (a.time - b.time) || (a.ord - b.ord));
+    return { thread: "nogate", rows, mainCount: total, total, slot, t: 0, playing: false,
+      done: false, started: false, evIdx: 0, events, landed: 0, dividerShown: false,
+      gateTime: null, hasFollowup: false, gated: false, finishTime, useBubbles: false,
+      summary: G._feedNoGateSummary || null };
+  } catch { return null; }
+}
+function feedTypewriteSetup(rowEl, row) {
+  try {
+    if (reducedMotion) return;
+    const msgEl = rowEl.querySelector(".feed-msg");
+    if (!msgEl) return;
+    if (row.isGate) {
+      if (!row.gateReason) return;
+      const spans = msgEl.querySelectorAll("span");
+      const rs = spans.length > 1 ? spans[spans.length - 1] : null;
+      if (!rs) return;
+      rs.textContent = "";
+      const caret = document.createElement("span");
+      caret.className = "fcaret";
+      rs.appendChild(caret);
+      return;
+    }
+    const full = String(row.text ?? "");
+    if (!full) return;
+    msgEl.textContent = "";
+    const caret = document.createElement("span");
+    caret.className = "fcaret";
+    msgEl.appendChild(caret);
+  } catch {}
+}
+function feedExecTyping(player, ev) {
+  try {
+    const thread = ev.thread, row = ev.row, key = ev.key;
+    const l = feedListFor(thread);
+    if (!l) return;
+    if (player.useBubbles && key !== "m0") feedFadeAllBubbles();
+    const el = feedTypingEl(row, 0);
+    el.dataset.row = key;
+    el.dataset.idx = ev.idx;
+    l.appendChild(el);
+    try { feedWireRow(el, row, thread); } catch {}
+    feedOnNewRowThread(thread);
+    feedSetSpeakingThread(thread, row.from);
+    if (row.isGate) feedStatusTextThread(thread, `${feedName(row.from)} is deciding…`);
+    else if (row.isDraft) feedStatusTextThread(thread, `${feedName(row.from)} is drafting…`);
+    else if (row.isThinking) feedStatusTextThread(thread, `${feedName(row.from)} is thinking…`);
+    else feedStatusTextThread(thread, `${feedName(row.from)} is typing…`);
+    if (player.useBubbles) feedShowBubbleTyping(row.from);
+    if ((G._feedTab || "with") === thread) feedEdgeFlash(feedColour(row.from));
+  } catch (e) { if (DEBUG) console.warn("feedtyping:", e); }
+}
+function feedExecMessage(player, ev) {
+  try {
+    const thread = ev.thread, row = ev.row, key = ev.key;
+    const l = feedListFor(thread);
+    if (!l) return;
+    const typingEl = l.querySelector(`[data-row="${key}"]`);
+    if (!typingEl) return;
+    if (!typingEl.classList.contains("typing")) return;
+    const msgEl = feedRowEl(row, 0);
+    msgEl.dataset.row = key;
+    msgEl.dataset.idx = ev.idx;
+    typingEl.className = msgEl.className;
+    typingEl.dataset.row = key;
+    typingEl.dataset.idx = ev.idx;
+    typingEl.innerHTML = msgEl.innerHTML;
+    try {
+      if (row.isAsk) {
+        const btn = typingEl.querySelector(".feed-more");
+        const m = typingEl.querySelector(".feed-msg");
+        if (btn && m) btn.addEventListener("click", e2 => {
+          e2.stopPropagation();
+          try {
+            const clamped = m.classList.toggle("clamp3");
+            btn.textContent = clamped ? "more" : "less";
+          } catch {}
+        });
+      }
+    } catch {}
+    try { feedWireRow(typingEl, row, thread); } catch {}
+    feedMaybeScrollThread(thread);
+    feedSetSpeakingThread(thread, row.from);
+    if (player.useBubbles) {
+      feedShowBubble(row.from, row.text);
+      feedShowBeam(row);
+    }
+    if (row.isFollowup) { try { setMeetingSpeak(row.from, row.to); } catch {} }
+    feedTypewriteSetup(typingEl, row);
+    try {
+      player.landed = Math.max(player.landed || 0, ev.idx + 1);
+      feedUpdateTimeline(thread);
+    } catch {}
+  } catch (e) { if (DEBUG) console.warn("feedmsg:", e); }
+}
+function feedExecTypewrite(player, ev) {
+  try {
+    if (reducedMotion) return;
+    const l = feedListFor(ev.thread);
+    if (!l) return;
+    const el = l.querySelector(`[data-row="${ev.key}"]`);
+    if (!el || !el.isConnected || el.classList.contains("typing")) return;
+    if (el.querySelector(":scope > .feed-body > .fraw") || el.querySelector(".fraw")) {
+      // Typing under an open raw record still completes; no special handling.
+    }
+    if (ev.row && ev.row.isGate) {
+      const msgEl = el.querySelector(".feed-msg");
+      if (!msgEl) return;
+      const spans = msgEl.querySelectorAll("span");
+      const rs = spans.length > 1 ? spans[spans.length - 1] : null;
+      if (!rs) return;
+      const full = ev.full || "";
+      rs.textContent = full.slice(0, ev.pos);
+      if (ev.pos < full.length) {
+        const caret = document.createElement("span");
+        caret.className = "fcaret";
+        rs.appendChild(caret);
+      }
+      return;
+    }
+    const msgEl = el.querySelector(".feed-msg");
+    if (!msgEl) return;
+    const full = ev.full || "";
+    msgEl.textContent = full.slice(0, ev.pos);
+    if (ev.pos < full.length) {
+      const caret = document.createElement("span");
+      caret.className = "fcaret";
+      msgEl.appendChild(caret);
+    }
+  } catch {}
+}
+function feedExecReplyTyping(player, ev) {
+  try {
+    const l = feedListFor(ev.thread);
+    if (!l) return;
+    const el = l.querySelector(`[data-row="${ev.key}"]`);
+    if (!el || el.classList.contains("typing")) return;
+    feedShowReplyTyping(ev.row, el);
+    feedMaybeScrollThread(ev.thread);
+    if (ev.row.replyFromRecipient && ev.row.to) {
+      feedStatusTextThread(ev.thread, `${feedName(ev.row.to)} is replying…`);
+      feedSetSpeakingThread(ev.thread, ev.row.to);
+      if (player.useBubbles) feedShowBubbleTyping(ev.row.to);
+    }
+  } catch (e) { if (DEBUG) console.warn("feedreplytyping:", e); }
+}
+function feedExecReply(player, ev) {
+  try {
+    const l = feedListFor(ev.thread);
+    if (!l) return;
+    const el = l.querySelector(`[data-row="${ev.key}"]`);
+    if (!el) return;
+    feedHideReplyTyping(el);
+    feedShowReply(ev.row, el);
+    feedMaybeScrollThread(ev.thread);
+    if (ev.row.replyFromRecipient && ev.row.to) {
+      feedSetSpeakingThread(ev.thread, ev.row.to);
+      if (player.useBubbles) feedShowBubble(ev.row.to, ev.row.reply);
+      if (ev.row.isFollowup) { try { setMeetingSpeak(ev.row.to, ev.row.from); } catch {} }
+    }
+  } catch (e) { if (DEBUG) console.warn("feedreply:", e); }
+}
+function feedExecDivider(player, ev) {
+  try {
+    const l = feedListFor("with");
+    if (!l || l.querySelector(".feed-divider")) { player.dividerShown = true; return; }
+    const secs = G.cs && G.cs.signoff ? G.cs.signoff.seconds : "";
+    l.appendChild(feedDividerEl(secs));
+    feedOnNewRowThread("with");
+    player.dividerShown = true;
+  } catch (e) { if (DEBUG) console.warn("feeddivider:", e); }
+}
+function feedExecFinish(player, ev) {
+  try {
+    if (player.done) return;
+    player.done = true;
+    player.playing = false;
+    const thread = player.thread;
+    if (thread === "with") {
+      G._feedWithDone = true;
+      feedSetSpeakingThread("with", null);
+      feedStatusSetThread("with", player.withFinal || "");
+      feedHeaderSetThread("with", "done");
+      try { maybeMeetingReturn(); } catch {}
+    } else {
+      G._feedNoGateDone = true;
+      try {
+        const l = feedListFor("nogate");
+        if (l && player.summary && !l.querySelector(".feed-summary")) {
+          l.appendChild(feedSummaryEl(player.summary));
+          feedOnNewRowThread("nogate");
+          player.summaryShown = true;
+        }
+      } catch {}
+      feedSetSpeakingThread("nogate", null);
+      const n = (G.cs && G.cs.without_gate && G.cs.without_gate.steps)
+        ? G.cs.without_gate.steps.length : player.total;
+      feedStatusSetThread("nogate", `Run replayed · ${n} steps <span class="fcheck">✓</span>`);
+      feedHeaderSetThread("nogate", "done");
+    }
+    try {
+      const list = feedListFor(thread);
+      if (list) list.classList.remove("paused");
+    } catch {}
+    try { feedUpdateTimeline(thread); } catch {}
+    try { feedUpdateControls(); } catch {}
+  } catch {}
+}
+function feedExecEvent(player, ev) {
+  try {
+    if (ev.kind === "typing") feedExecTyping(player, ev);
+    else if (ev.kind === "message") feedExecMessage(player, ev);
+    else if (ev.kind === "typewrite") feedExecTypewrite(player, ev);
+    else if (ev.kind === "replyTyping") feedExecReplyTyping(player, ev);
+    else if (ev.kind === "reply") feedExecReply(player, ev);
+    else if (ev.kind === "divider") feedExecDivider(player, ev);
+    else if (ev.kind === "finish") feedExecFinish(player, ev);
+  } catch {}
+}
+function feedSchedulerTick(dt) {
+  try {
+    if (!G._feedPlayers) return;
+    const sp = G._feedSpeed || 1;
+    for (const th of ["with", "nogate"]) {
+      const p = G._feedPlayers[th];
+      if (!p) continue;
+      if (p.playing && !p.done) p.t += dt * 1000 * sp;
+      else if (p.done) p.t += dt * 1000 * sp;
+      else continue;
+      if (!p.playing || p.done) continue;
+      let guard = 0;
+      while (p.evIdx < p.events.length && guard++ < 200) {
+        const ev = p.events[p.evIdx];
+        if (ev.time > p.t) break;
+        if (p.gated && !p.dividerShown && ev.time >= (p.gateTime || 0) && !feedMeetingReady()) {
+          p.t = Math.min(p.t, p.gateTime || 0);
+          break;
+        }
+        p.evIdx++;
+        feedExecEvent(p, ev);
+      }
+    }
+    try { feedBubbleTick(); } catch {}
+  } catch {}
+}
+function focusStep(dt, live) {
+  // live: { px,py,pz,lx,ly,lz } Blender coords of the phase view. Returns override or null.
+  try {
+    const f = G._focus;
+    if (!f) return null;
+    if (G.phase === "driving" || G.phase === "intro") { clearFocusNow(); return null; }
+    if (f.phase === "to") {
+      f.tPh += dt;
+      const u = sstep(0, 1, Math.min(1, f.tPh / 0.8));
+      _v1.lerpVectors(f.fromPos, f.toPos, u);
+      _v2.lerpVectors(f.fromLook, f.toLook, u);
+      camPos.copy(_v1); camLook.copy(_v2);
+      try { updateFocusChipPos(); } catch {}
+      if (f.tPh >= 0.8) { f.phase = "hold"; f.tPh = 0; }
+      return true;
+    }
+    if (f.phase === "hold") {
+      f.tPh += dt;
+      camPos.copy(f.toPos); camLook.copy(f.toLook);
+      try { updateFocusChipPos(); } catch {}
+      if (f.tPh >= 3.5) {
+        if (reducedMotion) { clearFocusNow(); return null; }
+        f.phase = "back"; f.tPh = 0;
+        f.backPos = f.toPos.clone(); f.backLook = f.toLook.clone();
+        try { const chip = document.getElementById("focusChip"); if (chip) chip.hidden = true; } catch {}
+      } else return true;
+    }
+    if (f.phase === "back") {
+      f.tPh += dt;
+      const u = sstep(0, 1, Math.min(1, f.tPh / 0.8));
+      _v1.set(live.px, live.pz, -live.py);
+      _v2.set(live.lx, live.lz, -live.ly);
+      const bp = f.backPos || camPos, bl = f.backLook || camLook;
+      camPos.lerpVectors(bp, _v1, u);
+      camLook.lerpVectors(bl, _v2, u);
+      if (f.tPh >= 0.8) { clearFocusNow(); return null; }
+      return true;
+    }
+    return null;
+  } catch { return null; }
+}
+function feedLandRowFinal(thread, idx) {
+  try {
+    const p = G._feedPlayers && G._feedPlayers[thread];
+    if (!p) return;
+    const row = p.rows[idx];
+    if (!row) return;
+    const l = feedListFor(thread);
+    if (!l) return;
+    const key = feedKeyFor(thread, idx, p.mainCount);
+    let el = l.querySelector(`[data-row="${key}"]`);
+    const isTyping = !!(el && el.classList.contains("typing"));
+    if (el && !isTyping) {
+      try { feedHideReplyTyping(el); } catch {}
+      try { feedShowReply(row, el); } catch {}
+      return;
+    }
+    const fresh = feedRowEl(row, 0);
+    fresh.dataset.row = key;
+    fresh.dataset.idx = idx;
+    if (el && isTyping) {
+      el.className = fresh.className;
+      el.dataset.row = key;
+      el.dataset.idx = idx;
+      el.innerHTML = fresh.innerHTML;
+      try {
+        if (row.isAsk) {
+          const btn = el.querySelector(".feed-more");
+          const m = el.querySelector(".feed-msg");
+          if (btn && m) btn.addEventListener("click", e2 => {
+            e2.stopPropagation();
+            try {
+              const clamped = m.classList.toggle("clamp3");
+              btn.textContent = clamped ? "more" : "less";
+            } catch {}
+          });
+        }
+      } catch {}
+    } else {
+      el = fresh;
+      l.appendChild(el);
+    }
+    try { feedWireRow(el, row, thread); } catch {}
+    try { feedShowReply(row, el); } catch {}
+    try {
+      if (row.isGate) feedStatusTextThread(thread, `${feedName(row.from)} is deciding…`);
+      else if (row.isDraft) feedStatusTextThread(thread, `${feedName(row.from)} is drafting…`);
+      else if (row.isThinking) feedStatusTextThread(thread, `${feedName(row.from)} is thinking…`);
+      else feedStatusTextThread(thread, `${feedName(row.from)} is typing…`);
+    } catch {}
+    try {
+      if (row.replyFromRecipient && row.to) {
+        feedSetSpeakingThread(thread, row.to);
+        feedStatusTextThread(thread, `${feedName(row.to)} is replying…`);
+      } else feedSetSpeakingThread(thread, row.from);
+    } catch {}
+    if (p.useBubbles) {
+      try { feedShowBubble(row.from, row.text); } catch {}
+      try { feedShowBeam(row); } catch {}
+      try { if (row.replyFromRecipient && row.to) feedShowBubble(row.to, row.reply); } catch {}
+    }
+    if (row.isFollowup) {
+      try { setMeetingSpeak(row.from, row.to); } catch {}
+      try { if (row.replyFromRecipient && row.to) setMeetingSpeak(row.to, row.from); } catch {}
+    }
+    if ((G._feedTab || "with") === thread) { try { feedEdgeFlash(feedColour(row.from)); } catch {} }
+  } catch {}
+}
+function feedAfterIdxTime(p, idx) {
+  try {
+    const R = p.mainCount, slot = p.slot;
+    const isF = p.thread === "with" && idx >= R;
+    const k = isF ? idx - R : idx;
+    const base = (p.thread === "with" && isF)
+      ? Math.round((p.gateTime || 0) + k * slot) : Math.round(300 + idx * slot);
+    const row = p.rows[idx];
+    if (row && row.reply != null) return Math.round(base + slot * 0.60 + 200);
+    const full = row && !row.isGate ? String(row.text ?? "") : (row && row.isGate ? ("· " + (row.gateReason || "")) : "");
+    const tw = full ? Math.min(full.length * 2, 350) : 0;
+    return Math.round(base + slot * 0.35 + tw);
+  } catch { return 0; }
+}
+function feedSeekToTime(p, t) {
+  try {
+    let i = 0;
+    while (i < p.events.length && p.events[i].time <= t) i++;
+    p.evIdx = i;
+    p.t = t;
+  } catch {}
+}
+function feedJumpTo(thread, target) {
+  try {
+    const p = G._feedPlayers && G._feedPlayers[thread];
+    if (!p || p.total <= 0) return;
+    target = Math.max(0, Math.min(p.total - 1, target));
+    const wasDone = !!p.done;
+    const wasPlaying = !!p.playing && !p.done;
+    const oldLanded = p.landed || 0;
+    if (!wasDone && target + 1 === oldLanded) return;
+    if (wasDone && target + 1 === oldLanded) return;
+    const l = feedListFor(thread);
+    if (target + 1 > oldLanded) {
+      try { if (p.useBubbles) feedFadeAllBubbles(); } catch {}
+      try { if (p.useBubbles) feedClearBeams(); } catch {}
+      if (thread === "with" && target >= p.mainCount && !p.dividerShown) {
+        try {
+          if (l && !l.querySelector(".feed-divider")) {
+            const secs = G.cs && G.cs.signoff ? G.cs.signoff.seconds : "";
+            l.appendChild(feedDividerEl(secs));
+          }
+          p.dividerShown = true;
+        } catch {}
+      }
+      for (let i = oldLanded; i <= target; i++) { try { feedLandRowFinal(thread, i); } catch {} }
+      p.landed = target + 1;
+      try { feedSeekToTime(p, feedAfterIdxTime(p, target)); } catch {}
+      try {
+        if (l) {
+          feedWireStick(l);
+          if (l._stick !== false) { l.scrollTop = l.scrollHeight; feedPillHideActive(); }
+          else {
+            const n = target + 1 - oldLanded;
+            for (let k = 0; k < n; k++) { try { feedPillBump(); } catch {} }
+          }
+        }
+      } catch {}
+    } else {
+      try {
+        if (l) {
+          const rows = l.querySelectorAll("[data-row]");
+          rows.forEach(el => {
+            try {
+              const ii = el.dataset && el.dataset.idx != null ? parseInt(el.dataset.idx, 10) : -1;
+              if (ii > target && el.parentNode) el.parentNode.removeChild(el);
+            } catch {}
+          });
+          if (thread === "with" && target < p.mainCount) {
+            const dv = l.querySelector(".feed-divider");
+            if (dv && dv.parentNode) dv.parentNode.removeChild(dv);
+            p.dividerShown = false;
+          }
+          if (thread === "nogate") {
+            const sm = l.querySelector(".feed-summary");
+            if (sm && sm.parentNode) sm.parentNode.removeChild(sm);
+            p.summaryShown = false;
+          }
+        }
+      } catch {}
+      try { if (p.useBubbles) feedFadeAllBubbles(); } catch {}
+      try { if (p.useBubbles) feedClearBeams(); } catch {}
+      p.landed = target + 1;
+      p.done = false;
+      if (thread === "with") G._feedWithDone = false;
+      else G._feedNoGateDone = false;
+      if (wasDone) p.playing = true;
+      try { feedSeekToTime(p, feedAfterIdxTime(p, target)); } catch {}
+      try {
+        const row = p.rows[target];
+        if (row) {
+          if (row.replyFromRecipient && row.to) {
+            feedSetSpeakingThread(thread, row.to);
+            feedStatusTextThread(thread, `${feedName(row.to)} is replying…`);
+          } else {
+            feedSetSpeakingThread(thread, row.from);
+            if (row.isGate) feedStatusTextThread(thread, `${feedName(row.from)} is deciding…`);
+            else if (row.isDraft) feedStatusTextThread(thread, `${feedName(row.from)} is drafting…`);
+            else if (row.isThinking) feedStatusTextThread(thread, `${feedName(row.from)} is thinking…`);
+            else feedStatusTextThread(thread, `${feedName(row.from)} is typing…`);
+          }
+          if (thread === "with" && p.useBubbles) {
+            try { feedShowBubble(row.from, row.text); } catch {}
+            try { if (row.replyFromRecipient && row.to) feedShowBubble(row.to, row.reply); } catch {}
+          }
+        }
+        feedHeaderSetThread(thread, "replaying");
+      } catch {}
+      try {
+        if (l && l._stick !== false) { l.scrollTop = l.scrollHeight; feedPillHideActive(); }
+      } catch {}
+    }
+    try { feedUpdateTimeline(thread); } catch {}
+    try { feedUpdateControls(); } catch {}
+  } catch {}
+}
+function feedStepNext(thread) {
+  try {
+    const p = G._feedPlayers && G._feedPlayers[thread];
+    if (!p || p.total <= 0) return;
+    if (p.done) return;
+    if ((p.landed || 0) >= p.total) {
+      try {
+        const fi = p.events.findIndex(e => e.kind === "finish");
+        if (fi >= 0) { p.evIdx = fi + 1; p.t = Math.max(p.t, p.events[fi].time); }
+        feedExecFinish(p, { thread });
+      } catch {}
+      return;
+    }
+    feedJumpTo(thread, p.landed || 0);
+  } catch {}
+}
+function feedFinishNow(thread) {
+  try {
+    const p = G._feedPlayers && G._feedPlayers[thread];
+    if (!p || p.done) return;
+    p.t = Math.max(p.t, p.finishTime || 0);
+    p.evIdx = p.events.length;
+    feedExecFinish(p, { thread });
+  } catch {}
+}
+function feedReplay(thread) {
+  try {
+    const p = G._feedPlayers && G._feedPlayers[thread];
+    if (!p) return;
+    const l = feedListFor(thread);
+    try { if (l) { l.innerHTML = ""; l._stick = true; } } catch {}
+    try { feedCloseAllRaw(); } catch {}
+    if (thread === "with") {
+      try { feedClearBubbles(); } catch {}
+      try { feedClearBeams(); } catch {}
+      G._feedWithDone = false;
+    } else G._feedNoGateDone = false;
+    if (reducedMotion) {
+      try {
+        if (l) {
+          if (thread === "with") {
+            const R = p.mainCount;
+            p.rows.forEach((row, idx) => {
+              if (idx === R && p.hasFollowup) {
+                const secs = G.cs && G.cs.signoff ? G.cs.signoff.seconds : "";
+                l.appendChild(feedDividerEl(secs));
+              }
+              const el = feedRowEl(row, 0);
+              el.dataset.row = feedKeyFor(thread, idx, R);
+              el.dataset.idx = idx;
+              l.appendChild(el);
+              try { feedWireRow(el, row, thread); } catch {}
+              try { feedShowReply(row, el); } catch {}
+            });
+          } else {
+            p.rows.forEach((row, idx) => {
+              const el = feedRowEl(row, 0);
+              el.dataset.row = "n" + idx;
+              el.dataset.idx = idx;
+              l.appendChild(el);
+              try { feedWireRow(el, row, thread); } catch {}
+              try { feedShowReply(row, el); } catch {}
+            });
+            if (p.summary) l.appendChild(feedSummaryEl(p.summary));
+          });
+          l.scrollTop = l.scrollHeight;
+        }
+      } catch {}
+      p.t = p.finishTime || 0;
+      p.evIdx = p.events.length;
+      p.landed = p.total;
+      p.done = true;
+      p.playing = false;
+      p.started = true;
+      p.dividerShown = !!p.hasFollowup;
+      if (thread === "with") {
+        G._feedWithDone = true;
+        feedSetSpeakingThread("with", null);
+        feedStatusSetThread("with", p.withFinal || "");
+        feedHeaderSetThread("with", "done");
+        try { maybeMeetingReturn(); } catch {}
+      } else {
+        G._feedNoGateDone = true;
+        feedSetSpeakingThread("nogate", null);
+        const n = (G.cs && G.cs.without_gate && G.cs.without_gate.steps)
+          ? G.cs.without_gate.steps.length : p.total;
+        feedStatusSetThread("nogate", `Run replayed · ${n} steps <span class="fcheck">✓</span>`);
+        feedHeaderSetThread("nogate", "done");
+      }
+      try { feedUpdateTimeline(thread); } catch {}
+      try { feedUpdateControls(); } catch {}
+      return;
+    }
+    p.t = 0; p.evIdx = 0; p.landed = 0; p.done = false; p.playing = true; p.started = true;
+    p.dividerShown = false; p.summaryShown = false;
+    feedSetSpeakingThread(thread, null);
+    feedStatusTextThread(thread, "");
+    feedHeaderSetThread(thread, p.total ? "replaying" : "hidden");
+    try {
+      if (thread === "with") G._feedWithUnread = 0;
+      else G._feedNoGateUnread = 0;
+      if ((G._feedTab || "with") === thread) feedPillHideActive();
+    } catch {}
+    try {
+      const list = feedListFor(thread);
+      if (list) list.classList.remove("paused");
+    } catch {}
+    try { feedUpdateTimeline(thread); } catch {}
+    try { feedUpdateControls(); } catch {}
+  } catch {}
+}
+function feedSetPlaying(thread, playing) {
+  try {
+    const p = G._feedPlayers && G._feedPlayers[thread];
+    if (!p || p.done) return;
+    p.playing = !!playing;
+    try {
+      const list = feedListFor(thread);
+      if (list) list.classList.toggle("paused", !p.playing);
+    } catch {}
+    try { feedUpdateControls(); } catch {}
+  } catch {}
+}
+function feedCycleSpeed() {
+  try {
+    const cur = G._feedSpeed || 1;
+    const nxt = cur === 1 ? 2 : cur === 2 ? 0.5 : 1;
+    G._feedSpeed = nxt;
+    try {
+      const b = document.getElementById("fspeed");
+      if (b) {
+        b.textContent = nxt === 0.5 ? "0.5×" : nxt + "×";
+        b.setAttribute("aria-label", "Playback speed");
+      }
+    } catch {}
+    try { feedUpdateControls(); } catch {}
+  } catch {}
+}
+function feedBuildTimelineDots(thread) {
+  try {
+    const box = document.querySelector("#fctl .fdots");
+    if (!box) return;
+    box.innerHTML = "";
+    const p = G._feedPlayers && G._feedPlayers[thread];
+    const total = p ? p.total : 0;
+    for (let i = 0; i < total; i++) {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "fdot";
+      b.dataset.idx = i;
+      b.setAttribute("aria-label", "Jump to row " + (i + 1));
+      const dot = document.createElement("i");
+      b.appendChild(dot);
+      b.addEventListener("click", ev => {
+        try {
+          ev.stopPropagation();
+          const th = G._feedTab || "with";
+          const ii = parseInt(b.dataset.idx, 10);
+          if (isFinite(ii)) feedJumpTo(th, ii);
+        } catch {}
+      });
+      box.appendChild(b);
+    }
+  } catch {}
+}
+function feedUpdateTimeline(thread) {
+  try {
+    const active = G._feedTab || "with";
+    if (thread !== active) return;
+    const p = G._feedPlayers && G._feedPlayers[thread];
+    const total = p ? p.total : 0, landed = p ? (p.landed || 0) : 0;
+    const fill = document.querySelector("#fctl .ffill");
+    if (fill) fill.style.width = total ? Math.round(landed / total * 100) + "%" : "0%";
+    const box = document.querySelector("#fctl .fdots");
+    if (box && box.childElementCount !== total) feedBuildTimelineDots(thread);
+    if (box) {
+      const kids = box.children;
+      for (let i = 0; i < kids.length; i++) {
+        try { kids[i].classList.toggle("landed", i < landed); } catch {}
+      }
+    }
+  } catch {}
+}
+function feedUpdateControls() {
+  try {
+    const active = G._feedTab || "with";
+    const p = G._feedPlayers && G._feedPlayers[active];
+    const play = document.getElementById("fplay");
+    const next = document.getElementById("fnext");
+    const spd = document.getElementById("fspeed");
+    const total = p ? p.total : 0;
+    if (play) {
+      if (!p || total <= 0) {
+        play.textContent = "▶";
+        play.setAttribute("aria-label", "Play");
+        play.disabled = true;
+      } else if (p.done) {
+        play.textContent = "↺";
+        play.setAttribute("aria-label", "Replay");
+        play.disabled = false;
+      } else if (p.playing) {
+        play.textContent = "⏸";
+        play.setAttribute("aria-label", "Pause");
+        play.disabled = false;
+      } else {
+        play.textContent = "▶";
+        play.setAttribute("aria-label", "Play");
+        play.disabled = false;
+      }
+    }
+    if (next) next.disabled = !p || total <= 0 || !!p.done;
+    if (spd) {
+      const s = G._feedSpeed || 1;
+      spd.textContent = s === 0.5 ? "0.5×" : s + "×";
+    }
+    try {
+      for (const th of ["with", "nogate"]) {
+        const pp = G._feedPlayers && G._feedPlayers[th];
+        const list = feedListFor(th);
+        if (list) list.classList.toggle("paused", !!(pp && !pp.playing && !pp.done && pp.total > 0));
+      }
+    } catch {}
+    try {
+      const f = document.getElementById("feed");
+      if (f) f.classList.toggle("paused", !!(p && !p.playing && !p.done && p.total > 0));
+    } catch {}
+    try {
+      const box = document.querySelector("#fctl .fdots");
+      if (box && box.childElementCount !== total) feedBuildTimelineDots(active);
+    } catch {}
+    try { feedUpdateTimeline(active); } catch {}
+  } catch {}
+}
+function feedWireControlsOnce() {
+  try {
+    const play = document.getElementById("fplay");
+    if (play && !play._wired) {
+      play._wired = true;
+      play.addEventListener("click", () => {
+        try {
+          const th = G._feedTab || "with";
+          const p = G._feedPlayers && G._feedPlayers[th];
+          if (!p) return;
+          if (p.done) feedReplay(th);
+          else feedSetPlaying(th, !p.playing);
+        } catch {}
+      });
+    }
+    const spd = document.getElementById("fspeed");
+    if (spd && !spd._wired) {
+      spd._wired = true;
+      spd.addEventListener("click", () => { try { feedCycleSpeed(); } catch {} });
+    }
+    const nxt = document.getElementById("fnext");
+    if (nxt && !nxt._wired) {
+      nxt._wired = true;
+      nxt.addEventListener("click", () => {
+        try { feedStepNext(G._feedTab || "with"); } catch {}
+      });
+    }
+    const chip = document.getElementById("focusChip");
+    if (chip && !chip._wired) {
+      chip._wired = true;
+      chip.addEventListener("click", () => { try { focusReturnAtOnce(); } catch {} });
+    }
+  } catch {}
+}
+function feedPlayerState() {
+  try {
+    const th = G._feedTab || "with";
+    const p = G._feedPlayers && G._feedPlayers[th];
+    return { thread: th, playing: !!(p && p.playing && !p.done),
+      speed: G._feedSpeed || 1, landed: p ? (p.landed || 0) : 0, total: p ? (p.total || 0) : 0 };
+  } catch { return { thread: "with", playing: false, speed: 1, landed: 0, total: 0 }; }
+}
 function scheduleNoGateThread() {
   try {
     if (G._feedNoGateStarted || G._feedNoGateDone) return;
     G._feedNoGateStarted = true;
-    const rows = G._feedNoGateRows || [];
-    const summary = G._feedNoGateSummary;
-    const slot = G._feedWithSlot || (rows.length > 12 ? 650 : 900);
+    const p = G._feedPlayers && G._feedPlayers.nogate;
+    if (!p) return;
+    if (p.total <= 0 && !p.summary) {
+      feedHeaderSetThread("nogate", "hidden");
+      G._feedNoGateHeader = "hidden";
+      G._feedNoGateDone = true;
+      p.done = true;
+      p.playing = false;
+      try { feedUpdateControls(); } catch {}
+      return;
+    }
+    if (reducedMotion) {
+      try { feedReplay("nogate"); } catch {}
+      G._feedNoGateStarted = true;
+      return;
+    }
+    p.started = true;
+    p.playing = true;
     feedHeaderSetThread("nogate", "replaying");
-    const Rn = rows.length;
-    const finishAll = () => {
-      try {
-        if (G._feedNoGateDone) return;
-        G._feedNoGateDone = true;
-        try {
-          const l = feedListFor("nogate");
-          if (l && summary && !l.querySelector(".feed-summary")) {
-            const el = feedSummaryEl(summary);
-            l.appendChild(el);
-            feedOnNewRowThread("nogate");
-          }
-        } catch {}
-        feedSetSpeakingThread("nogate", null);
-        const n = (G.cs && G.cs.without_gate && G.cs.without_gate.steps) ? G.cs.without_gate.steps.length : Rn;
-        feedStatusSetThread("nogate", `Run replayed · ${n} steps <span class="fcheck">✓</span>`);
-        feedHeaderSetThread("nogate", "done");
-      } catch {}
-    };
-    G._feedNoGateFinish = finishAll;
-    if (!rows.length) { later(finishAll, 300); return; }
-    rows.forEach((r, i) => {
-      const base = Math.round(300 + i * slot);
-      scheduleFeedRow("nogate", r, `n${i}`, base, slot, i === Rn - 1, finishAll, false);
-    });
-    later(() => {
-      try {
-        if (G._feedNoGateDone) return;
-        const l = feedListFor("nogate");
-        if (!l) return;
-        if (l.querySelectorAll("[data-row]").length >= Rn) finishAll();
-      } catch {}
-    }, Math.round(300 + Rn * slot + 500));
+    try {
+      const list = feedListFor("nogate");
+      if (list) list.classList.remove("paused");
+    } catch {}
+    try { feedUpdateControls(); } catch {}
   } catch (e) { if (DEBUG) console.warn("feednogate:", e); }
 }
 function feedSchedule() {
@@ -4763,141 +6123,110 @@ function feedSchedule() {
       }
     } catch {}
     const hasFollowup = followupRows.length > 0;
-    const mainCount = ((G.cs && G.cs.agent && G.cs.agent.steps) || []).length;
-    const withFinal = hasFollowup
-      ? `Run replayed · ${mainCount} steps · Şef answered <span class="fcheck">✓</span>`
-      : `Run replayed · ${mainCount} steps <span class="fcheck">✓</span>`;
-    if (!rows.length && !hasFollowup) { feedHeaderSetThread("with", "hidden"); G._feedWithHeader = "hidden"; }
-    if (!noGateRows.length && !noGateSummary) { G._feedNoGateHeader = "hidden"; }
-    else { G._feedNoGateHeader = "hidden"; }
-    if (!rows.length && !hasFollowup) {
-      if (!noGateRows.length) return;
-    }
-    if (reducedMotion) {
-      G._feedWithHeader = "done";
-      G._feedNoGateHeader = "done";
-      feedHeaderSet("done");
-      G._feedWithStatus = withFinal;
-      const nNo = (G.cs && G.cs.without_gate && G.cs.without_gate.steps) ? G.cs.without_gate.steps.length : noGateRows.length;
-      G._feedNoGateStatus = `Run replayed · ${nNo} steps <span class="fcheck">✓</span>`;
-      const renderFollowupNow = () => {
-        try {
-          const l = feedListFor("with");
-          if (l && !l.querySelector(".feed-divider")) {
-            const secs = G.cs && G.cs.signoff ? G.cs.signoff.seconds : "";
-            l.appendChild(feedDividerEl(secs));
-            followupRows.forEach((r) => {
-              const el = feedRowEl(r, 0);
-              l.appendChild(el);
-              feedShowReply(r, el);
-            });
-            l.scrollTop = l.scrollHeight;
-          }
-        } catch (e) { if (DEBUG) console.warn("feed:", e); }
-        G._feedWithDone = true;
-        G._feedWithSpeaking = null;
-        feedSetSpeaking(null);
-        feedStatusSet((G._feedTab || "with") === "nogate" ? G._feedNoGateStatus : G._feedWithStatus);
-        try { maybeMeetingReturn(); } catch {}
-      };
-      later(() => {
-        try {
-          const l = feedListFor("with");
-          if (l) {
-            rows.forEach((r) => {
-              const el = feedRowEl(r, 0);
-              l.appendChild(el);
-              feedShowReply(r, el);
-            });
-            l.scrollTop = l.scrollHeight;
-          }
-          const nl = feedListFor("nogate");
-          if (nl) {
-            noGateRows.forEach((r) => {
-              const el = feedRowEl(r, 0);
-              nl.appendChild(el);
-              feedShowReply(r, el);
-            });
-            if (noGateSummary) nl.appendChild(feedSummaryEl(noGateSummary));
-            nl.scrollTop = nl.scrollHeight;
-          }
-          G._feedNoGateDone = true;
-          G._feedNoGateStarted = true;
-          G._feedNoGateSpeaking = null;
-          let gated = false;
-          try { gated = hasFollowup && meetingIds().length > 0; } catch {}
-          if (!hasFollowup) {
-            G._feedWithDone = true;
-            G._feedWithSpeaking = null;
-            feedSetSpeaking(null);
-            feedStatusSet((G._feedTab || "with") === "nogate" ? G._feedNoGateStatus : G._feedWithStatus);
-            try { maybeMeetingReturn(); } catch {}
-          } else if (gated) {
-            gateFollowupOnMeeting(renderFollowupNow);
-          } else {
-            renderFollowupNow();
-          }
-        } catch (e) { if (DEBUG) console.warn("feed:", e); }
-      }, 300);
-      return;
-    }
-    feedHeaderSetThread("with", rows.length || hasFollowup ? "replaying" : "hidden");
     const R = rows.length;
     const slot = R > 12 ? 650 : 900;
     G._feedWithSlot = slot;
-    const finishAll = () => {
+    G._feedSpeed = 1;
+    try { feedWireControlsOnce(); } catch {}
+    G._feedPlayers = { with: null, nogate: null };
+    try { G._feedPlayers.with = feedBuildPlayer("with"); } catch (e) { if (DEBUG) console.warn("feed:", e); }
+    try { G._feedPlayers.nogate = feedBuildPlayer("nogate"); } catch (e) { if (DEBUG) console.warn("feed:", e); }
+    try {
+      G._feedWithFinish = () => feedFinishNow("with");
+      G._feedNoGateFinish = () => feedFinishNow("nogate");
+    } catch {}
+    const pw = G._feedPlayers.with, pn = G._feedPlayers.nogate;
+    if (!rows.length && !hasFollowup) { feedHeaderSetThread("with", "hidden"); G._feedWithHeader = "hidden"; }
+    else if (pw && pw.total <= 0) { feedHeaderSetThread("with", "hidden"); G._feedWithHeader = "hidden"; }
+    G._feedNoGateHeader = "hidden";
+    if ((!rows.length && !hasFollowup) && (!noGateRows.length && !noGateSummary)) {
+      try { feedUpdateControls(); } catch {}
+      return;
+    }
+    if (reducedMotion) {
       try {
-        if (G._feedWithDone) return;
+        const l = feedListFor("with");
+        if (l && pw) {
+          pw.rows.forEach((r, idx) => {
+            if (idx === pw.mainCount && pw.hasFollowup) {
+              const secs = G.cs && G.cs.signoff ? G.cs.signoff.seconds : "";
+              l.appendChild(feedDividerEl(secs));
+            }
+            const el = feedRowEl(r, 0);
+            el.dataset.row = feedKeyFor("with", idx, pw.mainCount);
+            el.dataset.idx = idx;
+            l.appendChild(el);
+            try { feedWireRow(el, r, "with"); } catch {}
+            try { feedShowReply(r, el); } catch {}
+          });
+          l.scrollTop = l.scrollHeight;
+          pw.landed = pw.total;
+          pw.done = true;
+          pw.playing = false;
+          pw.started = true;
+          pw.dividerShown = !!pw.hasFollowup;
+          pw.t = pw.finishTime || 0;
+          pw.evIdx = pw.events.length;
+        }
+        const nl = feedListFor("nogate");
+        if (nl && pn) {
+          pn.rows.forEach((r, idx) => {
+            const el = feedRowEl(r, 0);
+            el.dataset.row = "n" + idx;
+            el.dataset.idx = idx;
+            nl.appendChild(el);
+            try { feedWireRow(el, r, "nogate"); } catch {}
+            try { feedShowReply(r, el); } catch {}
+          });
+          if (pn.summary) nl.appendChild(feedSummaryEl(pn.summary));
+          nl.scrollTop = nl.scrollHeight;
+          pn.landed = pn.total;
+          pn.done = true;
+          pn.playing = false;
+          pn.started = true;
+          pn.t = pn.finishTime || 0;
+          pn.evIdx = pn.events.length;
+        }
+        G._feedWithHeader = "done";
+        G._feedNoGateHeader = "done";
+        feedHeaderSet("done");
+        const mainCount = ((G.cs && G.cs.agent && G.cs.agent.steps) || []).length;
+        G._feedWithStatus = hasFollowup
+          ? `Run replayed · ${mainCount} steps · Şef answered <span class="fcheck">✓</span>`
+          : `Run replayed · ${mainCount} steps <span class="fcheck">✓</span>`;
+        const nNo = (G.cs && G.cs.without_gate && G.cs.without_gate.steps)
+          ? G.cs.without_gate.steps.length : noGateRows.length;
+        G._feedNoGateStatus = `Run replayed · ${nNo} steps <span class="fcheck">✓</span>`;
         G._feedWithDone = true;
-        feedSetSpeakingThread("with", null);
-        feedStatusSetThread("with", withFinal);
-        feedHeaderSetThread("with", "done");
+        G._feedNoGateDone = true;
+        G._feedNoGateStarted = true;
+        G._feedWithSpeaking = null;
+        G._feedNoGateSpeaking = null;
+        feedSetSpeaking(null);
+        feedStatusSet((G._feedTab || "with") === "nogate" ? G._feedNoGateStatus : G._feedWithStatus);
         try { maybeMeetingReturn(); } catch {}
-      } catch {}
-    };
-    G._feedWithFinish = finishAll;
-    rows.forEach((r, i) => {
-      const base = Math.round(300 + i * slot);
-      const isLast = !hasFollowup && i === R - 1;
-      scheduleFeedRow("with", r, `m${i}`, base, slot, isLast, finishAll, true);
-    });
-    if (hasFollowup) {
-      const showDivider = () => {
-        try {
-          const l = feedListFor("with");
-          if (!l || l.querySelector(".feed-divider")) return;
-          const secs = G.cs && G.cs.signoff ? G.cs.signoff.seconds : "";
-          l.appendChild(feedDividerEl(secs));
-          feedOnNewRowThread("with");
-        } catch (e) { if (DEBUG) console.warn("feeddivider:", e); }
-      };
-      const queueFollowup = base0 => {
-        followupRows.forEach((r, k) => {
-          scheduleFeedRow("with", r, `fup${k}`, Math.round(base0 + k * slot),
-            slot, k === followupRows.length - 1, finishAll, true);
-        });
-      };
-      let gated = false;
-      try { gated = meetingIds().length > 0; } catch {}
-      if (gated) {
-        // Şef's answer is given at the table: the divider and everything
-        // after it wait until the meeting has arrived (or 9 s have passed).
-        gateFollowupOnMeeting(() => { showDivider(); queueFollowup(0); });
+        try { feedUpdateControls(); } catch {}
+      } catch (e) { if (DEBUG) console.warn("feed:", e); }
+      return;
+    }
+    if (pw) {
+      if (pw.total > 0) {
+        feedHeaderSetThread("with", "replaying");
+        pw.playing = true;
+        pw.started = true;
       } else {
-        const divBase = Math.round(300 + R * slot);
-        later(showDivider, divBase);
-        queueFollowup(divBase);
+        feedHeaderSetThread("with", "hidden");
+        pw.done = true;
+        pw.playing = false;
+        G._feedWithDone = true;
       }
     }
-    const totalWith = R + (hasFollowup ? followupRows.length : 0);
-    later(() => {
-      try {
-        if (G._feedWithDone) return;
-        const l = feedListFor("with");
-        if (!l) return;
-        if (l.querySelectorAll("[data-row]").length >= totalWith) finishAll();
-      } catch {}
-    }, Math.round(300 + (R + (hasFollowup ? followupRows.length : 0)) * slot + 500));
+    if (pn && pn.total <= 0 && !pn.summary) {
+      pn.done = true;
+      pn.playing = false;
+      G._feedNoGateDone = true;
+    }
+    try { feedUpdateControls(); } catch {}
   } catch (e) { if (DEBUG) console.warn("feed:", e); }
 }
 try {
@@ -5368,6 +6697,7 @@ function tick() {
     try { updateStations(); } catch {}
     try { updateSamBeam(); } catch {}
     try { updateSefStep(dt); } catch {}
+    try { feedSchedulerTick(dt); } catch {}
     stepCamera(dt);
     updateLabels();
     try { updateFeedBubbles(); } catch {}
@@ -5400,7 +6730,7 @@ if (new URLSearchParams(location.search).has("test"))
   window.__sim = { G, CHAR, ST, pickup: () => pickupPallet(true), drop: dropPallet, DROP, ZONE,
     FORK: { pick: PICK_D, set: SET_D }, camera, get delivery() { return deliveryGroup; },
     feed: () => feedPlainRows(), feedFollowup: () => feedPlainFollowup(), feedNoGate: () => feedPlainNoGate(),
-    meeting: () => meetingInfo() };
+    meeting: () => meetingInfo(), feedPlayer: () => feedPlayerState() };
 if ("ontouchstart" in window || navigator.maxTouchPoints > 0) document.body.classList.add("touch");
 boot();
 tick();
