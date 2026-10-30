@@ -322,6 +322,110 @@ body.deciding #noteCard, body.deciding #keys, body.deciding #joy, body.deciding 
 .wicon.light .lp { animation: wblink .9s linear infinite; }
 .wicon.light .lp2 { animation-delay: .3s; } .wicon.light .lp3 { animation-delay: .6s; }
 @keyframes wblink { 0%, 100% { opacity: .22; } 8%, 30% { opacity: 1; } }
+/* ---------- agent run feed ---------- */
+#feed {
+  position: fixed; z-index: 25; left: 10px; top: 10px;
+  width: min(330px, 30vw); max-height: calc(100dvh - 20px);
+  display: none; flex-direction: column; overflow: hidden;
+  background: rgba(11,18,38,.68);
+  -webkit-backdrop-filter: blur(16px) saturate(1.3); backdrop-filter: blur(16px) saturate(1.3);
+  border: 1px solid rgba(255,255,255,.14); border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.1);
+  padding: 12px 12px 10px; color: #fff;
+}
+body.deciding #feed, body.done #feed { display: flex; }
+body.deciding #demoLink, body.deciding #tallyChip,
+body.done #demoLink, body.done #tallyChip { display: none !important; }
+.feed-head-top { display: flex; align-items: flex-start; gap: 8px; }
+.feed-title { font-weight: 800; font-size: 14px; line-height: 1.2; }
+.feed-sub { font-size: 12.5px; color: rgba(255,255,255,.7); margin-top: 2px; }
+#feedToggle {
+  display: none; margin-left: auto; flex: none;
+  font: inherit; font-size: 12.5px; font-weight: 700; color: #fff; cursor: pointer;
+  background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.22);
+  border-radius: 10px; padding: 6px 10px; min-height: 36px;
+}
+.feed-team { display: flex; gap: 6px; margin: 8px 0 6px; flex-wrap: wrap; }
+.feed-team img {
+  width: 26px; height: 26px; border-radius: 50%; object-fit: cover; display: block;
+  border: 2px solid rgba(255,255,255,.25); background: #0b1226;
+}
+.feed-team img.speaking { animation: feedpulse 1.2s ease-in-out infinite; }
+@keyframes feedpulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0); }
+  50% { box-shadow: 0 0 0 4px var(--spk, rgba(255,255,255,.25)); }
+}
+.feed-list { overflow-y: auto; display: flex; flex-direction: column; gap: 8px; min-height: 0; }
+.feed-row {
+  display: flex; gap: 8px; align-items: flex-start;
+  background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1);
+  border-radius: 12px; padding: 8px 10px;
+  animation: feedin .3s ease-out;
+}
+@keyframes feedin { from { opacity: 0; transform: translateY(8px); } }
+.feed-av {
+  width: 34px; height: 34px; border-radius: 50%; object-fit: cover; flex: none;
+  border: 2px solid rgba(255,255,255,.25); background: #0b1226; display: block;
+}
+.feed-body { min-width: 0; flex: 1 1 auto; }
+.feed-head { display: flex; align-items: baseline; gap: 6px; }
+.feed-names { font-size: 13px; font-weight: 700; min-width: 0; overflow-wrap: anywhere; }
+.feed-names .arrow { color: rgba(255,255,255,.6); font-weight: 400; }
+.feed-names .thinks-label { font-style: italic; font-weight: 400; opacity: .7; font-size: 12.5px; }
+.feed-step { margin-left: auto; flex: none; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12.5px; color: rgba(255,255,255,.6); }
+.feed-msg { font-size: 13px; line-height: 1.45; color: rgba(255,255,255,.92); overflow-wrap: anywhere; margin-top: 2px; }
+.feed-msg.thinks-msg { font-style: italic; opacity: .75; }
+.feed-msg.mono-msg { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+.feed-msg.clamp3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.feed-msg .verdict-word { font-weight: 800; }
+.feed-msg .verdict-word.post { color: var(--dpost); }
+.feed-msg .verdict-word.block { color: var(--dblock); }
+.feed-msg .verdict-word.human { color: var(--dhuman); }
+.feed-more {
+  font: inherit; font-size: 12.5px; font-weight: 700; color: #7dd3fc; cursor: pointer;
+  background: none; border: 0; padding: 2px 0; text-align: left;
+}
+.feed-reply {
+  display: flex; gap: 6px; align-items: flex-start; margin-top: 6px; margin-left: 8px;
+  font-size: 13px; line-height: 1.45; color: rgba(255,255,255,.92); overflow-wrap: anywhere;
+}
+.feed-reply img { width: 18px; height: 18px; border-radius: 50%; object-fit: cover; flex: none; border: 1px solid rgba(255,255,255,.25); background: #0b1226; }
+.feed-reply.red { color: var(--dblock); font-weight: 700; }
+.feed-reply.status { color: rgba(255,255,255,.65); font-size: 12.5px; }
+.bubble {
+  position: absolute; left: 0; top: 0; transform: translate(-50%,-100%);
+  background: rgba(11,18,38,.68);
+  -webkit-backdrop-filter: blur(16px) saturate(1.3); backdrop-filter: blur(16px) saturate(1.3);
+  border: 1px solid rgba(255,255,255,.14); border-left: 3px solid #fff; border-radius: 10px;
+  padding: 5px 9px; font-size: 12.5px; line-height: 1.3; color: #fff; white-space: nowrap;
+  max-width: 240px; overflow: hidden; text-overflow: ellipsis;
+  transition: opacity .3s ease; pointer-events: none;
+}
+.bubble::after {
+  content: ""; position: absolute; left: 18px; bottom: -6px; width: 10px; height: 10px;
+  background: inherit; border-right: 1px solid rgba(255,255,255,.14); border-bottom: 1px solid rgba(255,255,255,.14);
+  transform: rotate(45deg);
+}
+.bubble.fade { opacity: 0; }
+@media (max-width: 640px) {
+  #feed { left: 10px; right: 10px; top: 10px; width: auto; max-height: none; }
+  #feedToggle { display: block; }
+  .feed-list { overflow: hidden; max-height: none; }
+  #feed .feed-list .feed-row { display: none; }
+  #feed .feed-list .feed-row:last-child { display: flex; }
+  #feed .feed-list .feed-row:last-child .feed-msg { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  #feed:not(.expanded) .feed-list .feed-row:last-child .feed-reply { display: none; }
+  #feed.expanded .feed-list { overflow-y: auto; max-height: 46dvh; }
+  #feed.expanded .feed-list .feed-row { display: flex; }
+  #feed.expanded .feed-list .feed-row:last-child .feed-msg { display: block; -webkit-line-clamp: unset; }
+  #feed.expanded .feed-list .feed-row:last-child .feed-reply { display: flex; }
+  .feed-more, #feedToggle { min-height: 36px; min-width: 36px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .feed-row { animation: none; }
+  .feed-team img.speaking { animation: none; }
+  .bubble { transition: none; }
+}
 /* ---------- result ---------- */
 #resultWrap {
   position: fixed; inset: 0; z-index: 40; display: none;
@@ -500,6 +604,18 @@ body.done #resultWrap { display: flex; }
 </div>
 
 <div id="reads" aria-live="polite"></div>
+
+<div id="feed" aria-live="polite">
+  <div class="feed-head-top">
+    <div>
+      <div class="feed-title">Agent run</div>
+      <div class="feed-sub"></div>
+    </div>
+    <button id="feedToggle" aria-expanded="false">All 0 steps ▾</button>
+  </div>
+  <div class="feed-team"></div>
+  <div class="feed-list"></div>
+</div>
 
 <div id="resultWrap">
   <div id="result" class="card" role="dialog" aria-label="Result"></div>
@@ -2704,6 +2820,7 @@ function resetScene() {
   G._look = null; G._react = null; G._sefStep = null;
   try { resetWorkProps(); } catch {}
   $("reads").innerHTML = "";
+  try { feedClear(); } catch {}
   try { updateCarryChip(); } catch {}
   showOutline(false);
   setGateLight(null);
@@ -2924,6 +3041,550 @@ function readCard(avatars, who, html, cls, work) {
   }
   return d;
 }
+// ---------- agent run feed ----------
+function feedSafeParse(s) {
+  try {
+    if (typeof s !== "string") return null;
+    return JSON.parse(s);
+  } catch { return null; }
+}
+function feedName(id) {
+  if (!id) return "";
+  if (id === "erp") return "ERP";
+  try {
+    const p = PEOPLE.find(p => p.id === id);
+    if (p) return p.name;
+  } catch {}
+  return id;
+}
+function feedColour(id) {
+  if (!id) return "rgba(255,255,255,.7)";
+  if (id === "erp") return "rgba(255,255,255,.75)";
+  try { return charColour(id); } catch { return "rgba(255,255,255,.25)"; }
+}
+function feedTruncate(s, max) {
+  s = String(s ?? "");
+  if (s.length <= max) return s;
+  return s.slice(0, max).trimEnd() + "…";
+}
+function buildFeedRows(cs) {
+  const rows = [];
+  if (!cs || !cs.agent || !Array.isArray(cs.agent.steps)) return rows;
+  const push = r => { if (r) rows.push(r); };
+  cs.agent.steps.forEach((step, idx) => {
+    if (!step || typeof step !== "object") return;
+    const kind = step.kind;
+    if (kind === "thinking") {
+      const t = step.text;
+      if (t == null || String(t) === "") return;
+      push({ from: "spark", to: null, text: String(t), reply: null,
+        isThinking: true, stepIdx: idx });
+      return;
+    }
+    if (kind === "cross") {
+      const d = step.data;
+      if (!d || d.agreed == null || d.sam_only == null || d.spark_only == null) return;
+      push({ from: "sam", to: "spark", text: "Carton by carton:",
+        reply: `${d.agreed} agreed, ${d.sam_only} only Sam, ${d.spark_only} only Spark`,
+        isCross: true, replyFromRecipient: true, stepIdx: idx });
+      return;
+    }
+    if (kind !== "tool") return;
+    const tool = step.tool;
+    if (!tool) return;
+    if (tool === "read_delivery_note") {
+      const items = ((cs.note && cs.note.items) || [])
+        .map(it => `${it.quantity} × ${it.description}`).join("; ");
+      const text = items ? `Reads the note: ${items}` : "Reads the note:";
+      let reply = null;
+      try {
+        const emb = (cs.note && cs.note.embedded_instructions) || [];
+        if (emb.length) reply = `${emb.length} instructions to software set aside`;
+      } catch {}
+      push({ from: "spark", to: null, text, reply, isRead: true, stepIdx: idx });
+      return;
+    }
+    if (tool === "look_at_pallet") {
+      const parsed = feedSafeParse(step.result);
+      if (!parsed) {
+        push({ from: "spark", to: null, text: tool, reply: null, stepIdx: idx });
+        return;
+      }
+      const parts = [];
+      if (parsed.product_on_labels != null) parts.push(String(parsed.product_on_labels));
+      if (parsed.cartons_visible != null) parts.push(`${parsed.cartons_visible} cartons seen`);
+      if (parsed.damaged_cartons != null) parts.push(`${parsed.damaged_cartons} damaged`);
+      if (parsed.stacked != null) parts.push(parsed.stacked ? "stacked" : "not stacked");
+      if (parsed.all_cartons_visible === false) parts.push("not all visible");
+      push({ from: "spark", to: null, text: "Looks at the pallet:",
+        reply: parts.length ? parts.join(" · ") : null, isLook: true, stepIdx: idx });
+      return;
+    }
+    if (tool === "count_cartons") {
+      const a = feedSafeParse(step.args);
+      const concept = a && a.concept;
+      if (concept == null || concept === "") {
+        push({ from: "spark", to: "sam", text: tool, reply: null, stepIdx: idx });
+        return;
+      }
+      const r = feedSafeParse(step.result);
+      let reply = null;
+      if (r && r.sure != null && r.doubtful != null)
+        reply = `${r.sure} sure, ${r.doubtful} doubtful`;
+      push({ from: "spark", to: "sam", text: `count “${concept}”`, reply,
+        replyFromRecipient: !!reply, stepIdx: idx });
+      return;
+    }
+    if (tool === "post_goods_receipt") {
+      const a = feedSafeParse(step.args);
+      const qty = a && a.quantity;
+      if (qty == null) {
+        push({ from: "spark", to: "kapi", text: tool, reply: null, stepIdx: idx });
+        return;
+      }
+      let reply = null;
+      if (step.refused) {
+        try {
+          const m = String(step.result || "").match(/"reason":\s*"([^"]*?[.!?])/);
+          reply = m ? `blocked: ${m[1]}` : "blocked";
+        } catch { reply = "blocked"; }
+      } else {
+        const r = feedSafeParse(step.result);
+        if (r && r.posted === true) {
+          reply = r.document ? `posted · ${r.document}` : "posted";
+        }
+      }
+      push({ from: "spark", to: "kapi", text: `post ${qty}`, reply,
+        replyFromRecipient: !!reply, stepIdx: idx });
+      return;
+    }
+    if (tool === "ask_supervisor") {
+      const a = feedSafeParse(step.args);
+      const reason = a && a.reason;
+      if (reason == null || String(reason) === "") {
+        push({ from: "spark", to: "sef", text: tool, reply: null, stepIdx: idx });
+        return;
+      }
+      let reply = null;
+      try {
+        if (String(step.result || "").includes("notified")) reply = "Şef notified";
+      } catch {}
+      push({ from: "spark", to: "sef", text: String(reason), reply,
+        isAsk: true, stepIdx: idx });
+      return;
+    }
+    push({ from: "spark", to: null, text: tool, reply: null, isOtherTool: true, stepIdx: idx });
+  });
+  try {
+    const g = cs.gate;
+    if (g && g.action) {
+      const word = { post: "POST", block: "BLOCK", human: "ASK ŞEF" }[g.action] || g.action;
+      const reason = firstSentence(g.reason);
+      const text = reason ? `${word} · ${reason}` : word;
+      const to = g.action === "post" ? "erp" : g.action === "human" ? "sef" : null;
+      rows.push({ from: "kapi", to, text, reply: null,
+        isGate: true, gateAction: g.action, gateWord: word, gateReason: reason || "" });
+    }
+  } catch {}
+  try {
+    const d = cs.draft;
+    if (d) {
+      const kind = (typeof DOC_LABEL !== "undefined" && DOC_LABEL[d.document]) || d.document || "";
+      const title = d.title || "";
+      const to = d.to || "";
+      if (title || to) {
+        const text = kind ? `Draft: ${title} · to ${to} · ${kind}` : `Draft: ${title} · to ${to}`;
+        rows.push({ from: "wonder", to: "sef", text,
+          reply: "waiting for Şef's approval", isDraft: true });
+      }
+    }
+  } catch {}
+  return rows;
+}
+function feedPlainRows() {
+  try {
+    if (!G.cs) return [];
+    return buildFeedRows(G.cs).map(r => ({ from: r.from || null, to: r.to || null,
+      text: r.text, reply: r.reply != null ? r.reply : null }));
+  } catch { return []; }
+}
+let _feedBubbles = {};
+let _feedBeams = [];
+let _feedPoolTex = null;
+function feedClearBubbles() {
+  try {
+    for (const k of Object.keys(_feedBubbles)) {
+      const b = _feedBubbles[k];
+      try { clearTimeout(b.timeout); clearTimeout(b.fadeTimeout); } catch {}
+      try { if (b.el && b.el.parentNode) b.el.parentNode.removeChild(b.el); } catch {}
+    }
+  } catch {}
+  _feedBubbles = {};
+}
+function feedClearBeams() {
+  try {
+    for (const b of _feedBeams) {
+      try { scene.remove(b.line); } catch {}
+      try { scene.remove(b.sprite); } catch {}
+      try { b.line.geometry.dispose(); b.line.material.dispose(); } catch {}
+      try { b.sprite.material.dispose(); } catch {}
+    }
+  } catch {}
+  _feedBeams = [];
+}
+function feedClear() {
+  try { document.querySelector("#feed .feed-list").innerHTML = ""; } catch {}
+  try { document.querySelector("#feed .feed-team").innerHTML = ""; } catch {}
+  try { document.querySelector("#feed .feed-sub").textContent = ""; } catch {}
+  try {
+    const f = document.getElementById("feed");
+    if (f) f.classList.remove("expanded");
+    const t = document.getElementById("feedToggle");
+    if (t) { t.textContent = "All 0 steps ▾"; t.setAttribute("aria-expanded", "false"); }
+  } catch {}
+  G._feedRows = null;
+  feedClearBubbles();
+  feedClearBeams();
+}
+function feedSetSpeaking(id) {
+  try {
+    document.querySelectorAll("#feed .feed-team img").forEach(im => {
+      const on = im.dataset.char === id;
+      im.classList.toggle("speaking", !!on);
+      if (on) im.style.setProperty("--spk", hexGlow(feedColour(id)));
+    });
+  } catch {}
+}
+function feedMaybeScroll() {
+  try {
+    const list = document.querySelector("#feed .feed-list");
+    if (!list) return;
+    const nearBottom = list.scrollHeight - list.scrollTop - list.clientHeight < 60;
+    if (nearBottom) list.scrollTop = list.scrollHeight;
+  } catch {}
+}
+function feedTeamBuild(rows) {
+  try {
+    const teamEl = document.querySelector("#feed .feed-team");
+    if (!teamEl) return;
+    teamEl.innerHTML = "";
+    const seen = [];
+    for (const r of rows) {
+      for (const id of [r.from, r.to]) {
+        if (!id || id === "erp") continue;
+        if (seen.indexOf(id) < 0) seen.push(id);
+      }
+    }
+    for (const id of seen) {
+      const im = document.createElement("img");
+      im.src = AV(id);
+      im.alt = feedName(id);
+      im.title = feedName(id);
+      im.dataset.char = id;
+      im.style.borderColor = feedColour(id);
+      teamEl.appendChild(im);
+    }
+  } catch {}
+}
+function feedRowEl(row, num) {
+  const d = document.createElement("div");
+  d.className = "feed-row";
+  d.dataset.num = num;
+  const fromCol = feedColour(row.from);
+  const fromName = esc(feedName(row.from));
+  let namesHTML = "";
+  if (row.isThinking) {
+    namesHTML = `<span style="color:${esc(fromCol)}">${fromName}</span> <span class="thinks-label">thinks</span>`;
+  } else if (row.isCross) {
+    const toCol = feedColour(row.to);
+    const toName = esc(feedName(row.to));
+    namesHTML = `<span style="color:${esc(fromCol)}">${fromName}</span><span class="arrow"> ↔ </span><span style="color:${esc(toCol)}">${toName}</span>`;
+  } else if (row.to) {
+    const toCol = feedColour(row.to);
+    const toName = esc(feedName(row.to));
+    namesHTML = `<span style="color:${esc(fromCol)}">${fromName}</span><span class="arrow"> → </span><span style="color:${esc(toCol)}">${toName}</span>`;
+  } else {
+    namesHTML = `<span style="color:${esc(fromCol)}">${fromName}</span>`;
+  }
+  let msgHTML = "";
+  if (row.isGate) {
+    const cls = row.gateAction === "post" ? "post" : row.gateAction === "block" ? "block" : "human";
+    msgHTML = `<span class="verdict-word ${cls}">${esc(row.gateWord)}</span>${row.gateReason ? ` <span>· ${esc(row.gateReason)}</span>` : ""}`;
+  } else {
+    msgHTML = esc(row.text);
+  }
+  const msgCls = ["feed-msg"];
+  if (row.isThinking) msgCls.push("thinks-msg");
+  if (row.isOtherTool) msgCls.push("mono-msg");
+  if (row.isAsk) msgCls.push("clamp3");
+  const avHTML = row.from && row.from !== "erp"
+    ? `<img class="feed-av" src="${AV(row.from)}" alt="" style="border-color:${esc(fromCol)}">` : "";
+  d.innerHTML = `${avHTML}<div class="feed-body"><div class="feed-head"><span class="feed-names">${namesHTML}</span><span class="feed-step">#${num}</span></div><div class="${msgCls.join(" ")}">${msgHTML}</div></div>`;
+  if (row.isAsk) {
+    try {
+      const body = d.querySelector(".feed-body");
+      const btn = document.createElement("button");
+      btn.className = "feed-more";
+      btn.type = "button";
+      btn.textContent = "more";
+      btn.addEventListener("click", ev => {
+        ev.stopPropagation();
+        try {
+          const m = d.querySelector(".feed-msg");
+          const clamped = m.classList.toggle("clamp3");
+          btn.textContent = clamped ? "more" : "less";
+        } catch {}
+      });
+      body.appendChild(btn);
+    } catch {}
+  }
+  return d;
+}
+function feedShowReply(row, rowEl) {
+  if (row.reply == null) return;
+  try {
+    const body = rowEl.querySelector(".feed-body");
+    if (!body || body.querySelector(".feed-reply")) return;
+    const rd = document.createElement("div");
+    const cls = ["feed-reply"];
+    if (row.isRead) cls.push("red");
+    if (row.isAsk || row.isDraft) cls.push("status");
+    rd.className = cls.join(" ");
+    if (row.replyFromRecipient && row.to && row.to !== "erp") {
+      const im = document.createElement("img");
+      im.src = AV(row.to);
+      im.alt = "";
+      im.style.borderColor = feedColour(row.to);
+      rd.appendChild(im);
+    }
+    const sp = document.createElement("span");
+    sp.textContent = row.reply;
+    rd.appendChild(sp);
+    body.appendChild(rd);
+  } catch {}
+}
+function feedShowBubble(charId, text) {
+  if (reducedMotion) return;
+  if (!charId || charId === "erp") return;
+  try {
+    const rec = CHAR[charId];
+    if (!rec || !rec.loaded || !rec.group) return;
+    _pv.set(rec.group.position.x, rec.group.position.y + 3.075 + 0.35, rec.group.position.z).project(camera);
+    if (_pv.z > 1 || _pv.z < -1 || Math.abs(_pv.x) > 1.05 || Math.abs(_pv.y) > 1.05) return;
+    const prev = _feedBubbles[charId];
+    if (prev) {
+      try { clearTimeout(prev.timeout); clearTimeout(prev.fadeTimeout); } catch {}
+      try { if (prev.el && prev.el.parentNode) prev.el.parentNode.removeChild(prev.el); } catch {}
+    }
+    const isPhone = matchMedia("(max-width: 640px)").matches;
+    const maxCh = isPhone ? 28 : 46;
+    const short = feedTruncate(text, maxCh);
+    if (!short) return;
+    const el = document.createElement("div");
+    el.className = "bubble";
+    el.textContent = short;
+    el.style.borderLeftColor = feedColour(charId);
+    el.dataset.char = charId;
+    labelWrap.appendChild(el);
+    const rec2 = { el, timeout: 0, fadeTimeout: 0 };
+    rec2.timeout = setTimeout(() => {
+      try { el.classList.add("fade"); } catch {}
+      rec2.fadeTimeout = setTimeout(() => {
+        try { if (el.parentNode) el.parentNode.removeChild(el); } catch {}
+        try { if (_feedBubbles[charId] && _feedBubbles[charId].el === el) delete _feedBubbles[charId]; } catch {}
+      }, 350);
+    }, 1600);
+    _feedBubbles[charId] = rec2;
+  } catch {}
+}
+function feedFadeAllBubbles() {
+  try {
+    for (const k of Object.keys(_feedBubbles)) {
+      const b = _feedBubbles[k];
+      try { clearTimeout(b.timeout); } catch {}
+      try { b.el.classList.add("fade"); } catch {}
+      const el = b.el, key = k;
+      b.fadeTimeout = setTimeout(() => {
+        try { if (el.parentNode) el.parentNode.removeChild(el); } catch {}
+        try { if (_feedBubbles[key] && _feedBubbles[key].el === el) delete _feedBubbles[key]; } catch {}
+      }, 350);
+    }
+  } catch {}
+}
+function feedShowBeam(row) {
+  if (reducedMotion) return;
+  try {
+    const from = row.from, to = row.to;
+    if (!from || !to || to === "erp") return;
+    const rf = CHAR[from], rt = CHAR[to];
+    if (!rf || !rt || !rf.loaded || !rt.loaded || !rf.group || !rt.group) return;
+    const pf = personById(from), pt = personById(to);
+    if (!pf || !pt) return;
+    const a = new THREE.Vector3(rf.group.position.x, rf.group.position.y + (pf.h || 2.4), rf.group.position.z);
+    const b = new THREE.Vector3(rt.group.position.x, rt.group.position.y + (pt.h || 2.4), rt.group.position.z);
+    while (_feedBeams.length >= 3) {
+      const old = _feedBeams.shift();
+      try { scene.remove(old.line); scene.remove(old.sprite); } catch {}
+      try { old.line.geometry.dispose(); old.line.material.dispose(); old.sprite.material.dispose(); } catch {}
+    }
+    const geo = new THREE.BufferGeometry().setFromPoints([a, b]);
+    const col = new THREE.Color(feedColour(from));
+    const mat = new THREE.LineBasicMaterial({ color: col, transparent: true, opacity: 0,
+      depthTest: false, blending: THREE.AdditiveBlending, toneMapped: false });
+    const line = new THREE.Line(geo, mat);
+    line.renderOrder = 5;
+    line.frustumCulled = false;
+    scene.add(line);
+    if (!_feedPoolTex) {
+      try { _feedPoolTex = radialTex([[0, "rgba(255,255,255,1)"], [0.35, "rgba(255,255,255,.7)"], [1, "rgba(255,255,255,0)"]]); }
+      catch { _feedPoolTex = poolTex; }
+    }
+    const smat = new THREE.SpriteMaterial({ map: _feedPoolTex || poolTex, color: col,
+      transparent: true, depthTest: false, blending: THREE.AdditiveBlending, toneMapped: false });
+    const sprite = new THREE.Sprite(smat);
+    sprite.scale.setScalar(0.35);
+    sprite.position.copy(a);
+    sprite.renderOrder = 6;
+    scene.add(sprite);
+    _feedBeams.push({ line, sprite, t0: G.time, a: a.clone(), b: b.clone() });
+  } catch (e) { if (DEBUG) console.warn("beam:", e); }
+}
+function updateFeedBubbles() {
+  try {
+    for (const k of Object.keys(_feedBubbles)) {
+      const b = _feedBubbles[k];
+      const rec = CHAR[k];
+      if (!rec || !rec.loaded || !rec.group || !b.el || !b.el.isConnected) continue;
+      _pv.set(rec.group.position.x, rec.group.position.y + 3.075 + 0.35, rec.group.position.z).project(camera);
+      if (_pv.z > 1 || _pv.z < -1 || Math.abs(_pv.x) > 1.05 || Math.abs(_pv.y) > 1.05) {
+        b.el.style.display = "none";
+        continue;
+      }
+      b.el.style.display = "block";
+      const sx = (_pv.x * 0.5 + 0.5) * innerWidth;
+      const sy = (-_pv.y * 0.5 + 0.5) * innerHeight;
+      b.el.style.transform = `translate(${sx}px, ${sy}px) translate(-50%, -100%)`;
+    }
+  } catch {}
+}
+const _beamV = new THREE.Vector3();
+function updateFeedBeams() {
+  if (!_feedBeams.length) return;
+  try {
+    const keep = [];
+    for (const b of _feedBeams) {
+      const t = G.time - b.t0;
+      if (t >= 0.9) {
+        try { scene.remove(b.line); scene.remove(b.sprite); } catch {}
+        try { b.line.geometry.dispose(); b.line.material.dispose(); b.sprite.material.dispose(); } catch {}
+        continue;
+      }
+      try {
+        b.line.material.opacity = Math.sin(Math.PI * Math.min(1, t / 0.9)) * 0.9;
+        const u = Math.min(1, t / 0.6);
+        _beamV.lerpVectors(b.a, b.b, u);
+        b.sprite.position.copy(_beamV);
+        const s = 0.35 * (1 - 0.3 * u);
+        b.sprite.scale.setScalar(s);
+        b.sprite.material.opacity = 1 - u * 0.4;
+      } catch {}
+      keep.push(b);
+    }
+    _feedBeams = keep;
+  } catch {}
+}
+function feedSchedule() {
+  try {
+    const rows = buildFeedRows(G.cs);
+    G._feedRows = rows;
+    const list = document.querySelector("#feed .feed-list");
+    if (list) list.innerHTML = "";
+    feedTeamBuild(rows);
+    try {
+      const secs = G.cs && G.cs.agent ? G.cs.agent.seconds : "";
+      const n = G.cs && G.cs.agent && G.cs.agent.steps ? G.cs.agent.steps.length : rows.length;
+      document.querySelector("#feed .feed-sub").textContent = `recorded run · ${secs} s · ${n} steps`;
+    } catch {}
+    try {
+      const t = document.getElementById("feedToggle");
+      if (t) t.textContent = `All ${rows.length} steps ▾`;
+    } catch {}
+    if (!rows.length) return;
+    if (reducedMotion) {
+      later(() => {
+        try {
+          const l = document.querySelector("#feed .feed-list");
+          if (!l) return;
+          rows.forEach((r, i) => {
+            const el = feedRowEl(r, i + 1);
+            l.appendChild(el);
+            feedShowReply(r, el);
+          });
+          l.scrollTop = l.scrollHeight;
+          const last = rows[rows.length - 1];
+          if (last) feedSetSpeaking(last.from);
+        } catch (e) { if (DEBUG) console.warn("feed:", e); }
+      }, 300);
+      return;
+    }
+    const R = rows.length;
+    const slot = (6500 - 300) / R;
+    rows.forEach((r, i) => {
+      const atMsg = Math.round(300 + i * slot);
+      later(() => {
+        try {
+          const l = document.querySelector("#feed .feed-list");
+          if (!l) return;
+          if (i > 0) feedFadeAllBubbles();
+          const el = feedRowEl(r, i + 1);
+          el.dataset.row = i;
+          l.appendChild(el);
+          feedMaybeScroll();
+          feedSetSpeaking(r.from);
+          feedShowBubble(r.from, r.text);
+          feedShowBeam(r);
+        } catch (e) { if (DEBUG) console.warn("feedmsg:", e); }
+      }, atMsg);
+      if (r.reply != null) {
+        const atReply = Math.round(atMsg + slot * 0.45);
+        later(() => {
+          try {
+            const l = document.querySelector("#feed .feed-list");
+            if (!l) return;
+            const el = l.querySelector(`[data-row="${i}"]`) || l.children[i];
+            if (!el) return;
+            feedShowReply(r, el);
+            feedMaybeScroll();
+            if (r.replyFromRecipient && r.to) {
+              feedSetSpeaking(r.to);
+              feedShowBubble(r.to, r.reply);
+            }
+          } catch (e) { if (DEBUG) console.warn("feedreply:", e); }
+        }, atReply);
+      }
+    });
+  } catch (e) { if (DEBUG) console.warn("feed:", e); }
+}
+try {
+  document.getElementById("feedToggle").addEventListener("click", () => {
+    try {
+      const f = document.getElementById("feed");
+      const t = document.getElementById("feedToggle");
+      const on = f.classList.toggle("expanded");
+      t.setAttribute("aria-expanded", String(on));
+      if (on) {
+        t.textContent = "▴";
+        try {
+          const l = document.querySelector("#feed .feed-list");
+          if (l) l.scrollTop = l.scrollHeight;
+        } catch {}
+      } else {
+        const n = (G._feedRows && G._feedRows.length) || 0;
+        t.textContent = `All ${n} steps ▾`;
+      }
+    } catch {}
+  });
+} catch {}
 function startDeciding() {
   G.phase = "deciding";
   G._look = { kind: "pallet" };   // everyone on the floor turns to the pallet
@@ -3036,6 +3697,7 @@ function startDeciding() {
     sndChime(g8.action);
     if (g8.action === "post") G.barrierOpen = true;   // eased open in the main loop
   }, 5000);
+  try { feedSchedule(); } catch (e) { if (DEBUG) console.warn("feed:", e); }
   later(showResult, 6800);
 }
 
@@ -3067,6 +3729,16 @@ function showResult() {
   if (wrong) G.wrongCount++;
   document.body.classList.add("done");
   document.body.classList.remove("deciding");
+  try {
+    const f = document.getElementById("feed");
+    if (f) f.classList.remove("expanded");
+    const t = document.getElementById("feedToggle");
+    if (t) {
+      const n = (G._feedRows && G._feedRows.length) || 0;
+      t.textContent = `All ${n} steps ▾`;
+      t.setAttribute("aria-expanded", "false");
+    }
+  } catch {}
   if (g8.action === "human") wave("sef");
   const R = $("result");
   R.className = "card " + g8.action;
@@ -3101,6 +3773,7 @@ function showResult() {
   $("againBtn").addEventListener("click", () => {
     document.body.classList.remove("done", "deciding", "playing");
     $("reads").innerHTML = "";
+    try { feedClear(); } catch {}
     try { sendAllHome(); } catch {}
     G.phase = "intro";
     $("introWrap").style.display = "flex";
@@ -3349,6 +4022,8 @@ function tick() {
     try { updateSefStep(dt); } catch {}
     stepCamera(dt);
     updateLabels();
+    try { updateFeedBubbles(); } catch {}
+    try { updateFeedBeams(); } catch {}
     if (cabGroup && cabGroup.visible) {
       if (wheelSpinner) wheelSpinner.rotation.z = -G.fork.steerAngle * 2.5;
       if (G.time - dashAt > 0.12) { drawDash(); dashTex.needsUpdate = true; dashAt = G.time; }
@@ -3375,7 +4050,8 @@ function tick() {
 // case to the result card. Nothing is exposed without ?test.
 if (new URLSearchParams(location.search).has("test"))
   window.__sim = { G, CHAR, ST, pickup: () => pickupPallet(true), drop: dropPallet, DROP, ZONE,
-    FORK: { pick: PICK_D, set: SET_D }, camera, get delivery() { return deliveryGroup; } };
+    FORK: { pick: PICK_D, set: SET_D }, camera, get delivery() { return deliveryGroup; },
+    feed: () => feedPlainRows() };
 if ("ontouchstart" in window || navigator.maxTouchPoints > 0) document.body.classList.add("touch");
 boot();
 tick();
