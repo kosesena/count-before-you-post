@@ -774,7 +774,7 @@ def p_lights(P):
             bpy.ops.object.light_add(type="SPOT", location=(x, y, 6.15))
             L = bpy.context.object
             L.name = f"p_bay{ix}{iy}"
-            L.data.energy = 192.5
+            L.data.energy = 467.5  # bright like the concepts' warehouse
             L.data.color = (1.0, 0.78, 0.55)
             _psetattr(L.data, "spot_size", 1.15)
             _psetattr(L.data, "spot_blend", 0.8)
@@ -1271,7 +1271,7 @@ def p_quality():
     nt = bpy.context.scene.world.node_tree
     bg = nt.nodes["Background"]
     bg.inputs["Color"].default_value = (0.32, 0.32, 0.33, 1)
-    bg.inputs["Strength"].default_value = 0.1
+    bg.inputs["Strength"].default_value = 0.4
     try:
         bpy.context.scene.view_settings.view_transform = "Standard"
     except TypeError:
@@ -1300,6 +1300,25 @@ def p_quality():
                      ("use_taa_reprojection", True), ("use_bloom", True),
                      ("bloom_threshold", 1.0), ("shadow_pool_size", 2048)):
         _psetattr(ee, key, val)
+    # The viewport was grainy with black specks: too many shadowed lights for the
+    # shadow pool, one shadow ray, screen-traced reflections on the semi-gloss floor
+    # and coarse fast GI. These settings render it clean.
+    for key, val in (("taa_samples", 64), ("shadow_resolution_scale", 0.5),
+                     ("shadow_ray_count", 4), ("shadow_step_count", 16),
+                     ("use_shadow_jitter_viewport", False), ("fast_gi_resolution", "1"),
+                     ("fast_gi_ray_count", 8), ("fast_gi_step_count", 8)):
+        _psetattr(ee, key, val)
+    rt = getattr(ee, "ray_tracing_options", None)
+    if rt is not None:
+        _psetattr(rt, "trace_max_roughness", 0.2)
+        _psetattr(rt, "resolution_scale", "1")
+    for ob in bpy.data.objects:
+        if ob.type != "LIGHT":
+            continue
+        _psetattr(ob.data, "shadow_filter_radius", 3.0)
+        # Only each room's key light casts shadows inside the rooms.
+        if ob.name.startswith("p_room_") and not ob.name.endswith("_key"):
+            ob.data.use_shadow = False
 
 
 def p_rooms(P):
