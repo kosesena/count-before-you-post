@@ -1,11 +1,11 @@
 """LEGO-style outside of the dock's back wall (the `disari` view).
 
-Builds the exterior face the outside camera sees: a white/light-grey brick
-facade with a dark roof fascia, nine warm roof-edge lamps, a thick black
-dock-door surround with a yellow MAL KABUL 01 sign and a traffic light, flat
-yellow dashed lane tiles and a grey dock plate on the dark stud-textured apron
-(warehouse.py owns the apron material), and a clear 1 m square for a
-dock-guard minifig.
+Builds the exterior face the outside camera sees: the hall's small-brick
+texture over the whole outer facade, a dark roof fascia, nine warm roof-edge
+lamps, a thick black dock-door surround with a yellow MAL KABUL 01 sign and
+a traffic light, flat yellow dashed lane tiles and a grey dock plate on the
+dark stud-textured apron (warehouse.py owns the apron material), and a clear
+1 m square for a dock-guard minifig.
 `warehouse.py` calls `build_lego_front` from `polish()`.
 """
 
@@ -28,43 +28,54 @@ def _lf_hex(h):
     return tuple(out)
 
 
+def _lf_brick_uvs(ob):
+    """Box-projected world-scale UVs: one brick tile per 4 bricks x 4 courses,
+    the same scale as the hall walls inside (warehouse.py)."""
+    tile_w, tile_h = 4 * LF_BRICK_L, 4 * LF_BRICK_H
+    mesh = ob.data
+    if not mesh.uv_layers:
+        mesh.uv_layers.new(name="UVMap")
+    uv = mesh.uv_layers.active
+    sx, sy, sz = ob.scale
+    ox, oy, oz = ob.location
+    for poly in mesh.polygons:
+        n = poly.normal
+        ax = 0 if abs(n.x) >= abs(n.y) and abs(n.x) >= abs(n.z) else \
+            (1 if abs(n.y) >= abs(n.z) else 2)
+        for li in poly.loop_indices:
+            co = mesh.vertices[mesh.loops[li].vertex_index].co
+            x, y, z = co[0] * sx + ox, co[1] * sy + oy, co[2] * sz + oz
+            if ax == 0:
+                u, v = y / tile_w, z / tile_h
+            elif ax == 1:
+                u, v = x / tile_w, z / tile_h
+            else:
+                u, v = x / tile_w, y / tile_w
+            uv.data[li].uv = (u, v)
+
+
 def build_lego_front(P, box, cyl, text, mat):
     """Build the LEGO facade, door frame, sign and lane tiles.
 
-    `P` is the polish-materials dict, `box`/`cyl`/`text`/`mat` are the helpers
-    from `experiments/blender/warehouse.py` (`P` is unused: the facade keeps
-    LEGO colours; `text` draws the door sign). Returns nothing.
+    `P` is the polish-materials dict (`P["wall_back"]` is the hall's small
+    white brick texture, reused here at the same scale), `box`/`cyl`/`text`/
+    `mat` are the helpers from `experiments/blender/warehouse.py` (`text`
+    draws the door sign). Returns nothing.
     """
     grey = _lf_hex("#a0a5a9")  # light bluish grey
     dark = _lf_hex("#6c6e68")  # dark bluish grey
     Y0 = 10.15  # outer face of the back wall
 
-    # --- 1. brick facade: 0.96 x 0.288 white/light-grey bricks, running bond.
-    # The dock opening (x in [-1.6, 1.6], z < 3.4) stays free.
-    brick_w = mat("p_lf_brick_w", _lf_hex("#f2f3f2"), rough=0.55)
-    brick_o = mat("p_lf_brick_o", _lf_hex("#e4e6e3"), rough=0.55)
-    brick_g = mat("p_lf_brick_g", grey, rough=0.55)
-    n = 0
-    course = 0
-    while course * LF_BRICK_H < 7.0:
-        zc = LF_BRICK_H / 2 + course * LF_BRICK_H
-        x = -15.0 + (course % 2) * (LF_BRICK_L / 2) - LF_BRICK_L
-        spans = ((-15.0, -1.6), (1.6, 15.0)) \
-            if zc - LF_BRICK_H / 2 < 3.4 else ((-15.0, 15.0),)
-        while x < 15.0:
-            for lo, hi in spans:
-                a, b = max(x, lo), min(x + LF_BRICK_L, hi)
-                if b - a > 0.05:
-                    if (n * 7 + course * 5) % 11 == 0:
-                        m = brick_g
-                    else:
-                        m = brick_w if n % 2 == 0 else brick_o
-                    box(f"p_lf_brick{course}_{n}", (b - a, 0.24, LF_BRICK_H),
-                        ((a + b) / 2, Y0 + 0.22, zc), m)
-                    n += 1
-            x += LF_BRICK_L
-        course += 1
-    # Roof edge / fascia: 0.4 m tall, 0.3 m proud of the bricks.
+    # --- 1. brick facade: the hall's small white brick texture everywhere.
+    # Three slabs with P["wall_back"] at the inside scale (0.96 x 0.288
+    # running bond, faint mortar, normal-map relief); the dock opening
+    # (x in [-1.6, 1.6], z < 3.4) stays free. No scattered brick boxes.
+    for _fname, _fdims, _floc in (
+            ("p_lf_facade_l", (13.4, 0.24, 7.0), (-8.3, Y0 + 0.22, 3.5)),
+            ("p_lf_facade_r", (13.4, 0.24, 7.0), (8.3, Y0 + 0.22, 3.5)),
+            ("p_lf_facade_top", (3.2, 0.24, 3.6), (0, Y0 + 0.22, 5.2))):
+        _lf_brick_uvs(box(_fname, _fdims, _floc, P["wall_back"]))
+    # Roof edge / fascia: 0.4 m tall, 0.3 m proud of the facade.
     fascia_m = mat("p_lf_fascia", dark, rough=0.6)
     box("p_lf_fascia", (30.0, 0.45, 0.4), (0, 10.4, 7.0), fascia_m)
 

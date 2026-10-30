@@ -585,9 +585,10 @@ def _pnode(mat, ntype, name=None):
 
 
 # LEGO module at the cast's scale (a 4 cm minifigure scaled to our 2.4 m cast: x60).
-# Geometric studs (STUD_PITCH) survive only on small things (table top, stools,
+# Geometric studs (STUD_PITCH) survive only on small things (stools,
 # cartons, cab roof); the floor, apron, ceiling and meeting-platform rim carry
-# fine studs as a texture (STUD_TEX_PITCH).
+# fine studs as a texture (STUD_TEX_PITCH). The meeting table top is a smooth
+# tiled disc (no studs).
 STUD_PITCH = 0.48
 STUD_R = 0.144
 STUD_H = 0.10
@@ -827,8 +828,9 @@ def _lego_stud_normal():
 def _lego_stud_images(base_hex, tag):
     """512x512 tileable 4x4-stud colour image (base `base_hex`), packed.
 
-    Round studs (diameter 0.6 x pitch) with a soft top highlight and a soft
-    contact shadow; returns (colour image, shared normal image).
+    Round studs (diameter 0.6 x pitch) with a top highlight and a contact
+    ring strong enough to read at 10-15 m; returns (colour image, shared
+    normal image).
     """
     S, cell = 512, 128
     c, r = cell / 2, 0.3 * cell
@@ -843,13 +845,13 @@ def _lego_stud_images(base_hex, tag):
             t = d / r
             if t < 1.0:
                 dome = math.sqrt(1.0 - t * t)
-                f = 0.94 + 0.10 * (ly / r * 0.5 + 0.5) + 0.04 * dome
+                f = 0.92 + 0.14 * (ly / r * 0.5 + 0.5) + 0.06 * dome
                 col_cell[p:p + 3] = (min(1.0, base[0] * f),
                                      min(1.0, base[1] * f),
                                      min(1.0, base[2] * f))
             else:
                 s = max(0.0, 1.0 - (d - r) / 14.0)
-                f = 1.0 - 0.20 * s * s
+                f = 1.0 - 0.28 * s * s
                 col_cell[p:p + 3] = (base[0] * f, base[1] * f, base[2] * f)
             col_cell[p + 3] = 1.0
     col_px = [0.0] * (S * S * 4)
@@ -872,7 +874,7 @@ def _lego_stud_images(base_hex, tag):
 
 def _stud_material(name, color_img, normal_img):
     """ABS material with packed stud images as base colour (UV-mapped, one tile
-    per STUD_TEX_TILE) plus a normal map."""
+    per STUD_TEX_TILE) plus a full-strength normal map."""
     m = lego_mat(name, "#ffffff")
     nt = m.node_tree
     b = next(n for n in nt.nodes if n.type == "BSDF_PRINCIPLED")
@@ -882,6 +884,7 @@ def _stud_material(name, color_img, normal_img):
     ntex = _pnode(m, "ShaderNodeTexImage")
     ntex.image, ntex.extension = normal_img, "REPEAT"
     nmap = _pnode(m, "ShaderNodeNormalMap")
+    _pset(nmap, "Strength", 1.0)
     nt.links.new(uv.outputs["UV"], tex.inputs["Vector"])
     nt.links.new(uv.outputs["UV"], ntex.inputs["Vector"])
     nt.links.new(tex.outputs["Color"], b.inputs["Base Color"])
@@ -951,23 +954,29 @@ def _annulus(name, cx, cy, r_in, r_out, z0, z1, m, segs=64):
 def _lego_grid_image(disc_r):
     """512x512 orange tile-grid image for the meeting-table overlay disc, packed.
 
-    Dark lines every 0.48 m across the `2 * disc_r` disc (the cap UVs of the
-    overlay cylinder span the full image).
+    Faint darker-orange lines every 0.24 m across the `2 * disc_r` disc (the
+    cap UVs of the overlay cylinder span the full image), plus a slim darker
+    orange edge band around the rim.
     """
     S = 512
     base = _hex("#e4a149")
-    line = _hex("#8a5a24")
-    step = 0.48 * S / (2 * disc_r)
-    w = 3.0
-    centres = [S / 2 + k * step for k in range(-4, 5)]
+    line = _hex("#c98a3a")
+    step = 0.24 * S / (2 * disc_r)
+    w = 0.01 * S / (2 * disc_r)
+    n = int(math.ceil(disc_r / 0.24)) + 2
+    centres = [S / 2 + k * step for k in range(-n, n + 1)]
     is_line = [any(abs(p + 0.5 - L) < w / 2 for L in centres)
                for p in range(S)]
+    band = 0.06 * S / (2 * disc_r)
     col_px = [0.0] * (S * S * 4)
     for j in range(S):
         lj = is_line[j]
+        dj = j + 0.5 - S / 2
         for i in range(S):
             p = (j * S + i) * 4
-            col_px[p:p + 3] = line if (lj or is_line[i]) else base
+            di = i + 0.5 - S / 2
+            edge = math.hypot(di, dj) > S / 2 - band
+            col_px[p:p + 3] = line if (edge or lj or is_line[i]) else base
             col_px[p + 3] = 1.0
     img = bpy.data.images.new("p_meet_grid", S, S)
     img.colorspace_settings.name = "sRGB"
@@ -987,6 +996,11 @@ def p_materials():
     P["floor"] = _stud_material("p_floor", _floor_col, _floor_nor)
     _apron_col, _apron_nor = _lego_stud_images("#6c6e68", "apron")
     P["apron"] = _stud_material("p_apron", _apron_col, _apron_nor)
+    _ab = next(n for n in P["apron"].node_tree.nodes
+               if n.type == "BSDF_PRINCIPLED")
+    _ab.inputs["Roughness"].default_value = 0.45
+    _pset(_ab, "Coat Weight", 0.0)
+    _pset(_ab, "Clearcoat", 0.0)
     _rim_col, _rim_nor = _lego_stud_images("#f2cd37", "rim")
     P["rim"] = _stud_material("p_meet_rim", _rim_col, _rim_nor)
     _brick_col, _brick_nor = _lego_brick_images()
@@ -4917,7 +4931,7 @@ def p_lego_floor(P, V):
     _floor_tape_tiles("zone_karantina", 5.0, 3.4, 9.0, 7.6, P["red"])
     _hatch_tiles("zone_karantina", 5.0, 3.4, 9.0, 7.6, P["red"])
     # Room floors keep their finishes; geometric studs live only on small
-    # things now (table top, stools, cartons, cab roof).
+    # things now (stools, cartons, cab roof); the table top is a smooth tile.
     # The delivery pallet keeps its slats; only the look turns to LEGO.
     for suffix in [f"_top{k}" for k in range(5)] + [f"_blk{k}" for k in range(3)] \
             + [f"_bot{k}" for k in range(3)]:
@@ -4967,6 +4981,7 @@ def p_meeting(P):
     """
     dark = P["dark_steel"]
     top_orange = lego_mat("p_meet_top", "#e4a149")
+    edge_orange = lego_mat("p_meet_edge_orange", "#c98a3a")
     plat_navy = lego_mat("p_meet_rugmat", "#1f3a73")
     sign_navy = lego_mat("p_meet_navy", "#1e2a5a")
     screen_pale = mat("p_meet_screen", _hex("#dbeafe"), emit=2.0)
@@ -4978,21 +4993,26 @@ def p_meeting(P):
         verts=64)
     _annulus("p_meet_rug_ring", MEET_X, MEET_Y, MEET_RUG_R - 0.25, MEET_RUG_R,
              plat, plat + 0.02, P["rim"])
-    # Round table: top surface at MEET_TOP, dark edge band, pedestal on base plate.
-    # The table and the stools are Meshy models (assets/meshy, generated 30 Oct);
-    # without them the scene falls back to simple primitives.
+    # Round table: top surface at MEET_TOP, slim darker-orange edge band,
+    # pedestal on base plate. The table top itself is a smooth tiled disc
+    # (no studs). The table and the stools are Meshy models (assets/meshy,
+    # generated 30 Oct); without them the scene falls back to primitives.
     table = _meshy("meet_table.glb", "p_meet_table", (MEET_X, MEET_Y), MEET_R,
                    top - plat, tint=_hex("#e4a149"), z0=plat)
     if table is None:
         cyl("p_meet_tabletop", MEET_R, 0.09, (MEET_X, MEET_Y, top - 0.045),
             top_orange, verts=64)
         cyl("p_meet_edge", MEET_R + 0.01, 0.04, (MEET_X, MEET_Y, top - 0.045),
-            dark, verts=64)
+            edge_orange, verts=64)
         cyl("p_meet_pedestal", 0.24, top - plat - 0.15,
             (MEET_X, MEET_Y, plat + 0.06 + (top - plat - 0.15) / 2), dark)
         cyl("p_meet_base", 0.85, 0.06, (MEET_X, MEET_Y, plat + 0.03), dark,
             verts=48)
-    # Thin tile grid: overlay disc 2 mm above the top, dark lines 0.48 m apart.
+    else:
+        cyl("p_meet_edge", MEET_R + 0.01, 0.04, (MEET_X, MEET_Y, top - 0.045),
+            edge_orange, verts=64)
+    # Thin tile grid: overlay disc 2 mm above the top, faint darker-orange
+    # lines 0.24 m apart (the overlay image also paints the rim edge band).
     grid_m = lego_mat("p_meet_gridmat", "#e4a149")
     _gnt = grid_m.node_tree
     _gb = next(n for n in _gnt.nodes if n.type == "BSDF_PRINCIPLED")
@@ -5003,22 +5023,8 @@ def p_meeting(P):
     _gnt.links.new(_gtex.outputs["Color"], _gb.inputs["Base Color"])
     cyl("p_meet_grid", MEET_R, 0.002, (MEET_X, MEET_Y, top + 0.002), grid_m,
         verts=64)
-    # Studs on the table top: pitch grid inside the radius, a 0.3 m clear ring
-    # at the edge and the props' spots (offsets from the table centre) clear.
-    _props = [(-0.55, 0.25, 0.35), (0.55, -0.30, 0.35), (0.25, 0.55, 0.20),
-              (-0.15, -0.55, 0.30)]
-    _k = 0
-    for _ki in range(LEGO_NX):
-        _gx = LEGO_GX0 + _ki * STUD_PITCH
-        for _kj in range(LEGO_NY):
-            _gy = LEGO_GY0 + _kj * STUD_PITCH
-            _dx, _dy = _gx - MEET_X, _gy - MEET_Y
-            if _dx * _dx + _dy * _dy < (MEET_R - 0.3) ** 2 and all(
-                    (_dx - _px) ** 2 + (_dy - _py) ** 2 > (_pr + STUD_R) ** 2
-                    for _px, _py, _pr in _props):
-                _stud(f"p_meet_stud{_k}", _gx, _gy, top, top_orange)
-                _k += 1
-    # Six stools (1.4x) on the MEET_STOOL_R circle (0 deg = +x); seat top 0.87.
+    # Six stools (1.4x) on the MEET_STOOL_R circle (0 deg = +x); seat top 0.87,
+    # one small stud (r 0.08) on each seat.
     for i in range(6):
         col = ("#00a3a3", "#fe8a18", "#f2cd37", "#0055bf")[i % 4]
         ang = math.radians(i * 60)
@@ -5026,8 +5032,9 @@ def p_meeting(P):
         sy = MEET_Y + MEET_STOOL_R * math.sin(ang)
         if _meshy("meet_stool.glb", f"p_meet_stool{i}", (sx, sy), 0.34,
                   0.87 - plat, tint=_hex(col), z0=plat) is not None:
-            _stud(f"p_meet_stool{i}_stud", sx, sy, 0.87,
-                  lego_mat(f"p_meet_stoolm{i}", col))
+            cyl(f"p_meet_stool{i}_stud", 0.08, STUD_H,
+                (sx, sy, 0.87 + STUD_H / 2),
+                lego_mat(f"p_meet_stoolm{i}", col), verts=16)
             continue
         sm = lego_mat(f"p_meet_seat{i}", col)
         cyl(f"p_meet_stool{i}_seat", 0.34, 0.10, (sx, sy, 0.82), sm, verts=32)
@@ -5040,8 +5047,8 @@ def p_meeting(P):
         fring = bpy.context.object
         fring.name = f"p_meet_stool{i}_ring"
         fring.data.materials.append(dark)
-        _stud(f"p_meet_stool{i}_stud", sx, sy, 0.87,
-              lego_mat(f"p_meet_stoolm{i}", col))
+        cyl(f"p_meet_stool{i}_stud", 0.08, STUD_H, (sx, sy, 0.87 + STUD_H / 2),
+            lego_mat(f"p_meet_stoolm{i}", col), verts=16)
     # On the table: notes, clipboard, stamp, tablet (1.5x, spread over the top).
     for k, yaw in enumerate((0.12, -0.10, 0.04)):
         box(f"p_meet_note{k}", (0.32, 0.45, 0.004),
