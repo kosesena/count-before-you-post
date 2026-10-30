@@ -661,11 +661,12 @@ def p_materials():
     P["asphalt"] = mat("p_asphalt", (0.30, 0.30, 0.31), rough=0.95)
     P["red"] = mat("p_red", (0.70, 0.05, 0.03), rough=0.5)
     P["black"] = mat("p_black", (0.02, 0.02, 0.02), rough=0.85)
-    P["glass"] = mat("p_glass", (0.82, 0.90, 0.95), rough=0.06, metal=0.1)
+    # Clear glass: mostly reflection, a faint tint; a higher alpha veils the rooms.
+    P["glass"] = mat("p_glass", (0.80, 0.90, 0.95), rough=0.03)
     P["glass"].blend_method = "BLEND"
     _psetattr(P["glass"], "shadow_method", "NONE")
     _pset(next(n for n in P["glass"].node_tree.nodes
-               if n.type == "BSDF_PRINCIPLED"), "Alpha", 0.22)
+               if n.type == "BSDF_PRINCIPLED"), "Alpha", 0.08)
     P["film"] = mat("p_film", (0.88, 0.92, 0.94), rough=0.18)
     P["film"].blend_method = "BLEND"
     _psetattr(P["film"], "shadow_method", "NONE")
@@ -5011,6 +5012,10 @@ def polish(cams, V):
     p_racks(P, rnd)
     p_props(P, rnd)
     p_rooms(P)
+    # The simulator's floor workstations, so the video and the simulator match.
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    from stations import build_stations
+    build_stations(P, box, cyl, mat)
     p_quality()
 
 
