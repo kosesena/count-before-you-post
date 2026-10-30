@@ -52,7 +52,7 @@ def group_of(ob):
 
 def clean():
     for ob in list(bpy.data.objects):
-        if ob.type in ("CAMERA", "LIGHT") or ob.name.startswith(("p_stand_", "p_standft_")):
+        if ob.type in ("CAMERA", "LIGHT") or ob.name.startswith(("p_stand_", "p_standft_", "p_station_")):
             bpy.data.objects.remove(ob, do_unlink=True)
     fonts = [o for o in bpy.data.objects if o.type == "FONT"]
     for ob in fonts:

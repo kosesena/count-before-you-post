@@ -4476,6 +4476,40 @@ MEET_TOP = 1.35     # table top height (a standing table for the 2.4 m cast)
 MEET_STOOL_R = 2.4  # stools on this circle; the simulator stands the cast 0.5 m behind
 
 
+def _meshy(fname, name, xy, radius, height, tint=None):
+    """Import a Meshy model from assets/meshy, sized to radius x height at xy (origin at
+    its base), optionally tinted (a Multiply node the glTF export reads as a colour factor)."""
+    path = REPO / "assets" / "meshy" / fname
+    if not path.exists():
+        return None
+    before = set(bpy.data.objects)
+    bpy.ops.import_scene.gltf(filepath=str(path))
+    new = [o for o in bpy.data.objects if o not in before and o.type == "MESH"]
+    if not new:
+        return None
+    ob = new[0]
+    ob.name = name
+    ob.rotation_mode = "XYZ"
+    bpy.context.view_layer.update()
+    w, h = max(ob.dimensions.x, ob.dimensions.y), ob.dimensions.z
+    ob.scale = (2 * radius / w, 2 * radius / w, height / h)
+    ob.location = (xy[0], xy[1], 0.0)
+    if tint is not None:
+        m = ob.data.materials[0].copy()
+        ob.data.materials[0] = m
+        nt = m.node_tree
+        bsdf = next(n for n in nt.nodes if n.type == "BSDF_PRINCIPLED")
+        link = next((l for l in nt.links if l.to_socket == bsdf.inputs["Base Color"]), None)
+        if link is not None:
+            mix = nt.nodes.new("ShaderNodeMix")
+            mix.data_type, mix.blend_type = "RGBA", "MULTIPLY"
+            mix.inputs[0].default_value = 1.0
+            mix.inputs[7].default_value = (*tint, 1)
+            nt.links.new(link.from_socket, mix.inputs[6])
+            nt.links.new(mix.outputs[2], bsdf.inputs["Base Color"])
+    return ob
+
+
 def p_meeting(P):
     """Meeting corner in the open hall: round table, stools, rug, lamp, sign.
 
@@ -4499,18 +4533,25 @@ def p_meeting(P):
     rring.scale = (1.0, 1.0, 0.12)
     rring.data.materials.append(ring_yellow)
     # Round table: top surface at MEET_TOP, dark edge band, pedestal on base plate.
-    cyl("p_meet_tabletop", MEET_R, 0.09, (MEET_X, MEET_Y, top - 0.045), oak, verts=64)
-    cyl("p_meet_edge", MEET_R + 0.01, 0.04, (MEET_X, MEET_Y, top - 0.045), dark,
-        verts=64)
-    cyl("p_meet_pedestal", 0.24, top - 0.15, (MEET_X, MEET_Y, (top - 0.09) / 2 + 0.03),
-        dark)
-    cyl("p_meet_base", 0.85, 0.06, (MEET_X, MEET_Y, 0.03), dark, verts=48)
+    # The table and the stools are Meshy models (assets/meshy, generated 30 Oct);
+    # without them the scene falls back to simple primitives.
+    table = _meshy("meet_table.glb", "p_meet_table", (MEET_X, MEET_Y), MEET_R, top)
+    if table is None:
+        cyl("p_meet_tabletop", MEET_R, 0.09, (MEET_X, MEET_Y, top - 0.045), oak, verts=64)
+        cyl("p_meet_edge", MEET_R + 0.01, 0.04, (MEET_X, MEET_Y, top - 0.045), dark,
+            verts=64)
+        cyl("p_meet_pedestal", 0.24, top - 0.15,
+            (MEET_X, MEET_Y, (top - 0.09) / 2 + 0.03), dark)
+        cyl("p_meet_base", 0.85, 0.06, (MEET_X, MEET_Y, 0.03), dark, verts=48)
     # Six stools (1.4x) on the MEET_STOOL_R circle (0 deg = +x); seat top 0.87.
     for i, col in enumerate(("#f97316", "#3b82f6", "#a16207", "#1d4ed8",
                              "#ca8a04", "#0d9488")):
         ang = math.radians(i * 60)
         sx = MEET_X + MEET_STOOL_R * math.cos(ang)
         sy = MEET_Y + MEET_STOOL_R * math.sin(ang)
+        if _meshy("meet_stool.glb", f"p_meet_stool{i}", (sx, sy), 0.34, 0.87,
+                  tint=_hex(col)) is not None:
+            continue
         sm = mat(f"p_meet_seat{i}", _hex(col), rough=0.6)
         cyl(f"p_meet_stool{i}_seat", 0.34, 0.10, (sx, sy, 0.82), sm, verts=32)
         cyl(f"p_meet_stool{i}_post", 0.05, 0.77, (sx, sy, 0.385), dark)
@@ -4596,7 +4637,7 @@ def polish(cams, V):
     cams["teslimat"] = bpy.context.object
     cams["teslimat"].data.lens = 24
     aim(cams["teslimat"], (0.0, 5.3, 0.4))
-    p_standees(P, V["light"], g.location)
+    # The cardboard standees gave way to the real 3D cast (render_rooms.py seats them).
     p_racks(P, rnd)
     p_props(P, rnd)
     p_rooms(P)
@@ -4604,7 +4645,8 @@ def polish(cams, V):
     # The simulator's floor workstations, so the video and the simulator match.
     sys.path.insert(0, str(Path(__file__).resolve().parent))
     from stations import build_stations
-    build_stations(P, box, cyl, mat)
+    # Only the ok case's floor set works the floor, as in the simulator.
+    build_stations(P, box, cyl, mat, ids=("spark", "sam", "kapi", "rover"))
     p_quality()
 
 
