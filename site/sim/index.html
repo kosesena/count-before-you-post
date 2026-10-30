@@ -846,9 +846,6 @@ h1, h2, h3, .feed-title, .verdict-word, .v-doc, .v-badge, .who-name, .who-title 
 .fraw-src, .fraw-note { color: rgba(255,255,255,.78); }
 .feed-step, .feed-names .arrow { color: #e2e8f0; }
 .read .who-name, .read .who-name span,
-.feed-names span:not(.arrow):not(.thinks-label) {
-  color: #fff !important;
-}
 @media (max-width: 640px) {
   #feed, #result, .read, .pickPanel, .bottombar, #noteCard,
   #hint, #tallyChip, #carryChip, #demoLink, #keys, #focusChip {
@@ -3735,13 +3732,13 @@ function feedColour(id) {
   if (id === "erp") return "rgba(255,255,255,.75)";
   try { return charColour(id); } catch { return "rgba(255,255,255,.25)"; }
 }
-// Name text on the dark glass: the darkest character colours (Şef, Voice) lifted toward white.
+// Name text on the grey plates: the character colours lifted toward white until they read.
 function feedTextColour(id) {
   const col = feedColour(id);
   const m = /^#([0-9a-fA-F]{6})$/.exec(col);
   if (!m) return col;
   const n = parseInt(m[1], 16), r = n >> 16, g = (n >> 8) & 255, b = n & 255;
-  if (0.2126 * r + 0.7152 * g + 0.0722 * b > 110) return col;
+  if (0.2126 * r + 0.7152 * g + 0.0722 * b > 170) return col;   // readable on the grey plates
   const lift = c => Math.round(c + (255 - c) * 0.5);
   return `rgb(${lift(r)},${lift(g)},${lift(b)})`;
 }
