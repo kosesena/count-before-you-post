@@ -238,7 +238,7 @@ body.seat #demoLink, body.seat #noteCard { display: none !important; }
   flex-direction: column; gap: 8px;
 }
 body.deciding #reads { display: flex; }
-body.deciding #noteCard, body.deciding #keys, body.deciding #joy, body.deciding #pickBtn, body.deciding #camBtn { display: none !important; }
+body.done #keys, body.deciding #noteCard, body.deciding #keys, body.deciding #joy, body.deciding #pickBtn, body.deciding #camBtn { display: none !important; }
 .read {
   background: rgba(11,18,38,.68);
   -webkit-backdrop-filter: blur(16px) saturate(1.3); backdrop-filter: blur(16px) saturate(1.3);
@@ -611,7 +611,7 @@ body.done #resultWrap { display: flex; }
       <div class="feed-title">Agent run</div>
       <div class="feed-sub"></div>
     </div>
-    <button id="feedToggle" aria-expanded="false">All 0 steps ▾</button>
+    <button id="feedToggle" aria-expanded="false">Show all ▾</button>
   </div>
   <div class="feed-team"></div>
   <div class="feed-list"></div>
@@ -3062,6 +3062,16 @@ function feedColour(id) {
   if (id === "erp") return "rgba(255,255,255,.75)";
   try { return charColour(id); } catch { return "rgba(255,255,255,.25)"; }
 }
+// Name text on the dark glass: the darkest character colours (Şef, Voice) lifted toward white.
+function feedTextColour(id) {
+  const col = feedColour(id);
+  const m = /^#([0-9a-fA-F]{6})$/.exec(col);
+  if (!m) return col;
+  const n = parseInt(m[1], 16), r = n >> 16, g = (n >> 8) & 255, b = n & 255;
+  if (0.2126 * r + 0.7152 * g + 0.0722 * b > 110) return col;
+  const lift = c => Math.round(c + (255 - c) * 0.5);
+  return `rgb(${lift(r)},${lift(g)},${lift(b)})`;
+}
 function feedTruncate(s, max) {
   s = String(s ?? "");
   if (s.length <= max) return s;
@@ -3193,7 +3203,7 @@ function buildFeedRows(cs) {
       const title = d.title || "";
       const to = d.to || "";
       if (title || to) {
-        const text = kind ? `Draft: ${title} · to ${to} · ${kind}` : `Draft: ${title} · to ${to}`;
+        const text = `${kind || "Draft"}: “${title}” · to ${to}`;
         rows.push({ from: "wonder", to: "sef", text,
           reply: "waiting for Şef's approval", isDraft: true });
       }
@@ -3233,14 +3243,14 @@ function feedClearBeams() {
   _feedBeams = [];
 }
 function feedClear() {
-  try { document.querySelector("#feed .feed-list").innerHTML = ""; } catch {}
+  try { const l = document.querySelector("#feed .feed-list"); l.innerHTML = ""; l._stick = true; } catch {}
   try { document.querySelector("#feed .feed-team").innerHTML = ""; } catch {}
   try { document.querySelector("#feed .feed-sub").textContent = ""; } catch {}
   try {
     const f = document.getElementById("feed");
     if (f) f.classList.remove("expanded");
     const t = document.getElementById("feedToggle");
-    if (t) { t.textContent = "All 0 steps ▾"; t.setAttribute("aria-expanded", "false"); }
+    if (t) { t.textContent = "Show all ▾"; t.setAttribute("aria-expanded", "false"); }
   } catch {}
   G._feedRows = null;
   feedClearBubbles();
@@ -3259,8 +3269,15 @@ function feedMaybeScroll() {
   try {
     const list = document.querySelector("#feed .feed-list");
     if (!list) return;
-    const nearBottom = list.scrollHeight - list.scrollTop - list.clientHeight < 60;
-    if (nearBottom) list.scrollTop = list.scrollHeight;
+    // Follow the newest row unless the reader scrolled up (checked on their scroll, not
+    // after a tall row was appended).
+    if (!list._stickWired) {
+      list._stickWired = true;
+      list.addEventListener("scroll", () => {
+        list._stick = list.scrollHeight - list.scrollTop - list.clientHeight < 60;
+      }, { passive: true });
+    }
+    if (list._stick !== false) list.scrollTop = list.scrollHeight;
   } catch {}
 }
 function feedTeamBuild(rows) {
@@ -3294,17 +3311,17 @@ function feedRowEl(row, num) {
   const fromName = esc(feedName(row.from));
   let namesHTML = "";
   if (row.isThinking) {
-    namesHTML = `<span style="color:${esc(fromCol)}">${fromName}</span> <span class="thinks-label">thinks</span>`;
+    namesHTML = `<span style="color:${esc(feedTextColour(row.from))}">${fromName}</span> <span class="thinks-label">thinks</span>`;
   } else if (row.isCross) {
     const toCol = feedColour(row.to);
     const toName = esc(feedName(row.to));
-    namesHTML = `<span style="color:${esc(fromCol)}">${fromName}</span><span class="arrow"> ↔ </span><span style="color:${esc(toCol)}">${toName}</span>`;
+    namesHTML = `<span style="color:${esc(feedTextColour(row.from))}">${fromName}</span><span class="arrow"> ↔ </span><span style="color:${esc(feedTextColour(row.to))}">${toName}</span>`;
   } else if (row.to) {
     const toCol = feedColour(row.to);
     const toName = esc(feedName(row.to));
-    namesHTML = `<span style="color:${esc(fromCol)}">${fromName}</span><span class="arrow"> → </span><span style="color:${esc(toCol)}">${toName}</span>`;
+    namesHTML = `<span style="color:${esc(feedTextColour(row.from))}">${fromName}</span><span class="arrow"> → </span><span style="color:${esc(feedTextColour(row.to))}">${toName}</span>`;
   } else {
-    namesHTML = `<span style="color:${esc(fromCol)}">${fromName}</span>`;
+    namesHTML = `<span style="color:${esc(feedTextColour(row.from))}">${fromName}</span>`;
   }
   let msgHTML = "";
   if (row.isGate) {
@@ -3318,8 +3335,8 @@ function feedRowEl(row, num) {
   if (row.isOtherTool) msgCls.push("mono-msg");
   if (row.isAsk) msgCls.push("clamp3");
   const avHTML = row.from && row.from !== "erp"
-    ? `<img class="feed-av" src="${AV(row.from)}" alt="" style="border-color:${esc(fromCol)}">` : "";
-  d.innerHTML = `${avHTML}<div class="feed-body"><div class="feed-head"><span class="feed-names">${namesHTML}</span><span class="feed-step">#${num}</span></div><div class="${msgCls.join(" ")}">${msgHTML}</div></div>`;
+    ? `<img class="feed-av" src="${AV(row.from)}" alt="" style="border-color:${esc(feedTextColour(row.from))}">` : "";
+  d.innerHTML = `${avHTML}<div class="feed-body"><div class="feed-head"><span class="feed-names">${namesHTML}</span><span class="feed-step">${row.stepIdx != null ? "#" + (row.stepIdx + 1) : row.isGate ? "gate" : row.isDraft ? "draft" : ""}</span></div><div class="${msgCls.join(" ")}">${msgHTML}</div></div>`;
   if (row.isAsk) {
     try {
       const body = d.querySelector(".feed-body");
@@ -3461,7 +3478,9 @@ function updateFeedBubbles() {
         continue;
       }
       b.el.style.display = "block";
-      const sx = (_pv.x * 0.5 + 0.5) * innerWidth;
+      // Keep the whole bubble on screen (a speaker near the edge on a phone).
+      const hw = (b.el.offsetWidth || 0) / 2 + 6;
+      const sx = Math.min(innerWidth - hw, Math.max(hw, (_pv.x * 0.5 + 0.5) * innerWidth));
       const sy = (-_pv.y * 0.5 + 0.5) * innerHeight;
       b.el.style.transform = `translate(${sx}px, ${sy}px) translate(-50%, -100%)`;
     }
@@ -3507,7 +3526,7 @@ function feedSchedule() {
     } catch {}
     try {
       const t = document.getElementById("feedToggle");
-      if (t) t.textContent = `All ${rows.length} steps ▾`;
+      if (t) t.textContent = `Show all ▾`;
     } catch {}
     if (!rows.length) return;
     if (reducedMotion) {
@@ -3580,7 +3599,7 @@ try {
         } catch {}
       } else {
         const n = (G._feedRows && G._feedRows.length) || 0;
-        t.textContent = `All ${n} steps ▾`;
+        t.textContent = `Show all ▾`;
       }
     } catch {}
   });
@@ -3735,7 +3754,7 @@ function showResult() {
     const t = document.getElementById("feedToggle");
     if (t) {
       const n = (G._feedRows && G._feedRows.length) || 0;
-      t.textContent = `All ${n} steps ▾`;
+      t.textContent = `Show all ▾`;
       t.setAttribute("aria-expanded", "false");
     }
   } catch {}
