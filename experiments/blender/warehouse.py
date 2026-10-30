@@ -1281,7 +1281,7 @@ def p_quality():
     except TypeError:
         pass
     try:
-        bpy.context.scene.view_settings.exposure = -0.35
+        bpy.context.scene.view_settings.exposure = -0.9
     except (TypeError, AttributeError):
         pass
     # The camera sees a daylight sky outside; everything else keeps the soft grey ambient.
@@ -1461,7 +1461,7 @@ def p_rooms(P):
     sef_stripm = mat("p_room_sefstrip", (0.92, 0.96, 1.0), emit=5.0)
     plate_viol = mat("p_room_plateviol", _hex("#6d28d9"), rough=0.6)
     plate_gold = mat("p_room_plategold", _hex("#8a5a14"), rough=0.6)
-    plate_grey = mat("p_room_plategrey", _hex("#9ca3af"), rough=0.5, emit=3.0)
+    plate_grey = mat("p_room_plategrey", _hex("#4b5563"), rough=0.5, emit=1.2)
     plate_creamtxt = mat("p_room_platecreamtxt", _hex("#fff1c4"), rough=0.5, emit=4.0)
     neon_cyan = mat("p_room_neoncyan", _hex("#2ff3e0"), rough=0.4, emit=10.0)
     frost = mat("p_room_frost", _hex("#1f3b3d"), rough=0.6)
