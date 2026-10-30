@@ -18,7 +18,8 @@ plus depo-truth.json. Run experiments/blender/make_cutouts.py first (mascot stan
 
 CBYP_POLISH=1 builds a dressed-up scene instead: a recognisable semi-truck, an
 obviously open dock door with daylight, life-size character standees, full racking and
-props, panelled walls and an epoxy floor, warm high-bay lighting. Only the overview
+props, glossy LEGO-look ABS plastic throughout (studded baseplate floor, brick walls,
+brick-built racks and cartons), warm high-bay lighting. Only the overview
 cameras (genel, kapi, irsaliye, disari, teslimat) are rendered and depo-truth.json is left
 untouched.
 Without CBYP_POLISH the scene is built exactly as before, object for object.
@@ -583,105 +584,250 @@ def _pnode(mat, ntype, name=None):
     return n
 
 
-def p_materials():
-    """Extra materials for the polished scene (all new names; M[] is untouched)."""
-    P = {}
-    P["floor"] = mat("p_floor", (0.62, 0.62, 0.60), rough=0.38)
-    # Subtle large-scale tonal variation on the epoxy floor.
-    nt = P["floor"].node_tree
+# LEGO module at the cast's scale (a 4 cm minifigure scaled to our 2.4 m cast: x60).
+# Every LEGO dimension below derives from these five constants.
+STUD_PITCH = 0.48
+STUD_R = 0.144
+STUD_H = 0.10
+PLATE_H = 0.192
+BRICK_H = 0.576
+BRICK_W = 4 * STUD_PITCH       # 2x4 brick footprint: 1.92 m across
+BRICK_TILE_W = 4 * BRICK_W     # brick texture tile: 4 bricks across (7.68 m)
+BRICK_TILE_H = 4 * BRICK_H     # ... and 4 courses up (2.304 m)
+# Hall stud grid: LEGO_NX x LEGO_NY points on STUD_PITCH, centred at (0, -0.9),
+# spanning x in [-14.64, 14.64], y in [-11.46, 9.66].
+LEGO_GX0, LEGO_GY0 = -14.64, -11.46
+LEGO_NX, LEGO_NY = 62, 45
+
+
+def lego_mat(name, hexcol):
+    """Glossy ABS-plastic material in a LEGO colour (sRGB hex string)."""
+    if name in _mats:
+        return _mats[name]
+    m = bpy.data.materials.new(name)
+    m.use_nodes = True
+    b = next(n for n in m.node_tree.nodes if n.type == "BSDF_PRINCIPLED")
+    b.inputs["Base Color"].default_value = (*_hex(hexcol), 1)
+    b.inputs["Roughness"].default_value = 0.22
+    b.inputs["Metallic"].default_value = 0.0
+    _pset(b, "IOR", 1.46)
+    _pset(b, "Coat Weight", 0.15)      # Blender 4.x clearcoat names ...
+    _pset(b, "Coat Roughness", 0.1)
+    _pset(b, "Clearcoat", 0.15)        # ... and the 3.x ones
+    _pset(b, "Clearcoat Roughness", 0.1)
+    _mats[name] = m
+    return m
+
+
+def _stud(name, x, y, z_base, m):
+    """One LEGO stud (cylinder r STUD_R, h STUD_H, 16 sides) on a top face."""
+    return cyl(name, STUD_R, STUD_H, (x, y, z_base + STUD_H / 2), m, verts=16)
+
+
+def _brick_dress(name, cx, cy, top_z, w, d, yaw, P):
+    """Dress a tan carton as a brick: a stud per STUD_PITCH cell its top covers
+    (at least one, centred) plus a thin darker tape line across the top."""
+    nx = max(1, int(math.floor((w - 2 * STUD_R) / STUD_PITCH)) + 1)
+    ny = max(1, int(math.floor((d - 2 * STUD_R) / STUD_PITCH)) + 1)
+    cyaw, syaw = math.cos(yaw), math.sin(yaw)
+    for i in range(nx):
+        for j in range(ny):
+            ox = (i - (nx - 1) / 2) * STUD_PITCH
+            oy = (j - (ny - 1) / 2) * STUD_PITCH
+            _stud(f"{name}_st{i}{j}", cx + ox * cyaw - oy * syaw,
+                  cy + ox * syaw + oy * cyaw, top_z, P["tan"])
+    tdims = (w * 0.99, 0.05, 0.004) if w >= d else (0.05, d * 0.99, 0.004)
+    box(f"{name}_tape", tdims, (cx, cy, top_z + 0.002), P["tape"], rot_z=yaw)
+
+
+def _floor_tape_tiles(name, x0, y0, x1, y1, m, w=0.08):
+    """floor_tape() as flat LEGO tiles: same names and footprints, PLATE_H thick
+    boxes on top of the baseplate, glossy, no studs."""
+    for k, (a, b) in enumerate((((x0, y0), (x1, y0)), ((x1, y0), (x1, y1)),
+                                ((x1, y1), (x0, y1)), ((x0, y1), (x0, y0)))):
+        cx, cy = (a[0] + b[0]) / 2, (a[1] + b[1]) / 2
+        lx, ly = abs(b[0] - a[0]) or w, abs(b[1] - a[1]) or w
+        box(f"{name}_{k}", (lx + w, ly + w, PLATE_H), (cx, cy, 0.002 + PLATE_H / 2),
+            m)
+
+
+def _hatch_tiles(name, x0, y0, x1, y1, m):
+    """hatch() as flat LEGO tiles: same names and footprints, PLATE_H thick."""
+    for k in range(int((x1 - x0) / 0.6)):
+        x = x0 + 0.3 + k * 0.6
+        box(f"{name}_h{k}", (0.12, (y1 - y0) * 0.95, PLATE_H),
+            (x, (y0 + y1) / 2, 0.002 + PLATE_H / 2), m, rot_z=math.radians(20))
+
+
+def _lego_brick_images():
+    """1024x1024 tileable running-bond 2x4-brick colour + normal images, packed.
+
+    One tile spans 4 bricks across (BRICK_TILE_W) and 4 courses up (BRICK_TILE_H);
+    bricks are light bluish grey jittered +-4 %, ~6 % dark bluish grey, ~2 %
+    medium blue, with a dark grey mortar line. The normal map has bevelled brick
+    edges so Cycles shows relief. Own RNG stream: the layout stream is untouched.
+    """
+    S = 1024
+    BW = S // 4  # one brick: 256 x 256 px
+    base = _hex("#a0a5a9")
+    dark = _hex("#6c6e68")
+    blue = _hex("#5a93db")
+    mortar = _hex("#4c4f52")
+    brnd = random.Random(20240501)
+    bricks = {}
+    for c in range(4):
+        for bi in range(4):
+            r = brnd.random()
+            col = dark if r < 0.06 else (blue if r < 0.08 else base)
+            f = 1.0 + brnd.uniform(-0.04, 0.04)
+            bricks[(c, bi)] = (min(1.0, col[0] * f), min(1.0, col[1] * f),
+                               min(1.0, col[2] * f))
+    col_px = [0.0] * (S * S * 4)
+    nor_px = [0.0] * (S * S * 4)
+    mwx = 0.02 / BRICK_TILE_W * S / 2  # mortar half-width, px (x: 1.33)
+    mwy = 0.02 / BRICK_TILE_H * S / 2  # ... (y: 4.44)
+    bevx, bevy, nstr = 8.0, 14.0, 2.0
+    for j in range(S):  # image rows start at the bottom
+        c, ly = j // BW, j % BW
+        off = BW // 2 if c % 2 else 0
+        dy = ly if ly < BW // 2 else BW - 1 - ly
+        sy = -1.0 if ly < BW // 2 else 1.0
+        for i in range(S):
+            lx = (i - off) % BW
+            bi = ((i - off) // BW) % 4
+            dx = lx if lx < BW // 2 else BW - 1 - lx
+            sx = -1.0 if lx < BW // 2 else 1.0
+            p = (j * S + i) * 4
+            if dx < mwx or dy < mwy:
+                col_px[p:p + 3] = mortar
+                col_px[p + 3] = 1.0
+                # Flat groove bottom inside the mortar line.
+                nor_px[p:p + 4] = (0.5, 0.5, 1.0, 1.0)
+                continue
+            col_px[p:p + 3] = bricks[(c, bi)]
+            col_px[p + 3] = 1.0
+            nx = sx * (1.0 - (dx - mwx) / (bevx - mwx)) if dx < bevx else 0.0
+            ny = sy * (1.0 - (dy - mwy) / (bevy - mwy)) if dy < bevy else 0.0
+            inv = 1.0 / math.sqrt((nx * nstr) ** 2 + (ny * nstr) ** 2 + 1.0)
+            nor_px[p:p + 4] = (nx * nstr * inv * 0.5 + 0.5,
+                               ny * nstr * inv * 0.5 + 0.5, inv, 1.0)
+    img = bpy.data.images.new("p_brick_color", S, S)
+    img.colorspace_settings.name = "sRGB"
+    img.file_format = "PNG"
+    img.pixels[:] = col_px
+    img.pack()
+    nimg = bpy.data.images.new("p_brick_normal", S, S)
+    nimg.colorspace_settings.name = "Non-Color"
+    nimg.file_format = "PNG"
+    nimg.pixels[:] = nor_px
+    nimg.pack()
+    return img, nimg
+
+
+def _brick_material(name, color_img, normal_img):
+    """Wall material: lego ABS with the packed brick images as base colour
+    (UV-mapped, one tile per 4 bricks x 4 courses) plus a normal map."""
+    m = lego_mat(name, "#a0a5a9")
+    nt = m.node_tree
     b = next(n for n in nt.nodes if n.type == "BSDF_PRINCIPLED")
-    tex = _pnode(P["floor"], "ShaderNodeTexCoord")
-    mp = _pnode(P["floor"], "ShaderNodeMapping")
-    mp.inputs["Scale"].default_value = (14.0, 12.0, 1.0)
-    nz = _pnode(P["floor"], "ShaderNodeTexNoise")
-    nz.inputs["Scale"].default_value = 3.0
-    _pset(nz, "Detail", 4.0)
-    ramp = _pnode(P["floor"], "ShaderNodeValToRGB")
-    ramp.color_ramp.elements[0].color = (0.60, 0.60, 0.585, 1)
-    ramp.color_ramp.elements[0].position = 0.25
-    ramp.color_ramp.elements[1].color = (0.72, 0.72, 0.70, 1)
-    ramp.color_ramp.elements[1].position = 0.75
-    rramp = _pnode(P["floor"], "ShaderNodeValToRGB")
-    rramp.color_ramp.elements[0].color = (0.30, 0.30, 0.30, 1)
-    rramp.color_ramp.elements[0].position = 0.2
-    rramp.color_ramp.elements[1].color = (0.48, 0.48, 0.48, 1)
-    rramp.color_ramp.elements[1].position = 0.8
-    nt.links.new(tex.outputs["Object"], mp.inputs["Vector"])
-    nt.links.new(mp.outputs["Vector"], nz.inputs["Vector"])
-    nt.links.new(nz.outputs["Fac"], ramp.inputs["Fac"])
-    nt.links.new(nz.outputs["Fac"], rramp.inputs["Fac"])
-    nt.links.new(ramp.outputs["Color"], b.inputs["Base Color"])
-    nt.links.new(rramp.outputs["Color"], b.inputs["Roughness"])
-    _pset(b, "Coat Weight", 0.25)
-    _pset(b, "Coat Roughness", 0.4)
+    uv = _pnode(m, "ShaderNodeTexCoord")
+    tex = _pnode(m, "ShaderNodeTexImage")
+    tex.image, tex.extension = color_img, "REPEAT"
+    ntex = _pnode(m, "ShaderNodeTexImage")
+    ntex.image, ntex.extension = normal_img, "REPEAT"
+    nmap = _pnode(m, "ShaderNodeNormalMap")
+    nt.links.new(uv.outputs["UV"], tex.inputs["Vector"])
+    nt.links.new(uv.outputs["UV"], ntex.inputs["Vector"])
+    nt.links.new(tex.outputs["Color"], b.inputs["Base Color"])
+    nt.links.new(ntex.outputs["Color"], nmap.inputs["Color"])
+    nt.links.new(nmap.outputs["Normal"], b.inputs["Normal"])
+    return m
 
-    def wall_mat(name, brick_w, rotate):
-        m = mat(name, (0.80, 0.81, 0.82), rough=0.7)
-        nt = m.node_tree
-        b = next(n for n in nt.nodes if n.type == "BSDF_PRINCIPLED")
-        tex = _pnode(m, "ShaderNodeTexCoord")
-        mp = _pnode(m, "ShaderNodeMapping")
-        if rotate:
-            mp.inputs["Rotation"].default_value = (0, 0, math.radians(90))
-        br = _pnode(m, "ShaderNodeTexBrick")
-        _pset(br, "Offset", 0.0)
-        _pset(br, "Frequency", 1.0)
-        _pset(br, "Brick Width", brick_w)
-        _pset(br, "Row Height", 1.0)
-        _pset(br, "Mortar Size", 0.012)
-        _pset(br, "Mortar Smooth", 0.0)
-        _pset(br, "Bias", 0.0)
-        try:
-            br.inputs["Color1"].default_value = (0.80, 0.81, 0.82, 1)
-            br.inputs["Color2"].default_value = (0.77, 0.78, 0.79, 1)
-            br.inputs["Mortar"].default_value = (0.55, 0.56, 0.57, 1)
-        except KeyError:
-            pass
-        nt.links.new(tex.outputs["Object"], mp.inputs["Vector"])
-        nt.links.new(mp.outputs["Vector"], br.inputs["Vector"])
-        try:
-            nt.links.new(br.outputs["Color"], b.inputs["Base Color"])
-        except KeyError:
-            pass
-        return m
 
-    P["wall_back"] = wall_mat("p_wall_back", 1 / 13.4, False)
-    P["wall_side"] = wall_mat("p_wall_side", 1 / 26.0, True)
-    P["band"] = mat("p_band", (0.13, 0.25, 0.30), rough=0.6)
-    P["column"] = mat("p_column", (0.52, 0.54, 0.53), rough=0.5, metal=0.4)
-    P["yellow"] = mat("p_yellow", (0.92, 0.68, 0.03), rough=0.5)
-    P["dark_steel"] = mat("p_dark_steel", (0.18, 0.19, 0.20), rough=0.45, metal=0.7)
-    P["steel"] = mat("p_steel", (0.60, 0.61, 0.63), rough=0.35, metal=0.85)
-    P["chrome"] = mat("p_chrome", (0.85, 0.86, 0.88), rough=0.12, metal=1.0)
-    P["glass_dark"] = mat("p_glass_dark", (0.05, 0.08, 0.10), rough=0.08, metal=0.4)
-    P["cab_red"] = mat("p_cab_red", (0.62, 0.05, 0.03), rough=0.32, metal=0.15)
-    P["tyre"] = mat("p_tyre", (0.025, 0.025, 0.026), rough=0.9)
-    P["hub"] = mat("p_hub", (0.55, 0.55, 0.56), rough=0.35, metal=0.8)
-    P["trailer_in"] = mat("p_trailer_in", (0.72, 0.72, 0.70), rough=0.6)
-    P["wood"] = mat("p_wood", (0.55, 0.40, 0.24), rough=0.85)
-    P["wood_pale"] = mat("p_wood_pale", (0.68, 0.52, 0.32), rough=0.85)
-    P["cards"] = [mat(f"p_card{k}", c, rough=0.85) for k, c in enumerate(
-        [(0.62, 0.45, 0.28), (0.52, 0.36, 0.21), (0.70, 0.53, 0.34),
-         (0.46, 0.31, 0.18), (0.58, 0.42, 0.30)])]
-    P["paper"] = mat("p_paper", (0.93, 0.93, 0.90))
-    P["cone"] = mat("p_cone", (0.85, 0.22, 0.03), rough=0.55)
-    P["cone_white"] = mat("p_cone_white", (0.92, 0.92, 0.90), rough=0.5)
-    P["rack_blue"] = mat("p_rack_blue", (0.05, 0.20, 0.58), rough=0.4, metal=0.3)
-    P["rack_orange"] = mat("p_rack_orange", (0.88, 0.34, 0.02), rough=0.4, metal=0.3)
-    P["ceil"] = mat("p_ceil", (0.78, 0.79, 0.80), rough=0.9)
-    P["roof_steel"] = mat("p_roof_steel", (0.35, 0.37, 0.38), rough=0.55, metal=0.6)
-    P["shade"] = mat("p_shade", (0.10, 0.12, 0.11), rough=0.5, metal=0.5)
+def _brick_uvs(ob):
+    """Box-projected world-scale UVs on a wall object: one brick tile per
+    BRICK_TILE_W x BRICK_TILE_H, so bricks export to glTF at true scale."""
+    mesh = ob.data
+    if not mesh.uv_layers:
+        mesh.uv_layers.new(name="UVMap")
+    uv = mesh.uv_layers.active
+    sx, sy, sz = ob.scale
+    ox, oy, oz = ob.location
+    for poly in mesh.polygons:
+        n = poly.normal
+        ax = 0 if abs(n.x) >= abs(n.y) and abs(n.x) >= abs(n.z) else \
+            (1 if abs(n.y) >= abs(n.z) else 2)
+        for li in poly.loop_indices:
+            co = mesh.vertices[mesh.loops[li].vertex_index].co
+            x, y, z = co[0] * sx + ox, co[1] * sy + oy, co[2] * sz + oz
+            if ax == 0:
+                u, v = y / BRICK_TILE_W, z / BRICK_TILE_H
+            elif ax == 1:
+                u, v = x / BRICK_TILE_W, z / BRICK_TILE_H
+            else:
+                u, v = x / BRICK_TILE_W, y / BRICK_TILE_W
+            uv.data[li].uv = (u, v)
+
+
+def _brick_outer_face(name, direction, brick):
+    """Show brick courses on the outer (+x/-x) face of a room-block end wall."""
+    ob = bpy.data.objects[name]
+    ob.data.materials.append(brick)
+    idx = len(ob.data.materials) - 1
+    for poly in ob.data.polygons:
+        if poly.normal.x * direction > 0.5:
+            poly.material_index = idx
+    _brick_uvs(ob)
+
+
+def p_materials():
+    """Extra materials for the polished scene (all new names; M[] is untouched).
+
+    Glossy ABS plastic in LEGO's palette; emissive materials stay emissive.
+    """
+    P = {}
+    P["floor"] = lego_mat("p_floor", "#a0a5a9")
+    _brick_col, _brick_nor = _lego_brick_images()
+    P["wall_back"] = _brick_material("p_wall_back", _brick_col, _brick_nor)
+    P["wall_side"] = _brick_material("p_wall_side", _brick_col, _brick_nor)
+    P["band"] = lego_mat("p_band", "#6c6e68")
+    P["column"] = lego_mat("p_column", "#6c6e68")
+    P["yellow"] = lego_mat("p_yellow", "#f2cd37")
+    P["dark_steel"] = lego_mat("p_dark_steel", "#6c6e68")
+    P["steel"] = lego_mat("p_steel", "#a0a5a9")
+    P["chrome"] = lego_mat("p_chrome", "#e8e8ea")
+    P["glass_dark"] = lego_mat("p_glass_dark", "#1b1f23")
+    P["cab_red"] = lego_mat("p_cab_red", "#c91a09")
+    P["tyre"] = lego_mat("p_tyre", "#1b1f23")
+    P["hub"] = lego_mat("p_hub", "#a0a5a9")
+    P["trailer_in"] = lego_mat("p_trailer_in", "#a0a5a9")
+    P["wood"] = lego_mat("p_wood", "#582a12")
+    P["wood_pale"] = lego_mat("p_wood_pale", "#e4cd9e")
+    P["tan"] = lego_mat("p_tan", "#e4cd9e")
+    # Five identical entries: rnd.choice(P["cards"]) keeps the layout RNG stream.
+    P["cards"] = [P["tan"]] * 5
+    P["tape"] = lego_mat("p_tape", "#a0906f")
+    P["paper"] = lego_mat("p_paper", "#f4f4f4")
+    P["cone"] = lego_mat("p_cone", "#fe8a18")
+    P["cone_white"] = lego_mat("p_cone_white", "#f4f4f4")
+    P["rack_blue"] = lego_mat("p_rack_blue", "#0055bf")
+    P["rack_orange"] = lego_mat("p_rack_orange", "#fe8a18")
+    P["ceil"] = lego_mat("p_ceil", "#f4f4f4")
+    P["roof_steel"] = lego_mat("p_roof_steel", "#6c6e68")
+    P["shade"] = lego_mat("p_shade", "#1b1f23")
     P["lamp_warm"] = mat("p_lamp_warm", (1.0, 0.82, 0.60), emit=6.0)
     P["sky"] = mat("p_sky", (0.72, 0.84, 1.0), emit=5.0)
-    P["asphalt"] = mat("p_asphalt", (0.30, 0.30, 0.31), rough=0.95)
-    P["red"] = mat("p_red", (0.70, 0.05, 0.03), rough=0.5)
-    P["black"] = mat("p_black", (0.02, 0.02, 0.02), rough=0.85)
-    # Clear glass: mostly reflection, a faint tint; a higher alpha veils the rooms.
-    P["glass"] = mat("p_glass", (0.80, 0.90, 0.95), rough=0.03)
+    P["asphalt"] = lego_mat("p_asphalt", "#6c6e68")
+    P["red"] = lego_mat("p_red", "#c91a09")
+    P["black"] = lego_mat("p_black", "#1b1f23")
+    # Trans-clear LEGO panels: slight blue tint, low alpha, near-mirror surface.
+    P["glass"] = lego_mat("p_glass", "#d6eef5")
     P["glass"].blend_method = "BLEND"
     _psetattr(P["glass"], "shadow_method", "NONE")
     _pset(next(n for n in P["glass"].node_tree.nodes
-               if n.type == "BSDF_PRINCIPLED"), "Alpha", 0.08)
+               if n.type == "BSDF_PRINCIPLED"), "Alpha", 0.25)
+    next(n for n in P["glass"].node_tree.nodes
+         if n.type == "BSDF_PRINCIPLED").inputs["Roughness"].default_value = 0.05
     P["film"] = mat("p_film", (0.88, 0.92, 0.94), rough=0.18)
     P["film"].blend_method = "BLEND"
     _psetattr(P["film"], "shadow_method", "NONE")
@@ -709,7 +855,7 @@ def p_clear():
 
 
 def p_shell(P):
-    """Epoxy floor, panelled walls with a dark band, columns, roof, ceiling."""
+    """Baseplate floor, brick walls with a dark band, columns, roof, ceiling."""
     fl = bpy.data.objects["floor"]
     fl.data.materials.clear()
     fl.data.materials.append(P["floor"])
@@ -751,6 +897,10 @@ def p_shell(P):
     box("p_roof", (30.6, 28.4, 0.25), (0, -4, 7.7), P["roof_steel"])
     wl = bpy.data.objects["wall_left"]
     wl.scale.y, wl.location.y = 28, -4
+    # Brick courses at true scale on the hall walls.
+    for _wn in ("wall_back_l", "wall_back_r", "wall_back_top", "wall_left",
+                "p_wall_front"):
+        _brick_uvs(bpy.data.objects[_wn])
     # Tyre scuffs on the floor (thin translucent strips).
     for k, (x, y, yaw, ln) in enumerate(
             [(-1.2, 0.5, 8, 5.0), (-0.4, 0.7, 8, 5.0),
@@ -819,12 +969,12 @@ def p_pallet(name, x, y, z0, P):
             P["wood"])
     for k in range(2):
         box(f"{name}_s{k}", (1.2, 0.1, 0.02), (x, y - 0.45 + k * 0.9, z0 + 0.01),
-            P["wood_pale"])
+            P["wood"])
 
 
 def p_truck(P, rnd):
     """Semi-truck backed up to the dock: open 8 m trailer, red tractor behind."""
-    trailer = mat("p_trailer", (0.82, 0.83, 0.85), rough=0.4, metal=0.3)
+    trailer = lego_mat("p_trailer", "#f4f4f4")
     y0, tl = 10.25, 8.0
     yc = y0 + tl / 2
     box("p_tf_floor", (2.5, tl, 0.12), (0, yc, 0.48), P["dark_steel"])
@@ -876,10 +1026,13 @@ def p_truck(P, rnd):
         for j in range(n):
             w, d, h = rnd.choice([(0.55, 0.45, 0.4), (0.45, 0.4, 0.35),
                                   (0.6, 0.5, 0.3)])
-            box(f"p_tc{k}c{j}", (w, d, h),
-                (x + rnd.uniform(-0.25, 0.25), y + rnd.uniform(-0.2, 0.2),
-                 0.695 + h / 2), rnd.choice(P["cards"]), bevel=0.008,
-                rot_z=rnd.uniform(-0.06, 0.06))
+            jx = x + rnd.uniform(-0.25, 0.25)
+            jy = y + rnd.uniform(-0.2, 0.2)
+            jm = rnd.choice(P["cards"])
+            jyaw = rnd.uniform(-0.06, 0.06)
+            box(f"p_tc{k}c{j}", (w, d, h), (jx, jy, 0.695 + h / 2), jm,
+                bevel=0.008, rot_z=jyaw)
+            _brick_dress(f"p_tc{k}c{j}", jx, jy, 0.695 + h, w, d, jyaw, P)
         if k == 2:
             box(f"p_tc{k}_film", (1.3, 1.1, 0.55), (x, y, 0.93), P["film"])
         box(f"p_tc{k}_lbl", (0.3, 0.005, 0.2), (x, y - 0.48, 0.95), P["paper"])
@@ -939,7 +1092,7 @@ def p_forklift(P):
     """
     x, y = 8.0, -0.5
     yellow, dark, steel = P["yellow"], P["dark_steel"], P["steel"]
-    black = mat("p_fl_black", (0.03, 0.03, 0.03), rough=0.8)
+    black = lego_mat("p_fl_black", "#1b1f23")
     # Chassis and rounded rear counterweight.
     box("p_fl_body", (1.10, 1.50, 0.50), (x, y - 0.10, 0.62), yellow, bevel=0.04)
     box("p_fl_counter", (1.05, 0.50, 0.62), (x, y - 0.95, 0.66), yellow,
@@ -1100,7 +1253,7 @@ def p_racks(P, rnd):
                     (px - 0.45 + k * 0.45, py, z0 + 0.06), P["wood"])
             for k in range(2):
                 box(f"{tag}_s{k}", (0.1, 1.2, 0.02),
-                    (px - 0.45 + k * 0.9, py, z0 + 0.01), P["wood_pale"])
+                    (px - 0.45 + k * 0.9, py, z0 + 0.01), P["wood"])
         else:
             p_pallet(tag, px, py, z0, P)
         top = z0 + 0.134
@@ -1117,9 +1270,12 @@ def p_racks(P, rnd):
                 yaw = rnd.uniform(-0.05, 0.05)
                 cx = px + (od if rot90 else ol)
                 cy = py + (ol if rot90 else od)
-                box(f"{tag}b{jl}{jd}", (d, w, h0) if rot90 else (w, d, h0),
-                    (cx, cy, top + h0 / 2), rnd.choice(P["cards"]),
+                fdims = (d, w, h0) if rot90 else (w, d, h0)
+                jm = rnd.choice(P["cards"])
+                box(f"{tag}b{jl}{jd}", fdims, (cx, cy, top + h0 / 2), jm,
                     bevel=0.008, rot_z=yaw)
+                _brick_dress(f"{tag}b{jl}{jd}", cx, cy, top + h0, fdims[0],
+                             fdims[1], yaw, P)
                 front = jd > 0 if rot90 else jd < 0
                 if front and jl < 0:
                     lbl = (cx, cy, cx + d / 2 if rot90 else cy - d / 2, yaw, w)
@@ -1140,9 +1296,13 @@ def p_racks(P, rnd):
         for j, (ol, (w, d, h)) in enumerate(tops):
             tx = px + (rnd.uniform(-0.10, 0.10) if rot90 else ol)
             ty = py + (ol if rot90 else rnd.uniform(-0.10, 0.10))
-            box(f"{tag}t{j}", (d, w, h) if rot90 else (w, d, h),
-                (tx, ty, top + h0 + h / 2), rnd.choice(P["cards"]),
-                bevel=0.008, rot_z=rnd.uniform(-0.06, 0.06))
+            tdims = (d, w, h) if rot90 else (w, d, h)
+            jm = rnd.choice(P["cards"])
+            jyaw = rnd.uniform(-0.06, 0.06)
+            box(f"{tag}t{j}", tdims, (tx, ty, top + h0 + h / 2), jm,
+                bevel=0.008, rot_z=jyaw)
+            _brick_dress(f"{tag}t{j}", tx, ty, top + h0 + h, tdims[0],
+                         tdims[1], jyaw, P)
             th = max(th, h)
         if rnd.random() < 0.35:
             fh = h0 + th + 0.04
@@ -1166,23 +1326,42 @@ def p_racks(P, rnd):
             bx, by = (fixed, bc) if rot90 else (bc, fixed)
             for sl in (-1.29, 1.29):  # bay ends along the run
                 for sd in (-0.49, 0.49):  # front/back across the depth
-                    box(f"p_rk{letter}{bi}_up{sl}{sd}", (0.12, 0.12, 5.4),
-                        (bx + (sd if rot90 else sl),
-                         by + (sl if rot90 else sd), 2.7), P["rack_blue"])
+                    # Blue 1x1 brick columns: square 0.48 section, stud on top.
+                    ux, uy = (bx + (sd if rot90 else sl),
+                              by + (sl if rot90 else sd))
+                    box(f"p_rk{letter}{bi}_up{sl}{sd}", (0.48, 0.48, 5.4),
+                        (ux, uy, 2.7), P["rack_blue"])
+                    _stud(f"p_rk{letter}{bi}_up{sl}{sd}_stud", ux, uy, 5.4,
+                          P["rack_blue"])
             for lv, zb in enumerate((1.6, 3.0, 4.4)):
+                # Orange 1x2 plate beams: 0.48 deep, PLATE_H thick, tops flush
+                # with the pallet levels; light-grey deck plate between them.
+                zc = zb + 0.07 - PLATE_H / 2
                 for sd in (-0.49, 0.49):
                     box(f"p_rk{letter}{bi}_beam{lv}{sd}",
-                        (0.10, 2.58, 0.14) if rot90 else (2.58, 0.10, 0.14),
+                        (0.48, 2.58, PLATE_H) if rot90 else
+                        (2.58, 0.48, PLATE_H),
                         (bx + (sd if rot90 else 0),
-                         by + (0 if rot90 else sd), zb), P["rack_orange"])
+                         by + (0 if rot90 else sd), zc), P["rack_orange"])
+                box(f"p_rk{letter}{bi}_deck{lv}",
+                    (0.50, 2.58, PLATE_H) if rot90 else (2.58, 0.50, PLATE_H),
+                    (bx, by, zc), P["floor"])
+                for i in range(5):  # shelf stud grid: beam rows + deck row
+                    along = (i - 2) * STUD_PITCH
+                    for j, across in enumerate((-0.49, 0.0, 0.49)):
+                        sx = bx + (across if rot90 else along)
+                        syy = by + (along if rot90 else across)
+                        sm = P["rack_orange"] if j != 1 else P["floor"]
+                        _stud(f"p_rk{letter}{bi}_shelf{lv}_st{i}{j}", sx, syy,
+                              zb + 0.07, sm)
                 # Location label on the beam face, readable from the aisle.
                 off = rnd.uniform(-0.5, 0.5)
                 if rot90:
                     box(f"p_rk{letter}{bi}_beam{lv}_lbl", (0.012, 0.5, 0.12),
-                        (bx + 0.545, by + off, zb), P["paper"])
+                        (bx + 0.736, by + off, zb), P["paper"])
                 else:
                     box(f"p_rk{letter}{bi}_beam{lv}_lbl", (0.5, 0.012, 0.12),
-                        (bx + off, by - 0.545, zb), P["paper"])
+                        (bx + off, by - 0.736, zb), P["paper"])
             for lv, z0 in enumerate((0.02, 1.67, 3.07, 4.47)):
                 if rnd.random() < 0.05:
                     continue
@@ -1191,15 +1370,15 @@ def p_racks(P, rnd):
                 _load(f"p_rk{letter}{bi}l{lv}", px, py, z0, rot90)
             if rot90:
                 box(f"p_rk{letter}{bi}_tag", (0.012, 0.5, 0.18),
-                    (bx + 0.56, by + 0.75, 1.6), P["paper"])
+                    (bx + 0.736, by + 0.75, 1.6), P["paper"])
                 text(f"p_rk{letter}{bi}_txt", f"{letter}{bi + 1}",
-                     (bx + 0.575, by + 0.75, 1.6), 0.13, P["black"],
+                     (bx + 0.751, by + 0.75, 1.6), 0.13, P["black"],
                      rot=(math.radians(90), 0, math.radians(90)))
             else:
                 box(f"p_rk{letter}{bi}_tag", (0.5, 0.012, 0.18),
-                    (bx + 0.75, by - 0.56, 1.6), P["paper"])
+                    (bx + 0.75, by - 0.736, 1.6), P["paper"])
                 text(f"p_rk{letter}{bi}_txt", f"{letter}{bi + 1}",
-                     (bx + 0.75, by - 0.575, 1.6), 0.13, P["black"])
+                     (bx + 0.75, by - 0.751, 1.6), 0.13, P["black"])
     # RAFLAR sign re-hung in front of the back-wall run, facing the hall.
     bpy.data.objects["sign_raf_bg"].location = (-9.6, 8.0, 5.2)
     bpy.data.objects["sign_raf"].location = (-9.6, 7.97, 5.2)
@@ -1209,13 +1388,15 @@ def p_racks(P, rnd):
 
 
 def p_props(P, rnd):
-    """Floor props: walkways, cones, pallets, hand truck, extinguisher, office."""
+    """Floor props: walkways, cones, pallets, hand truck, extinguisher."""
     for k, x in enumerate((-4.2, -2.8)):
-        box(f"p_walk{k}", (0.10, 11.5, 0.004), (x, -4.25, 0.003), P["yellow"])
+        box(f"p_walk{k}", (0.10, 11.5, PLATE_H), (x, -4.25, 0.002 + PLATE_H / 2),
+            P["yellow"])
     for k, y in enumerate((-8.5, -9.1)):
-        box(f"p_lane{k}", (21.5, 0.10, 0.004), (-2.5, y, 0.003), P["yellow"])
-    floor_tape("p_dhatch_o", -2.2, 7.9, 2.2, 9.3, P["yellow"])
-    hatch("p_dhatch", -2.2, 7.9, 2.2, 9.3, P["yellow"])
+        box(f"p_lane{k}", (21.5, 0.10, PLATE_H), (-2.5, y, 0.002 + PLATE_H / 2),
+            P["yellow"])
+    _floor_tape_tiles("p_dhatch_o", -2.2, 7.9, 2.2, 9.3, P["yellow"])
+    _hatch_tiles("p_dhatch", -2.2, 7.9, 2.2, 9.3, P["yellow"])
     for k, (x, y) in enumerate(((-2.9, 3.1), (2.9, 3.1), (-2.9, 7.9), (2.9, 7.9))):
         box(f"p_cone_base{k}", (0.36, 0.36, 0.04), (x, y, 0.02), P["cone"])
         _pcone(f"p_cone{k}", 0.20, 0.035, 0.55, (x, y, 0.315), P["cone"])
@@ -1228,11 +1409,14 @@ def p_props(P, rnd):
         for j in range(4):
             w, d = rnd.choice([(0.55, 0.42), (0.5, 0.36)])
             h = rnd.choice([0.38, 0.42])
-            box(f"p_wait{k}c{j}", (w, d, h),
-                (x - 0.28 + (j % 2) * 0.56, y - 0.24 + (j // 2) * 0.48,
-                 0.154 + h / 2), rnd.choice(P["cards"]), bevel=0.008)
+            jx, jy = x - 0.28 + (j % 2) * 0.56, y - 0.24 + (j // 2) * 0.48
+            box(f"p_wait{k}c{j}", (w, d, h), (jx, jy, 0.154 + h / 2),
+                rnd.choice(P["cards"]), bevel=0.008)
+            _brick_dress(f"p_wait{k}c{j}", jx, jy, 0.154 + h, w, d, 0.0, P)
         box(f"p_wait{k}top", (0.9, 0.7, 0.35), (x, y, 0.154 + 0.42 + 0.175),
             rnd.choice(P["cards"]), bevel=0.008)
+        _brick_dress(f"p_wait{k}top", x, y, 0.154 + 0.42 + 0.35, 0.9, 0.7, 0.0,
+                     P)
         box(f"p_wait{k}_film", (1.3, 1.1, 1.0), (x, y, 0.62), P["film"])
         box(f"p_wait{k}_lbl", (0.35, 0.012, 0.22), (x - 0.3, y - 0.56, 0.5),
             P["paper"])
@@ -1254,63 +1438,6 @@ def p_props(P, rnd):
     box("p_ext_handle", (0.12, 0.03, 0.03), (4.2, 9.72, 1.82), P["dark_steel"])
     box("p_ext_sign", (0.45, 0.03, 0.32), (4.2, 9.79, 2.25), P["red"])
     text("p_ext_txt", "!", (4.2, 9.77, 2.25), 0.25, P["paper"])
-    p_office(P)
-
-
-def p_office(P):
-    """Small glass-walled office cabin with a desk."""
-    cx, cy = 11.0, 6.25
-    box("p_of_slab", (3.6, 3.7, 0.12), (cx, cy, 0.06), P["ceil"])
-    box("p_of_roof", (3.7, 3.8, 0.14), (cx, cy, 2.82), P["ceil"])
-    box("p_of_fascia", (3.72, 3.82, 0.10), (cx, cy, 2.72), P["rack_blue"])
-    for gx, gy, along_y in ((9.35, cy, True), (cx, 7.95, False), (cx, 4.55, False)):
-        if along_y:
-            box(f"p_of_glass{gx}", (0.05, 3.4, 2.5), (gx, gy, 1.37), P["glass"])
-            box(f"p_of_head{gx}", (0.09, 3.4, 0.12), (gx, gy, 2.68),
-                P["dark_steel"])
-            box(f"p_of_sill{gx}", (0.09, 3.4, 0.12), (gx, gy, 0.18),
-                P["dark_steel"])
-            for k, my in enumerate((4.6, 5.45, 6.3, 7.15, 7.9)):
-                box(f"p_of_mull{gx}{k}", (0.09, 0.09, 2.5), (gx, my, 1.37),
-                    P["dark_steel"])
-        else:
-            box(f"p_of_glass{gy}", (3.3, 0.05, 2.5), (gx, gy, 1.37), P["glass"])
-            box(f"p_of_head{gy}", (3.3, 0.09, 0.12), (gx, gy, 2.68),
-                P["dark_steel"])
-            box(f"p_of_sill{gy}", (3.3, 0.09, 0.12), (gx, gy, 0.18),
-                P["dark_steel"])
-            for k, mx in enumerate((9.6, 10.7, 11.8, 12.5)):
-                box(f"p_of_mull{gy}{k}", (0.09, 0.09, 2.5), (mx, gy, 1.37),
-                    P["dark_steel"])
-    box("p_of_back", (0.12, 3.5, 2.7), (12.65, cy, 1.41), P["ceil"])
-    box("p_of_door", (0.10, 1.0, 2.2), (9.33, 5.0, 1.22), P["dark_steel"])
-    box("p_of_door_gl", (0.06, 0.78, 1.9), (9.33, 5.0, 1.25), P["glass"])
-    box("p_of_door_hd", (0.06, 0.05, 0.18), (9.27, 5.35, 1.15), P["chrome"])
-    box("p_of_desk", (1.5, 0.7, 0.05), (11.9, 6.9, 0.78), P["wood_pale"])
-    for dx in (-0.65, 0.65):
-        for dy in (-0.28, 0.28):
-            box(f"p_of_leg{dx}{dy}", (0.05, 0.05, 0.75),
-                (11.9 + dx, 6.9 + dy, 0.40), P["dark_steel"])
-    box("p_of_mon", (0.55, 0.05, 0.34), (11.9, 7.1, 0.99), P["black"])
-    box("p_of_mon_gl", (0.50, 0.012, 0.29), (11.9, 7.07, 0.99), P["monitor"])
-    box("p_of_kb", (0.4, 0.15, 0.02), (11.9, 6.75, 0.815), P["black"])
-    box("p_of_papers", (0.3, 0.4, 0.03), (11.4, 6.9, 0.82), P["paper"])
-    box("p_of_seat", (0.45, 0.45, 0.06), (11.9, 6.2, 0.5), P["black"])
-    box("p_of_seatbk", (0.45, 0.06, 0.5), (11.9, 6.0, 0.8), P["black"])
-    cyl("p_of_post", 0.03, 0.5, (11.9, 6.2, 0.25), P["dark_steel"])
-    cyl("p_of_based", 0.28, 0.04, (11.9, 6.2, 0.14), P["dark_steel"])
-    box("p_of_shelf", (0.9, 0.32, 0.05), (12.1, 5.0, 1.2), P["wood_pale"])
-    box("p_of_shelf2", (0.9, 0.32, 0.05), (12.1, 5.0, 0.7), P["wood_pale"])
-    for k, c in enumerate(((0.7, 0.1, 0.1), (0.1, 0.2, 0.6), (0.1, 0.5, 0.2),
-                           (0.85, 0.65, 0.1))):
-        box(f"p_of_bind{k}", (0.09, 0.24, 0.3),
-            (12.0 + k * 0.14, 5.0, 1.38), mat(f"p_bind{k}", c, rough=0.6))
-    box("p_of_panel", (1.2, 0.6, 0.03), (cx, cy, 2.60), P["monitor"])
-    bpy.ops.object.light_add(type="POINT", location=(cx, cy, 2.4))
-    ol = bpy.context.object
-    ol.name = "p_office_light"
-    ol.data.energy, ol.data.color = 40, (1.0, 0.9, 0.78)
-    ol.data.use_shadow = False
 
 
 def p_quality():
@@ -1671,7 +1798,8 @@ def p_rooms(P):
                 sam_grey if cid == "sam" else ceilwarm)
             box(f"{pre}ceil", (6.0, 4.5, 0.2), (xc, -15.75, 3.1), _ceilmat)
             box(f"{pre}fascia", (6.0, 0.1, 0.14), (xc, -13.53, 2.95), pale)
-            box(f"{pre}aisle", (6.0, 0.1, 0.004), (xc, -11.2, 0.003), P["yellow"])
+            box(f"{pre}aisle", (6.0, 0.1, PLATE_H), (xc, -11.2,
+                0.002 + PLATE_H / 2), P["yellow"])
         else:
             box(f"{pre}balc", (6.0, 1.6, 0.2), (xc, -12.7, 3.1), P["ceil"])
             box(f"{pre}roof", (6.0, 4.5, 0.2), (xc, -15.75, 6.2), ceilwarm)
@@ -4429,6 +4557,10 @@ def p_rooms(P):
             pass
         _kl.data.use_shadow = True
         aim(_kl, (xc, -14.3, z0))
+    # Brick courses on the outer faces of the room block's end walls.
+    for _cid, _dir in (("voice", -1), ("ada", -1), ("kapi", 1), ("rover", 1)):
+        _brick_outer_face(f"p_room_{_cid}_" + ("divw" if _dir < 0 else "dive"),
+                          _dir, P["wall_back"])
     # Steel staircase at the right end, from the aisle up to the balcony.
     sxc, yb, yt = 14.0, -7.5, -11.9
     nsteps = 16
@@ -4471,6 +4603,7 @@ def p_rooms(P):
 
 MEET_X = 1.0
 MEET_Y = -7.0
+MEET_RUG_R = 3.4    # meeting rug radius (floor studs skip this circle)
 MEET_R = 1.8        # table top radius
 MEET_TOP = 1.35     # table top height (a standing table for the 2.4 m cast)
 MEET_STOOL_R = 2.4  # stools on this circle; the simulator stands the cast 0.5 m behind
@@ -4510,6 +4643,167 @@ def _meshy(fname, name, xy, radius, height, tint=None):
     return ob
 
 
+def p_lego_floor(P, V):
+    """LEGO hall floor: baseplate slab, geometry-node studs, tile markings, room
+    stud rows, and the delivery dressed as tan bricks (same count/positions)."""
+    # Baseplate slab: PLATE_H thick, top 2 mm above the floor (no z-fighting).
+    box("p_lego_plate", (29.6, 21.4, PLATE_H), (0, -0.9, 0.002 - PLATE_H / 2),
+        P["floor"])
+    # Stud template: one bevelled 16-sided cylinder, origin at its base, parked
+    # under the floor (the export deletes it after realizing the instances).
+    bpy.ops.mesh.primitive_cylinder_add(radius=STUD_R, depth=STUD_H, vertices=16,
+                                        location=(0, 0, -5 + STUD_H / 2))
+    tpl = bpy.context.object
+    tpl.name = "p_lego_stud_template"
+    for v in tpl.data.vertices:
+        v.co.z += STUD_H / 2
+    tpl.data.materials.append(P["floor"])
+    tpl.hide_viewport = True
+    tpl.hide_render = True
+    bevel = tpl.modifiers.new("bevel", "BEVEL")
+    bevel.width, bevel.segments = 0.01, 2
+    with bpy.context.temp_override(active_object=tpl, selected_objects=[tpl],
+                                   selected_editable_objects=[tpl], object=tpl):
+        bpy.ops.object.modifier_apply(modifier=bevel.name)
+    # Studs as instances: Mesh Grid -> delete the skipped rectangles/circle ->
+    # Instance on Points. Rectangles are in holder space (holder at (0, -0.9)).
+    grp = bpy.data.node_groups.new("p_lego_studs", "GeometryNodeTree")
+    try:
+        grp.interface.new_socket("Geometry", in_out="OUTPUT",
+                                 socket_type="NodeSocketGeometry")
+    except (TypeError, AttributeError):
+        grp.outputs.new("NodeSocketGeometry", "Geometry")
+    out = grp.nodes.new("NodeGroupOutput")
+    grid = grp.nodes.new("GeometryNodeMeshGrid")
+    grid.inputs["Vertices X"].default_value = LEGO_NX
+    grid.inputs["Vertices Y"].default_value = LEGO_NY
+    grid.inputs["Size X"].default_value = (LEGO_NX - 1) * STUD_PITCH
+    grid.inputs["Size Y"].default_value = (LEGO_NY - 1) * STUD_PITCH
+    pos = grp.nodes.new("GeometryNodeInputPosition")
+    sep = grp.nodes.new("ShaderNodeSeparateXYZ")
+    grp.links.new(pos.outputs["Position"], sep.inputs["Vector"])
+
+    def _gt(op, a, b):
+        c = grp.nodes.new("FunctionNodeCompare")
+        c.data_type = "FLOAT"
+        c.operation = op
+        grp.links.new(a, c.inputs[0])
+        c.inputs[1].default_value = b
+        return c.outputs["Result"]
+
+    def _and(a, b):
+        m = grp.nodes.new("FunctionNodeBooleanMath")
+        m.operation = "AND"
+        grp.links.new(a, m.inputs[0])
+        grp.links.new(b, m.inputs[1])
+        return m.outputs["Boolean"]
+
+    def _or(a, b):
+        m = grp.nodes.new("FunctionNodeBooleanMath")
+        m.operation = "OR"
+        grp.links.new(a, m.inputs[0])
+        grp.links.new(b, m.inputs[1])
+        return m.outputs["Boolean"]
+
+    skip_a = _and(_and(_gt("GREATER_THAN", sep.outputs["X"], -2.55),
+                       _gt("LESS_THAN", sep.outputs["X"], 2.55)),
+                  _and(_gt("GREATER_THAN", sep.outputs["Y"], 4.15),
+                       _gt("LESS_THAN", sep.outputs["Y"], 8.65)))
+    skip_b = _and(_and(_gt("GREATER_THAN", sep.outputs["X"], 4.85),
+                       _gt("LESS_THAN", sep.outputs["X"], 9.15)),
+                  _and(_gt("GREATER_THAN", sep.outputs["Y"], 4.15),
+                       _gt("LESS_THAN", sep.outputs["Y"], 8.65)))
+    dist = grp.nodes.new("ShaderNodeVectorMath")
+    dist.operation = "DISTANCE"
+    grp.links.new(pos.outputs["Position"], dist.inputs[0])
+    dist.inputs[1].default_value = (MEET_X, MEET_Y + 0.9, 0.0)
+    skip_rug = _gt("LESS_THAN", dist.outputs["Value"], MEET_RUG_R + STUD_R)
+    dele = grp.nodes.new("GeometryNodeDeleteGeometry")
+    dele.domain = "POINT"
+    grp.links.new(grid.outputs["Mesh"], dele.inputs["Geometry"])
+    grp.links.new(_or(_or(skip_a, skip_b), skip_rug), dele.inputs["Selection"])
+    info = grp.nodes.new("GeometryNodeObjectInfo")
+    info.inputs["Object"].default_value = tpl
+    inst = grp.nodes.new("GeometryNodeInstanceOnPoints")
+    grp.links.new(dele.outputs["Geometry"], inst.inputs["Points"])
+    grp.links.new(info.outputs["Geometry"], inst.inputs["Instance"])
+    grp.links.new(inst.outputs["Instances"], out.inputs[0])
+    bpy.ops.mesh.primitive_plane_add(size=1, location=(0, -0.9, 0.002))
+    holder = bpy.context.object
+    holder.name = "p_lego_floorstuds"
+    holder.data.materials.append(P["floor"])
+    mod = holder.modifiers.new("studs", "NODES")
+    mod.node_group = grp
+    # Yellow and red floor markings become flat tiles (same names/footprints).
+    _pdel("zone_kabul_*", "zone_karantina_*")
+    _floor_tape_tiles("zone_kabul", -2.4, 3.4, 2.4, 7.6, P["yellow"])
+    _floor_tape_tiles("zone_karantina", 5.0, 3.4, 9.0, 7.6, P["red"])
+    _hatch_tiles("zone_karantina", 5.0, 3.4, 9.0, 7.6, P["red"])
+    # Room floors keep their finishes; one stud row along a 0.48 m border inside
+    # the glass, plus a row on each balcony inside the balustrade.
+    gxs = [LEGO_GX0 + k * STUD_PITCH for k in range(LEGO_NX)]
+    for cid, floor, x0 in (("voice", 0, -15), ("sef", 0, -9), ("spark", 0, -3),
+                           ("sam", 0, 3), ("kapi", 0, 9), ("ada", 1, -15),
+                           ("iris", 1, -9), ("glimmer", 1, -3),
+                           ("wonder", 1, 3), ("rover", 1, 9)):
+        x1, z0 = x0 + 6.0, 0.0 if floor == 0 else 3.2
+        xw = -14.70 if x0 == -15 else x0 + 0.06
+        xe = 14.92 if x1 == 15 else x1 - 0.06
+        fmat = bpy.data.objects[f"p_room_{cid}_floor"].data.materials[0]
+        k = 0
+        for x in gxs:
+            if xw + 0.02 + STUD_R <= x <= xe - 0.02 - STUD_R:
+                _stud(f"p_room_{cid}_stud{k}", x, -13.74, z0 + 0.01, fmat)
+                k += 1
+        if floor == 1:
+            # Rover's stair opening (x in [13.2, 14.8]) stays clear of studs.
+            runs = [(x0 + 0.2, x1 - 0.2)] if cid != "rover" else [(9.23, 13.0)]
+            k = 0
+            for x in gxs:
+                if any(rx0 <= x <= rx1 for rx0, rx1 in runs):
+                    _stud(f"p_room_{cid}_balstud{k}", x, -12.16, 3.2, P["ceil"])
+                    k += 1
+    # The delivery pallet keeps its slats; only the look turns to LEGO.
+    for suffix in [f"_top{k}" for k in range(5)] + [f"_blk{k}" for k in range(3)] \
+            + [f"_bot{k}" for k in range(3)]:
+        ob = bpy.data.objects.get(f"pallet{suffix}")
+        if ob is not None:
+            ob.data.materials.clear()
+            ob.data.materials.append(P["wood"])
+    # Delivery cartons become tan bricks in place: same count and positions.
+    for k in range(12):
+        ob = bpy.data.objects.get(f"koli{k:02d}")
+        if ob is None:  # eksik ships 11 cartons
+            continue
+        dx, dy = 0.29, 0.38
+        dz = 0.22 if V["load"] == "damaged" and k == 5 else 0.3
+        ob.data.materials.clear()
+        ob.data.materials.append(P["tan"])
+        tape = bpy.data.objects.get(f"koli{k:02d}_tape")
+        if tape is not None:
+            tape.data.materials.clear()
+            tape.data.materials.append(P["tape"])
+            tape.scale = (0.05 / dx, 1.01, 0.003 / dz)
+        for suffix in ("_lbl", "_txt"):
+            old = bpy.data.objects.get(f"koli{k:02d}{suffix}")
+            if old is not None:
+                bpy.data.objects.remove(old, do_unlink=True)
+        # Stickers move to the -y face (the top carries the stud now).
+        lab = box(f"koli{k:02d}_lbl", (0.24, 0.002, 0.16),
+                  (0, -dy / 2 - 0.001, 0.0), P["paper"])
+        txt = text(f"koli{k:02d}_txt", V["label"], (0, -dy / 2 - 0.003, 0.0),
+                   0.034, P["black"])
+        st = cyl(f"koli{k:02d}_stud", STUD_R, STUD_H, (0, 0, dz / 2 + STUD_H / 2),
+                 P["tan"], verts=16)
+        for p in (lab, txt, st):  # ride along with the carton (tilt included)
+            p.parent = ob
+            p.matrix_parent_inverse.identity()
+            p.scale = (p.scale[0] / dx, p.scale[1] / dy, p.scale[2] / dz) \
+                if p.type == "MESH" else (1 / dx, 1 / dy, 1 / dz)
+            p.location = (p.location[0] / dx, p.location[1] / dy,
+                          p.location[2] / dz)
+
+
 def p_meeting(P):
     """Meeting corner in the open hall: round table, stools, rug, lamp, sign.
 
@@ -4517,14 +4811,15 @@ def p_meeting(P):
     receiving stations. Sized for the 2.4 m cast. Every mesh is named p_meet_*.
     """
     dark = P["dark_steel"]
-    oak = mat("p_meet_oak", _hex("#b07a45"), rough=0.5)
-    rug_navy = mat("p_meet_rugmat", _hex("#2b3a55"), rough=0.95)
-    ring_yellow = mat("p_meet_ring", _hex("#ffd21f"), rough=0.6)
-    sign_navy = mat("p_meet_navy", _hex("#1e2a5a"), rough=0.5)
+    oak = lego_mat("p_meet_oak", "#582a12")
+    rug_navy = lego_mat("p_meet_rugmat", "#2b3a55")
+    ring_yellow = lego_mat("p_meet_ring", "#ffd21f")
+    sign_navy = lego_mat("p_meet_navy", "#1e2a5a")
     screen_pale = mat("p_meet_screen", _hex("#dbeafe"), emit=2.0)
     top = MEET_TOP
     # Rug: navy disc with a yellow ring near the edge, wider than the stools.
-    cyl("p_meet_rug", 3.4, 0.012, (MEET_X, MEET_Y, 0.006), rug_navy, verts=64)
+    cyl("p_meet_rug", MEET_RUG_R, 0.012, (MEET_X, MEET_Y, 0.006), rug_navy,
+        verts=64)
     bpy.ops.mesh.primitive_torus_add(location=(_mx(MEET_X), MEET_Y, 0.018),
                                      major_radius=3.22, minor_radius=0.07,
                                      major_segments=64)
@@ -4535,7 +4830,8 @@ def p_meeting(P):
     # Round table: top surface at MEET_TOP, dark edge band, pedestal on base plate.
     # The table and the stools are Meshy models (assets/meshy, generated 30 Oct);
     # without them the scene falls back to simple primitives.
-    table = _meshy("meet_table.glb", "p_meet_table", (MEET_X, MEET_Y), MEET_R, top)
+    table = _meshy("meet_table.glb", "p_meet_table", (MEET_X, MEET_Y), MEET_R,
+                     top, tint=_hex("#582a12"))
     if table is None:
         cyl("p_meet_tabletop", MEET_R, 0.09, (MEET_X, MEET_Y, top - 0.045), oak, verts=64)
         cyl("p_meet_edge", MEET_R + 0.01, 0.04, (MEET_X, MEET_Y, top - 0.045), dark,
@@ -4543,6 +4839,21 @@ def p_meeting(P):
         cyl("p_meet_pedestal", 0.24, top - 0.15,
             (MEET_X, MEET_Y, (top - 0.09) / 2 + 0.03), dark)
         cyl("p_meet_base", 0.85, 0.06, (MEET_X, MEET_Y, 0.03), dark, verts=48)
+    # Studs on the table top: pitch grid inside the radius, a 0.3 m clear ring
+    # at the edge and the props' spots (offsets from the table centre) clear.
+    _props = [(-0.55, 0.25, 0.35), (0.55, -0.30, 0.35), (0.25, 0.55, 0.20),
+              (-0.15, -0.55, 0.30)]
+    _k = 0
+    for _ki in range(LEGO_NX):
+        _gx = LEGO_GX0 + _ki * STUD_PITCH
+        for _kj in range(LEGO_NY):
+            _gy = LEGO_GY0 + _kj * STUD_PITCH
+            _dx, _dy = _gx - MEET_X, _gy - MEET_Y
+            if _dx * _dx + _dy * _dy < (MEET_R - 0.3) ** 2 and all(
+                    (_dx - _px) ** 2 + (_dy - _py) ** 2 > (_pr + STUD_R) ** 2
+                    for _px, _py, _pr in _props):
+                _stud(f"p_meet_stud{_k}", _gx, _gy, top, P["wood"])
+                _k += 1
     # Six stools (1.4x) on the MEET_STOOL_R circle (0 deg = +x); seat top 0.87.
     for i, col in enumerate(("#f97316", "#3b82f6", "#a16207", "#1d4ed8",
                              "#ca8a04", "#0d9488")):
@@ -4551,8 +4862,10 @@ def p_meeting(P):
         sy = MEET_Y + MEET_STOOL_R * math.sin(ang)
         if _meshy("meet_stool.glb", f"p_meet_stool{i}", (sx, sy), 0.34, 0.87,
                   tint=_hex(col)) is not None:
+            _stud(f"p_meet_stool{i}_stud", sx, sy, 0.87,
+                  lego_mat(f"p_meet_stoolm{i}", col))
             continue
-        sm = mat(f"p_meet_seat{i}", _hex(col), rough=0.6)
+        sm = lego_mat(f"p_meet_seat{i}", col)
         cyl(f"p_meet_stool{i}_seat", 0.34, 0.10, (sx, sy, 0.82), sm, verts=32)
         cyl(f"p_meet_stool{i}_post", 0.05, 0.77, (sx, sy, 0.385), dark)
         cyl(f"p_meet_stool{i}_foot", 0.26, 0.03, (sx, sy, 0.015), dark, verts=32)
@@ -4561,6 +4874,8 @@ def p_meeting(P):
         fring = bpy.context.object
         fring.name = f"p_meet_stool{i}_ring"
         fring.data.materials.append(dark)
+        _stud(f"p_meet_stool{i}_stud", sx, sy, 0.87,
+              lego_mat(f"p_meet_stoolm{i}", col))
     # On the table: notes, clipboard, stamp, tablet (1.5x, spread over the top).
     for k, yaw in enumerate((0.12, -0.10, 0.04)):
         box(f"p_meet_note{k}", (0.32, 0.45, 0.004),
@@ -4642,6 +4957,7 @@ def polish(cams, V):
     p_props(P, rnd)
     p_rooms(P)
     p_meeting(P)
+    p_lego_floor(P, V)
     # The simulator's floor workstations, so the video and the simulator match.
     sys.path.insert(0, str(Path(__file__).resolve().parent))
     from stations import build_stations

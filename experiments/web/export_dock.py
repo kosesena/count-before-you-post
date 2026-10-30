@@ -9,8 +9,9 @@ page loads the one the player picked. The first also writes <out>.colliders.json
 footprint of everything a forklift can hit, as [x0, y0, x1, y1] boxes in Blender metres.
 
 From the saved polish scene: standees, cameras and lights go (the page lights the scene
-itself), text objects become meshes, and the three procedural materials (floor and walls)
-are baked to 2K textures so they look the same outside Blender. The parts the player
+itself), text objects become meshes, the floor-stud instances are realized, and any
+still-procedural material (floor, walls) is baked to a 2K texture so it looks the same
+outside Blender; the packed brick images stay as the glTF textures. The parts the player
 touches stay separate nodes, named for the page:
   forklift   every p_fl_* part (the page drives it and moves its forks)
   delivery   the pallet with its cartons and labels (picked up by the forks)
@@ -50,7 +51,29 @@ def group_of(ob):
     return None
 
 
+def realize_lego_studs():
+    """Realize the p_lego_floorstuds geometry-node instances into real mesh
+    (convert, then make duplicates real), before anything is joined. The hidden
+    stud template goes once the instances no longer need it."""
+    ob = bpy.data.objects.get("p_lego_floorstuds")
+    if ob is not None:
+        with bpy.context.temp_override(active_object=ob, selected_objects=[ob],
+                                       selected_editable_objects=[ob], object=ob):
+            bpy.ops.object.convert(target="MESH")
+        bpy.ops.object.select_all(action="DESELECT")
+        ob.select_set(True)
+        with bpy.context.temp_override(active_object=ob, selected_objects=[ob],
+                                       selected_editable_objects=[ob], object=ob):
+            bpy.ops.object.duplicates_make_real()
+        bpy.ops.object.select_all(action="DESELECT")
+        log("realized p_lego_floorstuds instances")
+    tpl = bpy.data.objects.get("p_lego_stud_template")
+    if tpl is not None:
+        bpy.data.objects.remove(tpl, do_unlink=True)
+
+
 def clean():
+    realize_lego_studs()
     for ob in list(bpy.data.objects):
         if ob.type in ("CAMERA", "LIGHT") or ob.name.startswith(("p_stand_", "p_standft_", "p_station_")):
             bpy.data.objects.remove(ob, do_unlink=True)
@@ -85,6 +108,18 @@ def bake_procedural(size=2048):
     for mname in BAKE:
         m = bpy.data.materials.get(mname)
         if not m:
+            continue
+        bsdf0 = next((n for n in m.node_tree.nodes if n.type == "BSDF_PRINCIPLED"),
+                     None)
+        links0 = bsdf0.inputs["Base Color"].links if bsdf0 is not None else []
+        if not links0:
+            log(f"not baking {mname}: flat colour, nothing to bake")
+            continue
+        if any(l.from_node.type == "TEX_IMAGE" for l in links0):
+            for l in links0:  # packed brick images stay as the glTF textures
+                if l.from_node.type == "TEX_IMAGE" and l.from_node.image:
+                    l.from_node.image.pack()
+            log(f"not baking {mname}: keeping packed textures")
             continue
         users = [o for o in bpy.data.objects if o.type == "MESH" and m.name in [s.name for s in o.data.materials if s]]
         img = bpy.data.images.new(f"bake_{mname}", size, size)
