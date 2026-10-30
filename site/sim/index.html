@@ -774,6 +774,12 @@ function charColour(id) {
   return CHAR_COL_FALLBACK[id] || "rgba(255,255,255,.25)";
 }
 const ZONE = { x0: -2.48, x1: 2.48, y0: 3.32, y1: 7.68 };   // receiving zone (yellow tape)
+// The gathering table: a point on the floor in Blender/sim coordinates (the same
+// frame as PEOPLE[].b). The mesh may not be in dock.glb yet, so nothing here may
+// look it up by name. Standing spots ring it at 1.7 m; 0 deg = +x.
+const MEET = { x: -4.0, y: -6.5 };
+const MEET_R = 1.7;
+const MEET_SPOT_ANGLE = { sef: 240, kapi: 300, spark: 180, sam: 0 };
 const DOOR = { x0: -1.0, x1: 1.0, y0: 9.44, y1: 10.76 };    // doorway volume: the open dock door,
   // listed in colliders.json but the forklift drives through it up the leveller.
 const PALLET = { hx: 0.6, hy: 0.52 };                       // half footprint 1.2 x 1.04 m
@@ -1428,6 +1434,7 @@ function startWalkTo(id, tx, ty, fx, fy) {
     return;
   }
   rec.tx = tx; rec.ty = ty; rec.faceX = fx; rec.faceY = fy; rec.hasFace = true;
+  rec._legs = null;   // a fresh single walk (the meeting sets its legs after)
   rec.pendingWave = false; rec.walking = true;
   faceBlender(rec, rec.x, rec.y, tx, ty);
   try { if (rec.wave) rec.wave.stop(); } catch {}
@@ -1440,14 +1447,25 @@ function updateWalkers(dt) {
     const rec = CHAR[p.id];
     if (!rec || !rec.loaded || !rec.group || !rec.walking) continue;
     const dx = rec.tx - rec.x, dy = rec.ty - rec.y;
-    const dist = Math.hypot(dx, dy), step = SPD * dt;
+    const dist = Math.hypot(dx, dy), step = (rec._spd || SPD) * dt;
     if (dist <= step) {
+      if (rec._legs && rec._legs.length) {
+        // Meeting waypoint reached: keep the stride, head for the next leg.
+        rec.x = rec.tx; rec.y = rec.ty;
+        rec.group.position.x = rec.x; rec.group.position.z = -rec.y;
+        const nxt = rec._legs.shift();
+        rec.tx = nxt.x; rec.ty = nxt.y;
+        faceBlender(rec, rec.x, rec.y, rec.tx, rec.ty);
+        continue;
+      }
       rec.x = rec.tx; rec.y = rec.ty; rec.walking = false;
       rec.group.position.x = rec.x; rec.group.position.z = -rec.y;
       rec.group.position.y = 0;
       if (rec.hasFace) faceBlender(rec, rec.x, rec.y, rec.faceX, rec.faceY);
       playIdle(rec);
+      rec._spd = null;
       if (rec.pendingWave) { rec.pendingWave = false; waveImmediate(p.id); }
+      try { onWalkerArrived(p.id); } catch (e) { if (DEBUG) console.warn("arrive:", e); }
     } else if (dist > 1e-6) {
       rec.x += dx / dist * step; rec.y += dy / dist * step;
       rec.group.position.x = rec.x; rec.group.position.z = -rec.y;
@@ -1491,9 +1509,11 @@ function updateParking(dt) {
 }
 function sendAllHome() {
   G._walkerTargets = {};
+  G._meet = null; G._meetCam = null;   // the gathering, if one was on
   for (const p of PEOPLE) {
     const rec = CHAR[p.id];
     if (!rec) continue;
+    rec._legs = null; rec._spd = null; rec._atTable = false;
     if (G._seatedById[p.id]) { try { sitCharacter(p.id, true); } catch {} continue; }
     try { standCharacter(p.id, true); } catch {}
   }
@@ -1520,6 +1540,226 @@ function dispatchWalkers() {
   // The deciding camera looks from the left: the east side keeps the pallet in view.
   const chosen = east;
   startWalkTo(solo, chosen.x, chosen.y, px, py);
+}
+
+// ---------- the gathering (human gate) ----------
+// Only when Kapı asks Şef: Kapı (who asked) and Şef (who decides) meet at the
+// table, plus whoever raised the doubt — Spark when the note's look saw damage,
+// Sam and Spark when their counts disagree. Wonder, Rover and the rest stay put.
+// G._meet = { ids, spots, t0, arrived, arrivedT, returning, done, speak }.
+// G._meetCam = null | { mode: "table" | "back", t, fpx..flz } (glide endpoints).
+function meetingIds() {
+  try {
+    if (!G.cs || !G.cs.gate || G.cs.gate.action !== "human") return [];
+    const ids = ["kapi", "sef"];
+    const rule = G.cs.gate.rule;
+    if (rule === "damaged") ids.push("spark");
+    else if (rule === "disagree") ids.push("sam", "spark");
+    return ids;
+  } catch { return []; }
+}
+function meetSpot(id) {
+  const deg = MEET_SPOT_ANGLE[id] != null ? MEET_SPOT_ANGLE[id] : 0;
+  const a = deg * Math.PI / 180;
+  return { x: MEET.x + MEET_R * Math.cos(a), y: MEET.y + MEET_R * Math.sin(a) };
+}
+function meetingInfo() {
+  try {
+    const ids = meetingIds();
+    if (!ids.length) return { ids: [], spots: {}, arrived: false };
+    const spots = {};
+    for (const id of ids) {
+      const s = (G._meet && G._meet.spots && G._meet.spots[id]) || meetSpot(id);
+      spots[id] = { x: s.x, y: s.y };
+    }
+    return { ids, spots, arrived: !!(G._meet && G._meet.arrived) };
+  } catch { return { ids: [], spots: {}, arrived: false }; }
+}
+function segHitsRect(x1, y1, x2, y2, r) {
+  const inside = (x, y) => x > r.x0 && x < r.x1 && y > r.y0 && y < r.y1;
+  if (inside(x1, y1) || inside(x2, y2)) return true;
+  const seg = (ax, ay, bx, by, cx, cy, dx, dy) => {
+    const d = (bx - ax) * (dy - cy) - (by - ay) * (dx - cx);
+    if (Math.abs(d) < 1e-12) return false;
+    const t = ((cx - ax) * (dy - cy) - (cy - ay) * (dx - cx)) / d;
+    const u = ((cx - ax) * (by - ay) - (cy - ay) * (bx - ax)) / d;
+    return t >= 0 && t <= 1 && u >= 0 && u <= 1;
+  };
+  return seg(x1, y1, x2, y2, r.x0, r.y0, r.x1, r.y0) ||
+         seg(x1, y1, x2, y2, r.x0, r.y1, r.x1, r.y1) ||
+         seg(x1, y1, x2, y2, r.x0, r.y0, r.x0, r.y1) ||
+         seg(x1, y1, x2, y2, r.x1, r.y0, r.x1, r.y1);
+}
+// Legs from the floor to a meeting spot: straight there, or around the receiving
+// zone (0.4 m margin) via one corner waypoint outside it when the line crosses.
+function meetingLegs(fx, fy, tx, ty) {
+  const r = { x0: ZONE.x0 - 0.4, x1: ZONE.x1 + 0.4, y0: ZONE.y0 - 0.4, y1: ZONE.y1 + 0.4 };
+  if (!segHitsRect(fx, fy, tx, ty, r)) return [{ x: tx, y: ty }];
+  const o = 0.12;
+  const corners = [
+    { x: r.x0 - o, y: r.y0 - o }, { x: r.x1 + o, y: r.y0 - o },
+    { x: r.x0 - o, y: r.y1 + o }, { x: r.x1 + o, y: r.y1 + o },
+  ];
+  let best = null, bestLen = Infinity, fb = corners[0], fbLen = Infinity;
+  for (const c of corners) {
+    const len = Math.hypot(c.x - fx, c.y - fy) + Math.hypot(tx - c.x, ty - c.y);
+    if (len < fbLen) { fbLen = len; fb = c; }
+    if (len < bestLen && !segHitsRect(fx, fy, c.x, c.y, r) && !segHitsRect(c.x, c.y, tx, ty, r)) {
+      bestLen = len; best = c;
+    }
+  }
+  const via = best || fb;
+  return [{ x: via.x, y: via.y }, { x: tx, y: ty }];
+}
+function startMeetingWalk(id, spot) {
+  const rec = CHAR[id];
+  const sx = rec ? rec.x : spot.x, sy = rec ? rec.y : spot.y;
+  const legs = meetingLegs(sx, sy, spot.x, spot.y);
+  startWalkTo(id, legs[0].x, legs[0].y, MEET.x, MEET.y);
+  if (rec) { rec._legs = legs.slice(1); rec._spd = 2.0; rec._atTable = false; }
+  if (G._walkerTargets) G._walkerTargets[id] = { tx: spot.x, ty: spot.y, fx: MEET.x, fy: MEET.y };
+}
+function captureMeetCam(mode) {
+  return { mode, t: 0,
+    fpx: camPos.x, fpy: -camPos.z, fpz: camPos.y,
+    flx: camLook.x, fly: -camLook.z, flz: camLook.y };
+}
+// 900 ms after Kapı's decision card: the meeting walks to the table and the
+// deciding camera glides to the yard-side view. Reduced motion: appear, cut.
+function beginMeetingWalk() {
+  try {
+    if (G.phase !== "deciding" && G.phase !== "done") return;
+    const ids = meetingIds();
+    if (!ids.length || G._meet) return;
+    const spots = {};
+    for (const id of ids) spots[id] = meetSpot(id);
+    G._meet = { ids, spots, t0: G.time, arrived: false, arrivedT: 0,
+                returning: false, done: false, speak: null };
+    for (const id of ids) {
+      try { const r = CHAR[id]; if (r && r.seated) standCharacter(id); } catch {}
+    }
+    G._meetCam = captureMeetCam("table");
+    G._look = { kind: "chars", ids };
+    if (reducedMotion) {
+      for (const id of ids) {
+        const rec = CHAR[id], s = spots[id];
+        if (!rec) continue;
+        rec.walking = false; rec._legs = null; rec._spd = null; rec._atTable = true;
+        rec.x = s.x; rec.y = s.y; rec.tx = s.x; rec.ty = s.y;
+        if (rec.group) {
+          rec.group.position.set(s.x, 0, -s.y);
+          faceBlender(rec, s.x, s.y, MEET.x, MEET.y);
+        }
+        if (G._walkerTargets) G._walkerTargets[id] = { tx: s.x, ty: s.y, fx: MEET.x, fy: MEET.y };
+      }
+      G._meet.arrived = true;
+      G._meet.arrivedT = G.time;
+      try { maybeMeetingReturn(); } catch {}
+      return;
+    }
+    for (const id of ids) {
+      try { startMeetingWalk(id, spots[id]); } catch (e) { if (DEBUG) console.warn("meetwalk:", e); }
+    }
+  } catch (e) { if (DEBUG) console.warn("meet:", e); }
+}
+function onWalkerArrived(id) {
+  const m = G._meet;
+  if (!m) return;
+  if (m.returning) {
+    for (const mid of m.ids) {
+      const r = CHAR[mid];
+      if (r && r.walking) return;
+    }
+    m.done = true;
+    return;
+  }
+  if (m.ids.indexOf(id) < 0) return;
+  const rec = CHAR[id];
+  if (rec) rec._atTable = true;
+  for (const mid of m.ids) {
+    const r = CHAR[mid];
+    if (!r || r.walking || !r._atTable) return;
+  }
+  m.arrived = true;
+  m.arrivedT = G.time;
+  try { maybeMeetingReturn(); } catch {}
+}
+// After the last follow-up row (or 6 s after arrival with no sign-off), wait
+// 2.5 s then walk home. Reduced motion: appear home when the feed has finished.
+function maybeMeetingReturn() {
+  const m = G._meet;
+  if (!m || m.returning || m._retSched || !m.arrived) return;
+  const nF = (G._feedFollowupRows && G._feedFollowupRows.length) || 0;
+  if (nF > 0) {
+    if (!G._feedWithDone) return;
+    m._retSched = true;
+    if (reducedMotion) meetingReturn();
+    else later(meetingReturn, 2500);
+  } else {
+    if (reducedMotion && !G._feedWithDone) return;
+    m._retSched = true;
+    if (reducedMotion) meetingReturn();
+    else later(meetingReturn, 8500);
+  }
+}
+function meetingReturn() {
+  const m = G._meet;
+  if (!m || m.returning) return;
+  if (G.phase !== "deciding" && G.phase !== "done") return;
+  m.returning = true;
+  m.speak = null;
+  try { G._meetCam = captureMeetCam("back"); } catch {}
+  G._look = { kind: "pallet" };
+  if (reducedMotion) {
+    for (const id of m.ids) {
+      const rec = CHAR[id];
+      if (!rec) continue;
+      rec._atTable = false; rec.walking = false; rec._legs = null; rec._spd = null;
+      rec.x = rec.hx; rec.y = rec.hy; rec.tx = rec.hx; rec.ty = rec.hy;
+      if (rec.group) {
+        rec.group.position.set(rec.hx, 0, -rec.hy);
+        faceBlender(rec, rec.hx, rec.hy, 0, 5.5);
+      }
+      if (G._walkerTargets) delete G._walkerTargets[id];
+    }
+    m.done = true;
+    return;
+  }
+  for (const id of m.ids) {
+    try {
+      const rec = CHAR[id];
+      if (rec) { rec._atTable = false; rec._legs = null; rec._spd = null; }
+      startWalkTo(id, rec ? rec.hx : 0, rec ? rec.hy : 0, G.pallet.x, G.pallet.y);
+    } catch (e) { if (DEBUG) console.warn("meetback:", e); }
+  }
+}
+// While a follow-up row speaks, its speaker turns slightly toward the addressed.
+function setMeetingSpeak(from, to) {
+  const m = G._meet;
+  if (!m || m.returning || !from) return;
+  const rec = CHAR[from];
+  if (!rec || !rec._atTable) return;
+  m.speak = { from, to: to || null };
+}
+// The divider and the rows after it wait for the table: all arrived, or 9 s
+// after the walk started.
+function gateFollowupOnMeeting(emit) {
+  let n = 0;
+  const attempt = () => {
+    n++;
+    let ready = false;
+    try {
+      const m = G._meet;
+      if (m && (m.arrived || (G.time - m.t0) >= 9)) ready = true;
+    } catch {}
+    if (!ready && n < 80) { later(attempt, 250); return; }
+    try { emit(); } catch (e) { if (DEBUG) console.warn("feedfollowup:", e); }
+  };
+  try {
+    const R = (G._feedWithRows || []).length;
+    const slot = G._feedWithSlot || 900;
+    later(attempt, Math.round(300 + R * slot));
+  } catch { later(attempt, 8000); }
 }
 
 // ---------- rooms roster ----------
@@ -2365,6 +2605,27 @@ function lookTargetPos() {
 }
 function updateAttention(rec, id, dt) {
   if (!rec.group || rec.seated || rec.walking) return;
+  // At the table the meeting faces its centre; the speaker leans slightly
+  // toward the one addressed.
+  const mm = G._meet;
+  if (mm && !mm.returning && rec._atTable && mm.ids.indexOf(id) >= 0) {
+    let des = faceYawOf(MEET.x - rec.x, MEET.y - rec.y);
+    try {
+      const sp = mm.speak;
+      if (sp && sp.from === id && sp.to) {
+        const rt = CHAR[sp.to], tp = personById(sp.to);
+        const tx = rt ? rt.x : (tp ? tp.b[0] : MEET.x);
+        const ty = rt ? rt.y : (tp ? tp.b[1] : MEET.y);
+        if (Math.hypot(tx - rec.x, ty - rec.y) > 0.5) {
+          const want = faceYawOf(tx - rec.x, ty - rec.y);
+          des = des + clampN(wrapAngle(want - des), -0.4, 0.4);
+        }
+      }
+    } catch {}
+    if (reducedMotion) rec.group.rotation.y = des;
+    else rec.group.rotation.y += wrapAngle(des - rec.group.rotation.y) * Math.min(1, 4.5 * dt);
+    return;
+  }
   const base = (rec.baseYaw != null) ? rec.baseYaw : rec.group.rotation.y;
   let des = base;
   if (G.phase === "driving") {
@@ -2959,9 +3220,40 @@ function stepCamera(dt) {
     // Gentle three-quarter from the dock floor's front, high enough to look over
     // the foreground cast at the pallet, the walker(s), the gate lamp and screen.
     // Portrait phones pull further back so the pallet and walker stay upper-frame.
-    if (camera.aspect < 0.9) { px = -1.4; py = -6.8; pz = 6.1; lx = 0.1; ly = 3.4; lz = 0.7; }
-    else { px = -2.0; py = -6.4; pz = 6.6; lx = 0.3; ly = 3.6; lz = 0.6; }
-    k = 1 - Math.exp(-2.2 * dt);
+    let dpx, dpy, dpz, dlx, dly, dlz;
+    if (camera.aspect < 0.9) { dpx = -1.4; dpy = -6.8; dpz = 6.1; dlx = 0.1; dly = 3.4; dlz = 0.7; }
+    else { dpx = -2.0; dpy = -6.4; dpz = 6.6; dlx = 0.3; dly = 3.6; dlz = 0.6; }
+    const mc = G._meetCam;
+    if (mc && mc.mode === "table") {
+      // The gathering from the yard (+y) side, so the far side faces the camera.
+      // Desktop: the table sits slightly below the middle, left of the result
+      // card; phones: the table rides in the upper half, above the result sheet.
+      let tpx, tpy, tpz, tlx, tly, tlz;
+      if (camera.aspect < 0.9) { tpx = -4.0; tpy = 1.5; tpz = 6.5; tlx = -4.0; tly = -5.5; tlz = 0.6; }
+      else { tpx = -4.0; tpy = -0.6; tpz = 4.6; tlx = -5.0; tly = -7.2; tlz = 0.9; }
+      if (reducedMotion) { px = tpx; py = tpy; pz = tpz; lx = tlx; ly = tly; lz = tlz; k = 1; }
+      else {
+        mc.t += dt;
+        const u = sstep(0, 1, Math.min(1, mc.t / 2.5));
+        px = mc.fpx + (tpx - mc.fpx) * u; py = mc.fpy + (tpy - mc.fpy) * u; pz = mc.fpz + (tpz - mc.fpz) * u;
+        lx = mc.flx + (tlx - mc.flx) * u; ly = mc.fly + (tly - mc.fly) * u; lz = mc.flz + (tlz - mc.flz) * u;
+        k = 1;
+      }
+    } else if (mc && mc.mode === "back") {
+      if (reducedMotion) {
+        px = dpx; py = dpy; pz = dpz; lx = dlx; ly = dly; lz = dlz; k = 1; G._meetCam = null;
+      } else {
+        mc.t += dt;
+        const u = sstep(0, 1, Math.min(1, mc.t / 2.5));
+        px = mc.fpx + (dpx - mc.fpx) * u; py = mc.fpy + (dpy - mc.fpy) * u; pz = mc.fpz + (dpz - mc.fpz) * u;
+        lx = mc.flx + (dlx - mc.flx) * u; ly = mc.fly + (dly - mc.fly) * u; lz = mc.flz + (dlz - mc.flz) * u;
+        k = 1;
+        if (mc.t >= 2.5) G._meetCam = null;
+      }
+    } else {
+      px = dpx; py = dpy; pz = dpz; lx = dlx; ly = dly; lz = dlz;
+      k = 1 - Math.exp(-2.2 * dt);
+    }
   } else if (G.camMode === "seat" && G.phase === "driving") {
     // Driver's seat: eye 2.05 m up (scaled with the forklift), just behind
     // the wheel, riding the cab. A slight right offset puts the wheel low centre-left.
@@ -4312,6 +4604,7 @@ function scheduleFeedRow(thread, row, key, base, slot, isLast, finishAll, useBub
         feedShowBubble(row.from, row.text);
         feedShowBeam(row);
       }
+      if (row.isFollowup) { try { setMeetingSpeak(row.from, row.to); } catch {} }
       feedTypewrite(typingEl, row);
       if (isLast && row.reply == null) later(finishAll, 400);
     } catch (e) { if (DEBUG) console.warn("feedmsg:", e); }
@@ -4346,6 +4639,7 @@ function scheduleFeedRow(thread, row, key, base, slot, isLast, finishAll, useBub
         if (row.replyFromRecipient && row.to) {
           feedSetSpeakingThread(thread, row.to);
           if (useBubbles) feedShowBubble(row.to, row.reply);
+          if (row.isFollowup) { try { setMeetingSpeak(row.to, row.from); } catch {} }
         }
         if (isLast) later(finishAll, 300);
       } catch (e) { if (DEBUG) console.warn("feedreply:", e); }
@@ -4482,6 +4776,26 @@ function feedSchedule() {
       G._feedWithStatus = withFinal;
       const nNo = (G.cs && G.cs.without_gate && G.cs.without_gate.steps) ? G.cs.without_gate.steps.length : noGateRows.length;
       G._feedNoGateStatus = `Run replayed · ${nNo} steps <span class="fcheck">✓</span>`;
+      const renderFollowupNow = () => {
+        try {
+          const l = feedListFor("with");
+          if (l && !l.querySelector(".feed-divider")) {
+            const secs = G.cs && G.cs.signoff ? G.cs.signoff.seconds : "";
+            l.appendChild(feedDividerEl(secs));
+            followupRows.forEach((r) => {
+              const el = feedRowEl(r, 0);
+              l.appendChild(el);
+              feedShowReply(r, el);
+            });
+            l.scrollTop = l.scrollHeight;
+          }
+        } catch (e) { if (DEBUG) console.warn("feed:", e); }
+        G._feedWithDone = true;
+        G._feedWithSpeaking = null;
+        feedSetSpeaking(null);
+        feedStatusSet((G._feedTab || "with") === "nogate" ? G._feedNoGateStatus : G._feedWithStatus);
+        try { maybeMeetingReturn(); } catch {}
+      };
       later(() => {
         try {
           const l = feedListFor("with");
@@ -4491,15 +4805,6 @@ function feedSchedule() {
               l.appendChild(el);
               feedShowReply(r, el);
             });
-            if (hasFollowup) {
-              const secs = G.cs && G.cs.signoff ? G.cs.signoff.seconds : "";
-              l.appendChild(feedDividerEl(secs));
-              followupRows.forEach((r) => {
-                const el = feedRowEl(r, 0);
-                l.appendChild(el);
-                feedShowReply(r, el);
-              });
-            }
             l.scrollTop = l.scrollHeight;
           }
           const nl = feedListFor("nogate");
@@ -4512,13 +4817,22 @@ function feedSchedule() {
             if (noGateSummary) nl.appendChild(feedSummaryEl(noGateSummary));
             nl.scrollTop = nl.scrollHeight;
           }
-          G._feedWithDone = true;
           G._feedNoGateDone = true;
           G._feedNoGateStarted = true;
-          G._feedWithSpeaking = null;
           G._feedNoGateSpeaking = null;
-          feedSetSpeaking(null);
-          feedStatusSet((G._feedTab || "with") === "nogate" ? G._feedNoGateStatus : G._feedWithStatus);
+          let gated = false;
+          try { gated = hasFollowup && meetingIds().length > 0; } catch {}
+          if (!hasFollowup) {
+            G._feedWithDone = true;
+            G._feedWithSpeaking = null;
+            feedSetSpeaking(null);
+            feedStatusSet((G._feedTab || "with") === "nogate" ? G._feedNoGateStatus : G._feedWithStatus);
+            try { maybeMeetingReturn(); } catch {}
+          } else if (gated) {
+            gateFollowupOnMeeting(renderFollowupNow);
+          } else {
+            renderFollowupNow();
+          }
         } catch (e) { if (DEBUG) console.warn("feed:", e); }
       }, 300);
       return;
@@ -4534,6 +4848,7 @@ function feedSchedule() {
         feedSetSpeakingThread("with", null);
         feedStatusSetThread("with", withFinal);
         feedHeaderSetThread("with", "done");
+        try { maybeMeetingReturn(); } catch {}
       } catch {}
     };
     G._feedWithFinish = finishAll;
@@ -4543,8 +4858,7 @@ function feedSchedule() {
       scheduleFeedRow("with", r, `m${i}`, base, slot, isLast, finishAll, true);
     });
     if (hasFollowup) {
-      const divBase = Math.round(300 + R * slot);
-      later(() => {
+      const showDivider = () => {
         try {
           const l = feedListFor("with");
           if (!l || l.querySelector(".feed-divider")) return;
@@ -4552,11 +4866,24 @@ function feedSchedule() {
           l.appendChild(feedDividerEl(secs));
           feedOnNewRowThread("with");
         } catch (e) { if (DEBUG) console.warn("feeddivider:", e); }
-      }, divBase);
-      followupRows.forEach((r, k) => {
-        const base = Math.round(divBase + k * slot);
-        scheduleFeedRow("with", r, `fup${k}`, base, slot, k === followupRows.length - 1, finishAll, true);
-      });
+      };
+      const queueFollowup = base0 => {
+        followupRows.forEach((r, k) => {
+          scheduleFeedRow("with", r, `fup${k}`, Math.round(base0 + k * slot),
+            slot, k === followupRows.length - 1, finishAll, true);
+        });
+      };
+      let gated = false;
+      try { gated = meetingIds().length > 0; } catch {}
+      if (gated) {
+        // Şef's answer is given at the table: the divider and everything
+        // after it wait until the meeting has arrived (or 9 s have passed).
+        gateFollowupOnMeeting(() => { showDivider(); queueFollowup(0); });
+      } else {
+        const divBase = Math.round(300 + R * slot);
+        later(showDivider, divBase);
+        queueFollowup(divBase);
+      }
     }
     const totalWith = R + (hasFollowup ? followupRows.length : 0);
     later(() => {
@@ -4662,7 +4989,7 @@ function startDeciding() {
       null, { kind: "dots", label: "Comparing the cartons…", cross: c });
   }, 3900);
   // 5. Kapı decides: the light, the barrier, the screen. The floor reacts:
-  // post waves, block shakes its head, human turns to Şef.
+  // post waves, block shakes its head, human gathers at the table.
   later(() => {
     try {
       const act = cs.gate.action;
@@ -4674,17 +5001,12 @@ function startDeciding() {
         if (!reducedMotion) G._react = { type: "block", t0: G.time, dur: 2.4 };
         else wave("kapi");
       } else {
-        G._look = { kind: "sef" };
-        G._react = { type: "ask", t0: G.time };
-        const sr = CHAR.sef;
-        if (!G._seatedById.sef && sr && sr.loaded && sr.group) {
-          // Step away from the pallet (never in front of it from the deciding camera).
-          const ax = sr.x - G.pallet.x, ay = sr.y - G.pallet.y, al = Math.hypot(ax, ay) || 1;
-          G._sefStep = { t: 0, waved: false, fx: sr.x, fy: sr.y,
-            dx: ax / al * 0.5, dy: ay / al * 0.5 };
-        } else {
-          wave("kapi");
-        }
+        // Human: no step-aside and no ask look — the finding is talked over
+        // at the table instead. The walk starts 900 ms after this card.
+        G._look = { kind: "pallet" };
+        G._react = null;
+        G._sefStep = null;
+        later(beginMeetingWalk, 900);
       }
     } catch (e) { if (DEBUG) console.warn("react:", e); }
     setStepHighlight(["kapi"]);
@@ -5073,7 +5395,8 @@ function tick() {
 if (new URLSearchParams(location.search).has("test"))
   window.__sim = { G, CHAR, ST, pickup: () => pickupPallet(true), drop: dropPallet, DROP, ZONE,
     FORK: { pick: PICK_D, set: SET_D }, camera, get delivery() { return deliveryGroup; },
-    feed: () => feedPlainRows(), feedFollowup: () => feedPlainFollowup(), feedNoGate: () => feedPlainNoGate() };
+    feed: () => feedPlainRows(), feedFollowup: () => feedPlainFollowup(), feedNoGate: () => feedPlainNoGate(),
+    meeting: () => meetingInfo() };
 if ("ontouchstart" in window || navigator.maxTouchPoints > 0) document.body.classList.add("touch");
 boot();
 tick();
