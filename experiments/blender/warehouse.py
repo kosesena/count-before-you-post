@@ -973,11 +973,28 @@ def p_pallet(name, x, y, z0, P):
 
 
 def p_truck(P, rnd):
-    """Semi-truck backed up to the dock: open 8 m trailer, red tractor behind."""
-    trailer = lego_mat("p_trailer", "#f4f4f4")
+    """LEGO City semi-truck at the dock: light-bluish-grey brick trailer, red cab."""
+    cab_red = P["cab_red"]
+    trailer = lego_mat("p_trailer", "#a0a5a9")
+    dark = P["dark_steel"]
+    white = P["paper"]
+    black = P["black"]
+    trans = lego_mat("p_cab_trans", "#1b1f23")
+    trans.blend_method = "BLEND"
+    _psetattr(trans, "shadow_method", "NONE")
+    _pset(next(n for n in trans.node_tree.nodes
+               if n.type == "BSDF_PRINCIPLED"), "Alpha", 0.75)
+    next(n for n in trans.node_tree.nodes
+         if n.type == "BSDF_PRINCIPLED").inputs["Roughness"].default_value = 0.05
+    chrome_stack = mat("p_stack_chrome", _hex("#e8e8ea"), rough=0.25, metal=0.9)
+    heads = mat("p_truck_head", (1.0, 0.95, 0.82), emit=4.0)
+    orange = mat("p_marker", (1.0, 0.55, 0.05), emit=2.5)
+    tails = mat("p_taillight", (1.0, 0.08, 0.05), emit=2.0)
+    strip = mat("p_strip", (0.9, 0.95, 1.0), emit=3.0)
     y0, tl = 10.25, 8.0
     yc = y0 + tl / 2
-    box("p_tf_floor", (2.5, tl, 0.12), (0, yc, 0.48), P["dark_steel"])
+    groove = PLATE_H / 10.0
+    box("p_tf_floor", (2.5, tl, 0.12), (0, yc, 0.48), dark)
     box("p_tf_deck", (2.4, tl - 0.1, 0.02), (0, yc, 0.55), P["wood"])
     for sgn in (-1, 1):
         box(f"p_tf_wall{sgn}", (0.06, tl, 2.28), (sgn * 1.22, yc, 1.68), trailer,
@@ -986,40 +1003,57 @@ def p_truck(P, rnd):
             P["trailer_in"])
         for k in range(4):
             box(f"p_tf_rib{sgn}{k}", (0.05, 0.08, 2.2),
-                (sgn * 1.15, y0 + 1 + k * 2.0, 1.68), P["dark_steel"])
-        box(f"p_tf_stripe{sgn}", (0.02, tl, 0.09), (sgn * 1.26, yc, 1.1), P["paper"])
+                (sgn * 1.15, y0 + 1 + k * 2.0, 1.68), dark)
+        for c in range(1, 4):
+            gz = 0.54 + c * BRICK_H
+            box(f"p_tf_groove{sgn}_{c}", (0.012, tl, groove),
+                (sgn * 1.252, yc, gz), dark)
         box(f"p_tf_guard{sgn}", (0.06, 3.0, 0.28), (sgn * 1.18, 13.2, 0.30),
-            P["dark_steel"])
-        # Open rear doors folded back along the trailer sides.
+            dark)
         box(f"p_tf_door{sgn}", (0.05, 1.25, 2.2), (sgn * 1.30, y0 + 0.68, 1.68),
             trailer, bevel=0.005)
         for k, dy in enumerate((0.35, 1.0)):
             cyl(f"p_tf_rod{sgn}{k}", 0.016, 1.9, (sgn * 1.34, y0 + dy, 1.68),
                 P["chrome"])
+        for i in range(19):
+            ry = y0 + 0.4 + i * 0.4
+            rmat = P["red"] if i % 2 == 0 else white
+            box(f"p_tf_refl{sgn}_{i}", (0.02, 0.38, 0.08),
+                (sgn * 1.26, ry, 0.68), rmat)
     box("p_tf_roof", (2.5, tl, 0.08), (0, yc, 2.90), trailer, bevel=0.005)
+    roof_top = 2.94
+    roof_stud_top = roof_top + STUD_H
+    x_edge = 1.25 - STUD_R - 0.05
+    ny = int((tl - 1.2) // STUD_PITCH) + 1
+    for sgn in (-1, 1):
+        for i in range(ny):
+            sy = y0 + 0.6 + i * STUD_PITCH
+            _stud(f"p_tf_topstud{sgn}_{i}", sgn * x_edge, sy, roof_top, trailer)
     box("p_tf_front", (2.5, 0.08, 2.28), (0, y0 + tl - 0.04, 1.68), trailer)
+    for c in range(1, 4):
+        gz = 0.54 + c * BRICK_H
+        box(f"p_tf_front_groove{c}", (2.5, 0.012, groove),
+            (0, y0 + tl + 0.005, gz), dark)
     for sgn in (-1, 1):
         box(f"p_tf_post{sgn}", (0.09, 0.09, 2.28), (sgn * 1.21, y0 + 0.03, 1.68),
-            P["dark_steel"])
-    box("p_tf_lintel", (2.5, 0.09, 0.16), (0, y0 + 0.03, 2.80), P["dark_steel"])
-    tails = mat("p_taillight", (1.0, 0.08, 0.05), emit=2.0)
+            dark)
+    box("p_tf_lintel", (2.5, 0.09, 0.16), (0, y0 + 0.03, 2.80), dark)
     for sgn in (-1, 1):
         box(f"p_tf_tail{sgn}", (0.14, 0.05, 0.28), (sgn * 1.02, y0 - 0.01, 0.72),
             tails)
-    box("p_tf_bumper", (2.4, 0.14, 0.20), (0, y0 - 0.03, 0.32), P["dark_steel"])
+    box("p_tf_bumper", (2.4, 0.14, 0.20), (0, y0 - 0.03, 0.32), dark)
     for k, x in enumerate((-0.35, 0, 0.35)):
         box(f"p_tf_marker{k}", (0.09, 0.05, 0.07), (x, y0 - 0.01, 2.80),
-            mat("p_marker", (1.0, 0.55, 0.05), emit=2.5))
+            orange)
     for k, y in enumerate((15.0, 16.2)):
-        box(f"p_tf_axle{k}", (2.9, 0.14, 0.14), (0, y, 0.40), P["dark_steel"])
+        box(f"p_tf_axle{k}", (2.9, 0.14, 0.14), (0, y, 0.40), dark)
         for sgn in (-1, 1):
             p_wheel(f"p_tf_w{k}{sgn}", sgn * 1.48, y, 0.40, 0.36, P)
     for sgn in (-1, 1):
         box(f"p_tf_fender{sgn}", (0.55, 2.9, 0.06), (sgn * 1.48, 15.6, 0.86),
-            P["dark_steel"])
+            dark)
         box(f"p_tf_leg{sgn}", (0.12, 0.12, 0.25), (sgn * 0.9, 17.3, 0.30),
-            P["dark_steel"])
-    # Cargo pallets inside the trailer, seen through the open rear.
+            dark)
     for k, (x, y) in enumerate(((-0.60, 11.6), (0.60, 11.6), (0.0, 13.15))):
         p_pallet(f"p_tc{k}", x, y, 0.56, P)
         n = rnd.randint(2, 4)
@@ -1036,112 +1070,132 @@ def p_truck(P, rnd):
         if k == 2:
             box(f"p_tc{k}_film", (1.3, 1.1, 0.55), (x, y, 0.93), P["film"])
         box(f"p_tc{k}_lbl", (0.3, 0.005, 0.2), (x, y - 0.48, 0.95), P["paper"])
-    strip = mat("p_strip", (0.9, 0.95, 1.0), emit=3.0)
     box("p_tf_strip", (0.3, 2.2, 0.03), (0, 12.4, 2.76), strip)
     bpy.ops.object.light_add(type="POINT", location=(0, 12.4, 2.3))
     il = bpy.context.object
     il.name = "p_trailer_light"
     il.data.energy, il.data.color = 50, (0.88, 0.93, 1.0)
     il.data.use_shadow = False
-    # --- tractor (faces away; its red rear-top shows over the trailer roof) ---
-    cab, dark, glass = P["cab_red"], P["dark_steel"], P["glass_dark"]
     for sgn in (-1, 1):
-        box(f"p_c_chassis{sgn}", (0.16, 4.2, 0.28), (sgn * 0.45, 20.5, 0.72), dark)
+        box(f"p_c_chassis{sgn}", (0.16, 4.2, 0.28), (sgn * 0.45, 20.5, 0.72),
+            dark)
     box("p_c_cross", (1.1, 0.14, 0.14), (0, 19.0, 0.72), dark)
     for k, y in enumerate((19.3, 20.4)):
         for sgn in (-1, 1):
             p_wheel(f"p_c_w{k}{sgn}", sgn * 1.0, y, 0.50, 0.40, P)
         for sgn in (-1, 1):
             box(f"p_c_flap{k}{sgn}", (0.55, 0.05, 0.45), (sgn * 1.0, 18.72, 0.42),
-                P["black"])
+                black)
     for sgn in (-1, 1):
         p_wheel(f"p_c_fw{sgn}", sgn * 1.0, 21.9, 0.50, 0.36, P)
         cyl(f"p_c_tank{sgn}", 0.32, 1.0, (sgn * 1.02, 21.15, 0.78), P["chrome"],
             rot=(math.radians(90), 0, 0))
-        box(f"p_c_step{sgn}", (0.5, 0.35, 0.08), (sgn * 1.05, 22.35, 0.55), dark)
-    box("p_cab", (2.4, 1.9, 2.6), (0, 21.5, 2.0), cab, bevel=0.03)
-    box("p_cab_back_win", (1.6, 0.06, 0.5), (0, 20.53, 3.2), glass)
-    shield = box("p_cab_shield", (2.1, 0.06, 0.95), (0, 22.44, 2.78), glass)
-    shield.rotation_euler = (math.radians(12), 0, 0)
+        box(f"p_c_step{sgn}", (0.5, 0.35, 0.08), (sgn * 1.05, 22.35, 0.55),
+            dark)
+    box("p_cab", (2.4, 1.9, 2.6), (0, 21.5, 2.0), cab_red, bevel=0.03)
+    box("p_cab_frontwin", (1.8, 0.06, 0.70), (0, 22.46, 2.78), trans)
     for sgn in (-1, 1):
-        box(f"p_cab_sidewin{sgn}", (0.06, 0.95, 0.7), (sgn * 1.21, 21.95, 2.78),
-            glass)
-        box(f"p_cab_stripe{sgn}", (0.03, 1.9, 0.22), (sgn * 1.22, 21.5, 1.55),
-            P["paper"])
-        box(f"p_cab_mirarm{sgn}", (0.3, 0.05, 0.05), (sgn * 1.32, 22.3, 2.95), dark)
+        box(f"p_cab_sidewin{sgn}", (0.06, 0.95, 0.70),
+            (sgn * 1.21, 21.95, 2.78), trans)
+        box(f"p_cab_mirarm{sgn}", (0.3, 0.05, 0.05), (sgn * 1.32, 22.3, 2.95),
+            dark)
         box(f"p_cab_mir{sgn}", (0.07, 0.28, 0.42), (sgn * 1.45, 22.3, 2.85),
-            P["black"])
-        cyl(f"p_cab_stack{sgn}", 0.075, 2.7, (sgn * 0.98, 20.62, 2.9), P["chrome"])
-    box("p_cab_grille", (1.8, 0.08, 0.7), (0, 22.47, 1.30), P["chrome"])
-    box("p_cab_bumper", (2.4, 0.16, 0.35), (0, 22.5, 0.72), P["chrome"])
-    heads = mat("p_headlight", (1.0, 0.95, 0.85), emit=3.0)
+            black)
+        cyl(f"p_cab_stack{sgn}", 0.075, 2.7, (sgn * 0.98, 20.62, 2.9),
+            chrome_stack)
+        box(f"p_cab_sidemarker{sgn}", (0.06, 0.12, 0.12),
+            (sgn * 1.21, 22.30, 1.35), orange)
+    box("p_cab_grilleband", (2.0, 0.06, 0.30), (0, 22.46, 1.60), white)
+    box("p_cab_grille", (1.6, 0.04, 0.18), (0, 22.49, 1.60), black)
+    box("p_cab_bumper", (2.4, 0.16, 0.35), (0, 22.5, 0.72), dark)
     for sgn in (-1, 1):
         cyl(f"p_cab_head{sgn}", 0.14, 0.08, (sgn * 0.78, 22.5, 1.35), heads,
             rot=(math.radians(90), 0, 0))
-        box(f"p_cab_ind{sgn}", (0.12, 0.06, 0.12), (sgn * 1.05, 22.49, 1.35),
-            mat("p_marker", (1.0, 0.55, 0.05), emit=2.5))
-    box("p_cab_plate", (0.44, 0.03, 0.11), (-0.5, 22.59, 0.72), P["paper"])
+    box("p_cab_plate", (0.44, 0.03, 0.11), (-0.5, 22.59, 0.72), white)
     for k, x in enumerate((-0.4, 0, 0.4)):
         box(f"p_cab_marker{k}", (0.09, 0.05, 0.07), (x, 20.52, 3.25),
-            mat("p_marker", (1.0, 0.55, 0.05), emit=2.5))
+            orange)
+    cab_top = 3.3
+    cab_stud_top = cab_top + STUD_H
+    for ix, sx in enumerate((-0.96, -0.48, 0, 0.48, 0.96)):
+        for iy, sy in enumerate((21.5 - STUD_PITCH / 2, 21.5 + STUD_PITCH / 2)):
+            _stud(f"p_cab_stud{ix}{iy}", sx, sy, cab_top, cab_red)
 
 
 def p_forklift(P):
-    """Counterbalance forklift in dock yellow: mast with forks, open overhead
-    guard, seat, steering wheel and lights. Front faces +y (toward the dock).
+    """LEGO City forklift in bright yellow: black mast, guard cage, forks, seat.
+
+    Front faces +y (toward the dock). Every p_fl_* name and pivot is kept for
+    the simulator; only shapes (guard bars) and materials change in place.
     """
     x, y = 8.0, -0.5
-    yellow, dark, steel = P["yellow"], P["dark_steel"], P["steel"]
+    yellow = P["yellow"]
+    dark = P["dark_steel"]
     black = lego_mat("p_fl_black", "#1b1f23")
-    # Chassis and rounded rear counterweight.
-    box("p_fl_body", (1.10, 1.50, 0.50), (x, y - 0.10, 0.62), yellow, bevel=0.04)
+    _plate_gap = PLATE_H / 10.0
+    _brick = BRICK_H
+    box("p_fl_body", (1.10, 1.50, 0.50), (x, y - 0.10, 0.62), yellow,
+        bevel=0.04)
     box("p_fl_counter", (1.05, 0.50, 0.62), (x, y - 0.95, 0.66), yellow,
         bevel=0.08)
+    counter_top = 0.97
+    counter_stud_top = counter_top + STUD_H
+    edge = 1.05 / 2 - STUD_R
+    for i, dx in enumerate((-STUD_PITCH / 2, STUD_PITCH / 2)):
+        _stud(f"p_fl_counter_stud{i}", x + dx, y - 0.95, counter_top, yellow)
     box("p_fl_floor", (0.90, 0.70, 0.04), (x, y + 0.15, 0.90), black)
-    # Wheels: bigger drivers in front, smaller steers at the back.
     for sgn in (-1, 1):
         p_wheel(f"p_fl_wf{sgn}", x + sgn * 0.55, y + 0.55, 0.30, 0.24, P)
         p_wheel(f"p_fl_wr{sgn}", x + sgn * 0.55, y - 0.75, 0.24, 0.20, P)
-    # Mast: outer rails, tie bars, inner chrome rails, carriage, forks.
+    for sgn in (-1, 1):
+        for pre in ("p_fl_wf", "p_fl_wr"):
+            hub = bpy.data.objects.get(f"{pre}{sgn}_hub")
+            if hub is not None:
+                hub.data.materials.clear()
+                hub.data.materials.append(yellow)
     ym = y + 1.05
     for sgn in (-1, 1):
         box(f"p_fl_rail{sgn}", (0.12, 0.14, 2.60), (x + sgn * 0.45, ym, 1.45),
-            dark)
+            black)
         box(f"p_fl_inner{sgn}", (0.08, 0.10, 2.30),
-            (x + sgn * 0.30, ym + 0.02, 1.45), P["chrome"])
+            (x + sgn * 0.30, ym + 0.02, 1.45), black)
+        box(f"p_fl_mast_in{sgn}", (0.04, 0.05, 2.28),
+            (x + sgn * 0.30, ym + 0.02, 1.45), black)
         box(f"p_fl_forkv{sgn}", (0.13, 0.06, 0.55),
-            (x + sgn * 0.27, ym + 0.14, 0.35), steel)
+            (x + sgn * 0.27, ym + 0.14, 0.35), black)
         box(f"p_fl_fork{sgn}", (0.13, 1.15, 0.05),
-            (x + sgn * 0.27, ym + 0.72, 0.10), steel)
+            (x + sgn * 0.27, ym + 0.72, 0.10), black)
         cyl(f"p_fl_ram{sgn}", 0.035, 0.80, (x + sgn * 0.42, y + 0.775, 1.20),
             P["chrome"], rot=(math.radians(-37), 0, 0))
-    box("p_fl_tie_top", (1.02, 0.12, 0.14), (x, ym, 2.68), dark)
-    box("p_fl_tie_low", (1.02, 0.16, 0.18), (x, ym, 0.35), dark)
-    box("p_fl_carriage", (0.72, 0.08, 0.45), (x, ym + 0.12, 0.45), dark)
+    box("p_fl_tie_top", (1.02, 0.12, 0.14), (x, ym, 2.68), black)
+    box("p_fl_tie_low", (1.02, 0.16, 0.18), (x, ym, 0.35), black)
+    box("p_fl_carriage", (0.72, 0.08, 0.45), (x, ym + 0.12, 0.45), black)
     box("p_fl_axle", (1.10, 0.12, 0.12), (x, y + 0.55, 0.30), dark)
     box("p_fl_mount", (1.00, 0.35, 0.25), (x, y + 0.80, 0.30), dark)
-    # Seat, column, wheel and dash.
     box("p_fl_seatbase", (0.30, 0.30, 0.12), (x, y - 0.30, 0.93), dark)
-    box("p_fl_seat", (0.46, 0.42, 0.14), (x, y - 0.30, 1.02), black, bevel=0.03)
+    box("p_fl_seat", (0.46, 0.42, 0.14), (x, y - 0.30, 1.02), black,
+        bevel=0.03)
     box("p_fl_seatback", (0.46, 0.12, 0.52), (x, y - 0.53, 1.32), black,
         bevel=0.03)
     cyl("p_fl_column", 0.035, 0.50, (x, y + 0.32, 1.15), dark,
         rot=(math.radians(25), 0, 0))
     cyl("p_fl_wheel", 0.12, 0.03, (x, y + 0.25, 1.38), black,
         rot=(math.radians(90 - 25), 0, 0))
-    box("p_fl_dash", (0.50, 0.25, 0.18), (x, y + 0.42, 1.00), yellow, bevel=0.02)
-    # Overhead guard: four posts and an open slatted roof frame.
+    box("p_fl_dash", (0.50, 0.25, 0.18), (x, y + 0.42, 1.00), yellow,
+        bevel=0.02)
     for ix, px in enumerate((x - 0.50, x + 0.50)):
         for iy, py in enumerate((y - 0.80, y + 0.35)):
-            box(f"p_fl_post{ix}{iy}", (0.07, 0.07, 1.35), (px, py, 1.475), dark)
+            cyl(f"p_fl_post{ix}{iy}", 0.035, 1.35, (px, py, 1.475), black,
+                verts=12)
     for ix, px in enumerate((x - 0.50, x + 0.50)):
-        box(f"p_fl_roofside{ix}", (0.07, 1.22, 0.07), (px, y - 0.225, 2.15),
-            dark)
+        cyl(f"p_fl_roofside{ix}", 0.035, 1.22, (px, y - 0.225, 2.15), black,
+            rot=(math.radians(90), 0, 0), verts=12)
     for iy, py in enumerate((y - 0.80, y + 0.35)):
-        box(f"p_fl_roofend{iy}", (1.07, 0.07, 0.07), (x, py, 2.15), dark)
+        cyl(f"p_fl_roofend{iy}", 0.035, 1.07, (x, py, 2.15), black,
+            rot=(0, math.radians(90), 0), verts=12)
     for k, py in enumerate((y - 0.55, y - 0.225, y + 0.10)):
-        box(f"p_fl_slat{k}", (1.00, 0.09, 0.05), (x, py, 2.15), dark)
-    # Working lights, tail light and amber beacon.
+        cyl(f"p_fl_slat{k}", 0.035, 1.00, (x, py, 2.15), black,
+            rot=(0, math.radians(90), 0), verts=12)
     heads = mat("p_headlight", (1.0, 0.95, 0.85), emit=3.0)
     for sgn in (-1, 1):
         box(f"p_fl_head{sgn}", (0.12, 0.06, 0.10),
