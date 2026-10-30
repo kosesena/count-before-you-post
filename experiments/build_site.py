@@ -97,6 +97,8 @@ def agent_steps(trace):
     for t in trace:
         if "thinking" in t:
             steps.append({"kind": "thinking", "text": t["thinking"]})
+        elif "signoff" in t:
+            steps.append({"kind": "signoff", "data": t["signoff"]})
         elif "gate_cross_check" in t:
             steps.append({"kind": "cross", "data": t["gate_cross_check"]})
         else:
@@ -125,11 +127,17 @@ def build(lang):
              for r in json.loads((RES / "agent_warehouse_cross.json").read_text())
              if r["gate"] and "note" not in r}
 
+    # Şef's sign-off was recorded once, on the Turkish notes (run_signoff.py); every language
+    # shows it as a follow-up of that Turkish run, labelled so.
+    sfile = RES_TR / "signoff.json"
+    signoffs = {r["variant"]: r for r in json.loads(sfile.read_text())} if sfile.exists() else {}
+
     cases = []
     for v, p in perception.items():
         confs = p["sam"]["cardboard box conf"]
         d = decide(p["note"], confs, p["spark"], cached_cross(v, RES / "sam_raw"))
-        g, u = gated.get(v), ungated.get(v)
+        g, u, so = gated.get(v), ungated.get(v), signoffs.get(v)
+        so_at = so and next(i for i, t in enumerate(so["trace"]) if "signoff" in t)
         cases.append({
             "id": v, "title": TITLE[v], "what": WHAT[v], "expected": p["truth"]["expected_decision"],
             "images": {"camera": jpg(OUT / f"depo-{v}-kamera.png", f"{pre}{v}-camera.jpg"),
@@ -146,10 +154,16 @@ def build(lang):
             # Muse Wonder's paperwork for a refused or escalated case (None when posted).
             "draft": drafts.get(v, {}).get("draft"),
             "without_gate": u and {"posted": [q for q, _ in u["posted"]],
-                                   "supervisor": bool(u["escalated"]), "answer": u["answer"]},
+                                   "supervisor": bool(u["escalated"]), "answer": u["answer"],
+                                   "seconds": u["seconds"], "steps": agent_steps(u["trace"])},
             "agent": g and {"posted": g["posted"], "refused": g["refused"],
                             "supervisor": bool(g["escalated"]), "answer": g["answer"],
                             "seconds": g["seconds"], "steps": agent_steps(g["trace"])},
+            # What happened after Şef answered (separate run, on the Turkish note).
+            "signoff": so and {"lang": so["lang"], "decision": so["signoff"],
+                               "posted": so["posted"], "answer": so["answer"],
+                               "seconds": so["seconds_after_signoff"],
+                               "steps": agent_steps(so["trace"][so_at + 1:])},
         })
 
     cast = []
