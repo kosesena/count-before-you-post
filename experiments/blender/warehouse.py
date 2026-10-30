@@ -3559,7 +3559,7 @@ def p_rooms(P):
                     kapi_tape)
             box(f"{pre}wtape0", (0.015, 0.06, 3.0), (xwf + 0.015, -15.84, 1.5),
                 kapi_tape)
-            box(f"{pre etape0", (0.015, 0.06, 3.0), (xef - 0.015, -14.94, 1.5),
+            box(f"{pre}etape0", (0.015, 0.06, 3.0), (xef - 0.015, -14.94, 1.5),
                 kapi_tape)
             _sgx = xc + 1.2
             box(f"{pre}sighouse", (0.45, 0.15, 1.05), (_sgx, -17.585, 1.9),
