@@ -337,32 +337,68 @@ body.deciding #feed, body.done #feed { display: flex; }
 body.deciding #demoLink, body.deciding #tallyChip,
 body.done #demoLink, body.done #tallyChip { display: none !important; }
 .feed-head-top { display: flex; align-items: flex-start; gap: 8px; }
-.feed-title { font-weight: 800; font-size: 14px; line-height: 1.2; }
+.feed-title { font-weight: 800; font-size: 14px; line-height: 1.2; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .feed-sub { font-size: 12.5px; color: rgba(255,255,255,.7); margin-top: 2px; }
+.freplay { display: inline-flex; align-items: center; gap: 5px; font-size: 12.5px; font-weight: 600; color: rgba(255,255,255,.75); }
+.freplay i { width: 8px; height: 8px; border-radius: 50%; background: #22d3ee; display: block; animation: fpulse 1.2s ease-in-out infinite; }
+.freplay em { font-style: normal; }
+.freplay.done i { background: #9ca3af; animation: none; }
+.freplay.done { color: rgba(255,255,255,.6); }
+.freplay[hidden] { display: none; }
+@keyframes fpulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .5; transform: scale(.8); } }
 #feedToggle {
   display: none; margin-left: auto; flex: none;
   font: inherit; font-size: 12.5px; font-weight: 700; color: #fff; cursor: pointer;
   background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.22);
   border-radius: 10px; padding: 6px 10px; min-height: 36px;
 }
-.feed-team { display: flex; gap: 6px; margin: 8px 0 6px; flex-wrap: wrap; }
+.feed-team { display: flex; gap: 6px; margin: 8px 0 4px; flex-wrap: wrap; }
+.feed-team .tm { position: relative; display: inline-block; line-height: 0; }
 .feed-team img {
   width: 26px; height: 26px; border-radius: 50%; object-fit: cover; display: block;
   border: 2px solid rgba(255,255,255,.25); background: #0b1226;
+  transition: transform .2s ease, box-shadow .2s ease;
 }
-.feed-team img.speaking { animation: feedpulse 1.2s ease-in-out infinite; }
-@keyframes feedpulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0); }
-  50% { box-shadow: 0 0 0 4px var(--spk, rgba(255,255,255,.25)); }
-}
+.feed-team img.speaking { transform: scale(1.15); box-shadow: 0 0 0 3px var(--spk, rgba(255,255,255,.25)), 0 0 12px var(--spk, rgba(255,255,255,.25)); animation: none; }
+.feed-team .tdot { position: absolute; right: -1px; bottom: -1px; width: 9px; height: 9px; border-radius: 50%; border: 2px solid #1b2544; display: block; }
+.feed-status { font-size: 12.5px; color: rgba(255,255,255,.65); min-height: 18px; margin: 0 0 6px; font-style: italic; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.feed-status .fcheck { font-style: normal; color: #4ade80; margin-left: 4px; }
 .feed-list { overflow-y: auto; display: flex; flex-direction: column; gap: 8px; min-height: 0; }
 .feed-row {
   display: flex; gap: 8px; align-items: flex-start;
   background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1);
   border-radius: 12px; padding: 8px 10px;
-  animation: feedin .3s ease-out;
+  animation: feedspring .45s cubic-bezier(.2,1.4,.4,1);
 }
-@keyframes feedin { from { opacity: 0; transform: translateY(8px); } }
+@keyframes feedspring {
+  0% { opacity: 0; transform: translateY(14px); }
+  60% { opacity: 1; transform: translateY(-4px); }
+  80% { transform: translateY(2px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.feed-row.typing { align-items: center; }
+.ftyping-label { font-style: italic; font-weight: 400; opacity: .7; font-size: 12.5px; margin-left: 6px; }
+.ftyping-line { margin-top: 4px; }
+.ftyping-dots { display: inline-flex; gap: 4px; vertical-align: middle; }
+.ftyping-dots i { width: 6px; height: 6px; border-radius: 50%; background: currentColor; display: block; animation: fbounce 1s infinite; }
+.ftyping-dots i:nth-child(2) { animation-delay: .15s; }
+.ftyping-dots i:nth-child(3) { animation-delay: .3s; }
+.ftyping-dots.dim { opacity: .55; }
+@keyframes fbounce { 0%, 60%, 100% { transform: translateY(0); opacity: .6; } 30% { transform: translateY(-5px); opacity: 1; } }
+.fcaret { display: inline-block; width: 2px; height: 1em; background: currentColor; vertical-align: -2px; margin-left: 2px; animation: fblink .8s steps(1) infinite; }
+@keyframes fblink { 50% { opacity: 0; } }
+.ftick-row { text-align: right; line-height: 1; margin-top: 2px; }
+.ftick { font-size: 12.5px; color: rgba(255,255,255,.5); }
+.ftick.seen { font-weight: 700; }
+.fto { display: inline-flex; align-items: center; gap: 4px; font-size: 11.5px; font-weight: 700; color: rgba(255,255,255,.7); border: 1px solid rgba(255,255,255,.2); border-radius: 99px; padding: 1px 7px 1px 5px; margin: 4px 6px 0 0; vertical-align: 1px; }
+.fto svg { width: 12px; height: 9px; display: block; }
+.feed-row.gate-post { border-left: 3px solid var(--dpost); }
+.feed-row.gate-block { border-left: 3px solid var(--dblock); }
+.feed-row.gate-human { border-left: 3px solid var(--dhuman); }
+.feed-msg .verdict-word.stamp { display: inline-block; animation: fstamp 250ms ease-out; }
+@keyframes fstamp { 0% { transform: scale(1.6); opacity: 0; } 60% { transform: scale(.95); opacity: 1; } 100% { transform: scale(1); } }
+.fnew { position: absolute; left: 50%; bottom: 12px; transform: translateX(-50%); font: inherit; font-size: 12.5px; font-weight: 700; color: #fff; background: rgba(38,33,26,.92); border: 1px solid rgba(255,255,255,.22); border-radius: 99px; padding: 8px 16px; min-height: 36px; min-width: 36px; cursor: pointer; box-shadow: 0 6px 20px rgba(0,0,0,.4); z-index: 2; }
+.fnew[hidden] { display: none; }
 .feed-av {
   width: 34px; height: 34px; border-radius: 50%; object-fit: cover; flex: none;
   border: 2px solid rgba(255,255,255,.25); background: #0b1226; display: block;
@@ -388,10 +424,17 @@ body.done #demoLink, body.done #tallyChip { display: none !important; }
 .feed-reply {
   display: flex; gap: 6px; align-items: flex-start; margin-top: 6px; margin-left: 8px;
   font-size: 13px; line-height: 1.45; color: rgba(255,255,255,.92); overflow-wrap: anywhere;
+  animation: ffade .3s ease-out;
 }
+@keyframes ffade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
 .feed-reply img { width: 18px; height: 18px; border-radius: 50%; object-fit: cover; flex: none; border: 1px solid rgba(255,255,255,.25); background: #0b1226; }
 .feed-reply.red { color: var(--dblock); font-weight: 700; }
 .feed-reply.status { color: rgba(255,255,255,.65); font-size: 12.5px; }
+.feed-reply.fflash { animation: fflash .6s ease-out, ffade .3s ease-out; }
+@keyframes fflash { 0% { background: rgba(248,113,113,.5); border-radius: 8px; } 100% { background: transparent; } }
+.feed-reply-typing { display: flex; gap: 6px; align-items: center; margin-top: 6px; margin-left: 8px; color: rgba(255,255,255,.7); }
+.feed-reply-typing img { width: 18px; height: 18px; border-radius: 50%; object-fit: cover; flex: none; border: 1px solid rgba(255,255,255,.25); background: #0b1226; }
+.feed-reply-typing .ftyping-dots i { width: 5px; height: 5px; }
 .bubble {
   position: absolute; left: 0; top: 0; transform: translate(-50%,-100%);
   background: rgba(11,18,38,.68);
@@ -407,6 +450,8 @@ body.done #demoLink, body.done #tallyChip { display: none !important; }
   transform: rotate(45deg);
 }
 .bubble.fade { opacity: 0; }
+.bubble .ftyping-dots { margin: 2px 0; }
+.bubble.typing-bubble { min-width: 44px; text-align: center; }
 @media (max-width: 640px) {
   #feed { left: 10px; right: 10px; top: 10px; width: auto; max-height: none; }
   #feedToggle { display: block; }
@@ -415,16 +460,27 @@ body.done #demoLink, body.done #tallyChip { display: none !important; }
   #feed .feed-list .feed-row:last-child { display: flex; }
   #feed .feed-list .feed-row:last-child .feed-msg { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
   #feed:not(.expanded) .feed-list .feed-row:last-child .feed-reply { display: none; }
+  #feed:not(.expanded) .feed-list .feed-row:last-child .feed-reply-typing { display: none; }
   #feed.expanded .feed-list { overflow-y: auto; max-height: 46dvh; }
   #feed.expanded .feed-list .feed-row { display: flex; }
   #feed.expanded .feed-list .feed-row:last-child .feed-msg { display: block; -webkit-line-clamp: unset; }
   #feed.expanded .feed-list .feed-row:last-child .feed-reply { display: flex; }
   .feed-more, #feedToggle { min-height: 36px; min-width: 36px; }
+  .feed-team img { width: 24px; height: 24px; }
+  .feed-team .tdot { width: 8px; height: 8px; }
+  .feed-status, .freplay, .ftyping-label, .ftick, .fto, .fnew { font-size: 12.5px; }
+  body.done #feed { max-height: calc(60dvh - 20px); }
+  body.done #feed.expanded .feed-list { max-height: 30dvh; }
 }
 @media (prefers-reduced-motion: reduce) {
   .feed-row { animation: none; }
-  .feed-team img.speaking { animation: none; }
+  .feed-team img.speaking { animation: none; transform: none; box-shadow: 0 0 0 3px var(--spk, rgba(255,255,255,.25)); }
   .bubble { transition: none; }
+  .ftyping-dots i, .feed-reply-typing .ftyping-dots i, .bubble .ftyping-dots i { animation: none; }
+  .fcaret { animation: none; display: none; }
+  .feed-msg .verdict-word.stamp { animation: none; }
+  .feed-reply, .feed-reply.fflash { animation: none; }
+  .freplay i { animation: none; }
 }
 /* ---------- result ---------- */
 #resultWrap {
@@ -608,13 +664,15 @@ body.done #resultWrap { display: flex; }
 <div id="feed" aria-live="polite">
   <div class="feed-head-top">
     <div>
-      <div class="feed-title">Agent run</div>
+      <div class="feed-title">Agent run<span class="freplay" hidden><i></i><em>replaying</em></span></div>
       <div class="feed-sub"></div>
     </div>
     <button id="feedToggle" aria-expanded="false">Show all ▾</button>
   </div>
   <div class="feed-team"></div>
+  <div class="feed-status" aria-live="polite"></div>
   <div class="feed-list"></div>
+  <button class="fnew" type="button" hidden></button>
 </div>
 
 <div id="resultWrap">
@@ -2925,7 +2983,7 @@ function stepCamera(dt) {
 }
 
 // ---------- the gate decides ----------
-const later = (fn, ms) => { G._seqs.push(setTimeout(fn, ms)); };
+const later = (fn, ms) => { const id = setTimeout(fn, ms); G._seqs.push(id); return id; };
 function hexGlow(col) {
   try {
     if (/^#[0-9a-fA-F]{6}$/.test(col)) {
@@ -3242,17 +3300,60 @@ function feedClearBeams() {
   } catch {}
   _feedBeams = [];
 }
+function feedStatusSet(html) {
+  try { const el = document.querySelector("#feed .feed-status"); if (el) el.innerHTML = html || ""; } catch {}
+}
+function feedStatusText(t) {
+  try { const el = document.querySelector("#feed .feed-status"); if (el) el.textContent = t || ""; } catch {}
+}
+function feedHeaderSet(mode) {
+  try {
+    const el = document.querySelector("#feed .freplay");
+    if (!el) return;
+    if (mode === "hidden") { el.hidden = true; return; }
+    el.hidden = false;
+    const label = el.querySelector("em");
+    if (mode === "done") { el.classList.add("done"); if (label) label.textContent = "recorded run"; }
+    else { el.classList.remove("done"); if (label) label.textContent = "replaying"; }
+  } catch {}
+}
+function feedPillHide() {
+  try { G._feedUnread = 0; const p = document.querySelector("#feed .fnew"); if (p) { p.hidden = true; p.textContent = ""; } } catch {}
+}
+function feedPillBump() {
+  try {
+    G._feedUnread = (G._feedUnread || 0) + 1;
+    const p = document.querySelector("#feed .fnew");
+    if (!p) return;
+    p.textContent = `↓ ${G._feedUnread} new`;
+    p.hidden = false;
+  } catch {}
+}
+function feedEdgeFlash(colour) {
+  try {
+    if (!matchMedia("(max-width: 640px)").matches) return;
+    const f = document.getElementById("feed");
+    if (!f || f.classList.contains("expanded")) return;
+    f.style.borderColor = colour;
+    later(() => { try { f.style.borderColor = ""; } catch {} }, 600);
+  } catch {}
+}
 function feedClear() {
-  try { const l = document.querySelector("#feed .feed-list"); l.innerHTML = ""; l._stick = true; } catch {}
+  try { const l = document.querySelector("#feed .feed-list"); if (l) { l.innerHTML = ""; l._stick = true; } } catch {}
   try { document.querySelector("#feed .feed-team").innerHTML = ""; } catch {}
   try { document.querySelector("#feed .feed-sub").textContent = ""; } catch {}
   try {
     const f = document.getElementById("feed");
-    if (f) f.classList.remove("expanded");
+    if (f) { f.classList.remove("expanded"); f.style.borderColor = ""; }
     const t = document.getElementById("feedToggle");
     if (t) { t.textContent = "Show all ▾"; t.setAttribute("aria-expanded", "false"); }
   } catch {}
+  try { feedPillHide(); } catch {}
+  try { feedStatusText(""); } catch {}
+  try { feedHeaderSet("hidden"); } catch {}
+  try { feedSetSpeaking(null); } catch {}
   G._feedRows = null;
+  G._feedUnread = 0;
   feedClearBubbles();
   feedClearBeams();
 }
@@ -3265,19 +3366,30 @@ function feedSetSpeaking(id) {
     });
   } catch {}
 }
+function feedWireStick(list) {
+  if (!list || list._stickWired) return;
+  list._stickWired = true;
+  list.addEventListener("scroll", () => {
+    const stick = list.scrollHeight - list.scrollTop - list.clientHeight < 60;
+    list._stick = stick;
+    if (stick) feedPillHide();
+  }, { passive: true });
+}
 function feedMaybeScroll() {
   try {
     const list = document.querySelector("#feed .feed-list");
     if (!list) return;
-    // Follow the newest row unless the reader scrolled up (checked on their scroll, not
-    // after a tall row was appended).
-    if (!list._stickWired) {
-      list._stickWired = true;
-      list.addEventListener("scroll", () => {
-        list._stick = list.scrollHeight - list.scrollTop - list.clientHeight < 60;
-      }, { passive: true });
-    }
-    if (list._stick !== false) list.scrollTop = list.scrollHeight;
+    feedWireStick(list);
+    if (list._stick !== false) { list.scrollTop = list.scrollHeight; feedPillHide(); }
+  } catch {}
+}
+function feedOnNewRow() {
+  try {
+    const list = document.querySelector("#feed .feed-list");
+    if (!list) return;
+    feedWireStick(list);
+    if (list._stick !== false) { list.scrollTop = list.scrollHeight; feedPillHide(); }
+    else feedPillBump();
   } catch {}
 }
 function feedTeamBuild(rows) {
@@ -3292,20 +3404,134 @@ function feedTeamBuild(rows) {
         if (seen.indexOf(id) < 0) seen.push(id);
       }
     }
+    const caseId = (G.cs && G.cs.id) || G.caseId;
+    let floor = null;
+    try { floor = floorSetFor(caseId); } catch { floor = new Set(); }
     for (const id of seen) {
+      const wrap = document.createElement("span");
+      wrap.className = "tm";
+      wrap.dataset.char = id;
+      const onFloor = !!(floor && floor.has(id));
+      const status = onFloor ? "on the floor" : "in their room";
+      wrap.title = status;
       const im = document.createElement("img");
       im.src = AV(id);
       im.alt = feedName(id);
-      im.title = feedName(id);
+      im.title = `${feedName(id)} · ${status}`;
       im.dataset.char = id;
       im.style.borderColor = feedColour(id);
-      teamEl.appendChild(im);
+      wrap.appendChild(im);
+      const dot = document.createElement("i");
+      dot.className = "tdot";
+      dot.style.background = onFloor ? "#22c55e" : "#f59e0b";
+      dot.title = status;
+      wrap.appendChild(dot);
+      teamEl.appendChild(wrap);
     }
+  } catch {}
+}
+function feedTypingEl(row, num) {
+  const d = document.createElement("div");
+  d.className = "feed-row typing";
+  d.dataset.num = num;
+  const fromCol = feedColour(row.from);
+  const fromName = esc(feedName(row.from));
+  const label = row.isThinking ? "is thinking" : "is typing";
+  const dim = row.isThinking ? " dim" : "";
+  const avHTML = row.from && row.from !== "erp"
+    ? `<img class="feed-av" src="${AV(row.from)}" alt="" style="border-color:${esc(feedTextColour(row.from))}">` : "";
+  d.innerHTML = `${avHTML}<div class="feed-body"><div class="feed-head"><span class="feed-names">` +
+    `<span style="color:${esc(feedTextColour(row.from))}">${fromName}</span>` +
+    `<span class="ftyping-label">${label}</span></span></div>` +
+    `<div class="ftyping-line" style="color:${esc(fromCol)}"><span class="ftyping-dots${dim}"><i></i><i></i><i></i></span></div></div>`;
+  return d;
+}
+function feedTypewrite(rowEl, row) {
+  try {
+    const msgEl = rowEl.querySelector(".feed-msg");
+    if (!msgEl || reducedMotion) return;
+    if (row.isGate) {
+      if (!row.gateReason) return;
+      const spans = msgEl.querySelectorAll("span");
+      const reasonSpan = spans.length > 1 ? spans[spans.length - 1] : null;
+      if (!reasonSpan) return;
+      const full = `· ${row.gateReason}`;
+      reasonSpan.textContent = "";
+      const caret = document.createElement("span");
+      caret.className = "fcaret";
+      reasonSpan.appendChild(caret);
+      const total = Math.min(full.length * 2, 350);
+      const steps = Math.min(full.length, 18) || 1;
+      const chunk = Math.ceil(full.length / steps);
+      const interval = Math.max(8, total / steps);
+      let pos = 0;
+      for (let s = 0; s < steps; s++) {
+        later(() => {
+          try {
+            if (!reasonSpan.isConnected) return;
+            pos = Math.min(full.length, pos + chunk);
+            reasonSpan.textContent = full.slice(0, pos);
+            if (pos < full.length) reasonSpan.appendChild(caret);
+          } catch {}
+        }, Math.round(interval * (s + 1)));
+      }
+      return;
+    }
+    const full = String(row.text ?? "");
+    if (!full) return;
+    msgEl.textContent = "";
+    const caret = document.createElement("span");
+    caret.className = "fcaret";
+    msgEl.appendChild(caret);
+    const total = Math.min(full.length * 2, 350);
+    const steps = Math.min(full.length, 18) || 1;
+    const chunk = Math.ceil(full.length / steps);
+    const interval = Math.max(8, total / steps);
+    let pos = 0;
+    for (let s = 0; s < steps; s++) {
+      later(() => {
+        try {
+          if (!msgEl.isConnected) return;
+          pos = Math.min(full.length, pos + chunk);
+          msgEl.textContent = full.slice(0, pos);
+          if (pos < full.length) msgEl.appendChild(caret);
+        } catch {}
+      }, Math.round(interval * (s + 1)));
+    }
+  } catch {}
+}
+function feedShowReplyTyping(row, rowEl) {
+  try {
+    const body = rowEl.querySelector(".feed-body");
+    if (!body || body.querySelector(".feed-reply") || body.querySelector(".feed-reply-typing")) return;
+    const d = document.createElement("div");
+    d.className = "feed-reply-typing";
+    const avId = (row.to && row.to !== "erp") ? row.to : row.from;
+    if (avId && avId !== "erp") {
+      const im = document.createElement("img");
+      im.src = AV(avId);
+      im.alt = "";
+      im.style.borderColor = feedColour(avId);
+      d.appendChild(im);
+    }
+    const dots = document.createElement("span");
+    dots.className = "ftyping-dots";
+    dots.innerHTML = "<i></i><i></i><i></i>";
+    d.style.color = avId ? feedColour(avId) : "rgba(255,255,255,.7)";
+    d.appendChild(dots);
+    body.appendChild(d);
+  } catch {}
+}
+function feedHideReplyTyping(rowEl) {
+  try {
+    const t = rowEl.querySelector(".feed-reply-typing");
+    if (t && t.parentNode) t.parentNode.removeChild(t);
   } catch {}
 }
 function feedRowEl(row, num) {
   const d = document.createElement("div");
   d.className = "feed-row";
+  if (row.isGate && row.gateAction) d.classList.add("gate-" + row.gateAction);
   d.dataset.num = num;
   const fromCol = feedColour(row.from);
   const fromName = esc(feedName(row.from));
@@ -3326,7 +3552,7 @@ function feedRowEl(row, num) {
   let msgHTML = "";
   if (row.isGate) {
     const cls = row.gateAction === "post" ? "post" : row.gateAction === "block" ? "block" : "human";
-    msgHTML = `<span class="verdict-word ${cls}">${esc(row.gateWord)}</span>${row.gateReason ? ` <span>· ${esc(row.gateReason)}</span>` : ""}`;
+    msgHTML = `<span class="verdict-word ${cls} stamp">${esc(row.gateWord)}</span>${row.gateReason ? ` <span>· ${esc(row.gateReason)}</span>` : ""}`;
   } else {
     msgHTML = esc(row.text);
   }
@@ -3337,6 +3563,16 @@ function feedRowEl(row, num) {
   const avHTML = row.from && row.from !== "erp"
     ? `<img class="feed-av" src="${AV(row.from)}" alt="" style="border-color:${esc(feedTextColour(row.from))}">` : "";
   d.innerHTML = `${avHTML}<div class="feed-body"><div class="feed-head"><span class="feed-names">${namesHTML}</span><span class="feed-step">${row.stepIdx != null ? "#" + (row.stepIdx + 1) : row.isGate ? "gate" : row.isDraft ? "draft" : ""}</span></div><div class="${msgCls.join(" ")}">${msgHTML}</div></div>`;
+  if (row.isAsk) {
+    try {
+      const body = d.querySelector(".feed-body");
+      const msgEl = body.querySelector(".feed-msg");
+      const to = document.createElement("span");
+      to.className = "fto";
+      to.innerHTML = `<svg viewBox="0 0 16 12" aria-hidden="true"><rect x="0.7" y="0.7" width="14.6" height="10.6" rx="2" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M1.5 2.5l6.5 4.8 6.5-4.8" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>to Şef`;
+      body.insertBefore(to, msgEl);
+    } catch {}
+  }
   if (row.isAsk) {
     try {
       const body = d.querySelector(".feed-body");
@@ -3355,6 +3591,18 @@ function feedRowEl(row, num) {
       body.appendChild(btn);
     } catch {}
   }
+  if (row.to) {
+    try {
+      const body = d.querySelector(".feed-body");
+      const tickRow = document.createElement("div");
+      tickRow.className = "ftick-row";
+      const tick = document.createElement("span");
+      tick.className = "ftick";
+      tick.textContent = "✓";
+      tickRow.appendChild(tick);
+      body.appendChild(tickRow);
+    } catch {}
+  }
   return d;
 }
 function feedShowReply(row, rowEl) {
@@ -3366,6 +3614,10 @@ function feedShowReply(row, rowEl) {
     const cls = ["feed-reply"];
     if (row.isRead) cls.push("red");
     if (row.isAsk || row.isDraft) cls.push("status");
+    try {
+      const low = String(row.reply || "").toLowerCase();
+      if (row.isRead || low.includes("set aside") || low.startsWith("blocked")) cls.push("fflash");
+    } catch {}
     rd.className = cls.join(" ");
     if (row.replyFromRecipient && row.to && row.to !== "erp") {
       const im = document.createElement("img");
@@ -3378,6 +3630,37 @@ function feedShowReply(row, rowEl) {
     sp.textContent = row.reply;
     rd.appendChild(sp);
     body.appendChild(rd);
+    try {
+      const tick = rowEl.querySelector(".ftick");
+      if (tick && row.to) {
+        tick.textContent = "✓✓";
+        tick.classList.add("seen");
+        tick.style.color = feedColour(row.to);
+      }
+    } catch {}
+  } catch {}
+}
+function feedShowBubbleTyping(charId) {
+  if (reducedMotion) return;
+  if (!charId || charId === "erp") return;
+  try {
+    const rec = CHAR[charId];
+    if (!rec || !rec.loaded || !rec.group) return;
+    _pv.set(rec.group.position.x, rec.group.position.y + 3.075 + 0.35, rec.group.position.z).project(camera);
+    if (_pv.z > 1 || _pv.z < -1 || Math.abs(_pv.x) > 1.05 || Math.abs(_pv.y) > 1.05) return;
+    const prev = _feedBubbles[charId];
+    if (prev) {
+      try { clearTimeout(prev.timeout); clearTimeout(prev.fadeTimeout); } catch {}
+      try { if (prev.el && prev.el.parentNode) prev.el.parentNode.removeChild(prev.el); } catch {}
+    }
+    const el = document.createElement("div");
+    el.className = "bubble typing-bubble";
+    el.innerHTML = `<span class="ftyping-dots"><i></i><i></i><i></i></span>`;
+    el.style.borderLeftColor = feedColour(charId);
+    el.style.color = feedColour(charId);
+    el.dataset.char = charId;
+    labelWrap.appendChild(el);
+    _feedBubbles[charId] = { el, timeout: 0, fadeTimeout: 0 };
   } catch {}
 }
 function feedShowBubble(charId, text) {
@@ -3404,9 +3687,9 @@ function feedShowBubble(charId, text) {
     el.dataset.char = charId;
     labelWrap.appendChild(el);
     const rec2 = { el, timeout: 0, fadeTimeout: 0 };
-    rec2.timeout = setTimeout(() => {
+    rec2.timeout = later(() => {
       try { el.classList.add("fade"); } catch {}
-      rec2.fadeTimeout = setTimeout(() => {
+      rec2.fadeTimeout = later(() => {
         try { if (el.parentNode) el.parentNode.removeChild(el); } catch {}
         try { if (_feedBubbles[charId] && _feedBubbles[charId].el === el) delete _feedBubbles[charId]; } catch {}
       }, 350);
@@ -3421,7 +3704,7 @@ function feedFadeAllBubbles() {
       try { clearTimeout(b.timeout); } catch {}
       try { b.el.classList.add("fade"); } catch {}
       const el = b.el, key = k;
-      b.fadeTimeout = setTimeout(() => {
+      b.fadeTimeout = later(() => {
         try { if (el.parentNode) el.parentNode.removeChild(el); } catch {}
         try { if (_feedBubbles[key] && _feedBubbles[key].el === el) delete _feedBubbles[key]; } catch {}
       }, 350);
@@ -3517,7 +3800,7 @@ function feedSchedule() {
     const rows = buildFeedRows(G.cs);
     G._feedRows = rows;
     const list = document.querySelector("#feed .feed-list");
-    if (list) list.innerHTML = "";
+    if (list) { list.innerHTML = ""; list._stick = true; }
     feedTeamBuild(rows);
     try {
       const secs = G.cs && G.cs.agent ? G.cs.agent.seconds : "";
@@ -3528,60 +3811,148 @@ function feedSchedule() {
       const t = document.getElementById("feedToggle");
       if (t) t.textContent = `Show all ▾`;
     } catch {}
-    if (!rows.length) return;
+    feedPillHide();
+    feedStatusText("");
+    try {
+      const p = document.querySelector("#feed .fnew");
+      if (p && !p._wired) {
+        p._wired = true;
+        p.addEventListener("click", () => {
+          try {
+            const l = document.querySelector("#feed .feed-list");
+            if (l) { l._stick = true; l.scrollTop = l.scrollHeight; }
+            feedPillHide();
+          } catch {}
+        });
+      }
+    } catch {}
+    if (!rows.length) { feedHeaderSet("hidden"); return; }
     if (reducedMotion) {
+      feedHeaderSet("done");
       later(() => {
         try {
           const l = document.querySelector("#feed .feed-list");
           if (!l) return;
           rows.forEach((r, i) => {
             const el = feedRowEl(r, i + 1);
+            el.dataset.row = i;
             l.appendChild(el);
             feedShowReply(r, el);
           });
           l.scrollTop = l.scrollHeight;
-          const last = rows[rows.length - 1];
-          if (last) feedSetSpeaking(last.from);
+          feedSetSpeaking(null);
+          feedStatusSet(`Run replayed · ${rows.length} steps <span class="fcheck">✓</span>`);
         } catch (e) { if (DEBUG) console.warn("feed:", e); }
       }, 300);
       return;
     }
+    feedHeaderSet("replaying");
     const R = rows.length;
-    const slot = (6500 - 300) / R;
+    const slot = R > 12 ? 650 : 900;
+    const finishAll = () => {
+      try {
+        feedSetSpeaking(null);
+        feedStatusSet(`Run replayed · ${R} steps <span class="fcheck">✓</span>`);
+        feedHeaderSet("done");
+      } catch {}
+    };
     rows.forEach((r, i) => {
-      const atMsg = Math.round(300 + i * slot);
+      const base = Math.round(300 + i * slot);
+      const atMsg = Math.round(base + slot * 0.35);
       later(() => {
         try {
           const l = document.querySelector("#feed .feed-list");
           if (!l) return;
           if (i > 0) feedFadeAllBubbles();
-          const el = feedRowEl(r, i + 1);
+          const el = feedTypingEl(r, i + 1);
           el.dataset.row = i;
           l.appendChild(el);
+          feedOnNewRow();
+          feedSetSpeaking(r.from);
+          if (r.isGate) feedStatusText(`${feedName(r.from)} is deciding…`);
+          else if (r.isDraft) feedStatusText(`${feedName(r.from)} is drafting…`);
+          else if (r.isThinking) feedStatusText(`${feedName(r.from)} is thinking…`);
+          else feedStatusText(`${feedName(r.from)} is typing…`);
+          feedShowBubbleTyping(r.from);
+          feedEdgeFlash(feedColour(r.from));
+        } catch (e) { if (DEBUG) console.warn("feedtyping:", e); }
+      }, base);
+      later(() => {
+        try {
+          const l = document.querySelector("#feed .feed-list");
+          if (!l) return;
+          const typingEl = l.querySelector(`[data-row="${i}"]`) || l.children[i];
+          if (!typingEl) return;
+          const msgEl = feedRowEl(r, i + 1);
+          msgEl.dataset.row = i;
+          typingEl.className = msgEl.className;
+          typingEl.dataset.num = i + 1;
+          typingEl.dataset.row = i;
+          typingEl.innerHTML = msgEl.innerHTML;
+          try {
+            if (r.isAsk) {
+              const btn = typingEl.querySelector(".feed-more");
+              const m = typingEl.querySelector(".feed-msg");
+              if (btn && m) btn.addEventListener("click", ev => {
+                ev.stopPropagation();
+                try {
+                  const clamped = m.classList.toggle("clamp3");
+                  btn.textContent = clamped ? "more" : "less";
+                } catch {}
+              });
+            }
+          } catch {}
           feedMaybeScroll();
           feedSetSpeaking(r.from);
           feedShowBubble(r.from, r.text);
           feedShowBeam(r);
+          feedTypewrite(typingEl, r);
+          if (i === R - 1 && r.reply == null) later(finishAll, 400);
         } catch (e) { if (DEBUG) console.warn("feedmsg:", e); }
       }, atMsg);
       if (r.reply != null) {
-        const atReply = Math.round(atMsg + slot * 0.45);
+        const atReplyTyping = Math.round(base + slot * 0.60);
+        const atReply = Math.round(atReplyTyping + 200);
+        later(() => {
+          try {
+            const l = document.querySelector("#feed .feed-list");
+            if (!l) return;
+            const el = l.querySelector(`[data-row="${i}"]`) || l.children[i];
+            if (!el || el.classList.contains("typing")) return;
+            feedShowReplyTyping(r, el);
+            feedMaybeScroll();
+            if (r.replyFromRecipient && r.to) {
+              feedStatusText(`${feedName(r.to)} is replying…`);
+              feedSetSpeaking(r.to);
+              feedShowBubbleTyping(r.to);
+            }
+          } catch (e) { if (DEBUG) console.warn("feedreplytyping:", e); }
+        }, atReplyTyping);
         later(() => {
           try {
             const l = document.querySelector("#feed .feed-list");
             if (!l) return;
             const el = l.querySelector(`[data-row="${i}"]`) || l.children[i];
             if (!el) return;
+            feedHideReplyTyping(el);
             feedShowReply(r, el);
             feedMaybeScroll();
             if (r.replyFromRecipient && r.to) {
               feedSetSpeaking(r.to);
               feedShowBubble(r.to, r.reply);
             }
+            if (i === R - 1) later(finishAll, 300);
           } catch (e) { if (DEBUG) console.warn("feedreply:", e); }
         }, atReply);
       }
     });
+    later(() => {
+      try {
+        const l = document.querySelector("#feed .feed-list");
+        if (!l) return;
+        if (l.childElementCount >= R) finishAll();
+      } catch {}
+    }, Math.round(300 + R * slot + 500));
   } catch (e) { if (DEBUG) console.warn("feed:", e); }
 }
 try {
@@ -3792,6 +4163,7 @@ function showResult() {
   $("againBtn").addEventListener("click", () => {
     document.body.classList.remove("done", "deciding", "playing");
     $("reads").innerHTML = "";
+    try { (G._seqs || []).forEach(clearTimeout); G._seqs = []; } catch {}
     try { feedClear(); } catch {}
     try { sendAllHome(); } catch {}
     G.phase = "intro";
