@@ -5013,7 +5013,7 @@ def polish(cams, V):
     sys.path.insert(0, str(Path(__file__).resolve().parent))
     from lego_front import build_lego_front
     build_lego_front(P, box, cyl, text, mat)
-    _meshy_place("truck.glb", "p_lego_truck2", (7.4, 21.0), math.radians(90), 1.3)
+    _meshy_place("truck.glb", "p_lego_truck2", (9.0, 22.5), math.radians(-90), 1.3)
     _meshy_place("forklift.glb", "p_lego_forklift2", (-11.8, 3.2), math.radians(180), 1.35)
     p_truck(P, rnd)
     p_door(P, V["light"])
