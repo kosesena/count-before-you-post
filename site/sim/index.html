@@ -336,9 +336,15 @@ body.done #keys, body.deciding #noteCard, body.deciding #keys, body.deciding #jo
 body.deciding #feed, body.done #feed { display: flex; }
 body.deciding #demoLink, body.deciding #tallyChip,
 body.done #demoLink, body.done #tallyChip { display: none !important; }
-.feed-head-top { display: flex; align-items: flex-start; gap: 8px; }
+.feed-head-top { display: flex; align-items: flex-start; gap: 8px; flex-wrap: wrap; }
+.feed-head-left { flex: 1 1 auto; min-width: 0; }
 .feed-title { font-weight: 800; font-size: 14px; line-height: 1.2; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .feed-sub { font-size: 12.5px; color: rgba(255,255,255,.7); margin-top: 2px; }
+.feed-tabs { flex: 1 1 100%; display: flex; height: 36px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.14); border-radius: 10px; overflow: hidden; margin-top: 8px; }
+.feed-tabs button { flex: 1 1 0; font: inherit; font-size: 13px; font-weight: 700; color: rgba(255,255,255,.7); background: transparent; border: 0; cursor: pointer; min-height: 36px; padding: 0 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.feed-tabs button + button { border-left: 1px solid rgba(255,255,255,.14); }
+.feed-tabs button[aria-selected="true"] { background: rgba(255,255,255,.18); color: #fff; font-weight: 800; }
+.feed-tabs button:focus-visible { outline: 2px solid #7dd3fc; outline-offset: -2px; }
 .freplay { display: inline-flex; align-items: center; gap: 5px; font-size: 12.5px; font-weight: 600; color: rgba(255,255,255,.75); }
 .freplay i { width: 8px; height: 8px; border-radius: 50%; background: #22d3ee; display: block; animation: fpulse 1.2s ease-in-out infinite; }
 .freplay em { font-style: normal; }
@@ -364,6 +370,19 @@ body.done #demoLink, body.done #tallyChip { display: none !important; }
 .feed-status { font-size: 12.5px; color: rgba(255,255,255,.65); min-height: 18px; margin: 0 0 6px; font-style: italic; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .feed-status .fcheck { font-style: normal; color: #4ade80; margin-left: 4px; }
 .feed-list { overflow-y: auto; display: flex; flex-direction: column; gap: 8px; min-height: 0; }
+.feed-list[hidden] { display: none !important; }
+.feed-row.feed-divider { background: transparent; border: none; border-top: 1px solid rgba(255,255,255,.22); border-radius: 0; padding: 8px 4px 2px; justify-content: center; text-align: center; animation: ffade .3s ease-out; }
+.feed-divider .div-wrap { width: 100%; text-align: center; }
+.feed-divider .div-label { font-size: 12.5px; font-weight: 700; color: #fff; }
+.feed-divider .div-sub { font-size: 11.5px; color: rgba(255,255,255,.6); margin-top: 2px; }
+.feed-row.feed-summary { justify-content: center; text-align: center; }
+.feed-row.feed-summary.red { border-left: 3px solid var(--dblock); }
+.feed-row.feed-summary.green { border-left: 3px solid var(--dpost); }
+.feed-row.feed-summary.grey { border-left: 3px solid rgba(255,255,255,.3); }
+.feed-summary .sum-text { font-size: 13px; font-weight: 700; width: 100%; overflow-wrap: anywhere; }
+.feed-summary.red .sum-text { color: var(--dblock); }
+.feed-summary.green .sum-text { color: var(--dpost); }
+.feed-summary.grey .sum-text { color: rgba(255,255,255,.65); }
 .feed-row {
   display: flex; gap: 8px; align-items: flex-start;
   background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1);
@@ -455,6 +474,11 @@ body.done #demoLink, body.done #tallyChip { display: none !important; }
 @media (max-width: 640px) {
   #feed { left: 10px; right: 10px; top: 10px; width: auto; max-height: none; }
   #feedToggle { display: block; }
+  .feed-head-top { flex-wrap: nowrap; align-items: center; }
+  .feed-head-left { flex: 0 1 auto; }
+  .feed-head-left .feed-sub { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .feed-tabs { flex: 1 1 auto; margin-top: 0; margin-left: 4px; min-width: 0; }
+  .feed-tabs button { font-size: 12.5px; padding: 0 6px; min-height: 36px; min-width: 36px; }
   .feed-list { overflow: hidden; max-height: none; }
   #feed .feed-list .feed-row { display: none; }
   #feed .feed-list .feed-row:last-child { display: flex; }
@@ -507,6 +531,9 @@ body.done #resultWrap { display: flex; }
 .v-tile h3 { font-size: 11.5px; text-transform: uppercase; letter-spacing: .07em; margin: 0 0 6px; color: rgba(255,255,255,.72); }
 .v-tile p { margin: 0; font-size: 14px; font-weight: 700; color: #fff; overflow-wrap: anywhere; }
 .v-tile.bad { border-color: var(--dblock); box-shadow: 0 0 0 1px var(--dblock); }
+button.v-tile { font: inherit; text-align: left; width: 100%; cursor: pointer; color: #fff; appearance: none; }
+button.v-tile:hover { background: rgba(255,255,255,.10); }
+button.v-tile:focus-visible { outline: 2px solid #7dd3fc; outline-offset: 2px; }
 .v-tile.behind.post { border-color: var(--dpost); box-shadow: 0 0 0 1px var(--dpost); }
 .v-tile.behind.block { border-color: var(--dblock); box-shadow: 0 0 0 1px var(--dblock); }
 .v-tile.behind.human { border-color: var(--dhuman); box-shadow: 0 0 0 1px var(--dhuman); }
@@ -663,15 +690,20 @@ body.done #resultWrap { display: flex; }
 
 <div id="feed" aria-live="polite">
   <div class="feed-head-top">
-    <div>
+    <div class="feed-head-left">
       <div class="feed-title">Agent run<span class="freplay" hidden><i></i><em>replaying</em></span></div>
       <div class="feed-sub"></div>
+    </div>
+    <div class="feed-tabs" role="tablist" aria-label="Agent run">
+      <button id="tabWith" role="tab" aria-selected="true" type="button">With Kapı</button>
+      <button id="tabNoGate" role="tab" aria-selected="false" type="button">Without Kapı</button>
     </div>
     <button id="feedToggle" aria-expanded="false">Show all ▾</button>
   </div>
   <div class="feed-team"></div>
   <div class="feed-status" aria-live="polite"></div>
-  <div class="feed-list"></div>
+  <div class="feed-list" data-thread="with"></div>
+  <div class="feed-list feed-list-nogate" data-thread="nogate" hidden></div>
   <button class="fnew" type="button" hidden></button>
 </div>
 
@@ -3276,6 +3308,238 @@ function feedPlainRows() {
       text: r.text, reply: r.reply != null ? r.reply : null }));
   } catch { return []; }
 }
+function buildFollowupStepRow(step, idx, cs) {
+  if (!step || typeof step !== "object") return null;
+  const kind = step.kind;
+  if (kind === "thinking") {
+    const t = step.text;
+    if (t == null || String(t) === "") return null;
+    return { from: "spark", to: null, text: String(t), reply: null,
+      isThinking: true, isFollowup: true, fIdx: idx };
+  }
+  if (kind === "cross") {
+    const d = step.data;
+    if (!d || d.agreed == null || d.sam_only == null || d.spark_only == null) return null;
+    return { from: "sam", to: "spark", text: "Carton by carton:",
+      reply: `${d.agreed} agreed, ${d.sam_only} only Sam, ${d.spark_only} only Spark`,
+      isCross: true, replyFromRecipient: true, isFollowup: true, fIdx: idx };
+  }
+  if (kind !== "tool") return null;
+  const tool = step.tool;
+  if (!tool) return null;
+  if (tool === "read_delivery_note") {
+    return { from: "spark", to: null, text: "Reads the note", reply: null,
+      isFollowup: true, fIdx: idx };
+  }
+  if (tool === "look_at_pallet") {
+    const parsed = feedSafeParse(step.result);
+    if (!parsed) {
+      return { from: "spark", to: null, text: tool, reply: null, isFollowup: true, fIdx: idx };
+    }
+    const parts = [];
+    if (parsed.cartons_visible != null) parts.push(`${parsed.cartons_visible} cartons seen`);
+    if (parsed.damaged_cartons != null) parts.push(`${parsed.damaged_cartons} damaged`);
+    if (parsed.stacked != null) parts.push(parsed.stacked ? "stacked" : "not stacked");
+    if (parsed.all_cartons_visible === false) parts.push("not all visible");
+    return { from: "spark", to: null, text: "Looks at the pallet:",
+      reply: parts.length ? parts.join(" · ") : null, isLook: true, isFollowup: true, fIdx: idx };
+  }
+  if (tool === "count_cartons") {
+    const a = feedSafeParse(step.args);
+    const concept = a && a.concept;
+    if (concept == null || concept === "") {
+      return { from: "spark", to: "sam", text: tool, reply: null, isFollowup: true, fIdx: idx };
+    }
+    const r = feedSafeParse(step.result);
+    let reply = null;
+    if (r && r.sure != null && r.doubtful != null)
+      reply = `${r.sure} sure, ${r.doubtful} doubtful`;
+    return { from: "spark", to: "sam", text: `count “${concept}”`, reply,
+      replyFromRecipient: !!reply, isFollowup: true, fIdx: idx };
+  }
+  if (tool === "post_goods_receipt") {
+    const a = feedSafeParse(step.args);
+    const qty = a && a.quantity;
+    if (qty == null) {
+      return { from: "spark", to: "kapi", text: tool, reply: null, isFollowup: true, fIdx: idx };
+    }
+    let reply = null;
+    if (step.refused) {
+      try {
+        const m = String(step.result || "").match(/"reason":\s*"([^"]*?[.!?])/);
+        reply = m ? `blocked: ${m[1]}` : "blocked";
+      } catch { reply = "blocked"; }
+    } else {
+      const r = feedSafeParse(step.result);
+      if (r && r.posted === true) {
+        reply = r.document ? `posted · ${r.document}` : "posted";
+      }
+    }
+    return { from: "spark", to: "kapi", text: `post ${qty}`, reply,
+      replyFromRecipient: !!reply, isFollowup: true, fIdx: idx };
+  }
+  if (tool === "ask_supervisor") {
+    const a = feedSafeParse(step.args);
+    const reason = a && a.reason;
+    if (reason == null || String(reason) === "") {
+      return { from: "spark", to: "sef", text: tool, reply: null, isFollowup: true, fIdx: idx };
+    }
+    let reply = null;
+    try {
+      if (String(step.result || "").includes("notified")) reply = "Şef notified";
+    } catch {}
+    return { from: "spark", to: "sef", text: String(reason), reply,
+      isAsk: true, isFollowup: true, fIdx: idx };
+  }
+  return { from: "spark", to: null, text: tool, reply: null, isOtherTool: true, isFollowup: true, fIdx: idx };
+}
+function buildFeedFollowupRows(cs) {
+  const rows = [];
+  try {
+    if (!cs || !cs.signoff || !cs.signoff.decision) return rows;
+    const dec = cs.signoff.decision;
+    const approve = !!dec.approve;
+    const text = approve ? `Approved: ${dec.quantity} cartons` : "Not approved";
+    const notes = dec.notes != null ? String(dec.notes) : "";
+    rows.push({ from: "sef", to: "spark", text, reply: notes ? notes : null,
+      isSefDecision: true, approve, isFollowup: true, fIdx: null });
+    const steps = cs.signoff.steps || [];
+    steps.forEach((step, idx) => {
+      const r = buildFollowupStepRow(step, idx, cs);
+      if (r) rows.push(r);
+    });
+  } catch {}
+  return rows;
+}
+function buildNoGateStepRow(step, idx, cs) {
+  if (!step || typeof step !== "object") return null;
+  const kind = step.kind;
+  if (kind === "thinking") {
+    const t = step.text;
+    if (t == null || String(t) === "") return null;
+    return { from: "spark", to: null, text: String(t), reply: null,
+      isThinking: true, stepIdx: idx };
+  }
+  if (kind === "cross") {
+    const d = step.data;
+    if (!d || d.agreed == null || d.sam_only == null || d.spark_only == null) return null;
+    return { from: "sam", to: "spark", text: "Carton by carton:",
+      reply: `${d.agreed} agreed, ${d.sam_only} only Sam, ${d.spark_only} only Spark`,
+      isCross: true, replyFromRecipient: true, stepIdx: idx };
+  }
+  if (kind !== "tool") return null;
+  const tool = step.tool;
+  if (!tool) return null;
+  if (tool === "read_delivery_note") {
+    const items = ((cs.note && cs.note.items) || [])
+      .map(it => `${it.quantity} × ${it.description}`).join("; ");
+    const text = items ? `Reads the note: ${items}` : "Reads the note:";
+    let reply = null;
+    try {
+      const emb = (cs.note && cs.note.embedded_instructions) || [];
+      if (emb.length) reply = `${emb.length} instructions to software set aside`;
+    } catch {}
+    return { from: "spark", to: null, text, reply, isRead: true, stepIdx: idx };
+  }
+  if (tool === "look_at_pallet") {
+    const parsed = feedSafeParse(step.result);
+    if (!parsed) {
+      return { from: "spark", to: null, text: tool, reply: null, stepIdx: idx };
+    }
+    const parts = [];
+    if (parsed.product_on_labels != null) parts.push(String(parsed.product_on_labels));
+    if (parsed.cartons_visible != null) parts.push(`${parsed.cartons_visible} cartons seen`);
+    if (parsed.damaged_cartons != null) parts.push(`${parsed.damaged_cartons} damaged`);
+    if (parsed.stacked != null) parts.push(parsed.stacked ? "stacked" : "not stacked");
+    if (parsed.all_cartons_visible === false) parts.push("not all visible");
+    return { from: "spark", to: null, text: "Looks at the pallet:",
+      reply: parts.length ? parts.join(" · ") : null, isLook: true, stepIdx: idx };
+  }
+  if (tool === "count_cartons") {
+    const a = feedSafeParse(step.args);
+    const concept = a && a.concept;
+    if (concept == null || concept === "") {
+      return { from: "spark", to: "sam", text: tool, reply: null, stepIdx: idx };
+    }
+    const r = feedSafeParse(step.result);
+    let reply = null;
+    if (r && r.sure != null && r.doubtful != null)
+      reply = `${r.sure} sure, ${r.doubtful} doubtful`;
+    return { from: "spark", to: "sam", text: `count “${concept}”`, reply,
+      replyFromRecipient: !!reply, stepIdx: idx };
+  }
+  if (tool === "post_goods_receipt") {
+    const a = feedSafeParse(step.args);
+    const qty = a && a.quantity;
+    if (qty == null) {
+      return { from: "spark", to: "erp", text: tool, reply: null, stepIdx: idx };
+    }
+    let reply = null;
+    try {
+      const r = feedSafeParse(step.result);
+      if (r && r.posted === true) reply = "written to the ERP";
+    } catch {}
+    return { from: "spark", to: "erp", text: `post ${qty}`, reply,
+      isNoGatePost: true, stepIdx: idx };
+  }
+  if (tool === "ask_supervisor") {
+    const a = feedSafeParse(step.args);
+    const reason = a && a.reason;
+    if (reason == null || String(reason) === "") {
+      return { from: "spark", to: "sef", text: tool, reply: null, stepIdx: idx };
+    }
+    let reply = null;
+    try {
+      if (String(step.result || "").includes("notified")) reply = "Şef notified";
+    } catch {}
+    return { from: "spark", to: "sef", text: String(reason), reply,
+      isAsk: true, stepIdx: idx };
+  }
+  return { from: "spark", to: null, text: tool, reply: null, isOtherTool: true, stepIdx: idx };
+}
+function buildFeedNoGateRows(cs) {
+  const rows = [];
+  try {
+    if (!cs || !cs.without_gate || !Array.isArray(cs.without_gate.steps)) return rows;
+    cs.without_gate.steps.forEach((step, idx) => {
+      const r = buildNoGateStepRow(step, idx, cs);
+      if (r) rows.push(r);
+    });
+  } catch {}
+  return rows;
+}
+function buildNoGateSummary(cs) {
+  try {
+    if (!cs || !cs.without_gate) return null;
+    const wg = cs.without_gate;
+    const posted = wg.posted || [];
+    if (posted.length) {
+      const qty = posted[0];
+      if (cs.expected !== "post") {
+        return { isSummary: true, summaryKind: "red", text: `A wrong receipt reached the ERP: ${qty} cartons` };
+      }
+      return { isSummary: true, summaryKind: "green", text: `Receipt written: ${qty} cartons` };
+    }
+    if (wg.supervisor) {
+      return { isSummary: true, summaryKind: "grey", text: "Nothing written · the agent asked Şef" };
+    }
+    return { isSummary: true, summaryKind: "grey", text: "Nothing written" };
+  } catch { return null; }
+}
+function feedPlainFollowup() {
+  try {
+    if (!G.cs) return [];
+    return buildFeedFollowupRows(G.cs).map(r => ({ from: r.from || null, to: r.to || null,
+      text: r.text, reply: r.reply != null ? r.reply : null }));
+  } catch { return []; }
+}
+function feedPlainNoGate() {
+  try {
+    if (!G.cs) return [];
+    return buildFeedNoGateRows(G.cs).map(r => ({ from: r.from || null, to: r.to || null,
+      text: r.text, reply: r.reply != null ? r.reply : null }));
+  } catch { return []; }
+}
 let _feedBubbles = {};
 let _feedBeams = [];
 let _feedPoolTex = null;
@@ -3318,16 +3582,135 @@ function feedHeaderSet(mode) {
   } catch {}
 }
 function feedPillHide() {
-  try { G._feedUnread = 0; const p = document.querySelector("#feed .fnew"); if (p) { p.hidden = true; p.textContent = ""; } } catch {}
+  try { G._feedUnread = 0; G._feedWithUnread = 0; G._feedNoGateUnread = 0; const p = document.querySelector("#feed .fnew"); if (p) { p.hidden = true; p.textContent = ""; } } catch {}
 }
 function feedPillBump() {
   try {
-    G._feedUnread = (G._feedUnread || 0) + 1;
+    const active = G._feedTab || "with";
+    let n;
+    if (active === "nogate") { G._feedNoGateUnread = (G._feedNoGateUnread || 0) + 1; n = G._feedNoGateUnread; }
+    else { G._feedWithUnread = (G._feedWithUnread || 0) + 1; n = G._feedWithUnread; }
+    G._feedUnread = n;
     const p = document.querySelector("#feed .fnew");
     if (!p) return;
-    p.textContent = `↓ ${G._feedUnread} new`;
+    p.textContent = `↓ ${n} new`;
     p.hidden = false;
   } catch {}
+}
+function feedPillHideActive() {
+  try {
+    const active = G._feedTab || "with";
+    if (active === "nogate") G._feedNoGateUnread = 0; else G._feedWithUnread = 0;
+    G._feedUnread = 0;
+    const p = document.querySelector("#feed .fnew"); if (p) { p.hidden = true; p.textContent = ""; }
+  } catch {}
+}
+function feedPillBumpActive() { feedPillBump(); }
+function feedListFor(thread) {
+  try {
+    if (thread === "nogate") return document.querySelector('.feed-list[data-thread="nogate"]');
+    const w = document.querySelector('.feed-list[data-thread="with"]');
+    if (w) return w;
+    return document.querySelector("#feed .feed-list");
+  } catch { return document.querySelector("#feed .feed-list"); }
+}
+function feedStatusTextThread(thread, t) {
+  try {
+    if (thread === "nogate") G._feedNoGateStatus = t || "";
+    else G._feedWithStatus = t || "";
+    if ((G._feedTab || "with") === thread) feedStatusText(t);
+  } catch {}
+}
+function feedStatusSetThread(thread, html) {
+  try {
+    if (thread === "nogate") G._feedNoGateStatus = html || "";
+    else G._feedWithStatus = html || "";
+    if ((G._feedTab || "with") === thread) feedStatusSet(html);
+  } catch {}
+}
+function feedHeaderSetThread(thread, mode) {
+  try {
+    if (thread === "nogate") G._feedNoGateHeader = mode;
+    else G._feedWithHeader = mode;
+    if ((G._feedTab || "with") === thread) feedHeaderSet(mode);
+  } catch {}
+}
+function feedSetSpeakingThread(thread, id) {
+  try {
+    if (thread === "nogate") G._feedNoGateSpeaking = id;
+    else G._feedWithSpeaking = id;
+    if ((G._feedTab || "with") === thread) feedSetSpeaking(id);
+  } catch {}
+}
+function updateFeedSubForTab(tab) {
+  try {
+    const el = document.querySelector("#feed .feed-sub");
+    if (!el || !G.cs) return;
+    if (tab === "nogate") {
+      const wg = G.cs.without_gate;
+      const secs = wg ? wg.seconds : "";
+      const n = wg && wg.steps ? wg.steps.length : 0;
+      el.textContent = `recorded run, no gate · ${secs} s · ${n} steps`;
+    } else {
+      const secs = G.cs && G.cs.agent ? G.cs.agent.seconds : "";
+      const n = G.cs && G.cs.agent && G.cs.agent.steps ? G.cs.agent.steps.length : 0;
+      el.textContent = `recorded run · ${secs} s · ${n} steps`;
+    }
+  } catch {}
+}
+function feedSetTab(tab) {
+  if (!G.cs) return;
+  if (tab !== "with" && tab !== "nogate") return;
+  const prev = G._feedTab || "with";
+  if (prev === tab) return;
+  G._feedTab = tab;
+  try {
+    const bw = document.getElementById("tabWith");
+    const bn = document.getElementById("tabNoGate");
+    if (bw) bw.setAttribute("aria-selected", String(tab === "with"));
+    if (bn) bn.setAttribute("aria-selected", String(tab === "nogate"));
+  } catch {}
+  try {
+    const wl = feedListFor("with"), nl = feedListFor("nogate");
+    if (wl) wl.hidden = (tab !== "with");
+    if (nl) nl.hidden = (tab !== "nogate");
+  } catch {}
+  try {
+    if (tab === "with") feedTeamBuild([...(G._feedWithRows || []), ...(G._feedFollowupRows || [])]);
+    else feedTeamBuild(G._feedNoGateRows || []);
+  } catch {}
+  try { updateFeedSubForTab(tab); } catch {}
+  try {
+    if (tab === "with") {
+      feedStatusSet(G._feedWithStatus || "");
+      feedHeaderSet(G._feedWithHeader || "hidden");
+      feedSetSpeaking(G._feedWithSpeaking || null);
+      const n = G._feedWithUnread || 0;
+      const p = document.querySelector("#feed .fnew");
+      if (p) {
+        if (n > 0) { p.textContent = `↓ ${n} new`; p.hidden = false; G._feedUnread = n; }
+        else { p.hidden = true; p.textContent = ""; G._feedUnread = 0; }
+      }
+    } else {
+      feedStatusSet(G._feedNoGateStatus || "");
+      feedHeaderSet(G._feedNoGateHeader || "hidden");
+      feedSetSpeaking(G._feedNoGateSpeaking || null);
+      const n = G._feedNoGateUnread || 0;
+      const p = document.querySelector("#feed .fnew");
+      if (p) {
+        if (n > 0) { p.textContent = `↓ ${n} new`; p.hidden = false; G._feedUnread = n; }
+        else { p.hidden = true; p.textContent = ""; G._feedUnread = 0; }
+      }
+    }
+  } catch {}
+  try {
+    const l = feedListFor(tab);
+    if (l && l._stick !== false) l.scrollTop = l.scrollHeight;
+    else if (l) { /* keep scroll, pill already shows unread */ }
+  } catch {}
+  if (tab === "nogate" && !G._feedNoGateStarted && !G._feedNoGateDone && !reducedMotion) {
+    try { scheduleNoGateThread(); } catch (e) { if (DEBUG) console.warn("feednogate:", e); }
+  }
 }
 function feedEdgeFlash(colour) {
   try {
@@ -3339,9 +3722,16 @@ function feedEdgeFlash(colour) {
   } catch {}
 }
 function feedClear() {
-  try { const l = document.querySelector("#feed .feed-list"); if (l) { l.innerHTML = ""; l._stick = true; } } catch {}
+  try { const wl = feedListFor("with"); if (wl) { wl.innerHTML = ""; wl._stick = true; wl.hidden = false; } } catch {}
+  try { const nl = feedListFor("nogate"); if (nl) { nl.innerHTML = ""; nl._stick = true; nl.hidden = true; } } catch {}
   try { document.querySelector("#feed .feed-team").innerHTML = ""; } catch {}
   try { document.querySelector("#feed .feed-sub").textContent = ""; } catch {}
+  try {
+    const bw = document.getElementById("tabWith");
+    const bn = document.getElementById("tabNoGate");
+    if (bw) bw.setAttribute("aria-selected", "true");
+    if (bn) bn.setAttribute("aria-selected", "false");
+  } catch {}
   try {
     const f = document.getElementById("feed");
     if (f) { f.classList.remove("expanded"); f.style.borderColor = ""; }
@@ -3353,6 +3743,23 @@ function feedClear() {
   try { feedHeaderSet("hidden"); } catch {}
   try { feedSetSpeaking(null); } catch {}
   G._feedRows = null;
+  G._feedWithRows = null;
+  G._feedFollowupRows = null;
+  G._feedNoGateRows = null;
+  G._feedNoGateSummary = null;
+  G._feedTab = "with";
+  G._feedWithStatus = "";
+  G._feedNoGateStatus = "";
+  G._feedWithHeader = "hidden";
+  G._feedNoGateHeader = "hidden";
+  G._feedWithSpeaking = null;
+  G._feedNoGateSpeaking = null;
+  G._feedWithUnread = 0;
+  G._feedNoGateUnread = 0;
+  G._feedWithDone = false;
+  G._feedNoGateDone = false;
+  G._feedNoGateStarted = false;
+  G._feedWithSlot = 0;
   G._feedUnread = 0;
   feedClearBubbles();
   feedClearBeams();
@@ -3369,27 +3776,64 @@ function feedSetSpeaking(id) {
 function feedWireStick(list) {
   if (!list || list._stickWired) return;
   list._stickWired = true;
+  const thread = (list.dataset && list.dataset.thread) || (G._feedTab || "with");
   list.addEventListener("scroll", () => {
     const stick = list.scrollHeight - list.scrollTop - list.clientHeight < 60;
     list._stick = stick;
-    if (stick) feedPillHide();
+    if (stick) {
+      if (thread === "nogate") G._feedNoGateUnread = 0; else G._feedWithUnread = 0;
+      if ((G._feedTab || "with") === thread) feedPillHideActive();
+    }
   }, { passive: true });
 }
 function feedMaybeScroll() {
   try {
-    const list = document.querySelector("#feed .feed-list");
+    const active = G._feedTab || "with";
+    const list = feedListFor(active);
     if (!list) return;
     feedWireStick(list);
-    if (list._stick !== false) { list.scrollTop = list.scrollHeight; feedPillHide(); }
+    if (list._stick !== false) { list.scrollTop = list.scrollHeight; feedPillHideActive(); }
   } catch {}
 }
 function feedOnNewRow() {
   try {
-    const list = document.querySelector("#feed .feed-list");
+    const active = G._feedTab || "with";
+    const list = feedListFor(active);
     if (!list) return;
     feedWireStick(list);
-    if (list._stick !== false) { list.scrollTop = list.scrollHeight; feedPillHide(); }
+    if (list._stick !== false) { list.scrollTop = list.scrollHeight; feedPillHideActive(); }
     else feedPillBump();
+  } catch {}
+}
+function feedMaybeScrollThread(thread) {
+  try {
+    const list = feedListFor(thread);
+    if (!list) return;
+    feedWireStick(list);
+    const active = G._feedTab || "with";
+    if (thread === active) {
+      if (list._stick !== false) { list.scrollTop = list.scrollHeight; feedPillHideActive(); }
+    } else if (list._stick !== false) {
+      list.scrollTop = list.scrollHeight;
+    }
+  } catch {}
+}
+function feedOnNewRowThread(thread) {
+  try {
+    const list = feedListFor(thread);
+    if (!list) return;
+    feedWireStick(list);
+    const active = G._feedTab || "with";
+    if (thread === active) {
+      if (list._stick !== false) { list.scrollTop = list.scrollHeight; feedPillHideActive(); }
+      else feedPillBump();
+    } else if (list._stick !== false) {
+      list.scrollTop = list.scrollHeight;
+    } else if (thread === "nogate") {
+      G._feedNoGateUnread = (G._feedNoGateUnread || 0) + 1;
+    } else {
+      G._feedWithUnread = (G._feedWithUnread || 0) + 1;
+    }
   } catch {}
 }
 function feedTeamBuild(rows) {
@@ -3562,9 +4006,14 @@ function feedRowEl(row, num) {
   if (row.isThinking) msgCls.push("thinks-msg");
   if (row.isOtherTool) msgCls.push("mono-msg");
   if (row.isAsk) msgCls.push("clamp3");
+  const msgStyle = row.isSefDecision
+    ? (row.approve ? ' style="color:var(--dpost);font-weight:800"' : ' style="color:var(--dblock);font-weight:800"')
+    : "";
   const avHTML = row.from && row.from !== "erp"
     ? `<img class="feed-av" src="${AV(row.from)}" alt="" style="border-color:${esc(feedTextColour(row.from))}">` : "";
-  d.innerHTML = `${avHTML}<div class="feed-body"><div class="feed-head"><span class="feed-names">${namesHTML}</span><span class="feed-step">${row.stepIdx != null ? "#" + (row.stepIdx + 1) : row.isGate ? "gate" : row.isDraft ? "draft" : ""}</span></div><div class="${msgCls.join(" ")}">${msgHTML}</div></div>`;
+  const stepLabel = row.fIdx != null ? "f" + (row.fIdx + 1)
+    : row.stepIdx != null ? "#" + (row.stepIdx + 1) : row.isGate ? "gate" : row.isDraft ? "draft" : "";
+  d.innerHTML = `${avHTML}<div class="feed-body"><div class="feed-head"><span class="feed-names">${namesHTML}</span><span class="feed-step">${stepLabel}</span></div><div class="${msgCls.join(" ")}"${msgStyle}>${msgHTML}</div></div>`;
   if (row.isAsk) {
     try {
       const body = d.querySelector(".feed-body");
@@ -3615,7 +4064,7 @@ function feedShowReply(row, rowEl) {
     const rd = document.createElement("div");
     const cls = ["feed-reply"];
     if (row.isRead) cls.push("red");
-    if (row.isAsk || row.isDraft) cls.push("status");
+    if (row.isAsk || row.isDraft || row.isNoGatePost) cls.push("status");
     try {
       const low = String(row.reply || "").toLowerCase();
       if (row.isRead || low.includes("set aside") || low.startsWith("blocked")) cls.push("fflash");
@@ -3642,6 +4091,21 @@ function feedShowReply(row, rowEl) {
       }
     } catch {}
   } catch {}
+}
+function feedDividerEl(seconds) {
+  const d = document.createElement("div");
+  d.className = "feed-row feed-divider";
+  const secs = seconds != null ? seconds : "";
+  d.innerHTML = `<div class="div-wrap"><div class="div-label">Follow-up · after Şef answered</div>` +
+    `<div class="div-sub">separate recorded run, on the Turkish note · ${esc(secs)} s</div></div>`;
+  return d;
+}
+function feedSummaryEl(summary) {
+  const d = document.createElement("div");
+  const kind = (summary && summary.summaryKind) || "grey";
+  d.className = "feed-row feed-summary " + kind;
+  d.innerHTML = `<div class="sum-text">${esc(summary ? summary.text : "")}</div>`;
+  return d;
 }
 function feedShowBubbleTyping(charId) {
   if (reducedMotion) return;
@@ -3798,164 +4262,311 @@ function updateFeedBeams() {
     _feedBeams = keep;
   } catch {}
 }
+function scheduleFeedRow(thread, row, key, base, slot, isLast, finishAll, useBubbles) {
+  const atMsg = Math.round(base + slot * 0.35);
+  later(() => {
+    try {
+      const l = feedListFor(thread);
+      if (!l) return;
+      if (useBubbles && key !== "m0") feedFadeAllBubbles();
+      const el = feedTypingEl(row, 0);
+      el.dataset.row = key;
+      l.appendChild(el);
+      feedOnNewRowThread(thread);
+      feedSetSpeakingThread(thread, row.from);
+      if (row.isGate) feedStatusTextThread(thread, `${feedName(row.from)} is deciding…`);
+      else if (row.isDraft) feedStatusTextThread(thread, `${feedName(row.from)} is drafting…`);
+      else if (row.isThinking) feedStatusTextThread(thread, `${feedName(row.from)} is thinking…`);
+      else feedStatusTextThread(thread, `${feedName(row.from)} is typing…`);
+      if (useBubbles) feedShowBubbleTyping(row.from);
+      if ((G._feedTab || "with") === thread) feedEdgeFlash(feedColour(row.from));
+    } catch (e) { if (DEBUG) console.warn("feedtyping:", e); }
+  }, base);
+  later(() => {
+    try {
+      const l = feedListFor(thread);
+      if (!l) return;
+      const typingEl = l.querySelector(`[data-row="${key}"]`);
+      if (!typingEl) return;
+      const msgEl = feedRowEl(row, 0);
+      msgEl.dataset.row = key;
+      typingEl.className = msgEl.className;
+      typingEl.dataset.row = key;
+      typingEl.innerHTML = msgEl.innerHTML;
+      try {
+        if (row.isAsk) {
+          const btn = typingEl.querySelector(".feed-more");
+          const m = typingEl.querySelector(".feed-msg");
+          if (btn && m) btn.addEventListener("click", ev => {
+            ev.stopPropagation();
+            try {
+              const clamped = m.classList.toggle("clamp3");
+              btn.textContent = clamped ? "more" : "less";
+            } catch {}
+          });
+        }
+      } catch {}
+      feedMaybeScrollThread(thread);
+      feedSetSpeakingThread(thread, row.from);
+      if (useBubbles) {
+        feedShowBubble(row.from, row.text);
+        feedShowBeam(row);
+      }
+      feedTypewrite(typingEl, row);
+      if (isLast && row.reply == null) later(finishAll, 400);
+    } catch (e) { if (DEBUG) console.warn("feedmsg:", e); }
+  }, atMsg);
+  if (row.reply != null) {
+    const atReplyTyping = Math.round(base + slot * 0.60);
+    const atReply = Math.round(atReplyTyping + 200);
+    later(() => {
+      try {
+        const l = feedListFor(thread);
+        if (!l) return;
+        const el = l.querySelector(`[data-row="${key}"]`);
+        if (!el || el.classList.contains("typing")) return;
+        feedShowReplyTyping(row, el);
+        feedMaybeScrollThread(thread);
+        if (row.replyFromRecipient && row.to) {
+          feedStatusTextThread(thread, `${feedName(row.to)} is replying…`);
+          feedSetSpeakingThread(thread, row.to);
+          if (useBubbles) feedShowBubbleTyping(row.to);
+        }
+      } catch (e) { if (DEBUG) console.warn("feedreplytyping:", e); }
+    }, atReplyTyping);
+    later(() => {
+      try {
+        const l = feedListFor(thread);
+        if (!l) return;
+        const el = l.querySelector(`[data-row="${key}"]`);
+        if (!el) return;
+        feedHideReplyTyping(el);
+        feedShowReply(row, el);
+        feedMaybeScrollThread(thread);
+        if (row.replyFromRecipient && row.to) {
+          feedSetSpeakingThread(thread, row.to);
+          if (useBubbles) feedShowBubble(row.to, row.reply);
+        }
+        if (isLast) later(finishAll, 300);
+      } catch (e) { if (DEBUG) console.warn("feedreply:", e); }
+    }, atReply);
+  }
+}
+function feedWireTabsOnce() {
+  try {
+    const bw = document.getElementById("tabWith");
+    if (bw && !bw._wired) {
+      bw._wired = true;
+      bw.addEventListener("click", () => { try { feedSetTab("with"); } catch {} });
+    }
+    const bn = document.getElementById("tabNoGate");
+    if (bn && !bn._wired) {
+      bn._wired = true;
+      bn.addEventListener("click", () => { try { feedSetTab("nogate"); } catch {} });
+    }
+  } catch {}
+}
+function scheduleNoGateThread() {
+  try {
+    if (G._feedNoGateStarted || G._feedNoGateDone) return;
+    G._feedNoGateStarted = true;
+    const rows = G._feedNoGateRows || [];
+    const summary = G._feedNoGateSummary;
+    const slot = G._feedWithSlot || (rows.length > 12 ? 650 : 900);
+    feedHeaderSetThread("nogate", "replaying");
+    const Rn = rows.length;
+    const finishAll = () => {
+      try {
+        if (G._feedNoGateDone) return;
+        G._feedNoGateDone = true;
+        try {
+          const l = feedListFor("nogate");
+          if (l && summary && !l.querySelector(".feed-summary")) {
+            const el = feedSummaryEl(summary);
+            l.appendChild(el);
+            feedOnNewRowThread("nogate");
+          }
+        } catch {}
+        feedSetSpeakingThread("nogate", null);
+        const n = (G.cs && G.cs.without_gate && G.cs.without_gate.steps) ? G.cs.without_gate.steps.length : Rn;
+        feedStatusSetThread("nogate", `Run replayed · ${n} steps <span class="fcheck">✓</span>`);
+        feedHeaderSetThread("nogate", "done");
+      } catch {}
+    };
+    G._feedNoGateFinish = finishAll;
+    if (!rows.length) { later(finishAll, 300); return; }
+    rows.forEach((r, i) => {
+      const base = Math.round(300 + i * slot);
+      scheduleFeedRow("nogate", r, `n${i}`, base, slot, i === Rn - 1, finishAll, false);
+    });
+    later(() => {
+      try {
+        if (G._feedNoGateDone) return;
+        const l = feedListFor("nogate");
+        if (!l) return;
+        if (l.querySelectorAll("[data-row]").length >= Rn) finishAll();
+      } catch {}
+    }, Math.round(300 + Rn * slot + 500));
+  } catch (e) { if (DEBUG) console.warn("feednogate:", e); }
+}
 function feedSchedule() {
   try {
     const rows = buildFeedRows(G.cs);
+    const followupRows = buildFeedFollowupRows(G.cs);
+    const noGateRows = buildFeedNoGateRows(G.cs);
+    const noGateSummary = buildNoGateSummary(G.cs);
     G._feedRows = rows;
-    const list = document.querySelector("#feed .feed-list");
-    if (list) { list.innerHTML = ""; list._stick = true; }
-    feedTeamBuild(rows);
+    G._feedWithRows = rows;
+    G._feedFollowupRows = followupRows;
+    G._feedNoGateRows = noGateRows;
+    G._feedNoGateSummary = noGateSummary;
+    G._feedTab = "with";
+    G._feedWithDone = false;
+    G._feedNoGateDone = false;
+    G._feedNoGateStarted = false;
+    G._feedWithUnread = 0;
+    G._feedNoGateUnread = 0;
+    G._feedWithSpeaking = null;
+    G._feedNoGateSpeaking = null;
+    G._feedWithStatus = "";
+    G._feedNoGateStatus = "";
+    const withList = feedListFor("with");
+    const noGateList = feedListFor("nogate");
+    if (withList) { withList.innerHTML = ""; withList._stick = true; withList.hidden = false; }
+    if (noGateList) { noGateList.innerHTML = ""; noGateList._stick = true; noGateList.hidden = true; }
     try {
-      const secs = G.cs && G.cs.agent ? G.cs.agent.seconds : "";
-      const n = G.cs && G.cs.agent && G.cs.agent.steps ? G.cs.agent.steps.length : rows.length;
-      document.querySelector("#feed .feed-sub").textContent = `recorded run · ${secs} s · ${n} steps`;
+      const bw = document.getElementById("tabWith");
+      const bn = document.getElementById("tabNoGate");
+      if (bw) bw.setAttribute("aria-selected", "true");
+      if (bn) bn.setAttribute("aria-selected", "false");
     } catch {}
+    feedTeamBuild([...rows, ...followupRows]);
+    try { updateFeedSubForTab("with"); } catch {}
     try {
       const t = document.getElementById("feedToggle");
       if (t) t.textContent = `Show all ▾`;
     } catch {}
     feedPillHide();
     feedStatusText("");
+    G._feedWithStatus = "";
+    G._feedNoGateStatus = "";
+    try { feedWireTabsOnce(); } catch {}
     try {
       const p = document.querySelector("#feed .fnew");
       if (p && !p._wired) {
         p._wired = true;
         p.addEventListener("click", () => {
           try {
-            const l = document.querySelector("#feed .feed-list");
+            const l = feedListFor(G._feedTab || "with");
             if (l) { l._stick = true; l.scrollTop = l.scrollHeight; }
-            feedPillHide();
+            feedPillHideActive();
           } catch {}
         });
       }
     } catch {}
-    if (!rows.length) { feedHeaderSet("hidden"); return; }
+    const hasFollowup = followupRows.length > 0;
+    const mainCount = ((G.cs && G.cs.agent && G.cs.agent.steps) || []).length;
+    const withFinal = hasFollowup
+      ? `Run replayed · ${mainCount} steps · Şef answered <span class="fcheck">✓</span>`
+      : `Run replayed · ${mainCount} steps <span class="fcheck">✓</span>`;
+    if (!rows.length && !hasFollowup) { feedHeaderSetThread("with", "hidden"); G._feedWithHeader = "hidden"; }
+    if (!noGateRows.length && !noGateSummary) { G._feedNoGateHeader = "hidden"; }
+    else { G._feedNoGateHeader = "hidden"; }
+    if (!rows.length && !hasFollowup) {
+      if (!noGateRows.length) return;
+    }
     if (reducedMotion) {
+      G._feedWithHeader = "done";
+      G._feedNoGateHeader = "done";
       feedHeaderSet("done");
+      G._feedWithStatus = withFinal;
+      const nNo = (G.cs && G.cs.without_gate && G.cs.without_gate.steps) ? G.cs.without_gate.steps.length : noGateRows.length;
+      G._feedNoGateStatus = `Run replayed · ${nNo} steps <span class="fcheck">✓</span>`;
       later(() => {
         try {
-          const l = document.querySelector("#feed .feed-list");
-          if (!l) return;
-          rows.forEach((r, i) => {
-            const el = feedRowEl(r, i + 1);
-            el.dataset.row = i;
-            l.appendChild(el);
-            feedShowReply(r, el);
-          });
-          l.scrollTop = l.scrollHeight;
+          const l = feedListFor("with");
+          if (l) {
+            rows.forEach((r) => {
+              const el = feedRowEl(r, 0);
+              l.appendChild(el);
+              feedShowReply(r, el);
+            });
+            if (hasFollowup) {
+              const secs = G.cs && G.cs.signoff ? G.cs.signoff.seconds : "";
+              l.appendChild(feedDividerEl(secs));
+              followupRows.forEach((r) => {
+                const el = feedRowEl(r, 0);
+                l.appendChild(el);
+                feedShowReply(r, el);
+              });
+            }
+            l.scrollTop = l.scrollHeight;
+          }
+          const nl = feedListFor("nogate");
+          if (nl) {
+            noGateRows.forEach((r) => {
+              const el = feedRowEl(r, 0);
+              nl.appendChild(el);
+              feedShowReply(r, el);
+            });
+            if (noGateSummary) nl.appendChild(feedSummaryEl(noGateSummary));
+            nl.scrollTop = nl.scrollHeight;
+          }
+          G._feedWithDone = true;
+          G._feedNoGateDone = true;
+          G._feedNoGateStarted = true;
+          G._feedWithSpeaking = null;
+          G._feedNoGateSpeaking = null;
           feedSetSpeaking(null);
-          feedStatusSet(`Run replayed · ${((G.cs && G.cs.agent && G.cs.agent.steps) || []).length} steps <span class="fcheck">✓</span>`);
+          feedStatusSet((G._feedTab || "with") === "nogate" ? G._feedNoGateStatus : G._feedWithStatus);
         } catch (e) { if (DEBUG) console.warn("feed:", e); }
       }, 300);
       return;
     }
-    feedHeaderSet("replaying");
+    feedHeaderSetThread("with", rows.length || hasFollowup ? "replaying" : "hidden");
     const R = rows.length;
     const slot = R > 12 ? 650 : 900;
+    G._feedWithSlot = slot;
     const finishAll = () => {
       try {
-        feedSetSpeaking(null);
-        feedStatusSet(`Run replayed · ${((G.cs && G.cs.agent && G.cs.agent.steps) || []).length} steps <span class="fcheck">✓</span>`);
-        feedHeaderSet("done");
+        if (G._feedWithDone) return;
+        G._feedWithDone = true;
+        feedSetSpeakingThread("with", null);
+        feedStatusSetThread("with", withFinal);
+        feedHeaderSetThread("with", "done");
       } catch {}
     };
+    G._feedWithFinish = finishAll;
     rows.forEach((r, i) => {
       const base = Math.round(300 + i * slot);
-      const atMsg = Math.round(base + slot * 0.35);
-      later(() => {
-        try {
-          const l = document.querySelector("#feed .feed-list");
-          if (!l) return;
-          if (i > 0) feedFadeAllBubbles();
-          const el = feedTypingEl(r, i + 1);
-          el.dataset.row = i;
-          l.appendChild(el);
-          feedOnNewRow();
-          feedSetSpeaking(r.from);
-          if (r.isGate) feedStatusText(`${feedName(r.from)} is deciding…`);
-          else if (r.isDraft) feedStatusText(`${feedName(r.from)} is drafting…`);
-          else if (r.isThinking) feedStatusText(`${feedName(r.from)} is thinking…`);
-          else feedStatusText(`${feedName(r.from)} is typing…`);
-          feedShowBubbleTyping(r.from);
-          feedEdgeFlash(feedColour(r.from));
-        } catch (e) { if (DEBUG) console.warn("feedtyping:", e); }
-      }, base);
-      later(() => {
-        try {
-          const l = document.querySelector("#feed .feed-list");
-          if (!l) return;
-          const typingEl = l.querySelector(`[data-row="${i}"]`) || l.children[i];
-          if (!typingEl) return;
-          const msgEl = feedRowEl(r, i + 1);
-          msgEl.dataset.row = i;
-          typingEl.className = msgEl.className;
-          typingEl.dataset.num = i + 1;
-          typingEl.dataset.row = i;
-          typingEl.innerHTML = msgEl.innerHTML;
-          try {
-            if (r.isAsk) {
-              const btn = typingEl.querySelector(".feed-more");
-              const m = typingEl.querySelector(".feed-msg");
-              if (btn && m) btn.addEventListener("click", ev => {
-                ev.stopPropagation();
-                try {
-                  const clamped = m.classList.toggle("clamp3");
-                  btn.textContent = clamped ? "more" : "less";
-                } catch {}
-              });
-            }
-          } catch {}
-          feedMaybeScroll();
-          feedSetSpeaking(r.from);
-          feedShowBubble(r.from, r.text);
-          feedShowBeam(r);
-          feedTypewrite(typingEl, r);
-          if (i === R - 1 && r.reply == null) later(finishAll, 400);
-        } catch (e) { if (DEBUG) console.warn("feedmsg:", e); }
-      }, atMsg);
-      if (r.reply != null) {
-        const atReplyTyping = Math.round(base + slot * 0.60);
-        const atReply = Math.round(atReplyTyping + 200);
-        later(() => {
-          try {
-            const l = document.querySelector("#feed .feed-list");
-            if (!l) return;
-            const el = l.querySelector(`[data-row="${i}"]`) || l.children[i];
-            if (!el || el.classList.contains("typing")) return;
-            feedShowReplyTyping(r, el);
-            feedMaybeScroll();
-            if (r.replyFromRecipient && r.to) {
-              feedStatusText(`${feedName(r.to)} is replying…`);
-              feedSetSpeaking(r.to);
-              feedShowBubbleTyping(r.to);
-            }
-          } catch (e) { if (DEBUG) console.warn("feedreplytyping:", e); }
-        }, atReplyTyping);
-        later(() => {
-          try {
-            const l = document.querySelector("#feed .feed-list");
-            if (!l) return;
-            const el = l.querySelector(`[data-row="${i}"]`) || l.children[i];
-            if (!el) return;
-            feedHideReplyTyping(el);
-            feedShowReply(r, el);
-            feedMaybeScroll();
-            if (r.replyFromRecipient && r.to) {
-              feedSetSpeaking(r.to);
-              feedShowBubble(r.to, r.reply);
-            }
-            if (i === R - 1) later(finishAll, 300);
-          } catch (e) { if (DEBUG) console.warn("feedreply:", e); }
-        }, atReply);
-      }
+      const isLast = !hasFollowup && i === R - 1;
+      scheduleFeedRow("with", r, `m${i}`, base, slot, isLast, finishAll, true);
     });
+    if (hasFollowup) {
+      const divBase = Math.round(300 + R * slot);
+      later(() => {
+        try {
+          const l = feedListFor("with");
+          if (!l || l.querySelector(".feed-divider")) return;
+          const secs = G.cs && G.cs.signoff ? G.cs.signoff.seconds : "";
+          l.appendChild(feedDividerEl(secs));
+          feedOnNewRowThread("with");
+        } catch (e) { if (DEBUG) console.warn("feeddivider:", e); }
+      }, divBase);
+      followupRows.forEach((r, k) => {
+        const base = Math.round(divBase + k * slot);
+        scheduleFeedRow("with", r, `fup${k}`, base, slot, k === followupRows.length - 1, finishAll, true);
+      });
+    }
+    const totalWith = R + (hasFollowup ? followupRows.length : 0);
     later(() => {
       try {
-        const l = document.querySelector("#feed .feed-list");
+        if (G._feedWithDone) return;
+        const l = feedListFor("with");
         if (!l) return;
-        if (l.childElementCount >= R) finishAll();
+        if (l.querySelectorAll("[data-row]").length >= totalWith) finishAll();
       } catch {}
-    }, Math.round(300 + R * slot + 500));
+    }, Math.round(300 + (R + (hasFollowup ? followupRows.length : 0)) * slot + 500));
   } catch (e) { if (DEBUG) console.warn("feed:", e); }
 }
 try {
@@ -3968,11 +4579,10 @@ try {
       if (on) {
         t.textContent = "▴";
         try {
-          const l = document.querySelector("#feed .feed-list");
+          const l = feedListFor(G._feedTab || "with");
           if (l) l.scrollTop = l.scrollHeight;
         } catch {}
       } else {
-        const n = (G._feedRows && G._feedRows.length) || 0;
         t.textContent = `Show all ▾`;
       }
     } catch {}
@@ -4151,8 +4761,8 @@ function showResult() {
   const left = wg.length ? `posted ${wg.join(", ")}` : (cs.without_gate.supervisor ? "asked Şef" : "posted nothing");
   const right = posted.length ? `${posted.map(p => p[0]).join(", ")} reached the ERP${posted[0][1] ? ` as ${posted[0][1]}` : ""}` : "nothing reached the ERP";
   const wgWrong = wg.length > 0 && g8.action !== "post";
-  h += `<div class="v-tiles"><div class="v-tile without${wgWrong ? " bad" : ""}">` +
-    `<h3>Without the gate</h3><p>The agent ${esc(left)}</p></div>` +
+  h += `<div class="v-tiles"><button type="button" class="v-tile without${wgWrong ? " bad" : ""}">` +
+    `<h3>Without the gate</h3><p>The agent ${esc(left)}</p></button>` +
     `<div class="v-tile behind ${g8.action}"><h3>Behind the gate</h3><p>${esc(cap1(right))}</p></div></div>`;
   if (cs.draft) h += draftDetails(cs.draft, g8.reason);
   else if (firstSentence(g8.reason) !== String(g8.reason))
@@ -4163,6 +4773,24 @@ function showResult() {
     `<p id="tally">wrong receipts that reached the ERP: ${G.wrongCount}</p>`;
   R.innerHTML = h;
   $("tallyChip").textContent = `wrong receipts that reached the ERP: ${G.wrongCount}`;
+  try {
+    const wgBtn = R.querySelector(".v-tile.without");
+    if (wgBtn) wgBtn.addEventListener("click", () => {
+      try { feedSetTab("nogate"); } catch {}
+      try {
+        if (matchMedia("(max-width: 640px)").matches) {
+          const f = document.getElementById("feed");
+          if (f && !f.classList.contains("expanded")) {
+            f.classList.add("expanded");
+            const t = document.getElementById("feedToggle");
+            if (t) { t.textContent = "▴"; t.setAttribute("aria-expanded", "true"); }
+            const l = feedListFor("nogate");
+            if (l) l.scrollTop = l.scrollHeight;
+          }
+        }
+      } catch {}
+    });
+  } catch {}
   $("againBtn").addEventListener("click", () => {
     document.body.classList.remove("done", "deciding", "playing");
     $("reads").innerHTML = "";
@@ -4445,7 +5073,7 @@ function tick() {
 if (new URLSearchParams(location.search).has("test"))
   window.__sim = { G, CHAR, ST, pickup: () => pickupPallet(true), drop: dropPallet, DROP, ZONE,
     FORK: { pick: PICK_D, set: SET_D }, camera, get delivery() { return deliveryGroup; },
-    feed: () => feedPlainRows() };
+    feed: () => feedPlainRows(), feedFollowup: () => feedPlainFollowup(), feedNoGate: () => feedPlainNoGate() };
 if ("ontouchstart" in window || navigator.maxTouchPoints > 0) document.body.classList.add("touch");
 boot();
 tick();
