@@ -3313,7 +3313,7 @@ function feedHeaderSet(mode) {
     if (mode === "hidden") { el.hidden = true; return; }
     el.hidden = false;
     const label = el.querySelector("em");
-    if (mode === "done") { el.classList.add("done"); if (label) label.textContent = "recorded run"; }
+    if (mode === "done") { el.classList.add("done"); if (label) label.textContent = "replayed"; }
     else { el.classList.remove("done"); if (label) label.textContent = "replaying"; }
   } catch {}
 }
@@ -3501,6 +3501,8 @@ function feedTypewrite(rowEl, row) {
   } catch {}
 }
 function feedShowReplyTyping(row, rowEl) {
+  // Only a recipient who really answers types; a status ("Şef notified") just appears.
+  if (!row.replyFromRecipient) return;
   try {
     const body = rowEl.querySelector(".feed-body");
     if (!body || body.querySelector(".feed-reply") || body.querySelector(".feed-reply-typing")) return;
@@ -3632,10 +3634,11 @@ function feedShowReply(row, rowEl) {
     body.appendChild(rd);
     try {
       const tick = rowEl.querySelector(".ftick");
-      if (tick && row.to) {
+      // ✓✓ only when the recipient answered; a notification is not proof it was read.
+      if (tick && row.to && row.replyFromRecipient) {
         tick.textContent = "✓✓";
         tick.classList.add("seen");
-        tick.style.color = feedColour(row.to);
+        tick.style.color = feedTextColour(row.to);
       }
     } catch {}
   } catch {}
@@ -3841,7 +3844,7 @@ function feedSchedule() {
           });
           l.scrollTop = l.scrollHeight;
           feedSetSpeaking(null);
-          feedStatusSet(`Run replayed · ${rows.length} steps <span class="fcheck">✓</span>`);
+          feedStatusSet(`Run replayed · ${((G.cs && G.cs.agent && G.cs.agent.steps) || []).length} steps <span class="fcheck">✓</span>`);
         } catch (e) { if (DEBUG) console.warn("feed:", e); }
       }, 300);
       return;
@@ -3852,7 +3855,7 @@ function feedSchedule() {
     const finishAll = () => {
       try {
         feedSetSpeaking(null);
-        feedStatusSet(`Run replayed · ${R} steps <span class="fcheck">✓</span>`);
+        feedStatusSet(`Run replayed · ${((G.cs && G.cs.agent && G.cs.agent.steps) || []).length} steps <span class="fcheck">✓</span>`);
         feedHeaderSet("done");
       } catch {}
     };
