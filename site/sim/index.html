@@ -1044,6 +1044,10 @@ const ZONE = { x0: -2.48, x1: 2.48, y0: 3.32, y1: 7.68 };   // receiving zone (y
 // them at 2.9 m (stools at 2.4); 0 deg = +x.
 const MEET = { x: 1.0, y: -7.0 };
 const MEET_R = 2.9;
+// The table stands on a raised navy platform (dock.glb): radius 3.4 m, top 0.19 m. Anyone
+// standing on it (the meeting spots are at 2.9 m) stands on its top, not in it.
+const MEET_PLATFORM = { r: 3.4, z: 0.19 };
+const standY = (x, y) => Math.hypot(x - MEET.x, y - MEET.y) < MEET_PLATFORM.r ? MEET_PLATFORM.z : 0;
 const MEET_SPOT_ANGLE = { sef: 240, kapi: 300, spark: 180, sam: 0 };
 const DOOR = { x0: -1.0, x1: 1.0, y0: 9.44, y1: 10.76 };    // doorway volume: the open dock door,
   // listed in colliders.json but the forklift drives through it up the leveller.
@@ -1689,7 +1693,7 @@ function startWalkTo(id, tx, ty, fx, fy) {
   if (reducedMotion) {
     rec.walking = false; rec.pendingWave = false;
     rec.x = tx; rec.y = ty; rec.tx = tx; rec.ty = ty;
-    rec.group.position.set(tx, 0, -ty);
+    rec.group.position.set(tx, standY(tx, ty), -ty);
     faceBlender(rec, tx, ty, fx, fy);
     return;
   }
@@ -1725,7 +1729,7 @@ function updateWalkers(dt) {
       }
       rec.x = rec.tx; rec.y = rec.ty; rec.walking = false;
       rec.group.position.x = rec.x; rec.group.position.z = -rec.y;
-      rec.group.position.y = 0;
+      rec.group.position.y = standY(rec.x, rec.y);
       if (rec.hasFace) faceBlender(rec, rec.x, rec.y, rec.faceX, rec.faceY);
       playIdle(rec);
       rec._spd = null;
@@ -1734,7 +1738,7 @@ function updateWalkers(dt) {
     } else if (dist > 1e-6) {
       rec.x += dx / dist * step; rec.y += dy / dist * step;
       rec.group.position.x = rec.x; rec.group.position.z = -rec.y;
-      rec.group.position.y = 0;
+      rec.group.position.y = standY(rec.x, rec.y);
     }
   }
 }
@@ -1912,7 +1916,7 @@ function beginMeetingWalk() {
         rec.walking = false; rec._legs = null; rec._spd = null; rec._atTable = true;
         rec.x = s.x; rec.y = s.y; rec.tx = s.x; rec.ty = s.y;
         if (rec.group) {
-          rec.group.position.set(s.x, 0, -s.y);
+          rec.group.position.set(s.x, standY(s.x, s.y), -s.y);
           faceBlender(rec, s.x, s.y, MEET.x, MEET.y);
         }
         if (G._walkerTargets) G._walkerTargets[id] = { tx: s.x, ty: s.y, fx: MEET.x, fy: MEET.y };
