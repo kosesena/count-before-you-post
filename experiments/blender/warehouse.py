@@ -4422,6 +4422,100 @@ def p_rooms(P):
     outp.write_text(json.dumps(rooms, ensure_ascii=False, indent=2))
 
 
+MEET_X = -4.0
+MEET_Y = -6.5
+MEET_R = 1.1
+
+
+def p_meeting(P):
+    """Meeting corner in the open hall: round table, stools, rug, lamp, sign.
+
+    Centred at (MEET_X, MEET_Y) on the floor, between the rooms and the
+    receiving stations. Every mesh is named p_meet_*.
+    """
+    dark = P["dark_steel"]
+    oak = mat("p_meet_oak", _hex("#b07a45"), rough=0.5)
+    rug_navy = mat("p_meet_rugmat", _hex("#2b3a55"), rough=0.95)
+    ring_yellow = mat("p_meet_ring", _hex("#ffd21f"), rough=0.6)
+    sign_navy = mat("p_meet_navy", _hex("#1e2a5a"), rough=0.5)
+    screen_pale = mat("p_meet_screen", _hex("#dbeafe"), emit=2.0)
+    # Rug: navy disc with a 0.10 wide yellow ring near the edge.
+    cyl("p_meet_rug", 2.4, 0.012, (MEET_X, MEET_Y, 0.006), rug_navy, verts=48)
+    bpy.ops.mesh.primitive_torus_add(location=(_mx(MEET_X), MEET_Y, 0.018),
+                                     major_radius=2.25, minor_radius=0.05)
+    rring = bpy.context.object
+    rring.name = "p_meet_rug_ring"
+    rring.scale = (1.0, 1.0, 0.12)
+    rring.data.materials.append(ring_yellow)
+    # Round table: top surface at 0.97, dark edge band, pedestal on base plate.
+    cyl("p_meet_tabletop", MEET_R, 0.07, (MEET_X, MEET_Y, 0.935), oak, verts=48)
+    cyl("p_meet_edge", MEET_R + 0.008, 0.03, (MEET_X, MEET_Y, 0.935), dark,
+        verts=48)
+    cyl("p_meet_pedestal", 0.16, 0.85, (MEET_X, MEET_Y, 0.475), dark)
+    cyl("p_meet_base", 0.55, 0.05, (MEET_X, MEET_Y, 0.025), dark, verts=32)
+    # Six stools on a 1.7 m circle (0 deg = +x); seat top at 0.62.
+    for i, col in enumerate(("#f97316", "#3b82f6", "#a16207", "#1d4ed8",
+                             "#ca8a04", "#0d9488")):
+        ang = math.radians(i * 60)
+        sx, sy = MEET_X + 1.7 * math.cos(ang), MEET_Y + 1.7 * math.sin(ang)
+        sm = mat(f"p_meet_seat{i}", _hex(col), rough=0.6)
+        cyl(f"p_meet_stool{i}_seat", 0.24, 0.07, (sx, sy, 0.585), sm, verts=32)
+        cyl(f"p_meet_stool{i}_post", 0.035, 0.55, (sx, sy, 0.275), dark)
+        bpy.ops.mesh.primitive_torus_add(location=(_mx(sx), sy, 0.20),
+                                         major_radius=0.16, minor_radius=0.015)
+        fring = bpy.context.object
+        fring.name = f"p_meet_stool{i}_ring"
+        fring.data.materials.append(dark)
+    # On the table (top at 0.97; nothing taller than 0.25 above it).
+    for k, yaw in enumerate((0.12, -0.10, 0.04)):
+        box(f"p_meet_note{k}", (0.21, 0.30, 0.003),
+            (MEET_X - 0.35, MEET_Y + 0.15, 0.9715 + k * 0.003), P["paper"],
+            rot_z=yaw)
+    box("p_meet_clip", (0.24, 0.34, 0.015), (MEET_X + 0.35, MEET_Y - 0.20,
+        0.9775), P["wood"])
+    box("p_meet_clippaper", (0.20, 0.28, 0.005), (MEET_X + 0.35, MEET_Y - 0.20,
+        0.9875), P["paper"])
+    box("p_meet_clipclip", (0.08, 0.03, 0.02), (MEET_X + 0.35,
+        MEET_Y - 0.34, 0.995), dark)
+    box("p_meet_stampbase", (0.07, 0.09, 0.025), (MEET_X + 0.15, MEET_Y + 0.35,
+        0.9825), P["black"])
+    cyl("p_meet_stamphandle", 0.016, 0.06, (MEET_X + 0.15, MEET_Y + 0.35,
+        1.025), P["wood"])
+    _psphere("p_meet_stampknob", 0.022, (MEET_X + 0.15, MEET_Y + 0.35, 1.066),
+             P["wood"])
+    box("p_meet_tablet", (0.24, 0.18, 0.015), (MEET_X - 0.10, MEET_Y - 0.35,
+        0.9775), P["black"], rot_z=-0.15)
+    box("p_meet_tabscreen", (0.20, 0.14, 0.004), (MEET_X - 0.10, MEET_Y - 0.35,
+        0.987), screen_pale, rot_z=-0.15)
+    # Pendant lamp: shade on a cable from the ceiling, emissive disc, area light.
+    _pcone("p_meet_shade", 0.55, 0.12, 0.45, (MEET_X, MEET_Y, 4.55), P["shade"])
+    cyl("p_meet_cable", 0.02, 2.725, (MEET_X, MEET_Y, 6.1375), dark)
+    cyl("p_meet_disc", 0.45, 0.03, (MEET_X, MEET_Y, 4.31), P["lamp_warm"])
+    bpy.ops.object.light_add(type="AREA", location=(_mx(MEET_X), MEET_Y, 4.2))
+    pl = bpy.context.object
+    pl.name = "p_meet_light"
+    pl.data.energy, pl.data.color = 200, (1.0, 0.82, 0.6)
+    try:
+        pl.data.shape = "DISK"
+    except (TypeError, AttributeError):
+        try:
+            pl.data.shape = "DISC"
+        except (TypeError, AttributeError):
+            pass
+    try:
+        pl.data.size = 1.2
+    except (TypeError, AttributeError):
+        pass
+    pl.data.use_shadow = True
+    aim(pl, (MEET_X, MEET_Y, 0))
+    # Floor sign 1.6 m south of the table, facing the rooms.
+    cyl("p_meet_signpost", 0.035, 1.0, (MEET_X, MEET_Y - 1.6, 0.5), dark)
+    box("p_meet_sign", (0.9, 0.04, 0.3), (MEET_X, MEET_Y - 1.6, 1.15),
+        sign_navy)
+    text("p_meet_signtxt", "MEETING", (MEET_X, MEET_Y - 1.625, 1.15), 0.14,
+         P["paper"])
+
+
 def polish(cams, V):
     rnd = random.Random(99)
     P = p_materials()
@@ -4451,6 +4545,7 @@ def polish(cams, V):
     p_racks(P, rnd)
     p_props(P, rnd)
     p_rooms(P)
+    p_meeting(P)
     # The simulator's floor workstations, so the video and the simulator match.
     sys.path.insert(0, str(Path(__file__).resolve().parent))
     from stations import build_stations
