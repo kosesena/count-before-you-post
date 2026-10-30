@@ -1082,82 +1082,129 @@ def p_standees(P, light, cam_pos):
 
 
 def p_racks(P, rnd):
-    """Tall pallet-rack rows, nearly every slot holding a loaded pallet."""
-    rows = [("A", 8.5, (-11.9, -9.2, -6.5)), ("B", 6.0, (-11.9, -9.2)),
-            ("C", -2.5, (-12.5, -9.8, -7.1)), ("D", -5.0, (-12.5, -9.8)),
-            ("E", -7.5, (-12.5, -9.8, -7.1))]
-    for letter, y, bays in rows:
-        for bi, bx in enumerate(bays):
-            for sx in (-1.29, 1.29):
-                for sy in (-0.49, 0.49):
-                    box(f"p_rk{letter}{bi}_up{sx}{sy}", (0.12, 0.12, 5.4),
-                        (bx + sx, y + sy, 2.7), P["rack_blue"])
+    """Pallet-rack runs against the walls, nearly every slot holding a loaded pallet.
+
+    Left wall run (L1..L7): backs against the left wall (depth along x),
+    loads facing +x into the hall. Back wall run (B1..B3): backs against
+    the back wall west of the dock door (depth along y), loads facing -y.
+    The middle of the hall stays open floor.
+    """
+    def _load(tag, px, py, z0, rot90):
+        """One loaded pallet: tidy 2x2 bottom layer, top carton(s), film, label."""
+        if rot90:  # pallet turned 90 deg: 1.2 m along y, 1.0 m along x
+            for k in range(5):
+                box(f"{tag}_t{k}", (0.14, 1.2, 0.022),
+                    (px - 0.45 + k * 0.225, py, z0 + 0.123), P["wood"])
+            for k in range(3):
+                box(f"{tag}_b{k}", (0.1, 1.2, 0.1),
+                    (px - 0.45 + k * 0.45, py, z0 + 0.06), P["wood"])
+            for k in range(2):
+                box(f"{tag}_s{k}", (0.1, 1.2, 0.02),
+                    (px - 0.45 + k * 0.9, py, z0 + 0.01), P["wood_pale"])
+        else:
+            p_pallet(tag, px, py, z0, P)
+        top = z0 + 0.134
+        # Bottom layer: tidy 2x2 stack, one height per slot so the
+        # top layer sits flush; varied browns and footprints.
+        h0 = rnd.choice([0.34, 0.38, 0.42])
+        lbl = None
+        for jl in (-0.30, 0.30):  # along the bay
+            for jd in (-0.24, 0.24):  # across the depth
+                w, d = rnd.choice([(0.52, 0.40), (0.46, 0.36),
+                                   (0.54, 0.42), (0.40, 0.34)])
+                ol = jl + rnd.uniform(-0.02, 0.02)
+                od = jd + rnd.uniform(-0.02, 0.02)
+                yaw = rnd.uniform(-0.05, 0.05)
+                cx = px + (od if rot90 else ol)
+                cy = py + (ol if rot90 else od)
+                box(f"{tag}b{jl}{jd}", (d, w, h0) if rot90 else (w, d, h0),
+                    (cx, cy, top + h0 / 2), rnd.choice(P["cards"]),
+                    bevel=0.008, rot_z=yaw)
+                front = jd > 0 if rot90 else jd < 0
+                if front and jl < 0:
+                    lbl = (cx, cy, cx + d / 2 if rot90 else cy - d / 2, yaw, w)
+        # Top layer: one centred carton, or two side by side.
+        if rnd.random() < 0.55:
+            tops = [(rnd.uniform(-0.08, 0.08),
+                     rnd.choice([(0.55, 0.42, 0.36),
+                                 (0.48, 0.38, 0.32),
+                                 (0.62, 0.46, 0.30)]))]
+        else:
+            sizes = [(0.48, 0.38, 0.32), (0.42, 0.34, 0.30),
+                     (0.50, 0.40, 0.28)]
+            tops = [(-0.30 + rnd.uniform(-0.04, 0.04),
+                     rnd.choice(sizes)),
+                    (0.30 + rnd.uniform(-0.04, 0.04),
+                     rnd.choice(sizes))]
+        th = 0.0
+        for j, (ol, (w, d, h)) in enumerate(tops):
+            tx = px + (rnd.uniform(-0.10, 0.10) if rot90 else ol)
+            ty = py + (ol if rot90 else rnd.uniform(-0.10, 0.10))
+            box(f"{tag}t{j}", (d, w, h) if rot90 else (w, d, h),
+                (tx, ty, top + h0 + h / 2), rnd.choice(P["cards"]),
+                bevel=0.008, rot_z=rnd.uniform(-0.06, 0.06))
+            th = max(th, h)
+        if rnd.random() < 0.35:
+            fh = h0 + th + 0.04
+            box(f"{tag}_film", (1.1, 1.3, fh) if rot90 else (1.3, 1.1, fh),
+                (px, py, top + fh / 2 - 0.01), P["film"])
+        # Shipping label flush on the front bottom carton.
+        lx, ly, face, lyaw, lw = lbl
+        if rot90:
+            box(f"{tag}_lbl", (0.012, min(0.38, lw * 0.8), 0.15),
+                (face + 0.004, ly, top + 0.20), P["paper"], rot_z=lyaw)
+        else:
+            box(f"{tag}_lbl", (min(0.38, lw * 0.8), 0.012, 0.15),
+                (lx, face - 0.004, top + 0.20), P["paper"], rot_z=lyaw)
+
+    # (letter, turned 90 deg, fixed centre, first bay centre, bays, pitch)
+    runs = [("L", True, -14.25, -9.51, 7, 2.7),
+            ("B", False, 9.25, -12.31, 3, 2.7)]
+    for letter, rot90, fixed, start, count, pitch in runs:
+        for bi in range(count):
+            bc = start + bi * pitch
+            bx, by = (fixed, bc) if rot90 else (bc, fixed)
+            for sl in (-1.29, 1.29):  # bay ends along the run
+                for sd in (-0.49, 0.49):  # front/back across the depth
+                    box(f"p_rk{letter}{bi}_up{sl}{sd}", (0.12, 0.12, 5.4),
+                        (bx + (sd if rot90 else sl),
+                         by + (sl if rot90 else sd), 2.7), P["rack_blue"])
             for lv, zb in enumerate((1.6, 3.0, 4.4)):
-                for sy in (-0.49, 0.49):
-                    box(f"p_rk{letter}{bi}_beam{lv}{sy}", (2.58, 0.10, 0.14),
-                        (bx, y + sy, zb), P["rack_orange"])
+                for sd in (-0.49, 0.49):
+                    box(f"p_rk{letter}{bi}_beam{lv}{sd}",
+                        (0.10, 2.58, 0.14) if rot90 else (2.58, 0.10, 0.14),
+                        (bx + (sd if rot90 else 0),
+                         by + (0 if rot90 else sd), zb), P["rack_orange"])
                 # Location label on the beam face, readable from the aisle.
-                box(f"p_rk{letter}{bi}_beam{lv}_lbl", (0.5, 0.012, 0.12),
-                    (bx + rnd.uniform(-0.5, 0.5), y - 0.545, zb), P["paper"])
+                off = rnd.uniform(-0.5, 0.5)
+                if rot90:
+                    box(f"p_rk{letter}{bi}_beam{lv}_lbl", (0.012, 0.5, 0.12),
+                        (bx + 0.545, by + off, zb), P["paper"])
+                else:
+                    box(f"p_rk{letter}{bi}_beam{lv}_lbl", (0.5, 0.012, 0.12),
+                        (bx + off, by - 0.545, zb), P["paper"])
             for lv, z0 in enumerate((0.02, 1.67, 3.07, 4.47)):
                 if rnd.random() < 0.05:
                     continue
-                px = bx + rnd.uniform(-0.1, 0.1)
-                p_pallet(f"p_rk{letter}{bi}l{lv}", px, y, z0, P)
-                top = z0 + 0.134
-                # Bottom layer: tidy 2x2 stack, one height per slot so the
-                # top layer sits flush; varied browns and footprints.
-                h0 = rnd.choice([0.34, 0.38, 0.42])
-                lbl = None
-                for jx in (-0.30, 0.30):
-                    for jy in (-0.24, 0.24):
-                        w, d = rnd.choice([(0.52, 0.40), (0.46, 0.36),
-                                           (0.54, 0.42), (0.40, 0.34)])
-                        cx = px + jx + rnd.uniform(-0.02, 0.02)
-                        cy = y + jy + rnd.uniform(-0.02, 0.02)
-                        yaw = rnd.uniform(-0.05, 0.05)
-                        box(f"p_rk{letter}{bi}l{lv}b{jx}{jy}", (w, d, h0),
-                            (cx, cy, top + h0 / 2), rnd.choice(P["cards"]),
-                            bevel=0.008, rot_z=yaw)
-                        if jx < 0 and jy < 0:
-                            lbl = (cx, cy - d / 2, yaw, w)
-                # Top layer: one centred carton, or two side by side.
-                if rnd.random() < 0.55:
-                    tops = [(rnd.uniform(-0.08, 0.08),
-                             rnd.choice([(0.55, 0.42, 0.36),
-                                         (0.48, 0.38, 0.32),
-                                         (0.62, 0.46, 0.30)]))]
-                else:
-                    sizes = [(0.48, 0.38, 0.32), (0.42, 0.34, 0.30),
-                             (0.50, 0.40, 0.28)]
-                    tops = [(-0.30 + rnd.uniform(-0.04, 0.04),
-                             rnd.choice(sizes)),
-                            (0.30 + rnd.uniform(-0.04, 0.04),
-                             rnd.choice(sizes))]
-                th = 0.0
-                for j, (ox, (w, d, h)) in enumerate(tops):
-                    box(f"p_rk{letter}{bi}l{lv}t{j}", (w, d, h),
-                        (px + ox, y + rnd.uniform(-0.10, 0.10),
-                         top + h0 + h / 2), rnd.choice(P["cards"]),
-                        bevel=0.008, rot_z=rnd.uniform(-0.06, 0.06))
-                    th = max(th, h)
-                if rnd.random() < 0.35:
-                    fh = h0 + th + 0.04
-                    box(f"p_rk{letter}{bi}l{lv}_film", (1.3, 1.1, fh),
-                        (px, y, top + fh / 2 - 0.01), P["film"])
-                # Shipping label flush on the front bottom carton.
-                lx, ly, lyaw, lw = lbl
-                box(f"p_rk{letter}{bi}l{lv}_lbl",
-                    (min(0.38, lw * 0.8), 0.012, 0.15),
-                    (lx, ly - 0.004, top + 0.20), P["paper"], rot_z=lyaw)
-            box(f"p_rk{letter}{bi}_tag", (0.5, 0.012, 0.18), (bx + 0.75, y - 0.56,
-                1.6), P["paper"])
-            text(f"p_rk{letter}{bi}_txt", f"{letter}{bi + 1}", (bx + 0.75, y - 0.575,
-                 1.6), 0.13, P["black"])
-    bpy.data.objects["sign_raf_bg"].location = (-10, -3.75, 5.2)
-    bpy.data.objects["sign_raf"].location = (-10, -3.78, 5.2)
+                j = rnd.uniform(-0.1, 0.1)
+                px, py = (bx, by + j) if rot90 else (bx + j, by)
+                _load(f"p_rk{letter}{bi}l{lv}", px, py, z0, rot90)
+            if rot90:
+                box(f"p_rk{letter}{bi}_tag", (0.012, 0.5, 0.18),
+                    (bx + 0.56, by + 0.75, 1.6), P["paper"])
+                text(f"p_rk{letter}{bi}_txt", f"{letter}{bi + 1}",
+                     (bx + 0.575, by + 0.75, 1.6), 0.13, P["black"],
+                     rot=(math.radians(90), 0, math.radians(90)))
+            else:
+                box(f"p_rk{letter}{bi}_tag", (0.5, 0.012, 0.18),
+                    (bx + 0.75, by - 0.56, 1.6), P["paper"])
+                text(f"p_rk{letter}{bi}_txt", f"{letter}{bi + 1}",
+                     (bx + 0.75, by - 0.575, 1.6), 0.13, P["black"])
+    # RAFLAR sign re-hung in front of the back-wall run, facing the hall.
+    bpy.data.objects["sign_raf_bg"].location = (-9.6, 8.0, 5.2)
+    bpy.data.objects["sign_raf"].location = (-9.6, 7.97, 5.2)
     for k, dx in enumerate((-1.0, 1.0)):
-        cyl(f"p_sign_cable{k}", 0.015, 2.0, (-10 + dx, -3.75, 6.45),
+        cyl(f"p_sign_cable{k}", 0.015, 2.0, (-9.6 + dx, 8.0, 6.45),
             P["dark_steel"])
 
 
