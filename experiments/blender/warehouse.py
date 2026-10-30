@@ -4609,6 +4609,26 @@ MEET_TOP = 1.35     # table top height (a standing table for the 2.4 m cast)
 MEET_STOOL_R = 2.4  # stools on this circle; the simulator stands the cast 0.5 m behind
 
 
+def _meshy_place(fname, name, xy, yaw, scale):
+    """Import a Meshy model from assets/meshy at real-world size times scale, at xy on the
+    floor, turned by yaw."""
+    path = REPO / "assets" / "meshy" / fname
+    if not path.exists():
+        return None
+    before = set(bpy.data.objects)
+    bpy.ops.import_scene.gltf(filepath=str(path))
+    new = [o for o in bpy.data.objects if o not in before and o.type == "MESH"]
+    if not new:
+        return None
+    ob = new[0]
+    ob.name = name
+    ob.rotation_mode = "XYZ"
+    ob.rotation_euler = (0, 0, yaw)
+    ob.scale = (scale, scale, scale)
+    ob.location = (xy[0], xy[1], 0.0)
+    return ob
+
+
 def _meshy(fname, name, xy, radius, height, tint=None):
     """Import a Meshy model from assets/meshy, sized to radius x height at xy (origin at
     its base), optionally tinted (a Multiply node the glTF export reads as a colour factor)."""
@@ -4934,6 +4954,13 @@ def polish(cams, V):
     p_shell(P)
     p_lights(P)
     p_sky(P)
+    # The LEGO loading dock outside (lego_front.py, Muse Code) and two Meshy extras:
+    # a second truck waiting on the apron and a parked forklift by the racks.
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    from lego_front import build_lego_front
+    build_lego_front(P, box, cyl, text, mat)
+    _meshy_place("truck.glb", "p_lego_truck2", (7.4, 21.0), math.radians(90), 1.3)
+    _meshy_place("forklift.glb", "p_lego_forklift2", (-11.8, 3.2), math.radians(180), 1.35)
     p_truck(P, rnd)
     p_door(P, V["light"])
     p_forklift(P)
