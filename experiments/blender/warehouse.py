@@ -4064,14 +4064,14 @@ def p_rooms(P):
             for _sg in (-1, 1):
                 box(f"{pre}sidepanel{_sg}", (0.05, 0.90, 0.91),
                     (xc + _sg * 1.25, yd, 0.455), sam_white)
-            _mx = xc - 0.8
+            _mpx = xc - 0.8
             for k in range(5):
                 box(f"{pre}pslat{k}", (0.45, 0.05, 0.02),
-                    (_mx, yd - 0.14 + k * 0.07, 0.98), P["wood"])
+                    (_mpx, yd - 0.14 + k * 0.07, 0.98), P["wood"])
             for _ix in range(3):
                 for _iy in range(2):
                     for _iz in range(2):
-                        _cx = _mx - 0.12 + _ix * 0.12
+                        _cx = _mpx - 0.12 + _ix * 0.12
                         _cy = yd - 0.06 + _iy * 0.12
                         _cz = 1.05 + _iz * 0.12
                         box(f"{pre}mini{_ix}_{_iy}_{_iz}", (0.11, 0.11, 0.11),
