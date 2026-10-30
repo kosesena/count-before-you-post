@@ -844,10 +844,10 @@ function charColour(id) {
 const ZONE = { x0: -2.48, x1: 2.48, y0: 3.32, y1: 7.68 };   // receiving zone (yellow tape)
 // The gathering table: a point on the floor in Blender/sim coordinates (the same
 // frame as PEOPLE[].b). The mesh may not be in dock.glb yet, so nothing here may
-// look it up by name. The stools ring it at 1.7 m, so the standing spots are just behind
-// them at 2.2 m; 0 deg = +x.
-const MEET = { x: -4.0, y: -6.5 };
-const MEET_R = 2.2;
+// look it up by name. The stools ring it at 2.4 m, so the standing spots are just behind
+// them at 2.9 m (stools at 2.4); 0 deg = +x.
+const MEET = { x: 1.0, y: -7.0 };
+const MEET_R = 2.9;
 const MEET_SPOT_ANGLE = { sef: 240, kapi: 300, spark: 180, sam: 0 };
 const DOOR = { x0: -1.0, x1: 1.0, y0: 9.44, y1: 10.76 };    // doorway volume: the open dock door,
   // listed in colliders.json but the forklift drives through it up the leveller.
@@ -3301,8 +3301,8 @@ function stepCamera(dt) {
       // Desktop: the table sits slightly below the middle, left of the result
       // card; phones: the table rides in the upper half, above the result sheet.
       let tpx, tpy, tpz, tlx, tly, tlz;
-      if (camera.aspect < 0.9) { tpx = -4.0; tpy = 7.5; tpz = 6.0; tlx = -4.0; tly = -6.4; tlz = 0.5; }
-      else { tpx = -4.0; tpy = 3.0; tpz = 7.0; tlx = -4.0; tly = -6.9; tlz = 0.8; }
+      if (camera.aspect < 0.9) { tpx = 1.0; tpy = 9.0; tpz = 5.6; tlx = 1.0; tly = -6.9; tlz = 0.6; }
+      else { tpx = 1.0; tpy = 5.0; tpz = 5.8; tlx = 1.0; tly = -7.4; tlz = 0.9; }
       if (reducedMotion) { px = tpx; py = tpy; pz = tpz; lx = tlx; ly = tly; lz = tlz; k = 1; }
       else {
         mc.t += dt;
@@ -4307,8 +4307,7 @@ function feedTypewrite(rowEl, row) {
     if (!msgEl || reducedMotion) return;
     if (row.isGate) {
       if (!row.gateReason) return;
-      const spans = msgEl.querySelectorAll("span");
-      const reasonSpan = spans.length > 1 ? spans[spans.length - 1] : null;
+      const reasonSpan = msgEl.querySelector(".freason");
       if (!reasonSpan) return;
       const full = `· ${row.gateReason}`;
       reasonSpan.textContent = "";
@@ -4411,7 +4410,7 @@ function feedRowEl(row, num) {
   let msgHTML = "";
   if (row.isGate) {
     const cls = row.gateAction === "post" ? "post" : row.gateAction === "block" ? "block" : "human";
-    msgHTML = `<span class="verdict-word ${cls} stamp">${esc(row.gateWord)}</span>${row.gateReason ? ` <span>· ${esc(row.gateReason)}</span>` : ""}`;
+    msgHTML = `<span class="verdict-word ${cls} stamp">${esc(row.gateWord)}</span>${row.gateReason ? ` <span class="freason">· ${esc(row.gateReason)}</span>` : ""}`;
   } else {
     msgHTML = esc(row.text);
   }
@@ -5307,8 +5306,7 @@ function feedTypewriteSetup(rowEl, row) {
     if (!msgEl) return;
     if (row.isGate) {
       if (!row.gateReason) return;
-      const spans = msgEl.querySelectorAll("span");
-      const rs = spans.length > 1 ? spans[spans.length - 1] : null;
+      const rs = msgEl.querySelector(".freason");
       if (!rs) return;
       rs.textContent = "";
       const caret = document.createElement("span");
@@ -5401,8 +5399,7 @@ function feedExecTypewrite(player, ev) {
     if (ev.row && ev.row.isGate) {
       const msgEl = el.querySelector(".feed-msg");
       if (!msgEl) return;
-      const spans = msgEl.querySelectorAll("span");
-      const rs = spans.length > 1 ? spans[spans.length - 1] : null;
+      const rs = msgEl.querySelector(".freason");
       if (!rs) return;
       const full = ev.full || "";
       rs.textContent = full.slice(0, ev.pos);
