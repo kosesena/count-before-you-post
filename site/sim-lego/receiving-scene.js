@@ -104,7 +104,7 @@ export function buildReceivingScene({T,scene,group,box,cyl,label,twoSidedLabel,f
   // Briefing is a protected visitor area, not a required receiving operation.
   for(const z of [3,5,7,9,11])box(equipment,4,.85,z,.1,1.4,.1,C.teal);
   box(equipment,4,1.5,7,.1,.1,8,C.teal);box(equipment,4,.7,7,.1,.08,8,C.teal);
-  hangingSign(['BRIEFING','PEDESTRIANS ONLY'],0,11.4,4.2,'#167c70');
+  hangingSign(['BRIEFING','PEDESTRIANS ONLY'],-1,7,4.2,'#167c70',6.2);   // over the meeting table's centre (Sena, 1 Nov)
   flush(equipment);
   function worker(name,x,y,z,color){
     const g=group(root,x,y,z);box(g,0,1.15,0,.66,.65,.4,color);box(g,0,1.14,.22,.68,.09,.025,C.white);
