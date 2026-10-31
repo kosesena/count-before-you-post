@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Toy box options</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Inter:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  /* The demo video's toy box: one variant per ?v=, drawn with the cast's real cut-outs.
+     The project's own name, no company logo (it would read as an official product). */
+  :root { --navy: #0b1f4d; --orange: #f97316; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    display: grid; place-items: center; overflow: hidden;
+    background: radial-gradient(120% 90% at 30% 20%, #f3e3c9 0%, #d9b98c 55%, #b48a58 100%);
+    font-family: Inter, system-ui, sans-serif;
+  }
+  .stage { perspective: 2200px; }
+  .box {
+    --w: 1040px; --h: 640px; --d: 150px;
+    position: relative; width: var(--w); height: var(--h);
+    transform-style: preserve-3d; transform: rotateX(14deg) rotateY(-24deg) rotateZ(1deg);
+  }
+  .face { position: absolute; overflow: hidden; backface-visibility: hidden; }
+  .front { inset: 0; transform: translateZ(calc(var(--d) / 2)); border-radius: 6px;
+    box-shadow: 0 60px 90px rgba(60, 30, 0, .45); }
+  .side { width: var(--d); height: var(--h); right: calc(var(--d) / -2);
+    transform: rotateY(90deg); }
+  .top { width: var(--w); height: var(--d); top: calc(var(--d) / -2);
+    transform: rotateX(90deg); }
+  .gloss::after { content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(115deg, rgba(255,255,255,.35) 0%, rgba(255,255,255,0) 32%,
+      rgba(255,255,255,0) 70%, rgba(255,255,255,.12) 100%); }
+  .cast { position: absolute; display: flex; align-items: flex-end; }
+  .cast img { display: block; flex: 1 1 0; min-width: 0; width: 100%; height: auto; object-fit: contain;
+    object-position: bottom; filter: drop-shadow(0 10px 10px rgba(0,0,0,.35)); }
+  .title { font-family: Nunito, sans-serif; font-weight: 900; line-height: .92;
+    letter-spacing: -.01em; margin: 0; }
+  .muse { font-weight: 700; letter-spacing: .02em; }
+  .badge { position: absolute; display: grid; place-items: center; text-align: center;
+    border-radius: 50%; font-family: Nunito, sans-serif; font-weight: 900; line-height: 1; }
+  .names { position: absolute; display: flex; font: 700 13px/1.15 Inter, sans-serif;
+    text-align: center; }
+  .dock { position: absolute; border-radius: 14px; overflow: hidden; }
+  .dock img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .stud { position: absolute; width: 34px; height: 34px; border-radius: 50%; }
+  .tiny { position: absolute; font: 600 12px/1.3 Inter, sans-serif; opacity: .85; }
+  .v { display: none; } .v.on { display: block; }
+</style>
+</head>
+<body>
+<div class="stage">
+
+<!-- A: classic white set box, navy title, dock photo, cast on grey stands -->
+<div class="box v" id="A">
+  <div class="face front gloss" style="background:#fff">
+    <div style="position:absolute;inset:0 0 auto 0;height:16px;background:var(--navy)"></div>
+    <h1 class="title" style="position:absolute;left:46px;top:46px;font-size:92px;color:var(--navy)">COUNT<br>BEFORE<br>YOU POST</h1>
+    <div class="muse" style="position:absolute;left:50px;top:340px;font-size:26px;color:var(--navy)">Built with Muse</div>
+    <div class="badge" style="left:50px;top:400px;width:118px;height:118px;background:var(--orange);color:#fff;font-size:20px;box-shadow:0 0 0 6px #fff,0 0 0 9px var(--orange)">WARE-<br>HOUSE<br><span style="font-size:42px">01</span></div>
+    <div class="dock" style="right:34px;top:40px;width:520px;height:300px;box-shadow:0 8px 24px rgba(0,0,0,.25)"><img src="../story-5-dive.png" style="object-position:50% 60%"></div>
+    <div class="cast" style="left:200px;right:30px;bottom:22px;height:250px;gap:6px"></div>
+    <div class="tiny" style="left:50px;bottom:24px;color:var(--navy)">7 agents · 1 gate · 6 deliveries</div>
+  </div>
+  <div class="face side" style="background:var(--navy)"></div>
+  <div class="face top" style="background:#e9edf5"></div>
+</div>
+
+<!-- B: navy night box, glowing title, cast big in front of the dock -->
+<div class="box v" id="B">
+  <div class="face front gloss" style="background:linear-gradient(180deg,#0b1f4d 0%,#152c66 55%,#0b1734 100%)">
+    <div class="dock" style="inset:0;border-radius:0;opacity:.55"><img src="../../../site/img/hero-dock.jpg"></div>
+    <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,31,77,.15) 0%,rgba(11,23,52,.92) 78%)"></div>
+    <h1 class="title" style="position:absolute;left:0;right:0;top:44px;text-align:center;font-size:66px;white-space:nowrap;color:#fff;text-shadow:0 0 30px rgba(249,115,22,.55)">COUNT BEFORE YOU POST</h1>
+    <div class="muse" style="position:absolute;left:0;right:0;top:126px;text-align:center;font-size:24px;color:#fdba74">Built with Muse</div>
+    <div class="badge" style="right:40px;top:186px;width:104px;height:104px;background:#facc15;color:var(--navy);font-size:17px">WARE-<br>HOUSE<br><span style="font-size:36px">01</span></div>
+    <div class="cast" style="left:40px;right:40px;bottom:26px;height:330px;gap:6px"></div>
+  </div>
+  <div class="face side" style="background:#081633"></div>
+  <div class="face top" style="background:#1d3577"></div>
+</div>
+
+<!-- C: bright brick box, studs along the top, colour band per character -->
+<div class="box v" id="C">
+  <div class="face front gloss" style="background:#ffd23f">
+    <div id="studs" style="position:absolute;left:0;right:0;top:0;height:64px;background:#f2b705"></div>
+    <h1 class="title" style="position:absolute;left:44px;top:92px;font-size:84px;color:var(--navy)">COUNT BEFORE<br>YOU POST</h1>
+    <div class="muse" style="position:absolute;left:48px;top:268px;font-size:26px;color:var(--navy)">Built with Muse</div>
+    <div class="badge" style="right:48px;top:96px;width:120px;height:120px;background:#e11d48;color:#fff;font-size:20px;transform:rotate(-8deg)">WARE-<br>HOUSE<br><span style="font-size:42px">01</span></div>
+    <div id="bands" style="position:absolute;left:0;right:0;bottom:0;height:250px;display:flex"></div>
+    <div class="cast" style="left:10px;right:10px;bottom:10px;height:240px;gap:4px"></div>
+  </div>
+  <div class="face side" style="background:#e0a800"></div>
+  <div class="face top" style="background:#ffe27a"></div>
+</div>
+
+<!-- D: kraft cardboard box, stamped like a delivery carton -->
+<div class="box v" id="D">
+  <div class="face front gloss" style="background:#c99a62">
+    <div style="position:absolute;left:50%;top:0;bottom:0;width:120px;margin-left:-60px;background:rgba(240,220,170,.55)"></div>
+    <div style="position:absolute;left:44px;top:40px;padding:14px 22px;border:5px solid var(--navy);border-radius:10px;transform:rotate(-2deg)">
+      <h1 class="title" style="font-size:74px;color:var(--navy)">COUNT BEFORE<br>YOU POST</h1>
+    </div>
+    <div class="muse" style="position:absolute;left:52px;top:270px;font-size:24px;color:#3b2a14">Built with Muse · handle with care</div>
+    <div class="badge" style="right:54px;top:40px;width:130px;height:130px;border:6px solid #b91c1c;color:#b91c1c;font-size:20px;transform:rotate(10deg)">WARE-<br>HOUSE<br><span style="font-size:44px">01</span></div>
+    <div class="tiny" style="right:56px;top:196px;color:#3b2a14;font:800 22px/1 Nunito">▲ THIS SIDE UP</div>
+    <div class="cast" style="left:40px;right:40px;bottom:22px;height:270px;gap:6px"></div>
+  </div>
+  <div class="face side" style="background:#b4844f"></div>
+  <div class="face top" style="background:#d8ad78"></div>
+</div>
+
+</div>
+<script>
+  const CAST = ["spark", "sam", "voice", "iris", "ada", "wonder", "rover"];
+  const COL = ["#f97316", "#3b82f6", "#1e3a8a", "#db2777", "#0f766e", "#ca8a04", "#0d9488"];
+  const v = new URLSearchParams(location.search).get("v") || "A";
+  const box = document.getElementById(v); box.classList.add("on");
+  const h = { A: 230, B: 300, C: 230, D: 250 }[v];
+  for (const id of CAST) {
+    const im = document.createElement("img");
+    im.src = `../../../assets/mascots/hero/${id}.png`; im.style.maxHeight = h + "px";
+    box.querySelector(".cast").appendChild(im);
+  }
+  if (v === "C") {
+    const s = document.getElementById("studs");
+    for (let x = 18; x < 1040; x += 52) {
+      const d = document.createElement("div"); d.className = "stud";
+      d.style.cssText += `left:${x}px;top:15px;background:radial-gradient(circle at 35% 30%,#ffe680,#f2b705 60%,#c98f00)`;
+      s.appendChild(d);
+    }
+    const b = document.getElementById("bands");
+    for (const c of COL) { const d = document.createElement("div"); d.style.cssText = `flex:1;background:${c}`; b.appendChild(d); }
+  }
+</script>
+</body>
+</html>
