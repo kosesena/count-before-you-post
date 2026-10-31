@@ -157,6 +157,37 @@ RESULT_DIRECTIONS = {
         "like, perfectly aligned, no clutter."),
 }
 
+# Sena (31 Oct): the whole demo page in LEGO style, several directions to choose from. The
+# reference is the live page (site-ref.png) and the LEGO dock Muse Image drew (lego-hall.png).
+LEGO_BASE = (
+    "A redesign of this web page (the first image is the current page) in a LEGO style; the "
+    "second image shows the warehouse dock already rebuilt in LEGO. Keep its content: the "
+    "badge 'Live demo · recorded runs, no API calls from this page', the title 'Count Before "
+    "You Post', the tagline 'A verification gate between AI agents and the ERP', a primary "
+    "button 'Drive the dock' and a link 'See the six deliveries', and the row 'Built with "
+    "Muse' with the seven toy characters as cards (Muse Spark, SAM 3.1, Muse Voice, Muse "
+    "Image, Muse Code, Muse Wonder, Muse Spark Open). Desktop browser layout, 16:9, crisp, "
+    "polished, premium web design mockup, no device frame. Direction: ")
+LEGO_DIRECTIONS = {
+    "lego-bright-baseplate": (
+        "bright and clean: the page sits on a light grey LEGO baseplate with fine studs, the "
+        "hero is the LEGO dock scene photographed in soft daylight, the cards are smooth white "
+        "tiles with a coloured 1x2 brick on top in each character's colour, the button a "
+        "glossy blue brick. Lots of white space."),
+    "lego-night-dock": (
+        "cinematic at night like the current page: the LEGO dock with warm lights and the open "
+        "LEGO truck as the hero, the title in bold rounded type, the cards as dark grey studded "
+        "plates with the characters as minifigures standing on top of them."),
+    "lego-instruction-booklet": (
+        "like a LEGO building-instruction booklet: cream paper, numbered steps 1 to 6 for the "
+        "six deliveries, part callout boxes for the seven characters, clean isometric "
+        "illustrations of the dock, playful but very tidy."),
+    "lego-box-art": (
+        "like the front of a premium LEGO set box: the dock as a hero model shot on a gradient, "
+        "the title as the set name with a set number badge '01', the seven characters lined "
+        "up as the included minifigures along the bottom, the button as a bright yellow brick."),
+}
+
 REST_DIRECTIONS = {
     "rest-night": (
         "the night continues. The whole page keeps the hero's dusk dock mood: deep navy "
@@ -238,12 +269,14 @@ def draw(shot, name):
     refs = ([shot] + [HERE.parent / "assets" / "mascots" / "hero" / f"{c}.png" for c in ("spark", "sam", "voice")]
             + [HELLO / "kapi.jpg"] if name in CAST_DIRECTIONS else
             [shot, LOWER] if name in REST_DIRECTIONS else
+            [shot, OUT / "lego-hall.png"] if name in LEGO_DIRECTIONS else
             [shot, HELLO / "kapi.jpg", HELLO / "sef.jpg",
              HERE.parent / "site" / "img" / "en" / "belirsiz-camera.jpg"] if name in RESULT_DIRECTIONS else
             [shot] + [HELLO / f"{c}.jpg" for c in ("spark", "sam", "voice")])
     prompt = (CAST_BASE + CAST_DIRECTIONS[name] if name in CAST_DIRECTIONS else
               SIM_BASE + SIM_DIRECTIONS[name] if name in SIM_DIRECTIONS else
               RESULT_BASE + RESULT_DIRECTIONS[name] if name in RESULT_DIRECTIONS else
+              LEGO_BASE + LEGO_DIRECTIONS[name] if name in LEGO_DIRECTIONS else
               REST_BASE + REST_DIRECTIONS[name] if name in REST_DIRECTIONS else BASE + DIRECTIONS[name])
     size = "1024x1536" if name in REST_DIRECTIONS or name in CAST_DIRECTIONS else "1792x1024"
     body = {"model": "muse-image-1.0", "n": 1, "size": size, "output_format": "png",
@@ -272,6 +305,10 @@ if __name__ == "__main__":
             continue
         if n == "rest":
             for m in REST_DIRECTIONS:
+                draw(Path(sys.argv[1]), m)
+            continue
+        if n == "lego":
+            for m in LEGO_DIRECTIONS:
                 draw(Path(sys.argv[1]), m)
             continue
         if n == "result":
