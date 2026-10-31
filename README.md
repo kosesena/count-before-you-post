@@ -218,11 +218,18 @@ where the demo page's *Drive the dock* button leads: the same warehouse in toy b
 - **The recorded decision drives the floor.** A recorded *post* allows put-away; *block* and
   *ask Şef* both go to the hold area, where Şef and the receiver check the load. Choices made
   there are training decisions, not new AI results.
-- **The cast at work**: the ten characters in their offices along the wall, the recorded
-  conversation at the meeting table, and the recorded evidence, from `data.json`.
+- **Talk to the team.** Open the recorded conversation and message any agent: ask Şef "Count",
+  "Decision" or "Product" and the answer comes from that delivery's recorded evidence, in English
+  or Turkish, with the recorded source one tap away. Evidence, Workflow and Locate (the agent in
+  the warehouse) sit above the chat.
+- **The cast at work**: the ten characters in their offices along the wall, the meeting table,
+  and the recorded evidence, from `data.json`.
 - No model calls and no ERP writes. Code and notes: [`site/sim-lego/`](site/sim-lego/README.md).
 
-### The first simulator (written by Muse Code)
+![The Brick Dock's chat with Şef on a wrong-product delivery: asked "Count", Şef answers from the recorded evidence, "12 sure, 0 doubtful; the note says 12 cartons; wrong product"](assets/readme/brick-dock-chat.jpg)
+
+<details>
+<summary><b>The first simulator, written by Muse Code</b> (<a href="https://count-before-you-post.vercel.app/sim/">/sim</a>)</summary>
 
 **[count-before-you-post.vercel.app/sim](https://count-before-you-post.vercel.app/sim/)**: pick
 one of the six deliveries, drive the forklift into the trailer, bring the pallet to the yellow
@@ -264,6 +271,8 @@ driver's seat, overview); on a phone, a touch joystick.
 Written by Muse Code over many rounds (see [What Muse Code built](#what-muse-code-built)); the
 dock and the rooms are Blender scenes (`experiments/blender/warehouse.py`, `CBYP_POLISH=1`)
 exported for the browser by `experiments/web/export_dock.py`.
+
+</details>
 
 ## Meet the cast
 
