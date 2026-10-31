@@ -599,6 +599,17 @@ footer p { margin: 4px 0; }
 .toybox-bag .pop b { display: block; font-size: 17px; }
 .toybox-bag:hover .pop, .toybox-bag:focus-visible .pop { opacity: 1; transform: translate(-50%, -10%) scale(1); }
 .toybox-bag:hover, .toybox-bag:focus-visible { z-index: 2; }
+.toybox-bag canvas.fx { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2;
+  opacity: 0; transition: opacity .35s ease; }
+.toybox-bag canvas.fx.on { opacity: 1; }
+/* A soft dusk behind the grown figure, so its light effect reads on the bright box picture. */
+.toybox-bag .pop::before { content: ""; position: absolute; left: 8%; right: 8%; top: 2%; bottom: 10%; z-index: 0;
+  border-radius: 50%; background: rgba(12,14,30,.62); filter: blur(22px);
+  opacity: 0; transition: opacity .3s; }
+.toybox-bag:hover .pop::before, .toybox-bag:focus-visible .pop::before { opacity: 1; }
+.toybox-bag .pop img { position: relative; z-index: 1; }
+.toybox-bag canvas.fx { filter: drop-shadow(0 0 1.5px rgba(10,10,30,.9)) drop-shadow(0 0 5px rgba(10,10,30,.5)); }
+.toybox-bag .pop > span { position: relative; z-index: 3; }
 @media (prefers-reduced-motion: reduce) { .toybox-bag .pop { transition: opacity .2s; transform: translate(-50%, -10%); } }
 /* On the closed box the figure grows where it stands (the title is just above), its label under its feet. */
 #toyboxFigs .toybox-bag .pop { bottom: -26%; height: 152%; transform: translate(-50%, 4%) scale(.8); }
@@ -1942,14 +1953,22 @@ function buildToyboxBags(data) {
       a.dataset.x0 = x0; a.dataset.x1 = x1;
       a.setAttribute("aria-label", c.name + " · " + c.model);
       const pop = document.createElement("span"); pop.className = "pop"; pop.setAttribute("aria-hidden", "true");
-      const img = document.createElement("img"); img.alt = ""; img.loading = "lazy";
+      const img = document.createElement("img"); img.alt = ""; img.loading = "lazy"; img.className = "cutout";
       /* The hero figures (transparent, whole); Kapı, Şef and Glimmer have no hero figure, so
          their cut-outs with SAM's small holes filled from the drawing (img/pop-<id>.webp). */
       img.src = (data.hero && data.hero.tools && data.hero.tools[id]) || "img/pop-" + id + ".webp";
       const cap = document.createElement("span");
       cap.innerHTML = "<b></b>"; cap.querySelector("b").textContent = c.name;
       cap.append(c.model);
-      pop.append(img, cap); a.append(pop); nav.append(a);
+      /* The character's own light effect from the cast section (FX, startFx), around the figure. */
+      pop.dataset.fx = id;
+      const fx = document.createElement("canvas"); fx.className = "fx"; fx.setAttribute("aria-hidden", "true");
+      pop.append(fx, img, cap); a.append(pop); nav.append(a);
+      let fxT = 0;
+      const on = () => { clearTimeout(fxT); fxT = setTimeout(() => startFx(pop), 300); };
+      const off = () => { clearTimeout(fxT); if (fxActive && fxActive.card === pop) stopFx(); };
+      a.addEventListener("pointerenter", on); a.addEventListener("focus", on);
+      a.addEventListener("pointerleave", off); a.addEventListener("blur", off);
     });
   });
   placeToyboxBags();
