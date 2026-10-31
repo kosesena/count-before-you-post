@@ -307,15 +307,16 @@ speaks Turkish too: *"on iki koli geldi"* means *"twelve cartons came"*.
 
 ## The evidence
 
-A receiving dock built in Blender (headless, `experiments/blender/warehouse.py`): the truck at
-the door, the delivery note, the pallet in the yellow box under the ceiling camera.
+The numbers come from a receiving dock built in Blender (headless,
+`experiments/blender/warehouse.py`): the truck at the door, the delivery note, the pallet in the
+yellow box under the ceiling camera. Today the same warehouse is also the Brick Dock, in toy
+bricks (built with OpenAI Codex): the floor plan, and the receiving lane under the camera rig.
 
-![The truck at the dock, the delivery note, the truck outside](assets/readme/dock-views.jpg)
+![The Brick Dock from above, and its receiving lane under the camera rig](assets/readme/brick-dock-views.jpg)
 
 What the models measured is the ceiling camera, one frame per case. These are the frames every
-number below comes from. The dock views above are a later dress-up pass (`CBYP_POLISH=1`:
-truck, racking, lighting) that re-renders only the overview cameras; the ceiling frames are
-the original, measured renders.
+number below comes from: the original Blender renders, kept exactly as they were measured, which
+is why they look older than the rest of this page.
 
 ![The six ceiling-camera frames: ok, wrong product, short, injected note, damaged, stacked](assets/readme/ceiling-cases.jpg)
 
