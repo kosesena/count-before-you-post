@@ -55,9 +55,15 @@ PROPS = {
                 ["glowing orb", "crystal ball", "hand"]),
     "iris": ("holding the paint palette and paintbrush, the shoulder bag on, as in the reference",
              ["paint palette", "paintbrush", "bag"]),
-    # Ada as Sena chose her: no laptop, hands free (the laptop version was wrong).
-    "ada": ("waving with one hand, both hands empty and holding nothing: no laptop, no "
-            "computer, no robot, no props", []),
+    # Ada, Sena 31 Oct: the blue infinity sign on her hoodie like the rest of the cast, and
+    # an open dark grey laptop like Sam's tablet (the earlier pink one with stickers was wrong).
+    "ada": ("waving with one hand and holding an open dark grey laptop in the other, the "
+            "laptop the same dark grey and style as the tablet of the second reference "
+            "character; the screen faces HER, not the camera: we see the plain back of the "
+            "lid, no screen, no code visible to us, no stickers, no pink; on the chest "
+            "of her plain mint-green hoodie the small blue infinity sign, exactly like the "
+            "one on the second reference character's hoodie; no robot, no other props",
+            ["laptop", "hand"]),
 }
 
 # SAM found no mask for Sam's tablet or Voice's microphone under any word we tried. For these
@@ -75,7 +81,12 @@ PROMPT = (
 
 
 def _jpeg(path, width=1024):
-    im = Image.open(path).convert("RGB")
+    im = Image.open(path)
+    if im.mode == "RGBA":   # a cut-out portrait: flatten on light grey, not black
+        flat = Image.new("RGB", im.size, (214, 214, 214))
+        flat.paste(im, mask=im.getchannel("A"))
+        im = flat
+    im = im.convert("RGB")
     if im.width > width:
         im = im.resize((width, round(im.height * width / im.width)))
     buf = io.BytesIO()
@@ -89,6 +100,8 @@ def draw(name):
         return
     hello = CAST[name]
     refs = [MASCOTS / "hello" / f"{hello}.jpg"]
+    if name == "ada":   # her current look first, Sam for the logo and the device
+        refs = [OUT / "ada-v1.png", OUT / "sam.png"]
     sheet = MASCOTS / "sheets" / f"{hello}.jpg"
     if sheet.exists():
         refs.append(sheet)
