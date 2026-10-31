@@ -41,7 +41,7 @@ def import_figure(cid):
         new.remove(o)
         bpy.data.objects.remove(o)
     arm = next(o for o in new if o.type == "ARMATURE")
-    mesh = next(o for o in new if o.type == "MESH")
+    mesh = max((o for o in new if o.type == "MESH"), key=lambda o: len(o.data.vertices))
     s = HEIGHT.get(cid, 2.4) / mesh.dimensions.z
     arm.scale = (s, s, s)
     # The figures face -y as imported; yaw pi turns them toward +y (the yard).
