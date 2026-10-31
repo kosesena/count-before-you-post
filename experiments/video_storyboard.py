@@ -32,6 +32,15 @@ BASE = (
     "face is never visible. The toys are the toy-brick warehouse dock, truck, cartons, traffic "
     "light and the seven toy figures from the reference images, the same style and colours. "
     "No text overlays, no brand names or logos. Shot: ")
+# Shots with no child in them: the base above says a child is at the table, so these get
+# their own base (the model drew the child anyway when told only in the shot line).
+BASE_NO_CHILD = (
+    "A frame from a short film, cinematic, photorealistic, shallow depth of field. NO PEOPLE "
+    "AT ALL in this shot: no child, no hands, no hair, no shadow of a person. The toys are the "
+    "toy-brick warehouse dock, truck, cartons, traffic light and the seven toy figures from "
+    "the reference images, the same style and colours, standing on a wooden table. No text "
+    "overlays, no brand names or logos. Shot: ")
+NO_CHILD = {"1b-leave", "1c-alive", "6-night", "7-go", "5-dive"}
 SHOTS = {
     "1-arrive": (
         "the very start, NOTHING IS BUILT YET: no warehouse, no truck, no figures standing; "
@@ -60,6 +69,32 @@ SHOTS = {
         "amber at the side, the figures small in the background; no child, no hands, no "
         "hair; the table edges and the room are a soft blur at the frame edges, as if we "
         "have shrunk into the toy world."),
+    # Sena's story (31 Oct): the child leaves for a moment, the figures come alive and talk,
+    # freeze when the child comes back, and at night, when the child has gone to bed, the
+    # game begins. Shots after 1-arrive, numbered in story order.
+    "1b-leave": (
+        "top-down, exactly the table of the first reference image a moment later: NOTHING IS "
+        "BUILT, only the bare grey baseplate with three or four bricks clicked on it, the "
+        "colour-sorted piles of loose bricks around it, the open cardboard box with the seven "
+        "figures lying in it; at the bottom edge an empty wooden chair pushed back; quiet."),
+    "1c-alive": (
+        "NOT top-down: a close-up at the height of the toy figures, inside the open cardboard "
+        "box on the table; the seven toy figures have sat up and are leaning together, talking, "
+        "one peeking over the edge of the box toward where the child went; the empty chair a "
+        "soft blur behind; warm daylight; playful and secretive."),
+    "1d-shh": (
+        "same close-up at figure height: the figures startled, one with a finger on its lips "
+        "going 'shh', two diving back down into the box, a child's shadow falling across the "
+        "table from the side; motion blur on the figures; funny and tense."),
+    "6-night": (
+        "top-down again, late evening: the room is dark, moonlight from a window and a soft "
+        "night light; on the table the finished toy-brick dock, the truck at the door and the "
+        "seven figures on their stands, frozen; the chair empty, the child gone to bed."),
+    "7-go": (
+        "NOT top-down: a low dramatic close-up at figure height in the dark, the seven figures "
+        "on the dock apron turning their heads together toward the camera, the small traffic "
+        "light flickering on in amber, the figure in the cardboard-box costume lifting its "
+        "striped barrier; the moment the game begins."),
 }
 
 
@@ -67,9 +102,11 @@ def draw(name):
     dst = OUT / f"story-{name}.png"
     if dst.exists():
         return
+    refs = [OUT / "story-1-arrive.png"] + REFS if name == "1b-leave" else REFS
     body = {"model": "muse-image-1.0", "n": 1, "size": "1792x1024", "output_format": "png",
-            "response_format": "b64_json", "prompt": BASE + SHOTS[name],
-            "images": [{"image_url": _jpeg(p, 1536)} for p in REFS]}
+            "response_format": "b64_json",
+            "prompt": (BASE_NO_CHILD if name in NO_CHILD else BASE) + SHOTS[name],
+            "images": [{"image_url": _jpeg(p, 1536)} for p in refs]}
     req = urllib.request.Request(
         BASE_URL + "/images/edits", data=json.dumps(body).encode(), method="POST",
         headers={"Authorization": f"Bearer {os.environ['META_API_KEY']}",
