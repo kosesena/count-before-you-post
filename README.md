@@ -232,7 +232,7 @@ screen. The result shows what the same agent did without the gate, next to what 
 through. Arrows or WASD drive, Space picks up and sets down, C changes the camera (chase,
 driver's seat, overview); on a phone, a touch joystick.
 
-![The gate decides a wrong-product delivery: Spark beside the pallet reading the labels, Sam's ceiling camera scanning, Kapı at the barrier, Wonder at her desk, the reading cards on the right](assets/readme/sim-decision.jpg)
+![The gate blocks a wrong-product delivery in the LEGO dock: the recorded agent run as a chat on the left, Spark at the pallet, Sam and Kapı at the barrier, the BLOCK screen, and on the right the result: nothing written, with and without the gate](assets/readme/sim-decision.jpg)
 
 - **Who works the case.** Only the characters a delivery actually needs are on the floor, each
   at a workstation with a job sign: Spark at the reading lectern, Sam under the ceiling camera,
@@ -259,7 +259,7 @@ driver's seat, overview); on a phone, a touch joystick.
   projected screen boxes, so no character covers the pallet, the gate's screen or another
   character.
 
-![The ten character rooms on two storeys, seen from the yard](assets/readme/sim-rooms.jpg)
+![A damaged delivery goes to Şef: Kapı at the meeting table in front of the character rooms, the agent run on the left, "Sent to Şef" on the right](assets/readme/sim-meeting.jpg)
 
 Written by Muse Code over many rounds (see [What Muse Code built](#what-muse-code-built)); the
 dock and the rooms are Blender scenes (`experiments/blender/warehouse.py`, `CBYP_POLISH=1`)
