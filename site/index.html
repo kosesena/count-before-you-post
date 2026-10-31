@@ -2151,12 +2151,12 @@ addEventListener("resize", placeToyboxBags);
     const w = pic.clientWidth, h = pic.clientHeight, W = 1672, H = 941;
     const k = getComputedStyle(pic).objectFit === "contain" ? Math.min(w / W, h / H) : Math.max(w / W, h / H);
     const ox = (w - W * k) * .5, oy = (h - H * k) * .5;
-    // In the clip (420x564) her figure is 76% of the height and her feet sit 11% above the bottom.
-    const figH = 265 * k, vh = figH / .76, vw = vh * 420 / 564;
+    // In the clip (560x752) her figure is 76% of the height and her feet sit 11% above the bottom.
+    const figH = 265 * k, vh = figH / .76, vw = vh * 560 / 752;
     Object.assign(v.style, { width: vw + "px", height: vh + "px",
       left: (ox + 617 * k - vw / 2) + "px", top: (oy + 770 * k + vh * .11 - vh) + "px" });
-    // Grow to about 70% of the window's height, never off the top.
-    v.style.setProperty("--grow", Math.min(2.4, (h * .72) / vh).toFixed(2));
+    // Grow to about the clip's own size (752 px tall), at most 70% of the window: sharp, never off the top.
+    v.style.setProperty("--grow", Math.min(752 / vh, (h * .7) / vh).toFixed(2));
   };
   let on = false, queued = false;
   const update = () => {
