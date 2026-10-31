@@ -618,11 +618,9 @@ footer p { margin: 4px 0; }
 .toybox-bag canvas.fx { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2;
   opacity: 0; transition: opacity .35s ease; }
 .toybox-bag canvas.fx.on { opacity: 1; }
-/* A soft dusk behind the grown figure, so its light effect reads on the bright box picture. */
-.toybox-bag .pop::before { content: ""; position: absolute; left: 8%; right: 8%; top: 2%; bottom: 10%; z-index: 0;
-  border-radius: 50%; background: rgba(12,14,30,.62); filter: blur(22px);
-  opacity: 0; transition: opacity .3s; }
-.toybox-bag:hover .pop::before, .toybox-bag:focus-visible .pop::before { opacity: 1; }
+/* While a character is hovered, the box picture behind goes soft, like the glass behind the card. */
+.toybox-stage > img { transition: filter .3s ease; }
+.toybox-stage:has(.toybox-bag:hover, .toybox-bag:focus-visible) > img { filter: blur(7px) brightness(.82); }
 .toybox-bag .pop img { position: relative; z-index: 1; }
 .toybox-bag canvas.fx { filter: drop-shadow(0 0 1.5px rgba(10,10,30,.9)) drop-shadow(0 0 5px rgba(10,10,30,.5)); }
 @media (prefers-reduced-motion: reduce) { .toybox-bag .pop { transition: opacity .2s; transform: translate(-50%, -10%); } }
