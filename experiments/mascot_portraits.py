@@ -56,11 +56,14 @@ PROPS = {
     "iris": ("holding the paint palette and paintbrush, the shoulder bag on, as in the reference",
              ["paint palette", "paintbrush", "bag"]),
     # Ada, Sena 31 Oct: the blue infinity sign on her hoodie like the rest of the cast, and
-    # an open dark grey laptop like Sam's tablet (the earlier pink one with stickers was wrong).
+    # an open dark grey laptop like Sam's tablet (the earlier pink one with stickers was wrong),
+    # its screen turned to her, the same infinity sign on the back of the lid.
     "ada": ("waving with one hand and holding an open dark grey laptop in the other, the "
             "laptop the same dark grey and style as the tablet of the second reference "
             "character; the screen faces HER, not the camera: we see the plain back of the "
-            "lid, no screen, no code visible to us, no stickers, no pink; on the chest "
+            "lid, no screen, no code visible to us, no stickers, no pink; in the middle of "
+            "the lid's back the same blue infinity sign as on her hoodie, as a small glossy "
+            "emblem; on the chest "
             "of her plain mint-green hoodie the small blue infinity sign, exactly like the "
             "one on the second reference character's hoodie; no robot, no other props",
             ["laptop", "hand"]),
@@ -101,7 +104,7 @@ def draw(name):
     hello = CAST[name]
     refs = [MASCOTS / "hello" / f"{hello}.jpg"]
     if name == "ada":   # her current look first, Sam for the logo and the device
-        refs = [OUT / "ada-v1.png", OUT / "sam.png"]
+        refs = [OUT / "ada-v2.png", OUT / "ada-v1.png", OUT / "sam.png"]
     sheet = MASCOTS / "sheets" / f"{hello}.jpg"
     if sheet.exists():
         refs.append(sheet)
