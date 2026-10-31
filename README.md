@@ -50,8 +50,24 @@ Your World*. Everything in this repository was written during the event.
 
 | | |
 |---|---|
-| [Why](#why) · [What it does](#what-it-does) · [Results](#results-at-a-glance) · [Built with Muse](#built-with-muse) | [The 3D simulators](#drive-the-dock-the-3d-simulators) · [Meet the cast](#meet-the-cast) · [The evidence](#the-evidence) |
+| [Check it yourself](#check-it-yourself-two-minutes-no-api-key) · [Why](#why) · [What it does](#what-it-does) · [Results](#results-at-a-glance) · [Built with Muse](#built-with-muse) | [The 3D simulators](#drive-the-dock-the-3d-simulators) · [Meet the cast](#meet-the-cast) · [The evidence](#the-evidence) |
 | [How the gate decides](#how-the-gate-decides) · [Honest limits](#honest-limits) · [Next](#next) | [Repository map](#repository-map) · [Setup](#setup) · [Run](#run) |
+
+## Check it yourself: two minutes, no API key
+
+```bash
+git clone --depth 1 https://github.com/kosesena/count-before-you-post && cd count-before-you-post
+python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+.venv/bin/python -m unittest discover tests      # 76 tests, offline
+for l in tr en de zh; do CBYP_LANG=$l .venv/bin/python experiments/run_gate.py | tail -2; done
+node --test site/sim-lego/*.test.mjs              # the Brick Dock's logic (Node 20+)
+git status --short experiments/results            # empty: the gate's results came out the same
+```
+
+You should see `gate matches expected: 6/6` and `without gate 5/6, with gate 0/6` in each of
+the four languages (24/24 in all). The gate replays the recorded model outputs in
+`experiments/results/` (Spark's readings, SAM's masks and points), so no Meta API call is made
+here; the model runs themselves need a key ([Run](#run)). The clone is about 1 GB.
 
 ## Why
 

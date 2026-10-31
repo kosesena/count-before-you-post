@@ -7,12 +7,25 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from cbyp import mcp_server  # noqa: E402
 from cbyp.mcp_server import Dock, build  # noqa: E402
 
 NOTE = {"items": [{"description": "Ayçiçek yağı 5 L", "quantity": 12, "unit": "koli",
                    "legible": True}], "embedded_instructions": []}
 LOOK = {"product_on_labels": "AYÇİÇEK YAĞI 5 L", "cartons_visible": 12, "damaged_cartons": 0,
         "stacked": False, "all_cartons_visible": True}
+
+
+def scenes(lang):
+    """The rendered dock scenes are not in git (experiments/blender/out/*.png): give the tests
+    their own empty ones, so they run in a fresh clone. The tests set the evidence themselves."""
+    folder = Path(tempfile.mkdtemp())
+    for kind in ("irsaliye", "kamera"):
+        (folder / f"depo-ok-{kind}.png").write_bytes(b"")
+    return folder
+
+
+mcp_server._scenes = scenes
 
 
 def dock():
