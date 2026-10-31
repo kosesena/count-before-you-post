@@ -510,6 +510,34 @@ and a hedge ("galiba on iki" → not sure). The Chinese miss heard "eleven" as 5
 sent it to Şef because it didn't match the camera. Without keywords the Turkish supplier came
 out as "Doğan Gündağ"; with them, "Doğan Gıda".
 
+The four clips in each language, the run with keyword biasing (the clips are spoken by
+ElevenLabs from the sentences in `experiments/voice/*/truth.json`; results in
+`experiments/results/*/voice_check.json`):
+
+| Clip | | What the receiver said | What Voice Transcribe wrote | Spark took |
+|---|---|---|---|---|
+| **Plain** | Turkish | On iki koli geldi, Doğan Gıda'dan. | on iki koli geldi Doğan Gıda'dan. | ✓ 12 |
+|  | English | Twelve cartons came in, from Harbor Foods. | twelve cartons came in from Harbor Foods. | ✓ 12 |
+|  | German | Zwölf Kartons sind angekommen, von Sonnenfeld Lebensmittel. | zwölf Kartons sind angekommen von Sonnenfeld Lebensmittel.. | ✓ 12 |
+|  | Chinese | 到了十二箱，是海港食品送来的。 | 到了十二箱施害港食品送来的。 | ✓ 12 |
+| **Number at the end** | Turkish | Doğan Gıda'nın ayçiçek yağı geldi, toplam on bir koli. | Doğan Gıda'nın ayçiçek yağı geldi. Toplam on bir koli. | ✓ 11 |
+|  | English | Harbor Foods' sunflower oil is here, eleven cartons in total. | Harbor Foods sunflower oil is here 11 cartons in total. | ✓ 11 |
+|  | German | Das Sonnenblumenöl von Sonnenfeld ist da, insgesamt elf Kartons. | Das Sonnenblumenöl von Sonnenfeld ist da. da. Insgesamt elf Kartons. | ✓ 11 |
+|  | Chinese | 海港食品的葵花籽油到了，一共十一箱。 | 海港食品的葵花籽油到了,到了，一个五十一箱。 | ✗ 51 |
+| **Self-correction** | Turkish | Yirmi dört koli dedim ama yanlış saydım, aslında yirmi iki koli. | yirmi dört koli dedim ama yanlış saydımım aslında yirmi iki koli. | ✓ 22 |
+|  | English | I said twenty-four cartons, but I miscounted. It's actually twenty-two. | I said 24 cartons, but I miscounted. It's actually 22.. | ✓ 22 |
+|  | German | Ich habe vierundzwanzig Kartons gesagt, aber ich habe mich verzählt. Es sind eigentlich zweiundzwanzig. | IchIch habe vierundzwanzig Kartons gesagt, aber ich habe mich verzählt. Es sind eigentlich zweiundzwanzig. | ✓ 22 |
+|  | Chinese | 我刚才说二十四箱，但是数错了，其实是二十二箱。 | 我刚才说二十四箱,但是输错了,其实是二十二箱。。 | ✓ 22 |
+| **Hedge** | Turkish | Kolilerin bir kısmı üst üste, tam sayamadım, galiba on iki. | kolilerin bir kısmı üst üste tam sayamadım galiba on iki | ✓ 12, not sure |
+|  | English | Some of the cartons are stacked, I couldn't count them all. Twelve, I think. | Some of the of the cartons are stacked, I couldn't count them all, twelve, I think. | ✓ 12, not sure |
+|  | German | Ein Teil der Kartons ist gestapelt, ich konnte nicht alle zählen. Ich glaube, zwölf. | Ein Teil der Kartons ist gestapelt, ich konnte nicht alle zählen. Ich glaube zwölf. | ✓ 12, not sure |
+|  | Chinese | 有些箱子摞在一起，我没数清楚，好像是十二箱。 | 有些箱子落在一起， 我美术清楚。 好像是十二箱。 | ✓ 12, not sure |
+
+Voice Transcribe's slips are kept as they came: the German doubles a word, and the Chinese hears
+"施害港" for the supplier 海港食品. Spark still took the right number from all but one: 一共
+("in total") came out as 一个五十 ("one fifty"), so the count read 51, and the gate sent it
+to Şef because it didn't match the camera.
+
 At a real dock two people talk. The driver says what they brought, the receiver says what they
 counted, and only the receiver's count is evidence. In one block of text Spark has to guess who
 said which number. So Voice Transcribe runs in diarization mode, which splits the recording
