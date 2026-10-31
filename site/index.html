@@ -593,10 +593,26 @@ footer p { margin: 4px 0; }
   display: flex; flex-direction: column; align-items: center; justify-content: flex-end; }
 .toybox-bag .pop img { flex: 1 1 auto; min-height: 0; width: auto; max-width: 70%; object-fit: contain;
   filter: drop-shadow(0 14px 16px rgba(0,0,0,.45)); }
-.toybox-bag .pop span { flex: 0 0 auto; margin-top: 6px; padding: 6px 12px; border-radius: 12px; background: rgba(255,255,255,.96);
-  color: #0b1f4d; font-size: 14px; line-height: 1.25; text-align: center; white-space: nowrap;
-  box-shadow: 0 6px 18px rgba(0,0,0,.25); }
-.toybox-bag .pop b { display: block; font-size: 17px; }
+.toybox-bag .card { position: absolute; top: -12%; left: 160%; width: min(400px, 30vw); z-index: 4;
+  display: block; padding: 22px 24px 20px; border-radius: 22px; pointer-events: none; text-align: left;
+  color: #f2f5ff; background: rgba(14, 18, 38, .9);
+  background: linear-gradient(115deg, color-mix(in srgb, var(--c) 30%, transparent) 0%, transparent 62%), rgba(14, 18, 38, .9);
+  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, .28); box-shadow: 0 16px 40px rgba(0, 0, 0, .45);
+  opacity: 0; transform: translateX(-10px); transition: opacity .25s ease, transform .3s ease; }
+.toybox-bag.card-left .card { left: auto; right: 160%; transform: translateX(10px); }
+.toybox-bag:hover .card, .toybox-bag:focus-visible .card { opacity: 1; transform: none; }
+.toybox-bag .card > span { display: block; }
+.toybox-bag .card .eyebrow { font-size: 11.5px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase;
+  color: color-mix(in srgb, var(--c) 55%, white); }
+.toybox-bag .card .name { margin-top: 6px; font-size: 30px; font-weight: 800; line-height: 1.1; color: #fff; }
+.toybox-bag .card .model { margin-top: 4px; font-size: 13.5px; color: rgba(235, 240, 255, .75); }
+.toybox-bag .card .line { margin-top: 12px; font-size: 14.5px; line-height: 1.55; color: rgba(255, 255, 255, .92); }
+.toybox-bag .card .job0 { margin-top: 12px; font-size: 14.5px; font-weight: 800; line-height: 1.45;
+  color: color-mix(in srgb, var(--c) 60%, white); }
+.toybox-bag .card .open { margin-top: 12px; font-size: 13.5px; font-weight: 700; text-decoration: underline;
+  text-underline-offset: 3px; color: color-mix(in srgb, var(--c) 55%, white); }
+@media (prefers-reduced-motion: reduce) { .toybox-bag .card { transition: opacity .2s; transform: none; } }
 .toybox-bag:hover .pop, .toybox-bag:focus-visible .pop { opacity: 1; transform: translate(-50%, -10%) scale(1); }
 .toybox-bag:hover, .toybox-bag:focus-visible { z-index: 2; }
 .toybox-bag canvas.fx { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2;
@@ -609,7 +625,6 @@ footer p { margin: 4px 0; }
 .toybox-bag:hover .pop::before, .toybox-bag:focus-visible .pop::before { opacity: 1; }
 .toybox-bag .pop img { position: relative; z-index: 1; }
 .toybox-bag canvas.fx { filter: drop-shadow(0 0 1.5px rgba(10,10,30,.9)) drop-shadow(0 0 5px rgba(10,10,30,.5)); }
-.toybox-bag .pop > span { position: relative; z-index: 3; }
 @media (prefers-reduced-motion: reduce) { .toybox-bag .pop { transition: opacity .2s; transform: translate(-50%, -10%); } }
 /* On the closed box the figure grows where it stands (the title is just above), its label under its feet. */
 #toyboxFigs .toybox-bag .pop { bottom: -26%; height: 152%; transform: translate(-50%, 4%) scale(.8); }
@@ -1957,13 +1972,22 @@ function buildToyboxBags(data) {
       /* The hero figures (transparent, whole); Kapı, Şef and Glimmer have no hero figure, so
          their cut-outs with SAM's small holes filled from the drawing (img/pop-<id>.webp). */
       img.src = (data.hero && data.hero.tools && data.hero.tools[id]) || "img/pop-" + id + ".webp";
-      const cap = document.createElement("span");
-      cap.innerHTML = "<b></b>"; cap.querySelector("b").textContent = c.name;
-      cap.append(c.model);
+      /* The same card as in the cast section: status, name, model, their line, first job. */
+      const job0 = (c.profile && c.profile.jobs && c.profile.jobs[0]) || "";
+      const card = document.createElement("span");
+      card.className = "card"; card.setAttribute("aria-hidden", "true");
+      card.style.setProperty("--c", c.colour);
+      card.innerHTML = `<span class="eyebrow">${esc(STATUS_TEXT[c.status] || c.status)}</span>` +
+        `<span class="name">${esc(c.name)}</span>` +
+        `<span class="model">Model  · ${esc(c.model)}</span>` +
+        `<span class="line">“${esc(c.line)}”</span>` +
+        (job0 ? `<span class="job0">${esc(job0)}</span>` : "") +
+        `<span class="open">Open profile &rarr;</span>`;
+      if ((x0 + x1) / 2 > 1659 / 2) a.classList.add("card-left");
       /* The character's own light effect from the cast section (FX, startFx), around the figure. */
       pop.dataset.fx = id;
       const fx = document.createElement("canvas"); fx.className = "fx"; fx.setAttribute("aria-hidden", "true");
-      pop.append(fx, img, cap); a.append(pop); nav.append(a);
+      pop.append(fx, img); a.append(pop, card); nav.append(a);
       let fxT = 0;
       const on = () => { clearTimeout(fxT); fxT = setTimeout(() => startFx(pop), 300); };
       const off = () => { clearTimeout(fxT); if (fxActive && fxActive.card === pop) stopFx(); };
