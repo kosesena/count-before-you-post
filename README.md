@@ -1,29 +1,35 @@
 <div align="center">
 
+<a href="https://count-before-you-post.vercel.app"><img src="assets/readme/toybox.jpg" alt="A child's hands hold the Count Before You Post toy box: a blue box with the ten figures in front of a warehouse dock" width="100%"></a>
+
 # Count Before You Post
 
 ### A verification gate between AI agents and the ERP
 
-**Before a goods receipt is written, the delivery note, the camera, the receiver's voice and a
-second model must agree. If they don't, nothing is written and a person decides.**
+Before a goods receipt is written, the delivery note, the camera, the receiver's voice and a second model must agree. If they don't, nothing is written and a person decides.
 
-[![Live demo](https://img.shields.io/badge/Live_demo-count--before--you--post.vercel.app-0866FF?style=for-the-badge)](https://count-before-you-post.vercel.app)
-[![Drive the dock](https://img.shields.io/badge/Drive_the_dock-3D_simulator-F97316?style=for-the-badge)](https://count-before-you-post.vercel.app/sim/)
+**[Open the toy box: the live demo →](https://count-before-you-post.vercel.app)** &nbsp;·&nbsp; [Drive the dock](https://count-before-you-post.vercel.app/sim-lego/) &nbsp;·&nbsp; [The first simulator](https://count-before-you-post.vercel.app/sim/)
 
-![Built with Muse](https://img.shields.io/badge/Built_with-Muse_Spark_·_SAM_3.1_·_Voice_·_Wonder_·_Spark_Open_·_Code_·_Image-1C2B33?style=flat-square)
-![Meta Global AI Developer Hackathon](https://img.shields.io/badge/Meta_Global_AI_Developer_Hackathon-26_Oct_–_4_Nov_2026-0866FF?style=flat-square)
-![Wrong receipts behind the gate](https://img.shields.io/badge/wrong_receipts_behind_the_gate-0-4ADE80?style=flat-square)
-
-![The receiving dock: the gate's light, the screen, the pallet under the ceiling camera, and the cast](assets/readme/dock.jpg)
+<sub>Built with Muse Spark · SAM 3.1 · Voice · Wonder · Spark Open · Muse Code · Muse Image &nbsp;|&nbsp; Meta Global AI Developer Hackathon, 26 Oct – 4 Nov 2026 &nbsp;|&nbsp; <b>0</b> wrong receipts behind the gate</sub>
 
 </div>
 
-**Live demo: [count-before-you-post.vercel.app](https://count-before-you-post.vercel.app)**:
-the six dock cases in four languages, the gate's decision on each, SAM's masks, the
-carton-by-carton cross-check and the agent's step-by-step trace, with and without the gate.
-The page replays recorded runs (real Meta API, real ERPNext) and makes no API calls.
-**[Drive the dock](https://count-before-you-post.vercel.app/sim/)**: drive the forklift, bring a
-delivery to the gate, and watch the characters work the case.
+<table>
+<tr>
+<td width="50%"><img src="assets/readme/toybox-open.jpg" alt="The box opened: the ten figures in their bags, the bricks, the GOODS IN sign, the truck and the traffic light"></td>
+<td width="50%"><img src="assets/readme/night.jpg" alt="At night, by Glimmer's light, the figures build the dock on the table"></td>
+</tr>
+<tr>
+<td><sub><b>Open the box.</b> On the demo page every figure and every piece is a door: the characters to their profiles, the truck to the note, the traffic light to the gate, GOODS IN to the simulator.</sub></td>
+<td><sub><b>At night they get to work.</b> Then the page tells what they did: six deliveries, four languages, the gate's decision on each, with and without it.</sub></td>
+</tr>
+</table>
+
+<sub>Toy box, night and morning pictures: ChatGPT (OpenAI), drawn from our Muse Image cast.</sub>
+
+The page replays recorded runs (real Meta API, real ERPNext) and makes no API calls: the six
+dock cases in four languages, SAM's masks, the carton-by-carton cross-check and the agent's
+step-by-step trace, with and without the gate.
 
 Built during the Meta Global AI Developer Hackathon (26 Oct – 4 Nov 2026), theme *Build for
 Your World*. Everything in this repository was written during the event.
@@ -638,3 +644,17 @@ CBYP_MCP_ERP=0 demo/muse-dock/muse-dock.sh              # Muse Code at the dock,
 `CBYP_LANG=en|de|zh` runs the same dock in another language. The Blender scenes render
 headless (`blender -b --factory-startup -P experiments/blender/warehouse.py`; run
 `experiments/blender/make_cutouts.py` first).
+
+---
+
+<div align="center">
+
+<img src="assets/readme/morning-wink.jpg" alt="Morning: the ten figures are toys again in front of the dock they built; Glimmer winks" width="100%">
+
+<img src="assets/readme/glimmer-farewell.gif" alt="Glimmer waves goodbye and winks" width="160">
+
+**Count before you post.**
+
+<sub>Glimmer's farewell: Higgsfield Genjutsu, from our Muse Image Glimmer; motion from a Pixabay clip by videoplasty.</sub>
+
+</div>
