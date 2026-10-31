@@ -40,7 +40,29 @@ export function buildReceivingScene({T,scene,group,box,cyl,label,twoSidedLabel,f
   for(const x of [-.34,.34]){box(jack,x,.18,.3,.22,.16,1.8,C.yellow);cyl(jack,x,.12,.95,.12,.16,C.black,16,0,0,Math.PI/2);}
   box(jack,0,.3,-.55,.9,.32,.5,C.yellow);box(jack,0,.9,-.65,.08,1.2,.08,C.black);
   box(jack,0,1.52,-.65,.55,.08,.08,C.black);flush(jack);floorTag('PALLET TRUCK',-7.2,-3.7,2);
-  for(const [x,name,color] of [[-7.1,'WRAP',C.blue],[-5.8,'CARDBOARD',C.green]]){box(equipment,x,.6,1.1,.8,.85,.8,color);label(equipment,name,x,1.15,1.52,.8,.22,'#243238','#ffffff');}
+  // Waste stations by the receiving desk, in bricks (written by hand, Claude Code): a wheelie bin
+  // for stretch film and a cage for flattened cardboard. Each stays inside its old 0.8 m footprint.
+  const wrapBin=group(equipment,-7.1,.18,1.1);
+  box(wrapBin,0,.42,0,.72,.76,.62,C.blue);
+  for(const x of [-.37,.37])box(wrapBin,x,.42,0,.04,.7,.5,0x0b3f8a);
+  box(wrapBin,0,.79,-.33,.76,.06,.08,0x0b3f8a);
+  for(const x of [-.28,.28])cyl(wrapBin,x,.09,-.3,.09,.07,C.black,16,0,0,Math.PI/2);
+  box(wrapBin,0,.86,-.38,.5,.05,.05,C.black);
+  const lid=group(wrapBin,0,.82,-.34);box(lid,0,.24,-.02,.78,.5,.06,0x0b3f8a,true);lid.rotation.x=-1.05;
+  const film=new T.Mesh(new T.SphereGeometry(.3,18,12),new T.MeshStandardMaterial({color:0xf2f7ff,transparent:true,opacity:.6,roughness:.12}));
+  film.scale.set(1.05,.55,.85);film.position.set(.02,.86,.05);wrapBin.add(film);
+  flush(lid);flush(wrapBin);
+  label(equipment,'WRAP · FILM',-7.1,.62,1.42,.62,.18,'#ffffff','#0b3f8a');
+  const cardCage=group(equipment,-5.8,.18,1.1);
+  box(cardCage,0,.08,0,.76,.1,.72,C.green);
+  for(const x of [-.35,.35])for(const z of [-.32,.32])box(cardCage,x,.5,z,.06,.86,.06,C.green);
+  for(const y of [.4,.7,.92])for(const z of [-.32,.32])box(cardCage,0,y,z,.7,.04,.04,C.green);
+  for(const y of [.4,.7,.92])for(const x of [-.35,.35])box(cardCage,x,y,0,.04,.04,.6,C.green);
+  for(const x of [-.2,0,.2])box(cardCage,x,.55,.31,.03,.8,.02,C.green);
+  for(let k=0;k<5;k++)box(cardCage,-.24+k*.12,.6+(k%2)*.08,0,.05,.9,.58,k%2?0xc9a46a:C.tan);
+  for(const x of [-.3,.3])for(const z of [-.27,.27])cyl(cardCage,x,.02,z,.05,.04,C.black,12);
+  flush(cardCage);
+  label(equipment,'CARDBOARD',-5.8,.81,1.45,.62,.15,'#ffffff','#167443');
   // Quarantine is physically distinct from authorized returns.
   for(const z of [5.6,8.4])box(equipment,13,.23,z,2.8,.06,.08,C.orange);
   for(const x of [11.6,14.4])box(equipment,x,.23,7,.08,.06,2.8,C.orange);
