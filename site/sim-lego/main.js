@@ -16,7 +16,9 @@ const $ = id => document.getElementById(id);
 const loadingText = $('loading').querySelector('strong');
 const pauseFrame = () => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 let stageAt=performance.now();
-async function stage(text) { loadingText.textContent=text;stageAt=performance.now();await pauseFrame(); }
+// Six loading stages and the crew of ten fill the bar (written by hand, Claude Code).
+let stageN=0;const progress=f=>{$('loading-bar').firstChild.style.width=`${Math.round(Math.max(.04,Math.min(1,f))*100)}%`;};
+async function stage(text) { loadingText.textContent=text;stageAt=performance.now();progress(++stageN/7);await pauseFrame(); }
 const C = {floor:0xc5c9cc,wall:0xd9dbd8,blue:0x0055bd,yellow:0xffcc00,orange:0xf47b13,navy:0x163360,teal:0x009e95,black:0x202326,red:0xc91a09,tan:0xd9b576,white:0xf4f3e9,pink:0xdc2485,purple:0x8553bf,green:0x438b40};
 const scene = new T.Scene(); scene.background = new T.Color(0xe7e9df);
 const renderer = new T.WebGLRenderer({antialias:true,alpha:false});
@@ -40,7 +42,10 @@ const fill = new T.DirectionalLight(0xd8e7ff,.6);fill.position.set(-14,12,12);sc
 const matCache = new Map(), geoCache = new Map(), batches = new Map();
 function mat(color,rough=.25){const k=color+':'+rough;if(!matCache.has(k))matCache.set(k,new T.MeshPhysicalMaterial({color,roughness:rough,metalness:0,clearcoat:.24,clearcoatRoughness:.16}));return matCache.get(k);}
 const glass = new T.MeshPhysicalMaterial({color:0xd9f4fa,transparent:true,opacity:.12,roughness:.08,depthWrite:false,side:T.DoubleSide});
-const glow = new T.MeshStandardMaterial({color:0xffe8a0,emissive:0xffce67,emissiveIntensity:2});
+const glow = new T.MeshStandardMaterial({color:0xfff1c8,emissive:0xffd27a,emissiveIntensity:5});
+// A soft additive halo around the small lamps, so they read as lit from a distance (written by hand, Claude Code).
+const haloMat=(()=>{const c=document.createElement('canvas');c.width=c.height=64;const g=c.getContext('2d'),r=g.createRadialGradient(32,32,0,32,32,32);r.addColorStop(0,'rgba(255,240,200,1)');r.addColorStop(.22,'rgba(255,214,140,.6)');r.addColorStop(1,'rgba(255,200,120,0)');g.fillStyle=r;g.fillRect(0,0,64,64);return new T.SpriteMaterial({map:new T.CanvasTexture(c),blending:T.AdditiveBlending,depthWrite:false,transparent:true});})();
+function halo(root,x,y,z,s=1){const h=new T.Sprite(haloMat);h.position.set(x,y,z);h.scale.set(s,s,1);root.add(h);}
 function geom(type,w=1,h=1,d=1){const key=[type,w,h,d].join(':');if(!geoCache.has(key)){let g;if(type==='box')g=new RoundedBoxGeometry(w,h,d,1,Math.min(.035,w*.1,h*.1,d*.1));else if(type==='cyl')g=new T.CylinderGeometry(w,w,h,d);else if(type==='sphere')g=new T.SphereGeometry(w,12,8);else if(type==='torus')g=new T.TorusGeometry(w,h,8,d);geoCache.set(key,g);}return geoCache.get(key);}
 // Static meshes are instanced by geometry and material: thousands of physical studs, few draw calls.
 const temp = new T.Object3D();
@@ -200,7 +205,7 @@ await Promise.all(castSlots.map(async slot=>{
   const idle=gltf.animations.find(c=>c.name==='Idle'),walk=gltf.animations.find(c=>c.name==='Walk');slot.idle=idle?slot.mixer.clipAction(idle):null;slot.walk=walk?slot.mixer.clipAction(walk):null;slot.idle?.play();
   // Imported wave deforms the shoulders; keep the seated idle pose until the rig is repaired.
   slot.wave=null;
-  castLoaded++;$('loading').querySelector('small').textContent=`CREW · ${castLoaded} / 10`;
+  castLoaded++;$('loading').querySelector('small').textContent=`CREW · ${castLoaded} / 10`;progress((4+castLoaded/10)/7);
  }catch(error){console.error(`Karakter yüklenemedi: ${slot.name}`,error);}
 }));
 draco.dispose();document.body.dataset.castLoaded=String(castLoaded);
@@ -267,6 +272,8 @@ function vehicleWindow(root,x,y,z,w,h,ry=0){
 }
 // Brick-built red cab, open light-grey trailer, white bumper and twin stacks.
 const truck=group(scene,22.6,-1.12,-4,Math.PI/2);
+// Headlamps (written by hand, Claude Code): off while parked, on while the truck is running.
+const truckLampMat=new T.MeshStandardMaterial({color:0xd9d6cc,emissive:0xfff0c8,emissiveIntensity:0,roughness:.2});
 box(truck,0,.65,0,2.8,.35,10.8,C.black,true);
 for(const z of [-3.8,-2.4,2.65,4.15])for(const x of [-1.45,1.45])wheel(truck,x,.67,z,.65);
 // Individual red courses, with narrower side sections around the wheel arches.
@@ -300,7 +307,7 @@ for(let x=-1.2;x<=1.2;x+=.4)cyl(truck,x,2.6,5.05,.12,.07,C.white,16,Math.PI/2);
 box(truck,0,1.98,4.97,2.25,.82,.18,C.white);
 box(truck,0,1.12,5.03,3,.3,.3,0x69757b,true);box(truck,0,.94,5.18,1.8,.13,.09,C.black);
 for(const side of [-1,1]){
- cyl(truck,side*1.13,2.04,5.1,.2,.12,glow,24,Math.PI/2);cyl(truck,side*1.38,1.92,5.02,.11,.1,C.orange,16,Math.PI/2);
+ cyl(truck,side*1.13,2.04,5.1,.2,.12,truckLampMat,24,Math.PI/2);cyl(truck,side*1.38,1.92,5.02,.11,.1,C.orange,16,Math.PI/2);
  for(let j=0;j<4;j++)cyl(truck,side*1.4,1.02,1.15+j*.2,.3,.19,0xaab3b7,24,Math.PI/2);
  for(let j=0;j<8;j++)cyl(truck,side*1.13,4.05+j*.28,2.18,.105,.265,0xbcc2c4,16);
  cyl(truck,side*1.13,6.22,2.18,.15,.13,0x92999c,16);
@@ -340,10 +347,17 @@ for(const z of [-1.8,.5])for(const x of [17.1,19.2]){box(yard,x,-.42,z,.22,1.15,
 for(let i=0;i<4;i++)box(yard,18.6,-.02-i*.28,.9+i*.34,1.05,.18,.35,0xa3adb2,true);
 for(let x=17.1;x<18.2;x+=.4)box(yard,x,.65,.65,.075,1.1,.075,C.black);
 box(yard,17.55,1.22,.65,1.1,.09,.09,C.black);
-for(const z of [-6,-4,-2]){cyl(yard,17.65,5.92,z,.13,.16,glow,16);}
-for(let z=-19;z<16;z+=1.6){box(yard,17.5,10.65,z,1.1,.2,1.585,0x57636a,true);if(Math.round((z+19)/1.6)%3===0){cyl(yard,17.7,10.4,z,.15,.15,glow,16);}}
+for(const z of [-6,-4,-2]){cyl(yard,17.65,5.92,z,.13,.16,glow,16);halo(yard,17.75,5.8,z,1.1);}
+for(let z=-19;z<16;z+=1.6){box(yard,17.5,10.65,z,1.1,.2,1.585,0x57636a,true);if(Math.round((z+19)/1.6)%3===0){cyl(yard,17.7,10.4,z,.19,.15,glow,16);halo(yard,17.85,10.3,z,1.4);}}
 twoSidedLabel(yard,'RECEIVING 01',17.48,5.65,-2.75,3.5,.35,'#20282b','#ffe393',Math.PI/2);
-const dockSignal=group(yard,17.5,2,1.4,Math.PI/2);box(dockSignal,0,0,0,.45,1.2,.25,C.black);for(let i=0;i<3;i++)cyl(dockSignal,0,.35-i*.35,.15,.13,.07,[C.red,C.yellow,0x35bd43][i],16,Math.PI/2);flush(dockSignal);
+const dockSignal=group(yard,17.5,2,1.4,Math.PI/2);box(dockSignal,0,0,0,.45,1.2,.25,C.black);
+// The yard signal's lamps really light (written by hand, Claude Code): red while the driver waits, green on release.
+const dockLamps=[C.red,C.yellow,0x35bd43].map((c,i)=>{const m=new T.MeshStandardMaterial({color:c,emissive:c,emissiveIntensity:.05,roughness:.25});cyl(dockSignal,0,.35-i*.35,.15,.13,.07,m,16,Math.PI/2);return m;});
+flush(dockSignal);
+const dockGlow=new T.PointLight(0xff3b2a,14,5,2);dockGlow.position.set(0,.35,.6);dockSignal.add(dockGlow);
+const lampOn=[0xff2a1a,0xffc21a,0x2dff4a],lampOff=[0x3a1210,0x3a2c0c,0x0f2a14];
+function setDockSignal(go){dockLamps.forEach((m,i)=>{const on=i===(go?2:0);m.color.setHex(on?lampOn[i]:lampOff[i]);m.emissive.setHex(on?lampOn[i]:0x000000);m.emissiveIntensity=on?4:0;});dockGlow.color.setHex(go?0x45ff5c:0xff3b2a);dockGlow.position.y=go?-.35:.35;}
+setDockSignal(false);
 person(yard,28,-1.05,-.25,C.orange,0x242521,false,1,1.1);person(yard,17.9,-1.05,2.4,0x72933d,0x242521,true,.9,1.1);flush(yard);
 // Driveable forklift. Front is local -Z; mast and lifting carriage are separate.
 const fork=group(scene,18.2,.18,-.6,-Math.PI/2);const lift=group(fork,0,0,-1.45);
@@ -355,7 +369,19 @@ cyl(fork,0,3.08,.5,.13,.2,C.orange,16);cyl(fork,0,2.99,.5,.19,.06,C.black,16);
 for(const x of [-.56,.56]){box(fork,x,1.65,-1.25,.16,3,.2,C.black);box(lift,x,.25,-.65,.14,.1,1.6,0x777f83);}box(lift,0,.6,0,1.3,.9,.12,C.black);box(fork,0,3.1,-1.25,1.35,.18,.22,C.black,true);
 const steering=new T.Mesh(new T.TorusGeometry(.2,.035,8,20),mat(C.black));steering.position.set(0,1.6,-.7);steering.rotation.x=.6;fork.add(steering);
 person(fork,0,.65,-.05,C.blue,0x29271e,true,.65,Math.PI);
+const forkLampMat=new T.MeshStandardMaterial({color:0xd9d6cc,emissive:0xfff0c8,emissiveIntensity:0,roughness:.2});
+for(const x of [-.5,.5])cyl(fork,x,2.72,-1.12,.11,.08,forkLampMat,16,Math.PI/2);
 flush(fork);flush(lift);
+// Forklift and truck headlights (written by hand, Claude Code): on while the vehicle moves or runs.
+function beam(root,x,y,z,tz){const l=new T.SpotLight(0xfff0d0,0,14,.5,.6,1.5);l.position.set(x,y,z);l.target.position.set(x,0,tz);root.add(l,l.target);return l;}
+const forkBeam=beam(fork,0,2.6,-1.25,-7),truckBeam=beam(truck,0,2.1,5.3,13);
+const lastFork=new T.Vector3();let forkLitUntil=0;
+function updateHeadlights(now){
+ if(fork.position.distanceToSquared(lastFork)>1e-6)forkLitUntil=now+.8;lastFork.copy(fork.position);
+ const forkOn=now<forkLitUntil,truckOn=!!state.running;
+ forkLampMat.emissiveIntensity=forkOn?4:0;forkBeam.intensity=forkOn?40:0;
+ truckLampMat.emissiveIntensity=truckOn?4:0;truckBeam.intensity=truckOn?50:0;
+}
 // Delivery pallet and gate, beyond the meeting area.
 const delivery=group(scene,18.1,.18,-4,Math.PI/2);pallet(delivery,0,0,0,1.8,1.6);flush(delivery);
 let cartons=group(delivery);let currentCase='ok';
@@ -424,10 +450,10 @@ const views={hero:{eye:[-1,6.5,21],target:[-1,3.5,-4]},table:{eye:[8,7,18],targe
 // A live cinematic tour of this exact warehouse, with no external video.
 let introActive=false,introStarted=0;
 const introShots=[
- {view:'outside',title:'Every delivery starts here.',detail:'THE LOADING DOCK',offset:[-2,.4,1]},
- {view:'dock',title:'Count. Check. Verify.',detail:'THE RECEIVING FLOOR',offset:[-2,-.5,-1]},
- {view:'rooms',title:'Ten agents. One shared mission.',detail:'MEET THE CREW',offset:[-2,-.5,-1]},
- {view:'table',title:'Count Before You Post',detail:'META GLOBAL AI HACKATHON · PROJECT DEMO',offset:[-2,-.4,-1]}
+ {view:'outside',title:'The note says 12 cartons.',detail:'THE LOADING DOCK · A SHORT DELIVERY',offset:[-2,.4,1]},
+ {view:'dock',title:'The camera counts 11. The gate refuses the write.',detail:'THE RECEIVING FLOOR · CAMERA, VOICE, GATE',offset:[-2,-.5,-1]},
+ {view:'rooms',title:'Ten agents. One rule: count before you post.',detail:'MEET THE CREW',offset:[-2,-.5,-1]},
+ {view:'table',title:'24 of 24 gate decisions right. 0 wrong receipts.',detail:'SIX DELIVERIES · FOUR LANGUAGES · META GLOBAL AI HACKATHON',offset:[-2,-.4,-1]}
 ];
 function startIntro(){
  if(state.running)reset();
@@ -465,7 +491,7 @@ function resetMeeting(){
 }
 function resetReceiving(){
  dockReady=false;arrivalDone=false;inspectionRun=null;reviewTask=null;physicalLocation='trailer';locationConfirmed=false;handlingDecision=null;
- receivingScene.reset();updatePalletTag('UNVERIFIED');$('prepare-dock').disabled=false;$('prepare-dock').textContent='Prepare dock & receive documents';
+ receivingScene.reset();setDockSignal(false);updatePalletTag('UNVERIFIED');$('prepare-dock').disabled=false;$('prepare-dock').textContent='Prepare dock & receive documents';
  $('dock-checks').textContent='Vehicle restraint · bridge plate · driver refuge · delivery note';
  $('review-inspected').checked=false;$('review-document').checked=false;$('review-count').value='0';$('location-code').value='';$('location-confirm').hidden=true;
  for(const slot of castSlots){slot.workRoute=null;slot.working=false;}
@@ -655,7 +681,7 @@ $('next-delivery').onclick=()=>{
  if(state.running||state.held||!locationConfirmed)return;
  const li=document.createElement('li');li.textContent=`Delivery ${deliveryNumber} · ${currentCase} · ${areas[transferTarget].address} · ERP ${state.result} (recorded) · handling ${handlingDecision||transferTarget} (simulated)${currentCase==='hasarli'&&handlingDecision==='accepted'?' · 1 carton remains Q-01 quarantined':''}`;$('delivery-history').prepend(li);
  // End this exercise. This clears its scene, not persistent inventory or an outbound shipment.
- receivingScene.release();setView('outside');state.running=true;state.phase=9;state.t=0;$('next-delivery').hidden=true;status('Exercise saved. Receiver releases the dock; driver receives the green signal.');
+ receivingScene.release();setDockSignal(true);setView('outside');state.running=true;state.phase=9;state.t=0;$('next-delivery').hidden=true;status('Exercise saved. Receiver releases the dock; driver receives the green signal.');
 };
 $('toggle-panel').onclick=()=>{const collapsed=$('panel').classList.toggle('collapsed');$('panel-controls').hidden=collapsed;$('toggle-panel').textContent=collapsed?'+':'−';$('toggle-panel').setAttribute('aria-expanded',String(!collapsed));$('toggle-panel').setAttribute('aria-label',collapsed?'Expand controls':'Minimize controls');};
 $('pause-demo').onclick=()=>{state.paused=!state.paused;$('pause-demo').textContent=state.paused?'Resume':'Pause';};$('play-speed').onchange=()=>{state.speed=Number($('play-speed').value);};
@@ -694,7 +720,7 @@ function collisionOptions(){return {held:state.held,gateClosed:barrier.rotation.
 function blocked(x,z,angle=fork.rotation.y){return blockedPose(x,z,angle,collisionOptions());}
 let collisionNotice=false;
 const clock=new T.Clock();
-function animate(){requestAnimationFrame(animate);const dt=Math.min(clock.getDelta(),.05);receivingScene.tick(state.paused?0:dt*state.speed);updateWorkActors(state.paused?0:dt*state.speed);state.t+=state.running?(state.paused?0:dt*state.speed):dt;for(const slot of castSlots)slot.mixer?.update(state.paused&&slot.onFloor?0:dt);for(const slot of castSlots)if(!slot.onFloor||slot.seated)slot.legs?.forEach(leg=>leg.rotation.x=-Math.PI/2);
+function animate(){requestAnimationFrame(animate);updateHeadlights(performance.now()/1000);const dt=Math.min(clock.getDelta(),.05);receivingScene.tick(state.paused?0:dt*state.speed);updateWorkActors(state.paused?0:dt*state.speed);state.t+=state.running?(state.paused?0:dt*state.speed):dt;for(const slot of castSlots)slot.mixer?.update(state.paused&&slot.onFloor?0:dt);for(const slot of castSlots)if(!slot.onFloor||slot.seated)slot.legs?.forEach(leg=>leg.rotation.x=-Math.PI/2);
  for(const slot of castSlots){if(slot.seated&&slot.id===meetingRun?.speaker&&!state.paused){const t=clock.elapsedTime;slot.arms?.forEach((arm,i)=>{arm.rotation.x=-.18-.12*Math.sin(t*2.8+i);arm.rotation.z=(i?1:-1)*(.04+.035*Math.sin(t*2));});}}
  for(const door of officeDoors)door.rotation.y=T.MathUtils.damp(door.rotation.y,door.userData.open?-Math.PI*.47:0,4,dt);
  if(walkStarted){const t=(performance.now()-walkStarted)/1000;const points=[[-9.6,.18,3],...stairApproach,...stairAscent.slice(1),[-11.2,4.3,9.4],[-11.2,4.3,3]];let duration=0;for(let i=0;i<points.length-1;i++){const a=new T.Vector3(...points[i]),b=new T.Vector3(...points[i+1]),d=a.distanceTo(b)/1.4;if(t>=duration&&t<duration+d){walkingGuide.position.lerpVectors(a,b,(t-duration)/d);walkingGuide.rotation.y=Math.atan2(b.x-a.x,b.z-a.z);break;}duration+=d;}if(t>duration){walkStarted=0;status('Pedestrian route complete: upper office balcony.');}}
@@ -711,4 +737,4 @@ function animate(){requestAnimationFrame(animate);const dt=Math.min(clock.getDel
 window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
 window.__lego={scene,camera,controls,renderer,state,fork,delivery,zone,reset,pickup,runDemo,setView,blocked,get currentCase(){return currentCase;}};
 if(camera.aspect<1.25)setView('hero');
-resetReceiving();animate();await pauseFrame();$('loading').remove();if(!matchMedia('(prefers-reduced-motion: reduce)').matches)startIntro();
+resetReceiving();animate();progress(1);await pauseFrame();$('loading').remove();if(!matchMedia('(prefers-reduced-motion: reduce)').matches)startIntro();

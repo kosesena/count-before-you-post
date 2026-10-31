@@ -194,16 +194,15 @@ def build(lang):
                       "supplier": row["supplier"], "certain": row["certain"], "ok": row["ok"],
                       "said": row["truth"]["quantity"]})
 
-    # The dressed-up dock (warehouse.py with CBYP_POLISH=1), in this language's signs.
-    shots = OUT / "polish" if lang == "tr" else OUT.parent / "polish" / lang
-    dock = [{"src": jpg(shots / f"depo-ok-{cam}.png", f"{pre}dock-{cam}.jpg", width),
-             "caption": caption}
-            for cam, width, caption in (
-                ("teslimat", 1400, "The receiving zone: 12 cartons on the pallet, the gate light "
-                                   "green, the trailer open behind the dock door."),
-                ("genel", 900, "The warehouse, with the cast at their posts."),
-                ("disari", 900, "Outside: the truck backed up to the dock."))
-            if (shots / f"depo-ok-{cam}.png").exists()]
+    # The dock as it looks today: the Brick Dock (site/sim-lego, built with OpenAI Codex), one set
+    # for every language. The measured frames are the ceiling-camera renders in each case below.
+    dock = [{"src": f"img/{name}.jpg", "caption": caption} for name, caption in (
+        ("brick-dock-receiving", "The receiving floor in the Brick Dock: the camera rig over the "
+                                 "inspection lane, the quarantine bay, the briefing table. The "
+                                 "measured frames are the Camera views below."),
+        ("brick-dock-crew", "The crew's offices, one per agent, with their nameplates."),
+        ("brick-dock-outside", "Outside: the truck at Receiving 01, the signal red until the dock "
+                               "releases it."))]
 
     data = {"lang": lang, "dock": dock, **extras(),
             "voice_source": "synthetic voice, ElevenLabs",
