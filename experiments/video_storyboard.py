@@ -46,10 +46,11 @@ NO_CHILD = {"1b-leave", "1c-alive", "6-night", "7-go", "5-dive"}
 BOX = (
     "The toy-set box is a glossy printed retail box, not plain cardboard: on its lid in big "
     "bold navy letters 'COUNT BEFORE YOU POST', under it smaller 'Built with Muse', a small "
-    "round badge 'WAREHOUSE 01', and a printed picture of the toy-brick dock with exactly "
-    "the seven figures from the reference images in a row, each with its own hair, clothes "
-    "and prop (orange spiky hair, glasses and tablet, headphones, palette, flower clip, pen "
-    "and clipboard, teal beanie). No other logos or brand names. ")
+    "round badge 'WAREHOUSE 01', and a printed picture of the toy-brick dock with the "
+    "seven figures in a row. The seven figures, on the box and in the tray, must be exactly "
+    "the seven characters of the first reference image (left to right, same faces, skin, "
+    "hair, clothes and props), as toy figures like in the second reference image. No other "
+    "logos or brand names. ")
 SHOTS = {
     "1-arrive": (
         "the very start, NOTHING IS BUILT YET: no warehouse, no truck, no figures standing; "
@@ -82,12 +83,14 @@ SHOTS = {
     # freeze when the child comes back, and at night, when the child has gone to bed, the
     # game begins. Shots after 1-arrive, numbered in story order.
     "0-box": (
-        "the very first moment: top-down, the bare table with the closed printed box in the "
-        "middle; the child's two hands lifting the lid off, the top of the head at the bottom "
-        "edge."),
+        "the very first moment, a moment before the first reference image: top-down, the "
+        "bare table with the same printed box as in the first reference image, still closed, "
+        "in the middle, its lid art exactly as there (title, 'Built with Muse', the badge, "
+        "the dock picture, the seven figures on grey stands); the child's two hands on the "
+        "lid about to lift it, the top of the head at the bottom edge."),
     "0b-open": (
         "top-down: the box lid lies beside the open box; inside, EXACTLY SEVEN toy figures, "
-        "each one different, the seven from the reference images, in a neat moulded tray "
+        "the seven characters of the first reference image in the same order, in a neat moulded tray "
         "with seven slots, smiling up; the child's hand lifting the first figure out; next "
         "to the box a bare grey baseplate and bags of loose bricks. NOTHING IS BUILT yet: no "
         "warehouse, no truck on the table."),
@@ -120,12 +123,32 @@ SHOTS = {
 BOXED = {"0-box", "0b-open", "1-arrive", "1b-leave", "1c-alive"}
 
 
+HELLO = HERE.parent / "assets" / "mascots" / "hello"
+CAST = ("spark", "sam", "voice", "iris", "ada", "wonder", "spark-open")
+
+
+def cast_sheet():
+    """The seven Muse characters' portraits side by side, in the page's order, so the box and
+    the tray show exactly them (the model drifted when it only had the diorama)."""
+    dst = OUT / "story-cast-sheet.jpg"
+    if not dst.exists():
+        ims = [Image.open(HELLO / f"{c}.jpg").convert("RGB").resize((400, 400)) for c in CAST]
+        sheet = Image.new("RGB", (400 * len(ims), 400), "white")
+        for i, im in enumerate(ims):
+            sheet.paste(im, (400 * i, 0))
+        sheet.save(dst, quality=90)
+    return dst
+
+
 def draw(name):
     dst = OUT / f"story-{name}.png"
     if dst.exists():
         return
     refs = ([OUT / "story-1-arrive.png"] + REFS if name == "1b-leave"
-            else [OUT / "story-1-arrive.png"] + REFS if name in ("0-box", "0b-open") else REFS)
+            else [OUT / "story-0b-open.png", cast_sheet(), OUT / "story-4-cast.png"]
+            if name == "0-box"
+            else [cast_sheet(), OUT / "story-4-cast.png", OUT / "story-1-arrive.png"]
+            if name == "0b-open" else REFS)
     body = {"model": "muse-image-1.0", "n": 1, "size": "1792x1024", "output_format": "png",
             "response_format": "b64_json",
             "prompt": ((BASE_NO_CHILD if name in NO_CHILD else BASE) + BOX + SHOTS[name]
