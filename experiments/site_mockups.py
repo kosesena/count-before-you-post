@@ -186,6 +186,27 @@ LEGO_DIRECTIONS = {
         "like the front of a premium LEGO set box: the dock as a hero model shot on a gradient, "
         "the title as the set name with a set number badge '01', the seven characters lined "
         "up as the included minifigures along the bottom, the button as a bright yellow brick."),
+    # Round 2 (Sena did not like the first four). No brand logos or brand names anywhere.
+    "lego-tabletop-diorama": (
+        "the whole first screen is one photograph of a toy-brick diorama of the dock on a "
+        "wooden table, shot from above at an angle with shallow depth of field; the title and "
+        "tagline sit on a small printed tile in the diorama, the buttons are real bricks lying "
+        "on the table, the seven characters stand around the model. Warm, handmade, magical."),
+    "lego-hero-gate": (
+        "one bold hero: a huge close-up of the gate character Kapı (a toy figure in a cardboard-"
+        "box suit holding a striped barrier) next to a big toy-brick traffic light glowing "
+        "green, amber and red, on a deep navy background; the title in huge chunky rounded "
+        "type, very few words, the seven characters small in a neat row below. Minimal, "
+        "confident, like a premium product launch page."),
+    "lego-bento-bricks": (
+        "a playful bento grid where every tile is a different coloured toy brick seen from "
+        "above with studs (red, yellow, blue, green, orange, white): one big tile with the "
+        "title, one with the dock photo, one per character, one with the button. Bright, "
+        "joyful, modern, tidy alignment, no clutter."),
+    "lego-pastel-studio": (
+        "soft pastel studio: a pastel peach and lilac background, the seven characters as "
+        "toy figures standing on a pastel brick shelf, the dock as a small cute model on the "
+        "right, rounded soft UI cards, friendly and cosy, like a modern toy brand site."),
 }
 
 REST_DIRECTIONS = {
