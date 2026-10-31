@@ -637,8 +637,14 @@ footer p { margin: 4px 0; }
 .morning-stage { position: sticky; top: 0; height: 100vh; height: 100svh; min-height: 420px; overflow: hidden; }
 .morning-stage img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 50%; display: block; }
 @media (max-aspect-ratio: 1659/1100) { .morning-stage img { object-fit: contain; } }
-.morning-stage .wink { opacity: 0; }
-.morning.winked .morning-stage .wink { opacity: 1; }
+.morning-stage > img { transition: filter .6s ease; }
+.morning.farewell .morning-stage > img { filter: blur(7px) brightness(.85); }
+/* Glimmer's farewell: a Higgsfield Genjutsu clip (transparent) set exactly over her figure in
+   the picture; it grows from her place, she waves and winks. */
+.morning-glimmer { position: absolute; transform-origin: 50% 100%; transform: scale(1); opacity: 0;
+  transition: transform 1.1s cubic-bezier(.2,1.2,.4,1), opacity .25s ease; pointer-events: none; }
+.morning.farewell .morning-glimmer { opacity: 1; transform: scale(var(--grow, 1.9)); }
+@media (prefers-reduced-motion: reduce) { .morning-glimmer { transition: opacity .25s; } }
 .morning-credit { position: absolute; right: 16px; bottom: 14px; margin: 0; padding: 5px 10px;
   border-radius: 999px; background: rgba(20,14,8,.55); color: rgba(255,255,255,.9);
   font-size: 11.5px; line-height: 1.3; backdrop-filter: blur(6px); }
@@ -821,9 +827,9 @@ footer p { margin: 4px 0; }
   <div class="morning-stage">
     <img src="img/morning.webp" width="1672" height="941" decoding="async"
       alt="Morning: the ten figures stand still in a row in front of the dock they built in the night, toys again; the child's hands come back.">
-    <img class="wink" src="img/morning-wink.webp" width="1671" height="941" decoding="async" alt="" aria-hidden="true">
+    <video class="morning-glimmer" id="morningGlimmer" muted playsinline preload="auto" aria-hidden="true"></video>
     <p class="morning-line">Count before you post.</p>
-    <p class="morning-credit">Morning pictures: ChatGPT (OpenAI), drawn from our Muse Image cast</p>
+    <p class="morning-credit">Morning picture: ChatGPT (OpenAI) · Glimmer's farewell: Higgsfield Genjutsu, from our Muse Image Glimmer</p>
   </div>
 </section>
 <div class="wrap">
@@ -833,7 +839,7 @@ footer p { margin: 4px 0; }
     <p><a href="https://github.com/kosesena/count-before-you-post">https://github.com/kosesena/count-before-you-post</a></p>
     <p>Characters: Sena's concepts, drawn with Muse Image. Fan-made, not official Meta mascots.</p>
     <p>This page was written by Muse Code; the toy box opening and the morning ending were added with Claude Code.</p>
-    <p>Toy box, night and morning pictures: ChatGPT (OpenAI), drawn from our Muse Image cast. Brick Dock simulator: built with OpenAI Codex.</p>
+    <p>Toy box, night and morning pictures: ChatGPT (OpenAI), drawn from our Muse Image cast. Glimmer's farewell: Higgsfield Genjutsu (motion from a Pixabay clip by videoplasty), her wink drawn with Muse Image. Brick Dock simulator: built with OpenAI Codex.</p>
   </footer>
 </div>
 <div class="dock-overlay" id="dockOverlay" aria-hidden="true">
@@ -2127,20 +2133,42 @@ addEventListener("resize", placeToyboxBags);
   addEventListener("resize", update);
   update();
 })();
-/* The morning: past the middle of its scroll track the picture cuts (no fade) to Glimmer's wink. */
+/* The morning: once the picture fills the window, the box blurs and Glimmer grows out of her
+   place, waves and winks (transparent clip: HEVC with alpha for Safari, VP9 with alpha elsewhere).
+   Her figure in the picture, in picture pixels (1672x941): x 520-715, feet at y 770. */
 (() => {
-  const m = document.querySelector(".morning");
-  if (!m) return;
-  let queued = false;
+  const m = document.querySelector(".morning"), v = $("morningGlimmer"), pic = m && m.querySelector(".morning-stage > img");
+  if (!m || !v || !pic) return;
+  const safari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+  v.src = safari ? "media/glimmer-farewell.mov" : "media/glimmer-farewell.webm";
+  const place = () => {
+    const w = pic.clientWidth, h = pic.clientHeight, W = 1672, H = 941;
+    const k = getComputedStyle(pic).objectFit === "contain" ? Math.min(w / W, h / H) : Math.max(w / W, h / H);
+    const ox = (w - W * k) * .5, oy = (h - H * k) * .5;
+    // In the clip (560x752) her figure is 76% of the height and her feet sit 11% above the bottom.
+    const figH = 265 * k, vh = figH / .76, vw = vh * 560 / 752;
+    Object.assign(v.style, { width: vw + "px", height: vh + "px",
+      left: (ox + 617 * k - vw / 2) + "px", top: (oy + 770 * k + vh * .11 - vh) + "px" });
+    // Grow to about 70% of the window's height, never off the top.
+    v.style.setProperty("--grow", Math.min(2.4, (h * .72) / vh).toFixed(2));
+  };
+  let on = false, queued = false;
   const update = () => {
     queued = false;
     const r = m.getBoundingClientRect(), track = r.height - innerHeight;
     const p = track > 0 ? -r.top / track : 1;
-    m.classList.toggle("winked", p > .55);
+    const now = p > .12 && r.bottom > innerHeight * .5;
+    if (now !== on) {
+      on = now;
+      m.classList.toggle("farewell", on);
+      if (on) { v.currentTime = 0; const pr = v.play(); if (pr && pr.catch) pr.catch(() => {}); }
+      else v.pause();
+    }
     document.body.classList.toggle("on-morning", r.top < innerHeight * .5 && r.bottom > innerHeight * .5);
   };
   addEventListener("scroll", () => { if (!queued) { queued = true; requestAnimationFrame(update); } }, { passive: true });
-  update();
+  addEventListener("resize", place);
+  place(); update();
 })();
 </script>
 </body>

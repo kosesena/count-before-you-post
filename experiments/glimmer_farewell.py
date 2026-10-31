@@ -2,6 +2,7 @@
 
 Usage: .venv/bin/python experiments/glimmer_farewell.py draw     # Muse Image: Glimmer winking, A-pose
        .venv/bin/python experiments/glimmer_farewell.py green    # Muse Image: Glimmer on chroma green (video start frame)
+       .venv/bin/python experiments/glimmer_farewell.py wink     # Muse Image: the Genjutsu clip's last frame, one eye winking
        .venv/bin/python experiments/glimmer_farewell.py model    # Meshy: image to 3D (textured GLB)
        .venv/bin/python experiments/glimmer_farewell.py rig      # Meshy: rig the model
        .venv/bin/python experiments/glimmer_farewell.py wave     # Meshy: wave animation on the rig
@@ -121,6 +122,27 @@ def green():
     print("drawn", dst, Image.open(dst).size)
 
 
+WINK = (
+    "Exactly the same image: the same toy figure, the same pose, the same raised hand, the same "
+    "orb, the same framing, the same flat green background and light. Change only her face: "
+    "she winks, her right eye closed in a playful wink, her left eye open, a happy smile.")
+
+
+def wink():
+    src, dst = OUT / "genjutsu-last.png", OUT / "genjutsu-wink.png"
+    w, h = Image.open(src).size
+    body = {"model": "muse-image-1.0", "n": 1, "size": f"{w}x{h}", "output_format": "png",
+            "response_format": "b64_json", "prompt": WINK,
+            "images": [{"image_url": "data:image/jpeg;base64," + base64.b64encode(_jpeg(src, width=w)).decode()}]}
+    req = urllib.request.Request(
+        BASE_URL + "/images/edits", data=json.dumps(body).encode(), method="POST",
+        headers={"Authorization": f"Bearer {os.environ['META_API_KEY']}",
+                 "Content-Type": "application/json"})
+    with urllib.request.urlopen(req, timeout=TIMEOUT * 2) as r:
+        dst.write_bytes(base64.b64decode(json.loads(r.read())["data"][0]["b64_json"]))
+    print("drawn", dst, Image.open(dst).size)
+
+
 def model():
     t = _tasks()
     if "model" not in t:
@@ -153,4 +175,4 @@ def wave():
 if __name__ == "__main__":
     _load_env()
     OUT.mkdir(parents=True, exist_ok=True)
-    {"draw": draw, "green": green, "model": model, "rig": rig, "wave": wave}[sys.argv[1]]()
+    {"draw": draw, "green": green, "wink": wink, "model": model, "rig": rig, "wave": wave}[sys.argv[1]]()

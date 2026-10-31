@@ -1,6 +1,6 @@
 """Render Meshy's waving Glimmer (experiments/glimmer-farewell/wave.glb), front view, transparent.
 
-Usage: Blender -b -P experiments/glimmer_farewell_render.py -- <out_dir> [size] [step]
+Usage: Blender -b -P experiments/glimmer_farewell_render.py -- <out_dir> [width] [step] [height]
 Writes <out_dir>/f####.png (RGBA). Run with Blender in the background; it never touches an open Blender.
 """
 import math
@@ -12,6 +12,7 @@ from mathutils import Vector
 
 argv = sys.argv[sys.argv.index("--") + 1:]
 out = Path(argv[0]); size = int(argv[1]) if len(argv) > 1 else 720; step = int(argv[2]) if len(argv) > 2 else 1
+height = int(argv[3]) if len(argv) > 3 else size
 glb = Path(__file__).resolve().parent / "glimmer-farewell" / "wave.glb"
 
 bpy.ops.wm.read_factory_settings(use_empty=True)
@@ -56,7 +57,7 @@ try:
 except TypeError:
     sc.render.engine = "BLENDER_EEVEE"
 sc.render.film_transparent = True
-sc.render.resolution_x = sc.render.resolution_y = size
+sc.render.resolution_x, sc.render.resolution_y = size, height
 sc.render.image_settings.file_format = "PNG"
 sc.render.image_settings.color_mode = "RGBA"
 sc.view_settings.view_transform = "Standard"
