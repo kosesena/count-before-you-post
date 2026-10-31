@@ -49,3 +49,8 @@ character on this page". That is no longer true. Change its line to exactly:
 
 - Light and dark theme at 1440×900 and 1280×800, and 375 px wide: no console errors, no
   horizontal page scroll, the box's title and all ten figures fully visible in the picture.
+
+---
+
+Outcome: stopped part-way and reverted. Sena found Muse Code too slow tonight and asked Claude
+to write it; the opening was written by hand (commit "Home opens with the toy box picture").

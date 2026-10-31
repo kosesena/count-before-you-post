@@ -547,6 +547,8 @@ footer p { margin: 4px 0; }
 .ch-cta { margin: 22px 0 0; }
 /* Progress line down the left edge (desktop only). */
 .progress { position: fixed; left: 0; top: 0; bottom: 0; width: 52px; z-index: 5; pointer-events: none; }
+.progress { transition: opacity .3s; }
+.on-toybox .progress { opacity: 0; visibility: hidden; }
 .progress-track { position: absolute; left: 25px; top: 0; bottom: 0; width: 2px;
   background: rgba(255,255,255,.14); }
 .progress-fill { width: 100%; height: 0; background: #8fa8ff; display: block; }
@@ -572,11 +574,34 @@ footer p { margin: 4px 0; }
 .cast-band { padding-bottom: 40px; }
 .castshot video { display: block; width: 100%; height: auto; border-radius: 18px;
   border: 1px solid var(--line); box-shadow: var(--shadow); background: #000; }
+/* The opening: the video's toy box picture (ChatGPT, drawn from the Muse Image cast). The box
+   stays whole at any size; only the wooden table around it is cropped or extended. */
+.toybox { position: relative; height: 100vh; height: 100svh; min-height: 420px; max-height: 1100px;
+  overflow: hidden; background: #8a5a2e radial-gradient(120% 90% at 50% 40%, #b77a43 0%, #8a5a2e 60%, #5e3a1c 100%); }
+.toybox img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+  object-position: 50% 45%; display: block; }
+@media (max-aspect-ratio: 1659/1100) { .toybox img { object-fit: contain; } }
+.toybox-credit { position: absolute; right: 16px; bottom: 14px; margin: 0; padding: 5px 10px;
+  border-radius: 999px; background: rgba(20,14,8,.55); color: rgba(255,255,255,.9);
+  font-size: 11.5px; line-height: 1.3; backdrop-filter: blur(6px); }
+.toybox-next { position: absolute; left: 50%; bottom: 14px; width: 44px; height: 44px; margin-left: -22px;
+  display: grid; place-items: center; border-radius: 50%; background: rgba(20,14,8,.45); color: #fff;
+  text-decoration: none; animation: toybox-bob 1.8s ease-in-out infinite; }
+.toybox-next:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+@keyframes toybox-bob { 50% { transform: translateY(5px); } }
+@media (prefers-reduced-motion: reduce) { .toybox-next { animation: none; } }
+@media (max-width: 700px) { .toybox-credit { left: 12px; right: 12px; bottom: 66px; text-align: center; } }
 </style>
 </head>
 <body>
 <button id="theme" type="button" aria-label="Toggle colour theme">Dark</button>
-<header class="hero">
+<section class="toybox" aria-label="Count Before You Post toy box">
+  <img src="img/toybox.webp" width="1659" height="948" fetchpriority="high"
+    alt="A child's hands hold the Count Before You Post toy box: a blue box with the ten figures in front of a warehouse dock.">
+  <p class="toybox-credit">Toy box picture: ChatGPT (OpenAI), drawn from our Muse Image cast</p>
+  <a class="toybox-next" href="#top" aria-label="To the page"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M3 6.5l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+</section>
+<header class="hero" id="top">
   <div class="hero-bg" aria-hidden="true"><img id="heroImg" alt=""></div>
   <div class="hero-scrim" aria-hidden="true"></div>
   <div class="hero-inner">
@@ -592,7 +617,7 @@ footer p { margin: 4px 0; }
         <li data-tool="spark"><a class="tool" href="character.html?id=spark"><span class="fig" aria-hidden="true"><img src="img/hero-spark.webp" alt=""></span><span class="cap"><b>Muse Spark</b><small>reads the note, looks at the pallet, runs the agent</small></span></a></li>
         <li data-tool="sam"><a class="tool" href="character.html?id=sam"><span class="fig" aria-hidden="true"><img src="img/hero-sam.webp" alt=""></span><span class="cap"><b>SAM 3.1</b><small>finds and outlines every carton</small></span></a></li>
         <li data-tool="voice"><a class="tool" href="character.html?id=voice"><span class="fig" aria-hidden="true"><img src="img/hero-voice.webp" alt=""></span><span class="cap"><b>Muse Voice</b><small>writes down the receiver's spoken count</small></span></a></li>
-        <li data-tool="iris"><a class="tool" href="character.html?id=iris"><span class="fig" aria-hidden="true"><img src="img/hero-iris.webp" alt=""></span><span class="cap"><b>Muse Image</b><small>drew every character on this page</small></span></a></li>
+        <li data-tool="iris"><a class="tool" href="character.html?id=iris"><span class="fig" aria-hidden="true"><img src="img/hero-iris.webp" alt=""></span><span class="cap"><b>Muse Image</b><small>drew the cast; ChatGPT drew the toy box from it</small></span></a></li>
         <li data-tool="ada"><a class="tool" href="character.html?id=ada"><span class="fig" aria-hidden="true"><img src="img/hero-ada.webp" alt=""></span><span class="cap"><b>Muse Code</b><small>wrote the ERPNext client, this page and the first simulator (sim/)</small></span></a></li>
         <li data-tool="wonder"><a class="tool" href="character.html?id=wonder"><span class="fig" aria-hidden="true"><img src="img/hero-wonder.webp" alt=""></span><span class="cap"><b>Muse Wonder</b><small>checks Spark's reading against the note; writes the dispute, the damage report or the note to Şef</small></span></a></li>
         <li data-tool="spark-open"><a class="tool" href="character.html?id=spark-open"><span class="fig" aria-hidden="true"><img src="img/hero-spark-open.webp" alt=""></span><span class="cap"><b>Muse Spark Open</b><small>reads the note a second time on open weights before any receipt</small></span></a></li>
@@ -1867,6 +1892,13 @@ fetch("data.json").then(r => {
   $("case").innerHTML = `<div class="card"><p class="what">Could not load the demo data.</p>` +
     `<p class="sub">${esc(err.message)}. Serve this folder over HTTP so <span class="mono">fetch("data.json")</span> works.</p></div>`;
 });
+/* The chapter dots stay out of the toy box picture while it fills the window. */
+(() => {
+  const box = document.querySelector(".toybox");
+  if (!box || !("IntersectionObserver" in window)) return;
+  new IntersectionObserver(([e]) => document.body.classList.toggle("on-toybox", e.intersectionRatio > 0.35),
+    { threshold: [0, 0.35, 1] }).observe(box);
+})();
 </script>
 </body>
 </html>
