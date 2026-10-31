@@ -593,8 +593,8 @@ footer p { margin: 4px 0; }
   display: flex; flex-direction: column; align-items: center; justify-content: flex-end; }
 .toybox-bag .pop img { flex: 1 1 auto; min-height: 0; width: auto; max-width: 70%; object-fit: contain;
   filter: drop-shadow(0 14px 16px rgba(0,0,0,.45)); }
-.toybox-bag .card { position: absolute; top: -12%; left: 160%; width: min(400px, 30vw); z-index: 4;
-  display: block; padding: 22px 24px 20px; border-radius: 22px; pointer-events: none; text-align: left;
+.toybox-bag .card { position: absolute; top: -6%; left: 160%; width: min(720px, 52vw); z-index: 4;
+  display: block; padding: 28px 32px 26px; border-radius: 22px; pointer-events: none; text-align: left;
   color: #f2f5ff; background: rgba(14, 18, 38, .9);
   background: linear-gradient(115deg, color-mix(in srgb, var(--c) 30%, transparent) 0%, transparent 62%), rgba(14, 18, 38, .9);
   -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
@@ -603,14 +603,14 @@ footer p { margin: 4px 0; }
 .toybox-bag.card-left .card { left: auto; right: 160%; transform: translateX(10px); }
 .toybox-bag:hover .card, .toybox-bag:focus-visible .card { opacity: 1; transform: none; }
 .toybox-bag .card > span { display: block; }
-.toybox-bag .card .eyebrow { font-size: 11.5px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase;
+.toybox-bag .card .eyebrow { font-size: 12.5px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase;
   color: color-mix(in srgb, var(--c) 55%, white); }
-.toybox-bag .card .name { margin-top: 6px; font-size: 30px; font-weight: 800; line-height: 1.1; color: #fff; }
-.toybox-bag .card .model { margin-top: 4px; font-size: 13.5px; color: rgba(235, 240, 255, .75); }
-.toybox-bag .card .line { margin-top: 12px; font-size: 14.5px; line-height: 1.55; color: rgba(255, 255, 255, .92); }
-.toybox-bag .card .job0 { margin-top: 12px; font-size: 14.5px; font-weight: 800; line-height: 1.45;
+.toybox-bag .card .name { margin-top: 6px; font-size: 38px; font-weight: 800; line-height: 1.1; color: #fff; }
+.toybox-bag .card .model { margin-top: 4px; font-size: 14.5px; color: rgba(235, 240, 255, .75); }
+.toybox-bag .card .line { margin-top: 14px; font-size: 16px; line-height: 1.6; color: rgba(255, 255, 255, .92); }
+.toybox-bag .card .job0 { margin-top: 14px; font-size: 16px; font-weight: 800; line-height: 1.45;
   color: color-mix(in srgb, var(--c) 60%, white); }
-.toybox-bag .card .open { margin-top: 12px; font-size: 13.5px; font-weight: 700; text-decoration: underline;
+.toybox-bag .card .open { margin-top: 16px; font-size: 14.5px; font-weight: 700; text-decoration: underline;
   text-underline-offset: 3px; color: color-mix(in srgb, var(--c) 55%, white); }
 @media (prefers-reduced-motion: reduce) { .toybox-bag .card { transition: opacity .2s; transform: none; } }
 .toybox-bag:hover .pop, .toybox-bag:focus-visible .pop { opacity: 1; transform: translate(-50%, -10%) scale(1); }
@@ -1987,13 +1987,30 @@ function buildToyboxBags(data) {
       const fx = document.createElement("canvas"); fx.className = "fx"; fx.setAttribute("aria-hidden", "true");
       pop.append(fx, img); a.append(pop, card); nav.append(a);
       let fxT = 0;
-      const on = () => { clearTimeout(fxT); fxT = setTimeout(() => startFx(pop), 300); };
+      const on = () => { placeCard(a, card); clearTimeout(fxT); fxT = setTimeout(() => startFx(pop), 300); };
       const off = () => { clearTimeout(fxT); if (fxActive && fxActive.card === pop) stopFx(); };
       a.addEventListener("pointerenter", on); a.addEventListener("focus", on);
       a.addEventListener("pointerleave", off); a.addEventListener("blur", off);
     });
   });
   placeToyboxBags();
+}
+/* The card opens beside the grown figure (right of it, or left on the box's right half) and is
+   kept inside the picture: a wide card next to a middle figure would otherwise run off screen. */
+function placeCard(a, card) {
+  const stage = a.closest(".toybox-stage");
+  if (!stage) return;
+  card.style.left = card.style.right = card.style.width = "";
+  const st = stage.getBoundingClientRect(), br = a.getBoundingClientRect(), gap = br.width * .6;
+  const roomR = st.right - 16 - (br.right + gap), roomL = br.left - gap - (st.left + 16);
+  const want = card.offsetWidth;
+  // The preferred side if the card fits there, else the side with more room, narrowed to fit.
+  let left = !a.classList.contains("card-left");
+  if ((left ? roomR : roomL) < want) left = roomR >= roomL;
+  const w = Math.max(340, Math.min(want, left ? roomR : roomL));
+  card.style.width = w + "px";
+  const x = left ? br.right + gap : br.left - gap - w;
+  card.style.right = "auto"; card.style.left = (x - br.left) + "px";
 }
 /* Where they are on screen, for the pictures' object-fit and object-position (50% 45%). */
 function placeToyboxBags() {
