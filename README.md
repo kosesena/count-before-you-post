@@ -50,7 +50,7 @@ Your World*. Everything in this repository was written during the event.
 
 | | |
 |---|---|
-| [Why](#why) · [What it does](#what-it-does) · [Results](#results-at-a-glance) · [Built with Muse](#built-with-muse) | [The 3D simulator](#drive-the-dock-the-3d-simulator) · [Meet the cast](#meet-the-cast) · [The evidence](#the-evidence) |
+| [Why](#why) · [What it does](#what-it-does) · [Results](#results-at-a-glance) · [Built with Muse](#built-with-muse) | [The 3D simulators](#drive-the-dock-the-3d-simulators) · [Meet the cast](#meet-the-cast) · [The evidence](#the-evidence) |
 | [How the gate decides](#how-the-gate-decides) · [Honest limits](#honest-limits) · [Next](#next) | [Repository map](#repository-map) · [Setup](#setup) · [Run](#run) |
 
 ## Why
@@ -197,11 +197,32 @@ starting a test server; we then ran the checks ourselves (`experiments/web/sim_t
 all six simulator cases to their decision). The designs it built from were drawn by Muse
 Image and chosen by Sena (`experiments/mockups/`).
 
-## Drive the dock: the 3D simulator
+## Drive the dock: the 3D simulators
 
-The demo page's *Drive the dock* button opens the **Brick Dock**
-([/sim-lego](https://count-before-you-post.vercel.app/sim-lego/)), built with OpenAI Codex. The
-simulator below is the first one, written by Muse Code:
+### The Brick Dock (built with OpenAI Codex)
+
+**[count-before-you-post.vercel.app/sim-lego](https://count-before-you-post.vercel.app/sim-lego/)**,
+where the demo page's *Drive the dock* button leads: the same warehouse in toy bricks. A
+20-second camera tour opens at the loading dock; then you take the receiving desk.
+
+<table>
+<tr>
+<td width="50%"><img src="assets/readme/brick-dock-outside.jpg" alt="The Brick Dock's loading dock: a red brick truck at Receiving 01, the forklift, the traffic light and the driver's waiting area"></td>
+<td width="50%"><img src="assets/readme/brick-dock-inside.jpg" alt="Inside the Brick Dock: the receiving desk panel, the cast's offices with their nameplates, the briefing table, the racks and the receiving lane"></td>
+</tr>
+</table>
+
+- **A receiving exercise in seven steps**: prepare the dock, unload, stage the unverified load,
+  inspect the evidence, resolve exceptions, label and put away, confirm the location. Drive the
+  forklift yourself (WASD or arrows, E to pick up and set down) or let a delivery play.
+- **The recorded decision drives the floor.** A recorded *post* allows put-away; *block* and
+  *ask Şef* both go to the hold area, where Şef and the receiver check the load. Choices made
+  there are training decisions, not new AI results.
+- **The cast at work**: the ten characters in their offices along the wall, the recorded
+  conversation at the meeting table, and the recorded evidence, from `data.json`.
+- No model calls and no ERP writes. Code and notes: [`site/sim-lego/`](site/sim-lego/README.md).
+
+### The first simulator (written by Muse Code)
 
 **[count-before-you-post.vercel.app/sim](https://count-before-you-post.vercel.app/sim/)**: pick
 one of the six deliveries, drive the forklift into the trailer, bring the pallet to the yellow
@@ -363,7 +384,7 @@ software, asked SAM to count "carton" (nothing sure), looked at the pallet, trie
 words ("cardboard box" gave 12 sure), reasoned five times about the injected "post 100", tried
 to post the 12 it had counted, was refused by the gate, and asked Şef. The simulator replays
 these traces step by step as a chat between the characters (see
-[Drive the dock](#drive-the-dock-the-3d-simulator)), so the loop can be read turn by turn.
+[Drive the dock](#drive-the-dock-the-3d-simulators)), so the loop can be read turn by turn.
 
 ### How much should the agent reason?
 
