@@ -134,7 +134,16 @@ Every step that needs AI runs on Meta's models through the Meta Model API.
 | **Muse Wonder** (`muse-wonder-1.0`) | Wonder | Audits Spark's reading against the note before a write; drafts the dispute, the damage report or the note to Şef, in the note's language | `cbyp/wonder.py` |
 | **Muse Spark Open** (open weights, on Baseten) | Rover | Reads the note a second time, independently; if the two readings differ, Şef decides | `cbyp/second_reader.py` |
 | **Muse Code** | Ada | Wrote the ERPNext client, the demo page, the character pages, the 3D simulator and the dock scenes; and, through the gate's MCP server, worked the dock as an outside agent | see [What Muse Code built](#what-muse-code-built) |
-| **Muse Image** | Iris | Drew every character in this repository and on the demo page | `experiments/mascots_from_ref.py`, `assets/mascots/` |
+| **Muse Image** | Iris | Drew the whole cast: every character portrait in this repository and on the demo page | `experiments/mascots_from_ref.py`, `assets/mascots/` |
+
+### Other tools, named where they were used
+
+| Tool | What it made | Where |
+|---|---|---|
+| **ChatGPT** (OpenAI) | The toy box pictures that open and close the demo page and the video (the box closed and open, the night build, the morning), drawn from our Muse Image portraits | `experiments/mockups/story-0*-chatgpt.png`, `story-9-*`, `site/img/toybox*.webp`, `hero-night.webp`, `morning*.webp` |
+| **OpenAI Codex** | The Brick Dock, a second simulator in LEGO bricks, where the page's *Drive the dock* button leads | `site/sim-lego/` |
+| **Claude Code** | The page's toy box opening, the morning ending and the hover cards in the open box, written by hand on 31 Oct when Muse Code was too slow for the evening; marked as such in each commit | `site/index.html` |
+| **Meshy** | The LEGO truck, forklift and meeting table in the simulator; a rigged 3D Glimmer with a wave (Muse Image drew her winking first) | `site/sim/models/`, `experiments/glimmer_farewell.py` |
 
 ### What Muse Code built
 
@@ -182,6 +191,10 @@ all six simulator cases to their decision). The designs it built from were drawn
 Image and chosen by Sena (`experiments/mockups/`).
 
 ## Drive the dock: the 3D simulator
+
+The demo page's *Drive the dock* button opens the **Brick Dock**
+([/sim-lego](https://count-before-you-post.vercel.app/sim-lego/)), built with OpenAI Codex. The
+simulator below is the first one, written by Muse Code:
 
 **[count-before-you-post.vercel.app/sim](https://count-before-you-post.vercel.app/sim/)**: pick
 one of the six deliveries, drive the forklift into the trailer, bring the pallet to the yellow
@@ -593,7 +606,9 @@ Every experiment, with its numbers and its failures, is in **[docs/JOURNAL.md](d
 | `experiments/results/` | Raw JSON from every run |
 | `demo/muse-dock/` | Muse Code at the dock, started with the gate's MCP server |
 | `docs/muse-code/` | Every task given to Muse Code, verbatim |
-| `site/`, `experiments/build_site.py` | The live demo page, character pages and 3D simulator `site/sim/` (written by Muse Code) and their data |
+| `site/`, `experiments/build_site.py` | The live demo page, character pages and 3D simulator `site/sim/` (written by Muse Code; the page's toy box opening and morning ending added with Claude Code) and their data |
+| `site/sim-lego/` | The Brick Dock simulator, built with OpenAI Codex |
+| `experiments/glimmer_farewell.py`, `glimmer-farewell/` | Glimmer's farewell: Muse Image drawings, Meshy model, rig and wave |
 | `assets/mascots/` | The cast, drawn with Muse Image |
 | `experiments/web/` | `sim_test.mjs` (plays the six simulator cases), `export_dock.py` (the Blender dock for the browser), page checks |
 | `experiments/room_concepts.py`, `site_mockups.py` | Muse Image design concepts Sena chose from (`experiments/mockups/`) |
