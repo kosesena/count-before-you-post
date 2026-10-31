@@ -1,5 +1,5 @@
 import {openConversation} from './conversation.js?v=bilingual-1';
-import {buildReceivingScene} from './receiving-scene.js?v=brick-bins-1';
+import {buildReceivingScene} from './receiving-scene.js?v=brick-bins-2';
 import {receivingSteps,initialDestination,reviewPolicy,canAccept,locationMatches,atRouteStart,reviewRoute} from './receiving.mjs?v=receiving-9';
 import {participants,names,replayLines} from './replay.mjs?v=chat-3';
 import * as T from 'three';
