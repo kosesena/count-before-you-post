@@ -581,11 +581,11 @@ footer p { margin: 4px 0; }
 .toybox { position: relative; height: 230vh; height: 230svh;
   background: #8a5a2e radial-gradient(120% 90% at 50% 40%, #b77a43 0%, #8a5a2e 60%, #5e3a1c 100%); }
 .toybox-stage { position: sticky; top: 0; height: 100vh; height: 100svh; min-height: 420px; overflow: hidden; }
-.toybox img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+.toybox-stage > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
   object-position: 50% 45%; display: block; will-change: opacity, transform; }
 .toybox .toybox-open { opacity: var(--open, 0); }
 .toybox .toybox-closed { transform: scale(calc(1 + var(--open, 0) * .04)); }
-@media (max-aspect-ratio: 1659/1100) { .toybox img { object-fit: contain; } }
+@media (max-aspect-ratio: 1659/1100) { .toybox-stage > img { object-fit: contain; } }
 @media (prefers-reduced-motion: reduce) { .toybox .toybox-closed { transform: none; } }
 .toybox-credit { position: absolute; right: 16px; bottom: 14px; margin: 0; padding: 5px 10px;
   border-radius: 999px; background: rgba(20,14,8,.55); color: rgba(255,255,255,.9);
@@ -596,6 +596,23 @@ footer p { margin: 4px 0; }
 .toybox-next:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
 @keyframes toybox-bob { 50% { transform: translateY(5px); } }
 @media (prefers-reduced-motion: reduce) { .toybox-next { animation: none; } }
+.toybox-bags { position: absolute; inset: 0; pointer-events: none; }
+.toybox.is-open .toybox-bags { pointer-events: auto; }
+.toybox-bag { position: absolute; display: block; border-radius: 10px; outline: none; }
+.toybox-bag:focus-visible { box-shadow: 0 0 0 3px #fff, 0 0 0 6px rgba(20,14,8,.5); }
+.toybox-bag .pop { position: absolute; left: 50%; bottom: 4%; height: 118%; width: 200%;
+  transform: translate(-50%, 10%) scale(.75); transform-origin: 50% 100%; opacity: 0; pointer-events: none;
+  transition: transform .35s cubic-bezier(.2,1.4,.4,1), opacity .2s;
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-end; }
+.toybox-bag .pop img { flex: 1 1 auto; min-height: 0; width: auto; max-width: 70%; object-fit: contain;
+  filter: drop-shadow(0 14px 16px rgba(0,0,0,.45)); }
+.toybox-bag .pop span { flex: 0 0 auto; margin-top: 6px; padding: 6px 12px; border-radius: 12px; background: rgba(255,255,255,.96);
+  color: #0b1f4d; font-size: 13px; line-height: 1.25; text-align: center; white-space: nowrap;
+  box-shadow: 0 6px 18px rgba(0,0,0,.25); }
+.toybox-bag .pop b { display: block; font-size: 15px; }
+.toybox-bag:hover .pop, .toybox-bag:focus-visible .pop { opacity: 1; transform: translate(-50%, -18%) scale(1); }
+.toybox-bag:hover, .toybox-bag:focus-visible { z-index: 2; }
+@media (prefers-reduced-motion: reduce) { .toybox-bag .pop { transition: opacity .2s; transform: translate(-50%, -18%); } }
 @media (max-width: 700px) { .toybox-credit { left: 12px; right: 12px; bottom: 66px; text-align: center; } }
 </style>
 </head>
@@ -607,6 +624,7 @@ footer p { margin: 4px 0; }
       alt="A child's hands hold the Count Before You Post toy box: a blue box with the ten figures in front of a warehouse dock.">
     <img class="toybox-open" src="img/toybox-open.webp" width="1659" height="948" loading="eager"
       alt="The box opened: each of the ten figures in its own clear bag, with the bricks, the GOODS IN sign, the truck and the traffic light below.">
+    <nav class="toybox-bags" id="toyboxBags" aria-label="The ten characters in the box"></nav>
     <p class="toybox-credit">Toy box pictures: ChatGPT (OpenAI), drawn from our Muse Image cast</p>
     <a class="toybox-next" href="#top" aria-label="To the page"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M3 6.5l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
   </div>
@@ -1504,6 +1522,7 @@ function start(data) {
   langCache[BASE_LANG] = data;
   renderHow();
   renderCrew(data.characters || []);
+  buildToyboxBags(data);
   armFx();
   if (data.hero) {
     $("heroImg").src = data.hero.src; $("heroImg").alt = data.hero.alt || "";
@@ -1902,6 +1921,48 @@ fetch("data.json").then(r => {
   $("case").innerHTML = `<div class="card"><p class="what">Could not load the demo data.</p>` +
     `<p class="sub">${esc(err.message)}. Serve this folder over HTTP so <span class="mono">fetch("data.json")</span> works.</p></div>`;
 });
+/* The open box picture: the ten bags, left to right, in picture pixels (1659x948). Over each
+   bag a link to the character's page; on hover or focus the figure rises out of the bag. */
+const TOYBOX_BAGS = [["spark", 90, 235], ["sam", 235, 365], ["voice", 365, 505], ["glimmer", 505, 650],
+  ["iris", 650, 800], ["ada", 800, 945], ["wonder", 945, 1090], ["spark-open", 1090, 1240],
+  ["kapi", 1240, 1380], ["sef", 1380, 1550]];
+function buildToyboxBags(data) {
+  const nav = $("toyboxBags");
+  if (!nav) return;
+  nav.innerHTML = "";
+  TOYBOX_BAGS.forEach(([id, x0, x1]) => {
+    const c = byId(id);
+    if (!c) return;
+    const a = document.createElement("a");
+    a.className = "toybox-bag"; a.href = "character.html?id=" + id;
+    a.dataset.x0 = x0; a.dataset.x1 = x1;
+    a.setAttribute("aria-label", c.name + " · " + c.model);
+    const pop = document.createElement("span"); pop.className = "pop"; pop.setAttribute("aria-hidden", "true");
+    const img = document.createElement("img"); img.alt = ""; img.loading = "lazy";
+    /* The hero figures (transparent, whole); Kapı, Şef and Glimmer have no hero figure, so
+       their cut-outs with SAM's small holes filled from the drawing (img/pop-<id>.webp). */
+    img.src = (data.hero && data.hero.tools && data.hero.tools[id]) || "img/pop-" + id + ".webp";
+    const cap = document.createElement("span");
+    cap.innerHTML = "<b></b>"; cap.querySelector("b").textContent = c.name;
+    cap.append(c.model);
+    pop.append(img, cap); a.append(pop); nav.append(a);
+  });
+  placeToyboxBags();
+}
+/* Where the bags are on screen, for the picture's object-fit and object-position (50% 45%). */
+function placeToyboxBags() {
+  const nav = $("toyboxBags"), img = document.querySelector(".toybox-open");
+  if (!nav || !img) return;
+  const w = img.clientWidth, h = img.clientHeight, W = 1659, H = 948;
+  const k = getComputedStyle(img).objectFit === "contain" ? Math.min(w / W, h / H) : Math.max(w / W, h / H);
+  const ox = (w - W * k) * .5, oy = (h - H * k) * .45;
+  nav.querySelectorAll(".toybox-bag").forEach(a => {
+    const x0 = +a.dataset.x0, x1 = +a.dataset.x1;
+    a.style.left = (ox + x0 * k) + "px"; a.style.width = ((x1 - x0) * k) + "px";
+    a.style.top = (oy + 180 * k) + "px"; a.style.height = (260 * k) + "px";
+  });
+}
+addEventListener("resize", placeToyboxBags);
 /* The toy box opens as the page scrolls: --open goes 0 → 1 over the middle of the scroll
    track. The chapter dots stay hidden while the box fills the window. */
 (() => {
@@ -1914,6 +1975,7 @@ fetch("data.json").then(r => {
     const p = track > 0 ? Math.min(1, Math.max(0, -r.top / track)) : 1;
     const t = Math.min(1, Math.max(0, (p - .2) / .55));
     box.style.setProperty("--open", (t * t * (3 - 2 * t)).toFixed(3));
+    box.classList.toggle("is-open", t > .9);
     document.body.classList.toggle("on-toybox", r.bottom > innerHeight * .5);
   };
   addEventListener("scroll", () => { if (!queued) { queued = true; requestAnimationFrame(update); } }, { passive: true });
