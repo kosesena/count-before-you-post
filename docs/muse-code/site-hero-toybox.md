@@ -70,3 +70,8 @@ flat and readable).
 
 - Light and dark theme at 1440×900 and 1280×800, and 375 px wide: no console errors, no
   horizontal page scroll, all seven figures visible, all links working.
+
+---
+
+Outcome: stopped part-way and reverted, not committed. While it ran Sena decided the page should
+open directly with the video's toy box picture instead (`site-hero-toybox-picture.md`).
