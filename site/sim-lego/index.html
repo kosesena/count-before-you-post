@@ -4,7 +4,7 @@
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#f5f2eb">
   <title>Count Before You Post · Warehouse Simulator</title>
-  <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="./style.css?v=conversation-6">
   <script type="importmap">{"imports":{"three":"./vendor/three.module.js"}}</script>
 </head>
 <body>
@@ -29,7 +29,14 @@
     <button id="demo" class="primary">Play delivery <span>↗</span></button>
     <button id="drive" class="secondary">Drive forklift <span>W A S D</span></button>
     <div class="playback" hidden><button id="pause-demo">Pause</button><select id="play-speed" aria-label="Playback speed"><option value="0.35">Extra slow</option><option value="0.5" selected>Slow · 0.5×</option><option value="1">Normal · 1×</option></select></div>
-    </div><div id="status" role="status" aria-live="polite"><i></i><span>Ready to explore.</span></div>
+    <div id="outcome-actions" hidden>
+<label for="storage-level">PUT-AWAY LOCATION</label><select id="storage-level"><option value="0">A-01-L0 · Ground slot</option><option value="1">A-01-L1 · Upper shelf</option></select>
+<button id="transfer-load" class="primary">Transfer load</button><button id="manual-transfer" class="secondary">Handle manually</button>
+<div id="review-controls" hidden><p id="review-proposal"></p><label for="review-count">MANUALLY CONFIRMED INTACT CARTONS</label><input id="review-count" type="number" min="0" max="12" value="0"><p>Training decision only. No ERP write.</p><button id="review-approve">Confirm simulated acceptance</button><button id="review-return">Return entire load</button></div></div>
+<button id="next-delivery" hidden>Dispatch load &amp; next delivery</button>
+<div class="operation-tools"><button id="show-meeting">Conversation</button><button id="show-evidence">Recorded evidence</button><button id="office-doors" aria-pressed="false">Office doors</button><button id="walk-route">Walk upstairs</button></div>
+<details><summary>Delivery history</summary><ol id="delivery-history"></ol></details>
+</div><div id="status" role="status" aria-live="polite"><i></i><span>Ready to explore.</span></div>
     <p class="footnote">Recorded verification results.<br>No live ERP writes.<br>This scene was built with OpenAI Codex.</p>
   </aside>
   <button id="open-nav" aria-controls="scene-nav" aria-expanded="false">Explore <span>☰</span></button><nav id="scene-nav" aria-label="Explore the warehouse" hidden><div class="nav-heading"><h2>Where to?</h2><button id="close-nav" aria-label="Close navigation">×</button></div>
@@ -41,10 +48,12 @@
     <button data-view="outside"><b class="view-number">06</b><svg class="view-icon" viewBox="0 0 24 26" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 5h12v12H2zM14 9h5l3 4v4h-8"/><circle cx="6" cy="18" r="2"/><circle cx="18" cy="18" r="2"/></svg><span>Loading dock</span></button>
     <button id="crew" aria-label="Meet the ten agents"><b class="view-number">10</b><span>The crew</span></button>
   <button id="replay-intro"><span aria-hidden="true">▷</span><span>Replay introduction</span></button></nav>
-  <aside id="cast-card" hidden><label for="cast-select">MEET THE CREW</label><select id="cast-select" aria-label="Choose an agent"></select><p id="cast-caption"></p></aside>
+  <aside id="meeting-chat" hidden><button id="close-meeting" aria-label="Close conversation">×</button><p class="eyebrow">RECORDED AGENT RUN · NO LIVE AI CALLS</p><h2>Delivery team</h2><div id="meeting-team"></div><p id="meeting-stage"></p><div class="meeting-controls"><label><input id="manual-lines" type="checkbox" checked> Advance manually</label><button id="next-line" disabled>Next line →</button></div><div id="meeting-log" role="log" aria-live="polite"></div><div id="meeting-comparison"></div></aside><div id="speech" hidden><strong id="speech-name"></strong><p id="speech-text"></p></div>
+  <aside id="evidence" hidden aria-label="Recorded delivery evidence"><button id="close-evidence" aria-label="Close evidence">×</button><p class="eyebrow">RECORDED EVIDENCE · NOT A LIVE AI RUN</p><h2>Why this decision?</h2><p id="evidence-warning"></p><dl id="evidence-rows"></dl><details open><summary>Original delivery note</summary><img id="evidence-note" alt="Recorded delivery note"></details><details><summary>Recorded counting-camera image</summary><img id="evidence-camera" alt="Recorded pallet camera evidence"></details><p>Images are from the recorded trial, not the current 3D camera. Document instructions are treated as untrusted data.</p></aside>
+<aside id="cast-card" hidden><label for="cast-select">MEET THE CREW</label><select id="cast-select" aria-label="Choose an agent"></select><p id="cast-caption"></p></aside>
   <div id="hint">Drag to look around <b>·</b> Scroll to zoom <b>·</b> Right-drag to pan</div>
   <button id="clean" title="Hide / show interface (H)" aria-label="Hide or show interface">◩</button>
-  <div id="touch" hidden><button data-key="w" aria-label="Forward">↑</button><div><button data-key="a" aria-label="Turn left">←</button><button data-key="s" aria-label="Reverse">↓</button><button data-key="d" aria-label="Turn right">→</button></div><button id="touch-load">Pick up / set down</button></div>
+  <div id="touch" hidden><button data-key="w" aria-label="Forward">↑</button><div><button data-key="a" aria-label="Turn left">←</button><button data-key="s" aria-label="Reverse">↓</button><button data-key="d" aria-label="Turn right">→</button></div><button id="lift-up">Lift + (Q)</button><button id="lift-down">Lower − (Z)</button><button id="touch-load">Pick up / set down</button></div>
   <dialog id="instructions"><button id="close-help" aria-label="Close">×</button><div class="eyebrow">WAREHOUSE GUIDE</div><h2>Small pieces.<br>A bigger picture.</h2><p>Drag to orbit the scene, scroll to zoom, and right-drag to pan.</p><p><b>Forklift:</b> Select “Drive forklift”. Use W/S or ↑/↓ to move and A/D or ←/→ to turn. Press E to pick up or set down a pallet. Deliver it to the yellow inspection zone.</p><p><b>H</b> hides the interface. <b>R</b> resets the scene. “Play delivery” starts the recorded demonstration. Use Pause and Playback speed to read at your own pace.</p><p class="footnote">A hackathon project demo using recorded decisions. It does not write to a live ERP.</p></dialog>
   <section id="warehouse-intro" aria-label="Warehouse introduction" hidden>
     <div class="intro-copy"><p id="intro-detail"></p><h2 id="intro-title"></h2></div>
@@ -52,7 +61,7 @@
   </section>
   <div id="loading"><strong>Preparing your warehouse…</strong><small>COUNT BEFORE YOU POST · META GLOBAL AI HACKATHON</small></div>
   <script type="module">
-    import('./main.js?v=live-tour-2').catch(error => {
+    import('./main.js?v=conversation-6').catch(error => {
       console.error(error);
       const loading = document.getElementById('loading');
       if (loading) {

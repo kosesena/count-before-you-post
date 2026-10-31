@@ -1,5 +1,7 @@
+import {participants,names,replayLines} from './replay.mjs';
 import * as T from 'three';
 import { blockedPose, movePose, rectangle } from './collision.mjs';
+import {areas,contained,pickupAligned,placementClear,collectRoute,destinationRoute,evidenceRows} from './operations.mjs';
 import { GLTFLoader } from './vendor/GLTFLoader.js';
 import { DRACOLoader } from './vendor/DRACOLoader.js';
 import { OrbitControls } from './vendor/OrbitControls.js';
@@ -104,11 +106,11 @@ for(let z=-18;z<=14;z+=4)box(ceiling,0,10.9,z,34,.12,3.97,0xc7cbc4);for(let x=-1
  piece(ceiling,geom('torus',.13,.028,12),mat(0x939b97),x,10.82,z,Math.PI/2);
 }
 flush(ceiling);ceiling.traverse(o=>{o.castShadow=false;});
-const racks=group();
-function rack(parent,x,z,ry,bays){const g=group(parent,x,0,z,ry);const step=2.8;for(let b=0;b<=bays;b++){const xx=(b-bays/2)*step;for(const zz of [-.7,.7]){for(let k=0;k<16;k++)box(g,xx,.25+k*.48,zz,.18,.465,.22,C.blue,k===15);box(g,xx,.16,zz,.45,.16,.45,C.blue);for(let k=0;k<14;k++)cyl(g,xx,.55+k*.48,zz+.115,.035,.012,0x063d79,8,Math.PI/2);}}
- for(let b=0;b<bays;b++){const xx=(b+.5-bays/2)*step;for(let lev=0;lev<4;lev++){const y=.5+lev*1.95;box(g,xx,y,.73,2.8,.18,.18,C.yellow,true);box(g,xx,y,-.73,2.8,.18,.18,C.yellow,true);box(g,xx,y,0,2.66,.12,1.38,0xb7bdc0);for(let c=0;c<3;c++){const h=.6+((b+lev+c)%3)*.12;crate(g,xx+(c-1)*.78,y+.12,0,.68,h,.84);if((b+lev+c)%3===0)crate(g,xx+(c-1)*.78,y+.12+h+.08,0,.55,.48,.65);}box(g,xx+.75,y,.84,.4,.09,.02,C.white);}}
+const racks=group();let rackIndex=0;
+function rack(parent,x,z,ry,bays){const g=group(parent,x,0,z,ry);const rackCode=String.fromCharCode(66+rackIndex++);const step=2.8;for(let b=0;b<=bays;b++){const xx=(b-bays/2)*step;for(const zz of [-.7,.7]){for(let k=0;k<16;k++)box(g,xx,.25+k*.48,zz,.18,.465,.22,C.blue,k===15);box(g,xx,.16,zz,.45,.16,.45,C.blue);for(let k=0;k<14;k++)cyl(g,xx,.55+k*.48,zz+.115,.035,.012,0x063d79,8,Math.PI/2);}}
+ for(let b=0;b<bays;b++){const xx=(b+.5-bays/2)*step;for(let lev=0;lev<4;lev++){const y=.5+lev*1.95;box(g,xx,y,.73,2.8,.18,.18,C.yellow,true);box(g,xx,y,-.73,2.8,.18,.18,C.yellow,true);box(g,xx,y,0,2.66,.12,1.38,0xb7bdc0);for(let c=0;c<3;c++){const h=.6+((b+lev+c)%3)*.12;crate(g,xx+(c-1)*.78,y+.12,0,.68,h,.84);if((b+lev+c)%3===0)crate(g,xx+(c-1)*.78,y+.12+h+.08,0,.55,.48,.65);}label(g,`${rackCode}-${String(b+1).padStart(2,'0')}-L${lev}`,xx,y+.22,.86,1.2,.18,'#f4f3e9','#263d35');}}
  flush(g);return g;}
-rack(racks,2.3,-18.7,0,9);rack(racks,16,-13.7,-Math.PI/2,4);rack(racks,16,5.7,-Math.PI/2,3);rack(racks,-16,-15.9,Math.PI/2,2);
+rack(racks,2.3,-18.7,0,9);rack(racks,16,-13.7,-Math.PI/2,4);rack(racks,16,5.7,-Math.PI/2,3);
 // Continuous left shell: the office backs sit flush against its inner face.
 for(let layer=0;layer<21;layer++)for(let z=-20;z<16;z+=1.6){
   const start=z+(layer%2)*.8,end=Math.min(start+1.6,16);
@@ -120,7 +122,7 @@ for(let layer=1;layer<21;layer+=2)box(world,-17,.32+layer*.48,-19.6,.35,.465,.78
 flush(world);
 // Character construction: separate rigid limbs, printed face, C-shaped hands.
 const actors=[];
-const castSlots=[], castMixers=[];
+const castSlots=[], castMixers=[], officeDoors=[];
 const castIds=['spark','sef','sam','voice','kapi','iris','ada','glimmer','wonder','rover'];
 const castJobs=['Reads the delivery note','Makes the final call','Counts the cartons','Listens to the receiver','Guards the receiving gate','Designs the visuals','Builds the system','Read every note in the second-reader trial','Cross-checks the evidence','Reads the note again'];
 function person(parent,x,y,z,color,hair=0x39271e,hat=false,scale=1,ry=0){const g=group(parent,x,y,z,ry);g.scale.setScalar(scale);for(const s of [-1,1]){box(g,s*.2,.34,0,.34,.64,.4,0x243452);box(g,s*.2,.1,.12,.35,.2,.58,0x243452);}box(g,0,.76,0,.78,.2,.4,C.black);const torso=new T.Mesh(new T.CylinderGeometry(.33,.46,.65,4,1),mat(color));torso.rotation.y=Math.PI/4;torso.scale.z=.65;torso.position.y=1.16;g.add(torso);box(g,0,1.18,.26,.08,.5,.015,color===C.blue?C.yellow:C.white);for(const s of [-1,1]){const arm=group(g,s*.49,1.4,0,0);const a=new T.Mesh(geom('cyl',.14,.55,12),mat(color));a.position.set(0,-.2,.01);a.rotation.z=s*.14;arm.add(a);const hand=new T.Mesh(new T.TorusGeometry(.115,.055,8,14,Math.PI*1.65),mat(0xffce44));hand.position.set(0,-.55,.06);hand.rotation.z=-.3;arm.add(hand);}
@@ -141,8 +143,8 @@ for(let floor=0;floor<2;floor++)for(let n=0;n<5;n++){
  for(const xx of [-2.12,2.12]){box(room,xx,1.85,.04,.14,3.6,5.18,color,true);box(room,xx,1.85,2.58,.12,3.7,.15,C.black);}
  box(room,0,3.62,2.58,4.3,.22,.18,C.black);box(room,0,.14,2.58,4.3,.1,.18,C.black);box(room,0,1.85,2.58,.09,3.5,.12,C.black);
  const roomLight=new T.PointLight(0xffddb0,9,6,2);roomLight.position.set(0,3.1,.5);room.add(roomLight);
- const pane=new T.Mesh(new T.PlaneGeometry(4.05,3.35),glass);pane.position.set(0,1.85,2.6);room.add(pane);
- box(room,.77,1.4,2.67,.055,.36,.08,0xd7dadd);
+ const pane=new T.Mesh(new T.PlaneGeometry(2,3.35),glass);pane.position.set(-1.05,1.85,2.6);room.add(pane);
+ const door=group(room,2.08,0,2.61);const doorGlass=new T.Mesh(new T.PlaneGeometry(1.98,3.3),glass);doorGlass.position.set(-1,1.83,0);door.add(doorGlass);box(door,-1.98,1.84,0,.07,3.35,.1,C.black);box(door,-1.7,1.4,.07,.055,.36,.08,0xd7dadd);flush(door);officeDoors.push(door);
  litName(room,name,color);
  // Light tiled floors, desk, monitor, keyboard, paperwork, bookcase.
  for(let xx=-1.8;xx<2;xx+=.6)for(let zz=-2;zz<2.4;zz+=.6)box(room,xx,.155,zz,.585,.04,.585,floor?0xdacdb3:0xe7e5dc,true);
@@ -166,7 +168,7 @@ const castLoader=new GLTFLoader().setDRACOLoader(draco);
 let castLoaded=0;
 await Promise.all(castSlots.map(async slot=>{
  try{
-  const gltf=await castLoader.loadAsync(`../sim/models/${slot.id}.glb`);
+  const gltf=await castLoader.loadAsync(slot.id==='rover'?'./models/rover-clean.glb':slot.id==='sef'?'./models/sef-refined.glb':`../sim/models/${slot.id}.glb`);
   const root=gltf.scene, bounds=new T.Box3().setFromObject(root), size=bounds.getSize(new T.Vector3());
   const actor=group(slot.room,-.65,.21,-.85);
   root.position.set(-(bounds.min.x+bounds.max.x)/2,-bounds.min.y,-(bounds.min.z+bounds.max.z)/2);
@@ -176,14 +178,15 @@ await Promise.all(castSlots.map(async slot=>{
   slot.mixer=new T.AnimationMixer(root);castMixers.push(slot.mixer);
   // Keep the existing face design; full-resolution textures preserve its printed detail.
   root.traverse(o=>{if(o.isMesh)for(const material of (Array.isArray(o.material)?o.material:[o.material])){if(material.map)material.map.anisotropy=renderer.capabilities.getMaxAnisotropy();}});
+  slot.arms=[root.getObjectByName('ArmL'),root.getObjectByName('ArmR')].filter(Boolean);
   slot.legs=[root.getObjectByName('LegL'),root.getObjectByName('LegR')].filter(Boolean);
   if(slot.legs.length){
    actor.updateWorldMatrix(true,true);const hip=actor.worldToLocal(slot.legs[0].getWorldPosition(new T.Vector3()));
-   actor.position.y=.66-hip.y;
+   slot.hipHeight=hip.y;actor.position.y=.66-hip.y;
    // Rest legs point down; negative local X turns them towards the desk (+Z).
    slot.legs.forEach(leg=>leg.rotation.x=-Math.PI/2);
   }
-  const idle=gltf.animations.find(c=>c.name==='Idle');if(idle)slot.mixer.clipAction(idle).play();
+  const idle=gltf.animations.find(c=>c.name==='Idle'),walk=gltf.animations.find(c=>c.name==='Walk');slot.idle=idle?slot.mixer.clipAction(idle):null;slot.walk=walk?slot.mixer.clipAction(walk):null;slot.idle?.play();
   // Imported wave deforms the shoulders; keep the seated idle pose until the rig is repaired.
   slot.wave=null;
   castLoaded++;$('loading').querySelector('small').textContent=`CREW · ${castLoaded} / 10`;
@@ -204,7 +207,7 @@ for(let i=0;i<72;i++){const a=i*Math.PI*2/72;const p=group(meeting,Math.cos(a)*4
 cyl(meeting,0,.4,0,1,.27,C.black,48);for(let i=0;i<7;i++)cyl(meeting,0,.57+i*.19,0,.65,.18,C.black,32);cyl(meeting,0,1.94,0,2.55,.22,0xc9782e,96);cyl(meeting,0,2.055,0,2.5,.035,0xd68739,96);
 // Fine tile seams on smooth round top; rows stop exactly at the circular edge.
 for(let x=-2.4;x<=2.4;x+=.6){const len=Math.sqrt(2.48**2-x*x)*2;box(meeting,x,2.077,0,.012,.003,len,0xb96c2b);box(meeting,0,2.078,x,len,.003,.012,0xb96c2b);}
-const stools=[[-2.85,-1.5,C.yellow],[2.85,-1.5,C.blue],[-1.95,2.5,C.teal],[1.95,2.5,C.orange]];
+const stools=Array.from({length:5},(_,i)=>{const a=Math.PI+i*Math.PI*2/5;return [Math.cos(a)*3.15,Math.sin(a)*3.15,[C.yellow,C.blue,C.teal,C.orange,0x9853bf][i]];});
 for(const [x,z,c] of stools){cyl(meeting,x,.36,z,.5,.15,c,40);for(let i=0;i<5;i++)cyl(meeting,x,.5+i*.19,z,.105,.18,C.black,20);ring(meeting,x,.58,z,.34,.055,C.black);cyl(meeting,x,1.45,z,.51,.21,c,48);cyl(meeting,x,1.565,z,.46,.035,c,48);for(let i=0;i<4;i++){const a=i*Math.PI/2;cyl(meeting,x+Math.cos(a)*.32,1.6,z+Math.sin(a)*.32,.065,.045,c,12);}}
 sheet(meeting,.6,2.1,.7,.65,.8);sheet(meeting,.25,2.1,-.65,.65,.8);box(meeting,-.85,2.12,-.1,.6,.09,.75,C.black);box(meeting,-.85,2.17,-.1,.48,.012,.6,0xd3e8e6);box(meeting,.95,2.14,-.35,.25,.12,.25,C.black);cyl(meeting,.95,2.34,-.35,.06,.3,0x81888b,16);flush(meeting);
 await stage('Parking the vehicles…');
@@ -316,8 +319,8 @@ flush(fork);flush(lift);
 // Delivery pallet and gate, beyond the meeting area.
 const delivery=group(scene,18.1,.18,-4,Math.PI/2);pallet(delivery,0,0,0,1.8,1.6);flush(delivery);
 let cartons=group(delivery);let currentCase='ok';
-function buildLoad(){delivery.remove(cartons);cartons.traverse(o=>{if(o.isInstancedMesh)o.dispose();});batches.delete(cartons);cartons=group(delivery);const count=currentCase==='eksik'?11:12;for(let i=0;i<count;i++){const row=Math.floor(i/6),j=i%6;const x=(j%3-1)*.55,z=(Math.floor(j/3)-.5)*.72;crate(cartons,x,.36+row*.56,z,.51,.48,.64);if(currentCase==='wrong')box(cartons,x,.6+row*.56,z+.335,.25,.2,.02,C.yellow);if(currentCase==='hasarli'&&i===11){box(cartons,x,.91,z+.34,.32,.06,.02,C.red);box(cartons,x,.98,z+.34,.055,.25,.02,C.red);}}
- if(currentCase==='belirsiz'){cartons.children.length=0;batches.delete(cartons);for(let i=0;i<12;i++)crate(cartons,(i%2-.5)*.6,.36+Math.floor(i/4)*.56,(Math.floor(i/2)%2-.5)*.72,.54,.49,.64);}flush(cartons);}
+function buildLoad(overrideCount=null){delivery.remove(cartons);cartons.traverse(o=>{if(o.isInstancedMesh)o.dispose();});batches.delete(cartons);cartons=group(delivery);const count=overrideCount??(currentCase==='eksik'?11:12);for(let i=0;i<count;i++){const row=Math.floor(i/6),j=i%6;const x=(j%3-1)*.55,z=(Math.floor(j/3)-.5)*.72;if(currentCase==='hasarli'&&i===11){const broken=group(cartons,x,.36+row*.56,z);broken.rotation.z=.15;box(broken,0,.13,0,.51,.26,.64,C.tan);box(broken,.08,.27,0,.36,.035,.64,C.tan);flush(broken);}else crate(cartons,x,.36+row*.56,z,.51,.48,.64);label(cartons,currentCase==='wrong'?'CORN OIL':'SUNFLOWER OIL',x,.58+row*.56,z+.335,.46,.13,'#fff8df','#253b40');if(currentCase==='hasarli'&&i===11){box(cartons,x,.91,z+.34,.32,.06,.02,C.red);box(cartons,x,.98,z+.34,.055,.25,.02,C.red);}}
+ if(currentCase==='belirsiz'&&overrideCount===null){cartons.clear();batches.delete(cartons);for(let i=0;i<12;i++)crate(cartons,(i%2-.5)*.6,.36+Math.floor(i/4)*.56,(Math.floor(i/2)%2-.5)*.72,.54,.49,.64);}flush(cartons);}
 buildLoad();
 const zone={x:4,z:-5.5};const gate=group(scene,zone.x,.18,zone.z);
 for(const z of [-1.6,1.6])box(gate,0,.03,z,4,.06,.12,C.yellow);for(const x of [-2,2])box(gate,x,.03,0,.12,.06,3.2,C.yellow);
@@ -332,10 +335,27 @@ person(scene,7.2,.2,-3.6,C.blue,0x2b2826,true,1,-.6);
 // Small pallet jack, spare cartons and safety cones stay at the edges.
 const props=group();for(const [x,z] of [[-4,-10.5],[14,9],[13,-8]]){pallet(props,x,.16,z);for(let i=0;i<3;i++)crate(props,x+(i-1)*.55,.52,z,.5,.6,.65);}
 for(const [x,z] of [[6,-7.5],[6,-3.5],[-10,10]]){box(props,x,.2,z,.5,.12,.5,C.orange);const cone=new T.Mesh(new T.CylinderGeometry(.07,.2,.55,16),mat(C.orange));cone.position.set(x,.5,z);props.add(cone);cyl(props,x,.55,z,.12,.1,C.white,16);}flush(props);
+// Marked circulation and receiving partition, matching collision solids.
+const circulation=group();
+for(const [x,w] of [[-10.775,1.25],[-3.325,11.25],[11.65,10.7]]){for(let xx=x-w/2;xx<=x+w/2;xx+=1)box(circulation,xx,.8,-7.3,.1,1.4,.1,C.yellow);box(circulation,x,1.45,-7.3,w,.1,.12,C.yellow);box(circulation,x,.6,-7.3,w,.08,.1,C.black);}
+for(let z=-6;z<14;z+=.8)box(circulation,-9.6,.17,z,1.1,.03,.6,0x439b89);
+const walkSign=label(circulation,'PEDESTRIANS',-9.6,.2,4,3,.65,'#287a6d','#ffffff');walkSign.rotation.x=-Math.PI/2;
+const vehicleSign=label(circulation,'FORKLIFT ROUTE',8,.2,1,3,.65,'#ffcc00','#243238');vehicleSign.rotation.x=-Math.PI/2;
+for(let i=0;i<8;i++)box(circulation,-9.6+i*.5,.18,-10.05,.25,.03,1.4,C.white);
+label(circulation,'CONTROLLED STORAGE',0,1.9,-7.3,3,.4,'#243238','#fff3b2');
+for(const [id,a] of Object.entries(areas)){if(id==='inspection')continue;const col=id==='accepted'?0x369469:id==='hold'?C.orange:C.red;for(const dz of [-a.hz,a.hz])box(circulation,a.x,.19,a.z+dz,a.hx*2,.04,.09,col);for(const dx of [-a.hx,a.hx])box(circulation,a.x+dx,.19,a.z,.09,.04,a.hz*2,col);const tag=label(circulation,`${id==='returned'?'RETURN':id==='hold'?'HOLD FOR REVIEW':'ACCEPTED'} / ${a.address}`,a.x,.22,a.z+a.hz+.5,3.2,.55,'#f4f3e9','#243238');tag.rotation.x=-Math.PI/2;}
+// A dedicated put-away rack, with one empty pallet slot on each level.
+for(const x of [2.5,5.5])for(const z of [-13.65,-11.15])box(circulation,x,2.3,z,.14,4.3,.14,C.blue,true);
+box(circulation,4,2.45,-12.4,3,.16,2.6,C.yellow);box(circulation,4,4.4,-12.4,3,.12,2.6,C.yellow);
+label(circulation,'A-01 · L0 / L1',4,4.65,-11.08,2.8,.35,'#0055bd','#ffffff');
+for(const dz of [-1,1])box(circulation,13,.19,7+dz,2,.04,.07,C.orange);for(const dx of [-1,1])box(circulation,13+dx,.19,7,.07,.04,2,C.orange);const quarantineLabel=label(circulation,'QUARANTINE',13,.22,8.5,2,.4,'#fff1d1','#733b12');quarantineLabel.rotation.x=-Math.PI/2;
+flush(circulation);
+const walkingGuide=person(scene,-9.6,.18,3,0x72933d,0x242521,false,.8);let walkStarted=0;
 await stage('Finishing the details…');
 let caseData;
 try{const res=await fetch('../data.json');if(!res.ok)throw Error('data');caseData=await res.json();}catch{caseData=null;}
 const state={paused:false,speed:.5,mode:'orbit',held:false,running:false,phase:0,t:0,result:null};
+const completedLoads=[];let automation=null,transferTarget=null,verified=false,reviewResolved=false,deliveryNumber=1;let forkHeight=0;
 const keys=new Set();let cameraTween=null;let barrierTarget=0;
 const views={hero:{eye:[-1,6.5,21],target:[-1,3.5,-4]},table:{eye:[8,7,18],target:[-1,1.5,7]},rooms:{eye:[4,8,15],target:[-13,3.9,1]},dock:{eye:[10,8,8],target:[12,1,-4]},plan:{eye:[31,39,35],target:[6,0,0]},outside:{eye:[33,5.8,10],target:[22,2.7,-4]}};
 // A live cinematic tour of this exact warehouse, with no external video.
@@ -373,12 +393,152 @@ $('skip-intro').onclick=()=>endIntro();$('replay-intro').onclick=startIntro;
 document.addEventListener('keydown',e=>{if(introActive&&e.key==='Escape'){e.preventDefault();e.stopImmediatePropagation();endIntro();}},true);
 function status(text,color='#799c70'){$('status').querySelector('span').textContent=text;$('status').querySelector('i').style.background=color;}
 function setView(name){if(introActive)endIntro(false);$('scene-nav').hidden=true;$('open-nav').setAttribute('aria-expanded','false');document.body.classList.remove('cast-focus');state.mode='orbit';$('touch').hidden=true;$('drive').innerHTML='Drive forklift <span>W A S D</span>';const v=views[name];const aim=new T.Vector3(...v.target);const eye=new T.Vector3(...v.eye);if(camera.aspect<1.25)eye.sub(aim).multiplyScalar(Math.min(1.75,1.25/camera.aspect)).add(aim);cameraTween={from:camera.position.clone(),targetFrom:controls.target.clone(),to:eye,targetTo:aim,t:0};document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===name));controls.enabled=true;}
-function reset(){document.querySelector('.playback').hidden=true;state.paused=false;$('pause-demo').textContent='Pause';state.running=false;state.held=false;state.phase=0;state.result=null;state.mode='orbit';state.t=0;delivery.parent?.remove(delivery);scene.add(delivery);delivery.position.set(18.1,.18,-4);delivery.rotation.set(0,Math.PI/2,0);fork.position.set(18.2,.18,-.6);fork.rotation.y=-Math.PI/2;lift.position.y=0;barrierTarget=0;signals.forEach(s=>s.material.emissiveIntensity=.06);$('demo').disabled=false;$('case').disabled=false;status('Ready to explore.');setView('hero');}
-function pickup(){if(state.held){const pos=new T.Vector3();delivery.getWorldPosition(pos);const heading=fork.rotation.y;scene.attach(delivery);delivery.position.y=.18;delivery.rotation.y=heading;lift.position.y=0;state.held=false;if(Math.hypot(pos.x-zone.x,pos.z-zone.z)<1.6){state.running=true;state.phase=3;state.t=0;$('demo').disabled=true;$('case').disabled=true;status('Sam is counting the cartons…');}else status('Pallet placed. Take it to the yellow inspection zone.');return true;}
- const front=new T.Vector3(0,0,-2.3).applyAxisAngle(new T.Vector3(0,1,0),fork.rotation.y).add(fork.position);if(front.distanceTo(delivery.position)>1.7){status('Move closer and align the forks under the pallet.','#d19a31');return false;}if(blockedPose(fork.position.x,fork.position.z,fork.rotation.y,{...collisionOptions(),held:true,pallet:null})){status('Not enough clearance for the load. Align the forklift.','#d19a31');return false;}fork.attach(delivery);delivery.position.set(0,.42,-2.25);delivery.rotation.set(0,0,0);lift.position.y=.3;state.held=true;status('Load secured. Take it to the yellow zone; press E to set down.');return true;}
+let meetingRun=null;
+const castHomes=new Map(castSlots.filter(s=>s.actor).map(s=>[s.id,{position:s.actor.position.clone(),rotation:s.actor.rotation.clone()}]));
+let followupData=null;try{const r=await fetch('../data-en.json');if(r.ok)followupData=await r.json();}catch{}
+function resetMeeting(){
+ meetingRun=null;document.body.classList.remove('conversation-open');$('meeting-chat').hidden=true;$('speech').hidden=true;
+ for(const slot of castSlots){const home=castHomes.get(slot.id);if(!home)continue;slot.room.add(slot.actor);slot.actor.position.copy(home.position);slot.actor.rotation.copy(home.rotation);slot.onFloor=false;slot.route=null;slot.seated=false;slot.walk?.stop();slot.idle?.play();}
+}
+function beginMeeting(){
+ const entry=caseData?.cases.find(c=>c.id===currentCase);if(!entry){finish();return;}
+ const members=participants(currentCase);meetingRun={entry,members,lines:replayLines(entry,followupData?.cases.find(c=>c.id===currentCase)?.signoff),index:-1,elapsed:0,phase:'arriving'};
+ document.body.classList.add('conversation-open');$('meeting-team').replaceChildren();for(const id of members){const tile=document.createElement('div'),avatar=document.createElement('img'),name=document.createElement('span'),activity=document.createElement('small');tile.dataset.agent=id;avatar.src=id==='rover'?'./models/rover-avatar.png':`../img/av-${id}.jpg`;avatar.alt=names[id];name.textContent=names[id];activity.textContent='Joining';tile.append(avatar,name,activity);$('meeting-team').append(tile);}
+ $('meeting-log').replaceChildren();$('meeting-comparison').replaceChildren();$('meeting-chat').hidden=false;$('evidence').hidden=true;$('meeting-stage').textContent='The crew is walking to the table. Staging is illustrative; the dialogue replays recorded results.';
+ $('next-line').disabled=true;setView('table');officeDoors.forEach(d=>d.userData.open=true);
+ members.forEach((id,i)=>{
+  const slot=castSlots.find(s=>s.id===id);if(!slot?.actor)return;
+  const home=castHomes.get(id);const local=[home.position.clone(),new T.Vector3(.7,home.position.y,-.3),new T.Vector3(1.9,home.position.y,-.3),new T.Vector3(1.9,home.position.y,3.1)];
+  const points=local.map(v=>slot.room.localToWorld(v));const y=slot.index>=5?4.3:.18;points.forEach(v=>v.y=y);
+  if(slot.index>=5)points.push(new T.Vector3(-11.1,4.3,-10.05),new T.Vector3(-5.95,.18,-10.05),new T.Vector3(-5.95,.18,-8.6),new T.Vector3(-9.6,.18,-8.6));
+  else if(points.at(-1).z < -7.3)points.push(new T.Vector3(-9.6,.18,points.at(-1).z));
+  points.push(new T.Vector3(-9.6,.18,12.7),new T.Vector3(-5.7,.18,12.7),new T.Vector3(-5.7,.18,7));
+  const a=Math.PI+i*Math.PI*2/5;slot.seatAngle=a;
+  for(let t=Math.PI;t<a-.01;t+=.12)points.push(new T.Vector3(-1+Math.cos(t)*4.7,.18,7+Math.sin(t)*4.7));
+  points.push(new T.Vector3(-1+Math.cos(a)*4.7,.18,7+Math.sin(a)*4.7));
+  scene.attach(slot.actor);slot.actor.position.copy(points[0]);slot.actor.rotation.set(0,0,0);slot.onFloor=true;slot.seated=false;slot.idle?.stop();slot.walk?.reset().play();slot.route=points.slice(1);slot.returnRoute=points.slice().reverse();
+ });
+ state.phase=5;state.running=true;state.t=0;status('The delivery team is gathering at the meeting table.');
+}
+function seatActor(slot){
+ const actor=slot.actor;slot.walk?.stop();slot.idle?.reset().play();slot.seated=true;
+ actor.position.set(-1+Math.cos(slot.seatAngle)*3.15,1.72-(slot.hipHeight||.9),7+Math.sin(slot.seatAngle)*3.15);actor.lookAt(-1,actor.position.y,7);
+ slot.legs?.forEach(leg=>leg.rotation.x=-Math.PI/2);actor.updateWorldMatrix(true,true);
+ let bottom=Infinity;const point=new T.Vector3(),cx=actor.position.x,cz=actor.position.z;
+ actor.traverse(mesh=>{if(!mesh.isSkinnedMesh)return;mesh.skeleton.update();const count=mesh.geometry.attributes.position.count;for(let i=0;i<count;i++){mesh.getVertexPosition(i,point);mesh.localToWorld(point);if(Math.hypot(point.x-cx,point.z-cz)<.49)bottom=Math.min(bottom,point.y);}});
+ // Stool top including studs is 1.773. Keep the lowest overlapping surface above it.
+ if(Number.isFinite(bottom))actor.position.y+=Math.max(0,1.82-bottom);
+}
+function showMeetingLine(){
+ const run=meetingRun;if(!run||run.phase!=='talking')return;run.index++;run.elapsed=0;
+ const line=run.lines[run.index];if(!line){endMeeting();return;}
+ const from=names[line.speaker]||line.speaker,to=line.to?names[line.to]||line.to:null;
+ const article=document.createElement('article'),avatar=document.createElement('img');avatar.src=line.speaker==='rover'?'./models/rover-avatar.png':`../img/av-${line.speaker}.jpg`;avatar.alt='';article.dataset.speaker=line.speaker;const title=document.createElement('strong'),body=document.createElement('p'),source=document.createElement('small');title.textContent=from+(to?' → '+to:'')+(line.remote?' · office link':'');body.textContent=line.text;source.textContent=line.source+(line.summary?' · concise status summary':'');const details=document.createElement('details'),summary=document.createElement('summary');summary.textContent='Recorded source';details.append(summary,source);article.append(avatar,title,body,details);$('meeting-log').append(article);article.scrollIntoView({block:'nearest'});
+ for(const tile of $('meeting-team').children){const talking=tile.dataset.agent===line.speaker;tile.classList.toggle('speaking',talking);tile.querySelector('small').textContent=talking?'Speaking':'Listening';}
+ $('speech-name').textContent=title.textContent;$('speech-text').textContent=line.text;$('speech').hidden=false;run.speaker=line.speaker;
+ status('The team is reviewing this delivery at the meeting table.');
+ $('meeting-stage').textContent=`Recorded step ${run.index+1} / ${run.lines.length}`;
+ const actor=castSlots.find(s=>s.id===line.speaker)?.actor,target=castSlots.find(s=>s.id===line.to)?.actor;
+ if(actor&&target&&!castSlots.find(s=>s.actor===actor)?.seated){const v=target.getWorldPosition(new T.Vector3());actor.lookAt(v.x,actor.position.y,v.z);}
+ if(line.decision){barrierTarget=run.entry.gate.action==='post'?-Math.PI*.48:0;signals.forEach((s,i)=>s.material.emissiveIntensity=i===({block:0,human:1,post:2}[run.entry.gate.action])?2.5:.06);}
+}
+function endMeeting(){
+ const run=meetingRun;run.phase='returning';$('speech').hidden=true;$('next-line').disabled=true;
+ $('meeting-stage').textContent='Recorded run complete. The crew is returning to their offices.';
+ const without=run.entry.without_gate,withGate=run.entry.agent;
+ for(const [title,data] of [['Without the gate',without],['With the gate · initial run',withGate]]){const section=document.createElement('section'),h=document.createElement('h3'),p=document.createElement('p');h.textContent=title;p.textContent=`Posted quantities: ${JSON.stringify(data?.posted||[])}. Supervisor notified: ${data?.supervisor?'yes':'no'}.`;section.append(h,p);$('meeting-comparison').append(section);}
+ for(const slot of castSlots)if(slot.onFloor){slot.seated=false;slot.actor.position.set(-1+Math.cos(slot.seatAngle)*4.7,.18,7+Math.sin(slot.seatAngle)*4.7);slot.idle?.stop();slot.walk?.reset().play();slot.route=slot.returnRoute.slice();}
+}
+function updateMeeting(dt){
+ const run=meetingRun;if(!run)return;
+ for(const slot of castSlots){if(!slot.onFloor||!slot.route?.length)continue;const dest=slot.route[0],distance=slot.actor.position.distanceTo(dest),step=dt*2.8;if(distance<=step){slot.actor.position.copy(dest);slot.route.shift();}else{slot.actor.lookAt(dest.x,slot.actor.position.y,dest.z);slot.actor.position.addScaledVector(dest.clone().sub(slot.actor.position).normalize(),step);}}
+ if(run.phase==='arriving'&&!castSlots.some(s=>s.onFloor&&s.route?.length)){for(const slot of castSlots)if(slot.onFloor)seatActor(slot);run.phase='talking';$('next-line').disabled=false;showMeetingLine();}
+ else if(run.phase==='talking'){run.elapsed+=dt;const line=run.lines[run.index];const duration=Math.max(6,Math.min(24,(line?.text.length||0)*.065));if(!$('manual-lines').checked&&run.elapsed>=duration)showMeetingLine();}
+ else if(run.phase==='returning'&&!castSlots.some(s=>s.onFloor&&s.route?.length)){for(const slot of castSlots){if(!slot.onFloor)continue;const h=castHomes.get(slot.id);slot.room.add(slot.actor);slot.actor.position.copy(h.position);slot.actor.rotation.copy(h.rotation);slot.onFloor=false;slot.seated=false;slot.walk?.stop();slot.idle?.reset().play();}meetingRun=null;$('meeting-stage').textContent='Replay complete · continue with physical handling.';document.body.classList.remove('conversation-open');$('meeting-chat').hidden=true;finish();$('evidence').hidden=true;}
+}
+$('next-line').onclick=()=>{if(meetingRun?.phase==='talking'){showMeetingLine();}};
+$('close-meeting').onclick=()=>{$('meeting-chat').hidden=true;document.body.classList.remove('conversation-open');};
+$('show-meeting').onclick=()=>{$('meeting-chat').hidden=false;document.body.classList.add('conversation-open');};
+function reset(){resetMeeting();buildLoad();for(const load of completedLoads)scene.remove(load.object);completedLoads.length=0;automation=null;transferTarget=null;verified=false;reviewResolved=false;forkHeight=0;$('evidence').hidden=true;$('outcome-actions').hidden=true;$('next-delivery').hidden=true;document.querySelector('.playback').hidden=true;state.paused=false;$('pause-demo').textContent='Pause';state.running=false;state.held=false;state.phase=0;state.result=null;state.mode='orbit';state.t=0;delivery.parent?.remove(delivery);scene.add(delivery);delivery.position.set(18.1,.18,-4);delivery.rotation.set(0,Math.PI/2,0);fork.position.set(18.2,.18,-.6);fork.rotation.y=-Math.PI/2;lift.position.y=0;barrierTarget=0;signals.forEach(s=>s.material.emissiveIntensity=.06);$('demo').disabled=false;$('case').disabled=false;status('Ready to explore.');setView('hero');}
+function pickup(){
+ const pose={x:fork.position.x,z:fork.position.z,angle:fork.rotation.y};
+ if(state.held){
+  const pos=delivery.getWorldPosition(new T.Vector3()),p={x:pos.x,z:pos.z,angle:pose.angle};
+  const id=transferTarget||'inspection',area=areas[id];
+  if(!contained(p,area)){status(`Place the whole pallet inside ${area.address||'the inspection bay'}.`,'#c48223');return false;}
+  if(Math.abs(forkHeight-(area.y-.18))>.12){status('Lower / raise the forks to the selected shelf level.','#c48223');return false;}
+  if(!placementClear(p,completedLoads.map(o=>rectangle(o.x,o.z,.9,.8,o.angle)))){status('The placement area is occupied or obstructed.','#c48223');return false;}
+  scene.attach(delivery);delivery.position.y=area.y;delivery.rotation.y=pose.angle;state.held=false;forkHeight=0;lift.position.y=0;
+  if(id==='inspection'){if(!verified){state.running=true;state.phase=3;state.t=0;}document.querySelector('.playback').hidden=false;status('Reviewing recorded delivery evidence…');}
+  else {status(`Delivery ${deliveryNumber} placed in ${area.address}. ${id==='hold'?'Supervisor action required.':'Physical transfer complete.'}`);$('next-delivery').hidden=id==='hold';$('outcome-actions').hidden=false;showOutcomeActions(id);}
+  return true;
+ }
+ const pos=delivery.getWorldPosition(new T.Vector3());
+ if(!pickupAligned(pose,{x:pos.x,z:pos.z,angle:delivery.rotation.y})||Math.abs(forkHeight-(pos.y-.18))>.12){status('Align squarely with the pallet openings and match the fork height.','#c48223');return false;}
+ if(blockedPose(pose.x,pose.z,pose.angle,{...collisionOptions(),held:true,pallet:null})){status('Not enough clearance to lift the pallet.','#c48223');return false;}
+ fork.attach(delivery);delivery.position.set(0,.42+forkHeight,-2.25);delivery.rotation.set(0,0,0);state.held=true;lift.position.y=forkHeight+.3;
+ status('Load secured. Keep it low while travelling.');return true;
+}
 const resultCopy={ok:'12 cartons verified. The receiving gate is open.',eksik:'11 cartons found; the note says 12. Delivery blocked.',wrong:'The product label does not match the note. Delivery blocked.',hasarli:'A carton is damaged. Supervisor review required.',talimat:'Injected instructions found in the note. Delivery blocked.',belirsiz:'Stacked cartons cannot be counted. Supervisor review required.'};
-function finish(){const entry=caseData?.cases.find(c=>c.id===currentCase);if(!entry){status('Recorded verification data could not load. Result unavailable.','#bd4931');state.running=false;$('demo').disabled=false;$('case').disabled=false;return;}const action=entry.gate.action;state.result=action;signals.forEach((s,i)=>s.material.emissiveIntensity=i===({block:0,human:1,post:2}[action])?2.5:.06);barrierTarget=action==='post'?-Math.PI*.48:0;status(resultCopy[currentCase],{post:'#4e8e56',block:'#ca4d38',human:'#d19728'}[action]);state.running=false;$('demo').disabled=false;$('case').disabled=false;}
-function runDemo(){reset();document.querySelector('.playback').hidden=false;setView('dock');state.running=true;state.phase=-2;state.t=0;$('demo').disabled=true;$('case').disabled=true;status('The forklift is moving from the dock to the loading point…');}
+function renderEvidence(){
+ const entry=caseData?.cases.find(c=>c.id===currentCase);const list=$('evidence-rows');list.replaceChildren();
+ for(const [name,value] of evidenceRows(entry)){const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=name;dd.textContent=value;list.append(dt,dd);}
+ $('evidence-note').src='../'+(entry?.images.note||'');$('evidence-camera').src='../'+(entry?.images.camera||'');
+ $('evidence-warning').textContent=entry?.note.embedded_instructions?.length?'Untrusted document text — instructions below were NOT executed. '+entry.note.embedded_instructions.join(' | '):entry?.what||'';
+ $('evidence').hidden=false;
+}
+function finish(){
+ const entry=caseData?.cases.find(c=>c.id===currentCase);state.running=false;automation=null;
+ if(!entry){status('Recorded evidence unavailable. Delivery remains on hold.','#bd4931');$('demo').disabled=false;$('case').disabled=false;return;}
+ state.result=entry.gate.action;verified=true;renderEvidence();barrierTarget=state.result==='post'?-Math.PI*.48:0;
+ signals.forEach((s,i)=>s.material.emissiveIntensity=i===({block:0,human:1,post:2}[state.result])?2.5:.06);
+ status(resultCopy[currentCase]+(currentCase==='hasarli'?' Recorded proposal: accept 11 intact cartons; isolate 1 damaged carton.':''));
+ $('outcome-actions').hidden=false;showOutcomeActions();
+}
+function showOutcomeActions(location='inspection'){
+ $('manual-transfer').hidden=location!=='inspection';$('storage-level').disabled=location!=='inspection'||state.result!=='post';
+ $('transfer-load').hidden=location!=='inspection';$('transfer-load').textContent=state.result==='post'?'Put away · A-01-L0':state.result==='human'?'Move to review · H-01':'Move to return · R-01';
+ $('review-controls').hidden=location!=='hold';$('review-proposal').textContent=currentCase==='hasarli'?'Proposal: 11 intact cartons to storage, 1 damaged carton to quarantine.':'Count the load manually before choosing a simulated review outcome.';
+}
+function startCommands(commands,onComplete){automation={commands:commands.map(x=>[...x]),index:0,remaining:null,onComplete};state.running=true;state.paused=false;state.phase=4;$('pause-demo').textContent='Pause';document.querySelector('.playback').hidden=false;}
+function stepCommands(dt){
+ const a=automation;if(!a)return;const cmd=a.commands[a.index];if(!cmd){automation=null;state.running=false;a.onComplete?.();return;}
+ const [op,value]=cmd;
+ if(op==='pickup'||op==='drop'){
+  if(!pickup()){state.paused=true;$('pause-demo').textContent='Resume';return;}
+  a.index++;a.remaining=null;return;
+ }
+ if(op==='lift'){forkHeight=T.MathUtils.damp(forkHeight,value,5,dt);lift.position.y=forkHeight+.3;if(state.held)delivery.position.y=.42+forkHeight;if(Math.abs(forkHeight-value)<.02){forkHeight=value;a.index++;}return;}
+ if(a.remaining===null)a.remaining=value;
+ const delta=Math.sign(a.remaining)*Math.min(Math.abs(a.remaining),dt*(op==='turn'?.8:2.4));
+ const next=movePose({x:fork.position.x,z:fork.position.z,angle:fork.rotation.y},op==='move'?delta:0,op==='turn'?delta:0,collisionOptions());
+ fork.position.set(next.x,.18,next.z);fork.rotation.y=next.angle;
+ if(next.hit){state.paused=true;$('pause-demo').textContent='Resume';status('Route obstructed. Movement stopped; reset or clear the route.','#bd4931');return;}
+ a.remaining-=delta;if(Math.abs(a.remaining)<.0001){a.index++;a.remaining=null;}
+}
+function runDemo(){reset();setView('dock');$('demo').disabled=true;$('case').disabled=true;startCommands(collectRoute,()=>{state.running=true;state.phase=3;state.t=0;});status('Collecting the delivery using collision-checked driving…');}
+function chooseDestination(){transferTarget=state.result==='post'?'accepted':state.result==='human'?'hold':'returned';const upper=$('storage-level').value==='1';areas.accepted.y=upper?2.53:.18;areas.accepted.address=upper?'A-01-L1':'A-01-L0';}
+function withShelfLift(commands){if(transferTarget!=='accepted'||areas.accepted.y<1)return commands;const copy=commands.map(c=>[...c]),i=copy.findIndex(c=>c[0]==='drop');copy.splice(i,0,['lift',2.35]);return copy;}
+$('transfer-load').onclick=()=>{if(!verified||state.running)return;chooseDestination();$('storage-level').disabled=true;$('transfer-load').hidden=true;$('manual-transfer').hidden=true;$('evidence').hidden=true;setView('plan');startCommands(withShelfLift(destinationRoute(transferTarget)),()=>{showOutcomeActions(transferTarget);});};
+$('storage-level').onchange=()=>{$('transfer-load').textContent=`Put away · A-01-L${$('storage-level').value}`;};
+$('manual-transfer').onclick=()=>{if(!verified||state.running)return;chooseDestination();$('drive').click();status(`Manual transfer to ${areas[transferTarget].address}. Q raises, Z lowers; E places the pallet.`);};
+$('review-approve').onclick=()=>{
+ if(state.running||transferTarget!=='hold'||state.result!=='human')return;const expected=currentCase==='hasarli'?11:12;
+ if(Number($('review-count').value)!==expected){status(`Confirm ${expected} intact cartons for this training scenario, or return the load.`,'#c48223');return;}
+ reviewResolved=true;barrierTarget=-Math.PI*.48;transferTarget='accepted';areas.accepted.y=.18;areas.accepted.address='A-01-L0';
+ if(currentCase==='hasarli'){buildLoad(11);const isolated=group(scene,13,.18,7);pallet(isolated,0,0,0);crate(isolated,0,.36,0,.51,.26,.64);label(isolated,'QUARANTINE · 1 DAMAGED',0,1,0,1.5,.3,'#c91a09','#ffffff');flush(isolated);completedLoads.push({object:isolated,x:13,z:7,angle:0});}
+ $('review-controls').hidden=true;status('Supervisor training decision confirmed. Recorded AI decision stays HUMAN; no ERP write.');
+ // Return from H-01, through the controlled gate, to A-01-L0.
+ startCommands([['move',3],['pickup'],['move',-3.75],['turn',-Math.PI/2],['move',6],['turn',-Math.PI/2],['move',11.15],['drop'],['move',-3]],()=>showOutcomeActions('accepted'));
+};
+$('review-return').onclick=()=>{if(state.running||transferTarget!=='hold')return;transferTarget='returned';reviewResolved=true;$('review-controls').hidden=true;startCommands([['move',3],['pickup'],['move',5],['drop'],['move',-3]],()=>showOutcomeActions('returned'));};
+$('close-evidence').onclick=()=>$('evidence').hidden=true;$('show-evidence').onclick=renderEvidence;
+$('next-delivery').onclick=()=>{
+ if(state.running||state.held||!transferTarget||transferTarget==='hold')return;
+ const li=document.createElement('li');li.textContent=`Delivery ${deliveryNumber} · ${currentCase} · ${areas[transferTarget].address} · ${state.result} (recorded / simulated handling)`;$('delivery-history').prepend(li);
+ // Explicit dispatch clears the occupied single-load bay for the next exercise.
+ deliveryNumber++;reset();buildLoad();$('case').disabled=false;status('Previous load dispatched to the simulated inventory / return queue. Choose the next delivery.');
+};
 $('toggle-panel').onclick=()=>{const collapsed=$('panel').classList.toggle('collapsed');$('panel-controls').hidden=collapsed;$('toggle-panel').textContent=collapsed?'+':'−';$('toggle-panel').setAttribute('aria-expanded',String(!collapsed));$('toggle-panel').setAttribute('aria-label',collapsed?'Expand controls':'Minimize controls');};
 $('pause-demo').onclick=()=>{state.paused=!state.paused;$('pause-demo').textContent=state.paused?'Resume':'Pause';};$('play-speed').onchange=()=>{state.speed=Number($('play-speed').value);};
 $('demo').onclick=runDemo;$('case').onchange=()=>{currentCase=$('case').value;reset();buildLoad();};
@@ -403,28 +563,29 @@ $('open-nav').onclick=()=>{if(!$('scene-nav').hidden){closeNavigation();return;}
 $('close-nav').onclick=()=>{closeNavigation();$('open-nav').focus();};
 document.addEventListener('pointerdown',e=>{if(!$('scene-nav').hidden&&!$('scene-nav').contains(e.target)&&!$('open-nav').contains(e.target))closeNavigation();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('scene-nav').hidden){e.preventDefault();e.stopImmediatePropagation();closeNavigation();$('open-nav').focus();}},true);
+$('office-doors').onclick=()=>{const open=$('office-doors').getAttribute('aria-pressed')!=='true';$('office-doors').setAttribute('aria-pressed',String(open));officeDoors.forEach(d=>d.userData.open=open);};
+$('walk-route').onclick=()=>{walkStarted=performance.now();setView('rooms');status('Pedestrian route: office walkway → marked crossing → stairs → balcony.');};
+function adjustLift(delta){if(state.running||state.mode!=='drive')return;forkHeight=T.MathUtils.clamp(forkHeight+delta,0,2.35);lift.position.y=forkHeight+(state.held?.3:0);if(state.held)delivery.position.y=.42+forkHeight;status(`Fork height: ${forkHeight.toFixed(2)} · Lower before driving.`);}
+$('lift-up').onclick=()=>adjustLift(.1);$('lift-down').onclick=()=>adjustLift(-.1);
 $('help').onclick=()=>$('instructions').showModal();$('close-help').onclick=()=>$('instructions').close();$('clean').onclick=()=>document.body.classList.toggle('clean');
-window.addEventListener('keydown',e=>{if(['SELECT','INPUT','TEXTAREA'].includes(e.target.tagName)||$('instructions').open)return;const k=e.key.toLowerCase();if(['arrowup','arrowdown','arrowleft','arrowright',' '].includes(k))e.preventDefault();keys.add(k);if(e.repeat)return;if(k==='h')document.body.classList.toggle('clean');if(k==='r')reset();if(k==='escape')setView('hero');if(k==='e'&&state.mode==='drive'&&!state.running)pickup();});
+window.addEventListener('keydown',e=>{if(['SELECT','INPUT','TEXTAREA'].includes(e.target.tagName)||$('instructions').open)return;const k=e.key.toLowerCase();if(['arrowup','arrowdown','arrowleft','arrowright',' '].includes(k))e.preventDefault();keys.add(k);if(e.repeat)return;if(k==='h')document.body.classList.toggle('clean');if(k==='r')reset();if(k==='q')adjustLift(.1);if(k==='z')adjustLift(-.1);if(k==='escape')setView('hero');if(k==='e'&&state.mode==='drive'&&!state.running)pickup();});
 window.addEventListener('keyup',e=>keys.delete(e.key.toLowerCase()));window.addEventListener('blur',()=>keys.clear());
 document.querySelectorAll('[data-key]').forEach(b=>{b.onpointerdown=e=>{b.setPointerCapture(e.pointerId);keys.add(b.dataset.key);};b.onpointerup=b.onpointercancel=()=>keys.delete(b.dataset.key);});$('touch-load').onclick=()=>{if(state.mode==='drive'&&!state.running)pickup();};
 // Shared geometry handles the body, forks, carried load, rotation and dock edges.
-function collisionOptions(){return {held:state.held,gateClosed:barrier.rotation.z>-.35,pallet:state.held?null:rectangle(delivery.position.x,delivery.position.z,.9,.8,delivery.rotation.y)};}
+function collisionOptions(){return {held:state.held,gateClosed:barrier.rotation.z>-.35,pallet:state.held?null:rectangle(delivery.position.x,delivery.position.z,.9,.8,delivery.rotation.y),obstacles:completedLoads.map(o=>rectangle(o.x,o.z,.9,.8,o.angle))};}
 function blocked(x,z,angle=fork.rotation.y){return blockedPose(x,z,angle,collisionOptions());}
 let collisionNotice=false;
 const clock=new T.Clock();
-function animate(){requestAnimationFrame(animate);const dt=Math.min(clock.getDelta(),.05);state.t+=state.running?(state.paused?0:dt*state.speed):dt;for(const mixer of castMixers)mixer.update(dt);for(const slot of castSlots)slot.legs?.forEach(leg=>leg.rotation.x=-Math.PI/2);
+function animate(){requestAnimationFrame(animate);const dt=Math.min(clock.getDelta(),.05);state.t+=state.running?(state.paused?0:dt*state.speed):dt;for(const slot of castSlots)slot.mixer?.update(state.paused&&slot.onFloor?0:dt);for(const slot of castSlots)if(!slot.onFloor||slot.seated)slot.legs?.forEach(leg=>leg.rotation.x=-Math.PI/2);
+ for(const slot of castSlots){if(slot.seated&&slot.id===meetingRun?.speaker&&!state.paused){const t=clock.elapsedTime;slot.arms?.forEach((arm,i)=>{arm.rotation.x=-.18-.12*Math.sin(t*2.8+i);arm.rotation.z=(i?1:-1)*(.04+.035*Math.sin(t*2));});}}
+ for(const door of officeDoors)door.rotation.y=T.MathUtils.damp(door.rotation.y,door.userData.open?-Math.PI*.47:0,4,dt);
+ if(walkStarted){const t=(performance.now()-walkStarted)/1000;const points=[[-9.6,.18,3],[-9.6,.18,-8.6],[-5.95,.18,-8.6],[-5.95,.18,-10.05],[-10.76,4.3,-10.05],[-11.2,4.3,-8.8],[-11.2,4.3,3]];let duration=0;for(let i=0;i<points.length-1;i++){const a=new T.Vector3(...points[i]),b=new T.Vector3(...points[i+1]),d=a.distanceTo(b)/1.4;if(t>=duration&&t<duration+d){walkingGuide.position.lerpVectors(a,b,(t-duration)/d);walkingGuide.rotation.y=Math.atan2(b.x-a.x,b.z-a.z);break;}duration+=d;}if(t>duration){walkStarted=0;status('Pedestrian route complete: upper office balcony.');}}
  if(cameraTween){const a=cameraTween;a.t+=dt;const p=Math.min(1,a.t/1.3),q=p*p*(3-2*p);camera.position.lerpVectors(a.from,a.to,q);controls.target.lerpVectors(a.targetFrom,a.targetTo,q);if(p===1)cameraTween=null;}
- if(state.mode==='drive'&&!state.running){const turn=(keys.has('a')||keys.has('arrowleft')?1:0)-(keys.has('d')||keys.has('arrowright')?1:0);const speed=(keys.has('w')||keys.has('arrowup')?1:0)-(keys.has('s')||keys.has('arrowdown')?1:0);const next=movePose({x:fork.position.x,z:fork.position.z,angle:fork.rotation.y},speed*dt*3.2,turn*dt*1.5,collisionOptions());fork.position.x=next.x;fork.position.z=next.z;fork.rotation.y=next.angle;
+ if(state.mode==='drive'&&!state.running){const turn=(keys.has('a')||keys.has('arrowleft')?1:0)-(keys.has('d')||keys.has('arrowright')?1:0);const speed=(keys.has('w')||keys.has('arrowup')?1:0)-(keys.has('s')||keys.has('arrowdown')?1:0);const next=movePose({x:fork.position.x,z:fork.position.z,angle:fork.rotation.y},(forkHeight>.4?0:speed)*dt*3.2,(forkHeight>.4?0:turn)*dt*1.5,collisionOptions());fork.position.x=next.x;fork.position.z=next.z;fork.rotation.y=next.angle;
  if(next.hit){status('Obstacle ahead. Reverse or change direction.','#d19a31');collisionNotice=true;}else if(collisionNotice&&(speed||turn)){status(state.held?'Load secured. Take it to the yellow zone; press E to set down.':'Use WASD / arrow keys to drive. E picks up or sets down the load.');collisionNotice=false;}
  const follow=new T.Vector3(0,5.5,8).applyAxisAngle(new T.Vector3(0,1,0),fork.rotation.y).add(fork.position);camera.position.lerp(follow,1-Math.exp(-dt*4));controls.target.copy(fork.position).add(new T.Vector3(0,1,0));camera.lookAt(controls.target);}
- if(state.running&&!state.paused){if(state.phase===-2){const p=Math.min(state.t/1.4,1);fork.position.set(T.MathUtils.lerp(18.2,15.85,p),.18,-.6);if(p===1){state.phase=-1;state.t=0;}}else if(state.phase===-1){const p=Math.min(state.t/1.8,1);fork.rotation.y=0;fork.position.z=T.MathUtils.lerp(-.6,-4,p);if(p===1){fork.rotation.y=-Math.PI/2;state.phase=0;state.t=0;status('The forklift is collecting the delivery…');}}else if(state.phase===0&&state.t>.8){pickup();state.phase=1;state.t=0;status('Moving the delivery to the inspection zone…');}else if(state.phase===1){const p=Math.min(state.t/3,1);fork.position.set(T.MathUtils.lerp(15.85,10,p),.18,-4);fork.rotation.y=-Math.PI/2;if(p===1){state.phase=2;state.t=0;}}else if(state.phase===2){
- // Pass around the operator and cones, then align before entering the inspection bay.
- const t=state.t;
- if(t<2){fork.position.set(10,.18,T.MathUtils.lerp(-4,1,t/2));}
- else if(t<4){fork.position.set(T.MathUtils.lerp(10,4,(t-2)/2),.18,1);}
- else if(t<5.5){fork.rotation.y=T.MathUtils.lerp(-Math.PI/2,0,(t-4)/1.5);}
- else {const p=Math.min((t-5.5)/2,1);fork.position.set(4,.18,T.MathUtils.lerp(1,-3.25,p));fork.rotation.y=0;if(p===1){pickup();state.phase=3;state.t=0;}}
- }else if(state.phase===3){if(state.t>3)status('Spark checks the note. Wonder verifies the evidence…');if(state.t>7)finish();}}
+ if(state.running&&!state.paused){if(automation)stepCommands(dt*state.speed);else if(state.phase===3){beginMeeting();}else if(state.phase===5){updateMeeting(dt*state.speed);}}
+ if(meetingRun?.speaker&&!$('speech').hidden){const slot=castSlots.find(s=>s.id===meetingRun.speaker);if(slot?.actor){const v=slot.actor.getWorldPosition(new T.Vector3()).add(new T.Vector3(0,3,0)).project(camera);$('speech').style.left=`${Math.max(document.body.classList.contains('conversation-open')&&innerWidth>550?(innerWidth<=900?420:460):140,Math.min(innerWidth-140,(v.x+1)*innerWidth/2))}px`;$('speech').style.top=`${Math.max(130,Math.min(innerHeight-160,(1-v.y)*innerHeight/2))}px`;}}
  barrier.rotation.z=T.MathUtils.damp(barrier.rotation.z,barrierTarget,4,dt);
  if(introActive)updateIntro();else if(state.mode!=='drive')controls.update();ceiling.visible=camera.position.y<10.8;renderer.render(scene,camera);
  document.body.dataset.ready='true';document.body.dataset.cameraMoving=String(!!cameraTween);document.body.dataset.result=state.result||'';document.body.dataset.phase=String(state.phase);document.body.dataset.fork=JSON.stringify([fork.position.x,fork.position.z]);
