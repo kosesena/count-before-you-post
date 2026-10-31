@@ -47,12 +47,16 @@ img { max-width: 100%; }
 #theme:focus-visible, button:focus-visible, a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 /* Full-bleed dock hero (after experiments/mockups/hero-dock.png). */
 .hero { position: relative; color: #fff; overflow: hidden; overflow: clip; background: #10141b; }
+/* The night after the toy box: the picture whole, full width, then the page's words under it. */
+.hero-pic { position: relative; height: min(100vh, calc(100vw * 948 / 1659)); height: min(100svh, calc(100vw * 948 / 1659)); min-height: 260px; }
 .hero-bg { position: absolute; inset: 0; }
-.hero-bg img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.hero-scrim { position: absolute; inset: 0;
-  background: linear-gradient(90deg, rgba(8,10,16,.70) 0%, rgba(8,10,16,.42) 30%, rgba(8,10,16,.10) 50%, transparent 64%);
+.hero-bg img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 50%; display: block; }
+.hero-credit { position: absolute; right: 16px; bottom: 16px; z-index: 1; margin: 0; padding: 4px 10px;
+  border-radius: 999px; background: rgba(8,10,16,.55); color: rgba(255,255,255,.85); font-size: 11.5px; }
+.hero-scrim { position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(0deg, #10141b 0%, rgba(16,20,27,.6) 9%, transparent 22%);
 }
-.hero-inner { position: relative; z-index: 1; max-width: 1120px; margin: 0 auto; padding: 64px 16px 30px; }
+.hero-inner { position: relative; z-index: 1; max-width: 1120px; margin: 0 auto; padding: 18px 16px 34px; }
 .hero .kicker { background: rgba(251,238,223,.96); color: #7c2d12; border-color: transparent; }
 .hero h1 { color: #fff; }
 .hero .lede { color: rgba(255,255,255,.93); max-width: 34rem; }
@@ -116,43 +120,26 @@ img { max-width: 100%; }
   text-shadow: 0 1px 8px rgba(0,0,0,.55); }
 .muse-head b { font-size: 15px; letter-spacing: -.01em; }
 .muse-head span { font-size: 15px; opacity: .92; }
-.muse-tools { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 10px; margin: 0; padding: 34px 0 0; list-style: none; }
-.muse-tools li { position: relative; min-width: 0; height: 272px;
-  background: rgba(255,255,255,.10);
+.muse-tools { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; margin: 0; padding: 14px 0 0; list-style: none; }
+.muse-tools li { position: relative; min-width: 0;
+  background: rgba(16,20,29,.5);
   -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
-  border: 1px solid rgba(255,255,255,.28); border-radius: 16px;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.35);
+  border: 1px solid rgba(255,255,255,.24); border-radius: 12px;
   transition: background .25s ease; }
-.muse-tools li:hover, .muse-tools li:focus-within { background: rgba(255,255,255,.19); }
-.muse-tools a.tool { display: flex; flex-direction: column; height: 100%;
-  color: #fff; text-decoration: none; border-radius: 16px; text-align: center; }
+.muse-tools li:hover, .muse-tools li:focus-within { background: rgba(255,255,255,.16); }
+.muse-tools a.tool { display: block; height: 100%;
+  color: #fff; text-decoration: none; border-radius: 12px; text-align: center; }
 .muse-tools a.tool:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
-/* The full-body figure stands inside the card: feet on the frosted panel, head above the top edge. */
-.muse-tools .fig { flex: 1 1 auto; min-height: 0;
-  display: flex; align-items: flex-end; justify-content: center;
-  margin-top: -30px; padding: 0 4px; pointer-events: none; }
-.muse-tools .fig img { height: 100%; width: auto; max-width: 100%; object-fit: contain; flex: 0 0 auto;
-  border-radius: 0; box-shadow: none;
-  filter: drop-shadow(0 10px 14px rgba(0,0,0,.35));
-  transform-origin: 50% 100%; transition: transform .3s ease; }
-.muse-tools li:hover .fig img, .muse-tools li:focus-within .fig img { transform: scale(1.15); }
-.muse-tools .cap { display: block; padding: 10px 8px 12px;
-  background: rgba(16,20,29,.42);
-  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
-  border-top: 1px solid rgba(255,255,255,.22); border-radius: 0 0 15px 15px;
-  /* Same height on every card, so the seven name panels line up (texts differ in length). */
-  flex: 0 0 118px; box-sizing: border-box; overflow: hidden; }
+/* The figures stand in the toy box above; here only the tool and what it did. */
+.muse-tools .fig { display: none; }
+.muse-tools .cap { display: block; padding: 10px 8px 11px; }
 .muse-tools b { display: block; font-size: 13.5px; line-height: 1.2; }
-.muse-tools small { display: block; font-size: 11.5px; line-height: 1.35; opacity: .9; margin-top: 3px; }
-@media (prefers-reduced-motion: reduce) {
-  .muse-tools li { transition: none; }
-  .muse-tools .fig img { transition: none; }
-  .muse-tools li:hover .fig img, .muse-tools li:focus-within .fig img { transform: none; }
-}
+.muse-tools small { display: block; font-size: 11.5px; line-height: 1.35; opacity: .88; margin-top: 3px; }
+@media (prefers-reduced-motion: reduce) { .muse-tools li { transition: none; } }
 @media (max-width: 1080px) {
   .muse-tools { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; overscroll-behavior-x: contain;
-    margin: 0 -16px; padding: 38px 16px 10px; scrollbar-width: thin; }
-  .muse-tools li { flex: 0 0 180px; scroll-snap-align: start; height: 264px; }
+    margin: 0 -16px; padding: 14px 16px 10px; scrollbar-width: thin; }
+  .muse-tools li { flex: 0 0 170px; scroll-snap-align: start; }
 }
 @media (max-width: 420px) { .hero-inner { padding-top: 56px; } }
 .posthero { padding-top: 22px; }
@@ -635,8 +622,12 @@ footer p { margin: 4px 0; }
   </div>
 </section>
 <header class="hero" id="top">
-  <div class="hero-bg" aria-hidden="true"><img id="heroImg" alt=""></div>
-  <div class="hero-scrim" aria-hidden="true"></div>
+  <div class="hero-pic">
+    <div class="hero-bg"><img id="heroImg" src="img/hero-night.webp" width="1659" height="948"
+      alt="That night, by the light of Glimmer's orb, the ten figures build the dock on the table: the GOODS IN wall, the truck, pallets, the traffic light."></div>
+    <div class="hero-scrim" aria-hidden="true"></div>
+    <p class="hero-credit">Night picture: ChatGPT (OpenAI), drawn from our Muse Image cast</p>
+  </div>
   <div class="hero-inner">
     <p class="kicker">Live demo &middot; recorded runs, no API calls from this page</p>
     <h1>Count Before You Post</h1>
@@ -1530,7 +1521,8 @@ function start(data) {
   buildToyboxBags(data);
   armFx();
   if (data.hero) {
-    $("heroImg").src = data.hero.src; $("heroImg").alt = data.hero.alt || "";
+    /* The hero shows the night after the toy box (img/hero-night.webp, set in the page);
+       the dock render in data.hero.src is no longer drawn here. */
     if (data.hero.tools) {
       document.querySelectorAll(".muse-tools li[data-tool]").forEach(li => {
         const src = data.hero.tools[li.getAttribute("data-tool")];
