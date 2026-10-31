@@ -209,6 +209,37 @@ LEGO_DIRECTIONS = {
         "right, rounded soft UI cards, friendly and cosy, like a modern toy brand site."),
 }
 
+# Sena chose the tabletop diorama (hero-lego-tabletop-diorama.png); variations on it.
+DIORAMA_BASE = (
+    "Variations of this web page design (the first image): the demo page as a photograph of a "
+    "toy-brick diorama of a warehouse dock on a wooden table, the seven toy characters on "
+    "round grey stands with printed name cards, the title and tagline on printed tiles, the "
+    "buttons as real bricks. Keep exactly its content and texts: 'Live demo · recorded runs, "
+    "no API calls from this page', 'Count Before You Post', the tagline, 'Drive the dock', "
+    "'See the six deliveries', 'Built with Muse', and the seven characters with their names "
+    "(Muse Spark, SAM 3.1, Muse Voice, Muse Image, Muse Code, Muse Wonder, Muse Spark Open). "
+    "No brand names or logos. Crisp, polished web design mockup, no device frame. Variation: ")
+DIORAMA_DIRECTIONS = {
+    "diorama-morning": (
+        "bright morning: soft daylight from a window on the left, a light oak table, airy and "
+        "clean, more empty table space around the model, the text tiles white and very "
+        "readable."),
+    "diorama-topdown": (
+        "a flat-lay seen straight from above: the dock model in the middle with its roof "
+        "removed so the cartons, the yellow tape zone and the gate are visible, the seven "
+        "characters standing in a neat arc around it, the title tiles at the top, tidy and "
+        "graphic."),
+    "diorama-cinematic": (
+        "closer and cinematic: low camera at table height, the characters standing on the "
+        "dock apron in front of the open truck, warm lamp light and shallow depth of field, "
+        "the title as a printed sign hanging on the warehouse wall, the buttons as bricks "
+        "on the table edge in front."),
+    "diorama-phone": (
+        "the same design for a phone screen, portrait 2:3: the diorama photographed from a "
+        "higher angle, the title tile on top, the two brick buttons stacked, the seven "
+        "characters in two rows below, big readable text."),
+}
+
 REST_DIRECTIONS = {
     "rest-night": (
         "the night continues. The whole page keeps the hero's dusk dock mood: deep navy "
@@ -291,6 +322,7 @@ def draw(shot, name):
             + [HELLO / "kapi.jpg"] if name in CAST_DIRECTIONS else
             [shot, LOWER] if name in REST_DIRECTIONS else
             [shot, OUT / "lego-hall.png"] if name in LEGO_DIRECTIONS else
+            [OUT / "hero-lego-tabletop-diorama.png", shot] if name in DIORAMA_DIRECTIONS else
             [shot, HELLO / "kapi.jpg", HELLO / "sef.jpg",
              HERE.parent / "site" / "img" / "en" / "belirsiz-camera.jpg"] if name in RESULT_DIRECTIONS else
             [shot] + [HELLO / f"{c}.jpg" for c in ("spark", "sam", "voice")])
@@ -298,8 +330,10 @@ def draw(shot, name):
               SIM_BASE + SIM_DIRECTIONS[name] if name in SIM_DIRECTIONS else
               RESULT_BASE + RESULT_DIRECTIONS[name] if name in RESULT_DIRECTIONS else
               LEGO_BASE + LEGO_DIRECTIONS[name] if name in LEGO_DIRECTIONS else
+              DIORAMA_BASE + DIORAMA_DIRECTIONS[name] if name in DIORAMA_DIRECTIONS else
               REST_BASE + REST_DIRECTIONS[name] if name in REST_DIRECTIONS else BASE + DIRECTIONS[name])
-    size = "1024x1536" if name in REST_DIRECTIONS or name in CAST_DIRECTIONS else "1792x1024"
+    size = ("1024x1536" if name in REST_DIRECTIONS or name in CAST_DIRECTIONS
+            or name == "diorama-phone" else "1792x1024")
     body = {"model": "muse-image-1.0", "n": 1, "size": size, "output_format": "png",
             "response_format": "b64_json", "prompt": prompt,
             "images": [{"image_url": _jpeg(p)} for p in refs]}
