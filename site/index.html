@@ -80,7 +80,7 @@ img { max-width: 100%; }
   .btn-primary:hover .truck { transform: none; }
   .btn-primary:hover .truck .ww { animation: none; }
 }
-/* Full-screen overlay: the truck drives from the left to the middle, then the page goes to sim/. */
+/* Full-screen overlay: the truck drives from the left to the middle, then the page goes to sim-lego/. */
 .dock-overlay { position: fixed; inset: 0; z-index: 100; display: none;
   flex-direction: column; align-items: center; justify-content: center; gap: 20px;
   background: radial-gradient(ellipse at 50% 125%, rgba(245,158,11,.28), transparent 60%), #0b0e14;
@@ -585,7 +585,7 @@ footer p { margin: 4px 0; }
     <p class="lede"><b>A verification gate between AI agents and the ERP.</b>
       Before a goods receipt is written, the delivery note, the camera, the receiver's voice
       and a second model must agree. If they don't, nothing is written and a person decides.</p>
-    <p class="hero-cta"><a class="btn-primary drive" id="driveBtn" href="sim/"><svg class="truck" viewBox="0 0 28 18" aria-hidden="true"><rect x="1" y="3" width="15" height="9" rx="1.5" fill="rgba(255,255,255,.92)"/><path d="M16 6h4.6L25 10.4V12h-9z" fill="rgba(255,255,255,.92)"/><rect x="17.5" y="7.2" width="3.4" height="2.6" fill="#2f6bff"/><g class="ww"><circle cx="7.5" cy="13.6" r="2.8" fill="#1c2430"/><rect x="6.7" y="11.4" width="1.6" height="4.4" rx=".8" fill="#fff"/></g><g class="ww"><circle cx="21" cy="13.6" r="2.8" fill="#1c2430"/><rect x="20.2" y="11.4" width="1.6" height="4.4" rx=".8" fill="#fff"/></g></svg><span>Drive the dock &rarr;</span></a><a class="btn-quiet" href="#h-dock">See the six deliveries</a></p>
+    <p class="hero-cta"><a class="btn-primary drive" id="driveBtn" href="sim-lego/"><svg class="truck" viewBox="0 0 28 18" aria-hidden="true"><rect x="1" y="3" width="15" height="9" rx="1.5" fill="rgba(255,255,255,.92)"/><path d="M16 6h4.6L25 10.4V12h-9z" fill="rgba(255,255,255,.92)"/><rect x="17.5" y="7.2" width="3.4" height="2.6" fill="#2f6bff"/><g class="ww"><circle cx="7.5" cy="13.6" r="2.8" fill="#1c2430"/><rect x="6.7" y="11.4" width="1.6" height="4.4" rx=".8" fill="#fff"/></g><g class="ww"><circle cx="21" cy="13.6" r="2.8" fill="#1c2430"/><rect x="20.2" y="11.4" width="1.6" height="4.4" rx=".8" fill="#fff"/></g></svg><span>Drive the dock &rarr;</span></a><a class="btn-quiet" href="#h-dock">See the six deliveries</a></p>
     <section class="muse" aria-label="Built with Muse">
       <p class="muse-head"><b>Built with Muse</b><span>Meta's models, on the Meta Model API and on open weights, do every step that needs AI.</span></p>
       <ul class="muse-tools">
@@ -701,7 +701,7 @@ footer p { margin: 4px 0; }
       </div>
       <div class="tabs" role="tablist" id="tabs" aria-label="Deliveries"></div>
       <div id="case"></div>
-      <p class="ch-cta"><a class="btn-primary drive" href="sim/"><svg class="truck" viewBox="0 0 28 18" aria-hidden="true"><rect x="1" y="3" width="15" height="9" rx="1.5" fill="rgba(255,255,255,.92)"/><path d="M16 6h4.6L25 10.4V12h-9z" fill="rgba(255,255,255,.92)"/><rect x="17.5" y="7.2" width="3.4" height="2.6" fill="#2f6bff"/><g class="ww"><circle cx="7.5" cy="13.6" r="2.8" fill="#1c2430"/><rect x="6.7" y="11.4" width="1.6" height="4.4" rx=".8" fill="#fff"/></g><g class="ww"><circle cx="21" cy="13.6" r="2.8" fill="#1c2430"/><rect x="20.2" y="11.4" width="1.6" height="4.4" rx=".8" fill="#fff"/></g></svg><span>Drive the dock &rarr;</span></a></p>
+      <p class="ch-cta"><a class="btn-primary drive" href="sim-lego/"><svg class="truck" viewBox="0 0 28 18" aria-hidden="true"><rect x="1" y="3" width="15" height="9" rx="1.5" fill="rgba(255,255,255,.92)"/><path d="M16 6h4.6L25 10.4V12h-9z" fill="rgba(255,255,255,.92)"/><rect x="17.5" y="7.2" width="3.4" height="2.6" fill="#2f6bff"/><g class="ww"><circle cx="7.5" cy="13.6" r="2.8" fill="#1c2430"/><rect x="6.7" y="11.4" width="1.6" height="4.4" rx=".8" fill="#fff"/></g><g class="ww"><circle cx="21" cy="13.6" r="2.8" fill="#1c2430"/><rect x="20.2" y="11.4" width="1.6" height="4.4" rx=".8" fill="#fff"/></g></svg><span>Drive the dock &rarr;</span></a></p>
     </section>
 
     <section class="chapter" id="ch-05" aria-labelledby="h-outside">
@@ -816,7 +816,7 @@ themeBtn.addEventListener("click", () => {
 });
 paintTheme();
 
-/* "Drive the dock": a truck drives across a dark overlay, then the page goes to sim/.
+/* "Drive the dock": a truck drives across a dark overlay, then the page goes to sim-lego/.
    About 1.2 s in all; reduced motion (or no overlay) goes straight there.
    pageshow clears the overlay so Back from the simulator returns to a normal page. */
 (function () {
