@@ -62,8 +62,8 @@ CAST = [
      "Kapı's yes into a Purchase Receipt, its tests, and this page. Then I worked the dock "
      "myself, through Kapı's MCP server: five tries, no receipt."),
     ("iris", "Iris", "Muse Image", "#db2777", "done",
-     "I'm Iris, the painter. With Muse Image I drew everyone on this page from Sena's "
-     "concepts, myself included."),
+     "I'm Iris, the painter. With Muse Image I drew the whole cast from Sena's concepts, "
+     "myself included. ChatGPT drew the toy box on the front page from my drawings."),
     ("spark-open", "Rover", "Muse Spark Open", "#0d9488", "on duty",
      "I'm Rover, Spark's open-weight cousin: I run on anyone's servers, these days on "
      "Baseten. Before Kapı lets a "
