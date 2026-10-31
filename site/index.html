@@ -597,7 +597,7 @@ footer p { margin: 4px 0; }
 @keyframes toybox-bob { 50% { transform: translateY(5px); } }
 @media (prefers-reduced-motion: reduce) { .toybox-next { animation: none; } }
 .toybox-bags { position: absolute; inset: 0; pointer-events: none; }
-.toybox.is-open .toybox-bags { pointer-events: auto; }
+.toybox.is-open #toyboxBags, .toybox.is-closed #toyboxFigs { pointer-events: auto; }
 .toybox-bag { position: absolute; display: block; border-radius: 10px; outline: none; }
 .toybox-bag:focus-visible { box-shadow: 0 0 0 3px #fff, 0 0 0 6px rgba(20,14,8,.5); }
 .toybox-bag .pop { position: absolute; left: 50%; bottom: -40%; height: 170%; width: 280%;
@@ -613,6 +613,10 @@ footer p { margin: 4px 0; }
 .toybox-bag:hover .pop, .toybox-bag:focus-visible .pop { opacity: 1; transform: translate(-50%, -10%) scale(1); }
 .toybox-bag:hover, .toybox-bag:focus-visible { z-index: 2; }
 @media (prefers-reduced-motion: reduce) { .toybox-bag .pop { transition: opacity .2s; transform: translate(-50%, -10%); } }
+/* On the closed box the figure grows where it stands (the title is just above), its label under its feet. */
+#toyboxFigs .toybox-bag .pop { bottom: -26%; height: 152%; transform: translate(-50%, 4%) scale(.8); }
+#toyboxFigs .toybox-bag:hover .pop, #toyboxFigs .toybox-bag:focus-visible .pop { transform: translate(-50%, 0) scale(1); }
+@media (prefers-reduced-motion: reduce) { #toyboxFigs .toybox-bag .pop { transform: translate(-50%, 0); } }
 @media (max-width: 700px) { .toybox-credit { left: 12px; right: 12px; bottom: 66px; text-align: center; } }
 </style>
 </head>
@@ -624,6 +628,7 @@ footer p { margin: 4px 0; }
       alt="A child's hands hold the Count Before You Post toy box: a blue box with the ten figures in front of a warehouse dock.">
     <img class="toybox-open" src="img/toybox-open.webp" width="1659" height="948" loading="eager"
       alt="The box opened: each of the ten figures in its own clear bag, with the bricks, the GOODS IN sign, the truck and the traffic light below.">
+    <nav class="toybox-bags" id="toyboxFigs" aria-label="The ten characters on the box"></nav>
     <nav class="toybox-bags" id="toyboxBags" aria-label="The ten characters in the box"></nav>
     <p class="toybox-credit">Toy box pictures: ChatGPT (OpenAI), drawn from our Muse Image cast</p>
     <a class="toybox-next" href="#top" aria-label="To the page"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M3 6.5l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
@@ -1921,45 +1926,55 @@ fetch("data.json").then(r => {
   $("case").innerHTML = `<div class="card"><p class="what">Could not load the demo data.</p>` +
     `<p class="sub">${esc(err.message)}. Serve this folder over HTTP so <span class="mono">fetch("data.json")</span> works.</p></div>`;
 });
-/* The open box picture: the ten bags, left to right, in picture pixels (1659x948). Over each
-   bag a link to the character's page; on hover or focus the figure rises out of the bag. */
-const TOYBOX_BAGS = [["spark", 90, 235], ["sam", 235, 365], ["voice", 365, 505], ["glimmer", 505, 650],
-  ["iris", 650, 800], ["ada", 800, 945], ["wonder", 945, 1090], ["spark-open", 1090, 1240],
-  ["kapi", 1240, 1380], ["sef", 1380, 1550]];
+/* The ten characters in both toy box pictures, left to right, in picture pixels (1659x948):
+   [id, x0, x1] across, and the band they stand in. Over each a link to the character's page;
+   on hover or focus the figure grows out of the picture with its name and model. */
+const TOYBOX_CAST = {
+  toyboxFigs: { img: ".toybox-closed", y0: 470, y1: 730, cast: [["spark", 135, 290], ["sam", 290, 420],
+    ["voice", 420, 540], ["glimmer", 540, 690], ["iris", 690, 830], ["ada", 830, 980], ["wonder", 980, 1120],
+    ["spark-open", 1120, 1275], ["kapi", 1275, 1425], ["sef", 1425, 1570]] },
+  toyboxBags: { img: ".toybox-open", y0: 180, y1: 440, cast: [["spark", 90, 235], ["sam", 235, 365],
+    ["voice", 365, 505], ["glimmer", 505, 650], ["iris", 650, 800], ["ada", 800, 945], ["wonder", 945, 1090],
+    ["spark-open", 1090, 1240], ["kapi", 1240, 1380], ["sef", 1380, 1550]] },
+};
 function buildToyboxBags(data) {
-  const nav = $("toyboxBags");
-  if (!nav) return;
-  nav.innerHTML = "";
-  TOYBOX_BAGS.forEach(([id, x0, x1]) => {
-    const c = byId(id);
-    if (!c) return;
-    const a = document.createElement("a");
-    a.className = "toybox-bag"; a.href = "character.html?id=" + id;
-    a.dataset.x0 = x0; a.dataset.x1 = x1;
-    a.setAttribute("aria-label", c.name + " · " + c.model);
-    const pop = document.createElement("span"); pop.className = "pop"; pop.setAttribute("aria-hidden", "true");
-    const img = document.createElement("img"); img.alt = ""; img.loading = "lazy";
-    /* The hero figures (transparent, whole); Kapı, Şef and Glimmer have no hero figure, so
-       their cut-outs with SAM's small holes filled from the drawing (img/pop-<id>.webp). */
-    img.src = (data.hero && data.hero.tools && data.hero.tools[id]) || "img/pop-" + id + ".webp";
-    const cap = document.createElement("span");
-    cap.innerHTML = "<b></b>"; cap.querySelector("b").textContent = c.name;
-    cap.append(c.model);
-    pop.append(img, cap); a.append(pop); nav.append(a);
+  Object.entries(TOYBOX_CAST).forEach(([navId, spec]) => {
+    const nav = $(navId);
+    if (!nav) return;
+    nav.innerHTML = "";
+    spec.cast.forEach(([id, x0, x1]) => {
+      const c = byId(id);
+      if (!c) return;
+      const a = document.createElement("a");
+      a.className = "toybox-bag"; a.href = "character.html?id=" + id;
+      a.dataset.x0 = x0; a.dataset.x1 = x1;
+      a.setAttribute("aria-label", c.name + " · " + c.model);
+      const pop = document.createElement("span"); pop.className = "pop"; pop.setAttribute("aria-hidden", "true");
+      const img = document.createElement("img"); img.alt = ""; img.loading = "lazy";
+      /* The hero figures (transparent, whole); Kapı, Şef and Glimmer have no hero figure, so
+         their cut-outs with SAM's small holes filled from the drawing (img/pop-<id>.webp). */
+      img.src = (data.hero && data.hero.tools && data.hero.tools[id]) || "img/pop-" + id + ".webp";
+      const cap = document.createElement("span");
+      cap.innerHTML = "<b></b>"; cap.querySelector("b").textContent = c.name;
+      cap.append(c.model);
+      pop.append(img, cap); a.append(pop); nav.append(a);
+    });
   });
   placeToyboxBags();
 }
-/* Where the bags are on screen, for the picture's object-fit and object-position (50% 45%). */
+/* Where they are on screen, for the pictures' object-fit and object-position (50% 45%). */
 function placeToyboxBags() {
-  const nav = $("toyboxBags"), img = document.querySelector(".toybox-open");
-  if (!nav || !img) return;
-  const w = img.clientWidth, h = img.clientHeight, W = 1659, H = 948;
-  const k = getComputedStyle(img).objectFit === "contain" ? Math.min(w / W, h / H) : Math.max(w / W, h / H);
-  const ox = (w - W * k) * .5, oy = (h - H * k) * .45;
-  nav.querySelectorAll(".toybox-bag").forEach(a => {
-    const x0 = +a.dataset.x0, x1 = +a.dataset.x1;
-    a.style.left = (ox + x0 * k) + "px"; a.style.width = ((x1 - x0) * k) + "px";
-    a.style.top = (oy + 180 * k) + "px"; a.style.height = (260 * k) + "px";
+  Object.entries(TOYBOX_CAST).forEach(([navId, spec]) => {
+    const nav = $(navId), img = document.querySelector(spec.img);
+    if (!nav || !img) return;
+    const w = img.clientWidth, h = img.clientHeight, W = 1659, H = 948;
+    const k = getComputedStyle(img).objectFit === "contain" ? Math.min(w / W, h / H) : Math.max(w / W, h / H);
+    const ox = (w - W * k) * .5, oy = (h - H * k) * .45;
+    nav.querySelectorAll(".toybox-bag").forEach(a => {
+      const x0 = +a.dataset.x0, x1 = +a.dataset.x1;
+      a.style.left = (ox + x0 * k) + "px"; a.style.width = ((x1 - x0) * k) + "px";
+      a.style.top = (oy + spec.y0 * k) + "px"; a.style.height = ((spec.y1 - spec.y0) * k) + "px";
+    });
   });
 }
 addEventListener("resize", placeToyboxBags);
@@ -1976,6 +1991,7 @@ addEventListener("resize", placeToyboxBags);
     const t = Math.min(1, Math.max(0, (p - .2) / .55));
     box.style.setProperty("--open", (t * t * (3 - 2 * t)).toFixed(3));
     box.classList.toggle("is-open", t > .9);
+    box.classList.toggle("is-closed", t < .05);
     document.body.classList.toggle("on-toybox", r.bottom > innerHeight * .5);
   };
   addEventListener("scroll", () => { if (!queued) { queued = true; requestAnimationFrame(update); } }, { passive: true });
