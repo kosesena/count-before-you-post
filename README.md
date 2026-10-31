@@ -91,6 +91,19 @@ This is the pattern Meta teaches in its own hackathon workshop
 trustworthy"): a verification layer outside the agent's control, escalation to a person, a
 run that stops, and a sign-off. Here it guards a goods receipt instead of a legal memo.
 
+In the words of the hackathon's live sessions (Agents 102: Best Practices for Verifiable
+Agents Pt. 2, Yash Khare, 28 Oct; the Fireworks workshop, Sinan Ozdemir, 30 Oct):
+
+| Their term | Here |
+|---|---|
+| A mandatory verification check the agent cannot skip, built into the tool, not offered as a tool it may choose to call | Kapı sits inside `post_goods_receipt`; Spark has no way to write to the ERP around it |
+| Deterministic checks | Kapı's 12 rules in plain code (`cbyp/gate.py`): counts, labels, damage, stacking, instructions to software, invisible text |
+| LLM as a judge | Muse Wonder judges Spark's reading against the note itself, quoting it |
+| LLM as a jury: several models answer, one adjudicator decides | Spark and Rover (Muse Spark Open) read the note independently; the adjudicator is the gate, plain code, and two readings that differ go to Şef |
+| Human in the loop: escalate when the checks cannot settle it | The run stops at `ask_supervisor`; only Şef's sign-off releases it |
+| Checks at the crucial checkpoints, trading speed for accuracy | Wonder and Rover run only when the gate is about to post, not on every step |
+| The plan, act and observe loop | Spark's tool-calling loop ([below](#the-agent-loop-multi-turn-tool-calling-with-muse-spark)), every turn recorded |
+
 ## Results at a glance
 
 | Check | Result |
@@ -513,6 +526,9 @@ Every experiment, with its numbers and its failures, is in **[docs/JOURNAL.md](d
 - Real deliveries: photos, handwriting and voices at a noisy dock.
 - The receiver's glasses as the camera, hands-free at the dock. Not built yet; Sam wears them
   in the cast as a reminder.
+- After the hackathon: fine-tune Muse Glimmer for the dock (a small note reader, or a router
+  that decides which deliveries need the full set of checks). Fireworks offers free Glimmer
+  training through November (Fireworks workshop, 30 Oct). Not started.
 
 ## Repository map
 
