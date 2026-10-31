@@ -1,0 +1,4 @@
+hasarli   first='(waiting for the supervisor)' escalated=1 posted=[]
+hasarli   after sign-off posted=[(11, 'MAT-PRE-2026-00008')] refused=[11] tools=['read_delivery_note', 'look_at_pallet', 'count_cartons', 'count_cartons', 'count_cartons', 'count_cartons', 'post_goods_receipt', 'ask_supervisor', 'post_goods_receipt']
+belirsiz  first='(waiting for the supervisor)' escalated=1 posted=[]
+belirsiz  after sign-off posted=[(12, 'MAT-PRE-2026-00009')] refused=[12] tools=['read_delivery_note', 'count_cartons', 'look_at_pallet', 'count_cartons', 'count_cartons', 'count_cartons', 'post_goods_receipt', 'ask_supervisor', 'read_delivery_note', 'count_cartons', 'look_at_pallet', 'post_goods_receipt']

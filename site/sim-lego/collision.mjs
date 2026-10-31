@@ -14,14 +14,20 @@ export function forkliftShapes(x,z,angle,held=false){
  if(held)local.push([0,-2.25,.94,.84]);
  return local.map(([lx,lz,hx,hz])=>rectangle(...offset(x,z,angle,lx,lz),hx,hz,angle));
 }
+// Shared by the visible staircase, collision footprint and pedestrian routes.
+export const stairApproach=[[-9.6,.18,9.4],[-9.6,.18,11.8]];
+// Two parallel flights joined by a full-width intermediate landing.
+export const stairAscent=[[-9.6,.18,11.8],[-9.6,2.24,14.4],[-9.6,2.24,14.8],[-11.2,2.24,14.8],[-11.2,2.24,14.4],[-11.2,4.3,11.8],[-11.2,4.3,10.65]];
 export const solids=[
+ // Receiving furniture, pallet truck and waste stations.
+ rectangle(4,7,.08,4),rectangle(-5,-4,1.4,.6),rectangle(-5,-.8,1.4,.6),rectangle(-7.3,-5.1,.55,1.3),rectangle(-7.1,1.1,.4,.4),rectangle(-5.8,1.1,.4,.4),
  // Receiving partition: the only vehicle passage is the controlled gate.
  rectangle(-10.775,-7.3,.625,.12),rectangle(-3.325,-7.3,5.625,.12),rectangle(11.65,-7.3,5.35,.12),
  // Dedicated storage rack uprights; the ground slot remains accessible.
  rectangle(2.5,-12.4,.09,1.3),rectangle(5.5,-12.4,.09,1.3),
  rectangle(-17, -2,.175,18),rectangle(0,-20,17,.225),
  rectangle(17,-13.325,.3,6.675),rectangle(17,8.575,.3,7.425),
- rectangle(-14.235,.3,2.75,10.9),rectangle(-8.5,-10.05,2.8,.7),
+ rectangle(-14.235,.3,2.75,10.9),rectangle(-10.4,13.3,1.5,2),
  rectangle(2.3,-18.7,12.85,.94),rectangle(16,-13.7,.94,5.85),
  rectangle(16,5.7,.94,4.45),
  rectangle(17.1,-6.65,.3,.22),rectangle(17.1,1.15,.3,.22),
@@ -31,9 +37,9 @@ export const solids=[
  rectangle(6.3,-7.3,.3,.3),rectangle(1.6,-7.4,.25,.25),
  rectangle(1.6,-5.5,.1,.1),rectangle(6.4,-5.5,.1,.1),rectangle(7,-5.9,.6,.16),
  ...[[-4,-10.5],[14,9],[13,-8]].map(([x,z])=>rectangle(x,z,1,.8)),
- ...[[6,-7.5],[6,-3.5],[-10,10]].map(([x,z])=>rectangle(x,z,.25,.25)),
+ ...[[6,-7.5],[6,-3.5],[-8,10]].map(([x,z])=>rectangle(x,z,.25,.25)),
 ];
-const circles=[{x:-1,z:7,radius:4.35},{x:7.2,z:-3.6,radius:.62}];
+const circles=[{x:-1,z:7,radius:4.35}];
 function supported(x,z){return (x>=-16.8&&x<=17&&z>=-19.75&&z<=15.8)||(x>=16.7&&x<=19.45&&z>=-2&&z<=.7)||(x>=16.7&&x<=24&&z>=-5.45&&z<=-2.55);}
 export function blockedPose(x,z,angle,{held=false,gateClosed=true,pallet=null,obstacles=[]}={}){
  const shapes=forkliftShapes(x,z,angle,held);

@@ -13,6 +13,8 @@ for(const c of original){
  assert.ok(lines.every(x=>!x.text.includes('undefined')));
  for(const s of c.agent.steps.filter(s=>s.kind==='thinking'))assert.ok(!lines.some(x=>x.text===s.text));
  assert.ok(participants(c.id).length<=5);
+ const team=participants(c.id,lines);
+ for(const line of lines)for(const id of [line.speaker,line.to].filter(Boolean))assert.ok(team.includes(id),`${c.id}: missing participant ${id}`);
  if(c.gate.action==='human')assert.ok(lines.some(x=>x.source.includes('follow-up run, on the Turkish note')));
 }
 console.log('Six recorded replays retain per-step counts, gate decisions and labelled signoffs.');

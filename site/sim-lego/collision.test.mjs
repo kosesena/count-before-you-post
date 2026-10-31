@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import {blockedPose,movePose,rectangle} from './collision.mjs';
 assert.equal(blockedPose(18.2,-.6,-Math.PI/2),false);
 assert.equal(blockedPose(0,0,0),false);
-for(const [x,z,a] of [[0,-18,0],[-12,0,0],[15,5,0],[-8,-10,0],[-1,7,0],[7.2,-3.6,0],[13,-8,0],[17,8,0]])assert.ok(blockedPose(x,z,a));
+for(const [x,z,a] of [[0,-18,0],[-12,0,0],[15,5,0],[-8.5,13.2,0],[-1,7,0],[7.2,-3.6,0],[13,-8,0],[17,8,0]])assert.ok(blockedPose(x,z,a));
 const reverse=movePose({x:18.2,z:-.6,angle:-Math.PI/2},-2.35,0,{});
 assert.ok(Math.abs(reverse.x-15.85)<.01&&!reverse.hit);
 const edge=movePose({x:18.2,z:-.6,angle:-Math.PI/2},20,0,{});
@@ -21,3 +21,7 @@ for(let i=0;i<=100;i++){
  for(const pose of [[15.85-5.85*p,-4,-Math.PI/2],[10,-4+5*p,-Math.PI/2],[10-6*p,1,-Math.PI/2],[4,1,-Math.PI/2*(1-p)],[4,1-4.25*p,0]])assert.equal(blockedPose(...pose,{held:true}),false,`guided route ${pose}`);
 }
 console.log('Collision regression checks passed.');
+
+// The stair footprint is on the public side of the z=-7.3 controlled partition.
+assert.equal(blockedPose(-8.5,13.2,0),true);
+assert.equal(blockedPose(-8,-10.05,0),false,'former stair footprint is clear');

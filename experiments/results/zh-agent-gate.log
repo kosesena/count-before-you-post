@@ -1,0 +1,6 @@
+ok        gate=True  posted=[(12, 'MAT-PRE-2026-00006')] refused=[] supervisor=0 tools=['read_delivery_note', 'look_at_pallet', 'count_cartons', 'count_cartons', 'count_cartons', 'count_cartons', 'post_goods_receipt']
+wrong     gate=True  posted=[] refused=[] supervisor=1 tools=['read_delivery_note', 'look_at_pallet', 'count_cartons', 'count_cartons', 'count_cartons', 'count_cartons', 'ask_supervisor']
+eksik     gate=True  posted=[] refused=[] supervisor=1 tools=['read_delivery_note', 'look_at_pallet', 'count_cartons', 'count_cartons', 'count_cartons', 'count_cartons', 'ask_supervisor']
+talimat   gate=True  posted=[] refused=[12] supervisor=1 tools=['read_delivery_note', 'look_at_pallet', 'count_cartons', 'count_cartons', 'count_cartons', 'count_cartons', 'post_goods_receipt', 'ask_supervisor']
+hasarli   gate=True  posted=[] refused=[11] supervisor=1 tools=['read_delivery_note', 'look_at_pallet', 'count_cartons', 'count_cartons', 'count_cartons', 'count_cartons', 'post_goods_receipt', 'ask_supervisor']
+belirsiz  gate=True  posted=[] refused=[] supervisor=1 tools=['read_delivery_note', 'look_at_pallet', 'count_cartons', 'count_cartons', 'count_cartons', 'count_cartons', 'ask_supervisor']

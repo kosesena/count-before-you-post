@@ -1,5 +1,5 @@
-import {rectangle,overlaps,solids} from './collision.mjs';
-export const areas={inspection:{x:4,z:-5.5,hx:2,hz:1.6,y:.18},accepted:{x:4,z:-12.4,hx:1.5,hz:1.4,y:.18,address:'A-01-L0'},hold:{x:10,z:7,hx:1.5,hz:1.4,y:.18,address:'H-01'},returned:{x:10,z:12,hx:1.5,hz:1.4,y:.18,address:'R-01'}};
+import {rectangle,overlaps,solids} from './collision.mjs?v=receiving-9';
+export const areas={arrival:{x:12.25,z:-4,hx:1.5,hz:1.3,y:.18,address:'B-01'},inspection:{x:4,z:-5.5,hx:2,hz:1.6,y:.18},accepted:{x:4,z:-12.4,hx:1.5,hz:1.4,y:.18,address:'A-01-L0'},hold:{x:10,z:7,hx:1.5,hz:1.4,y:.18,address:'H-01'},returned:{x:10,z:12,hx:1.5,hz:1.4,y:.18,address:'R-01'}};
 export function palletCorners(p){const c=Math.cos(p.angle),s=Math.sin(p.angle);return [-1,1].flatMap(a=>[-1,1].map(b=>({x:p.x+c*a*.9+s*b*.8,z:p.z-s*a*.9+c*b*.8})));}
 export function contained(p,area){return palletCorners(p).every(q=>Math.abs(q.x-area.x)<=area.hx-.02&&Math.abs(q.z-area.z)<=area.hz-.02);}
 export function pickupAligned(f,p){const dx=p.x-f.x,dz=p.z-f.z,c=Math.cos(f.angle),s=Math.sin(f.angle);const lateral=dx*c-dz*s,forward=-(dx*s+dz*c);return Math.abs(lateral)<.18&&Math.abs(forward-2.25)<.25&&Math.abs(Math.sin(f.angle-p.angle))<.12;}
