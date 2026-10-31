@@ -41,6 +41,15 @@ BASE_NO_CHILD = (
     "the reference images, the same style and colours, standing on a wooden table. No text "
     "overlays, no brand names or logos. Shot: ")
 NO_CHILD = {"1b-leave", "1c-alive", "6-night", "7-go", "5-dive"}
+# The box the figures come in (Sena: not a plain box). The project's own name on it, no
+# company logo: a logo on a toy box would read as an official product.
+BOX = (
+    "The toy-set box is a glossy printed retail box, not plain cardboard: on its lid in big "
+    "bold navy letters 'COUNT BEFORE YOU POST', under it smaller 'Built with Muse', a small "
+    "round badge 'WAREHOUSE 01', and a printed picture of the toy-brick dock with exactly "
+    "the seven figures from the reference images in a row, each with its own hair, clothes "
+    "and prop (orange spiky hair, glasses and tablet, headphones, palette, flower clip, pen "
+    "and clipboard, teal beanie). No other logos or brand names. ")
 SHOTS = {
     "1-arrive": (
         "the very start, NOTHING IS BUILT YET: no warehouse, no truck, no figures standing; "
@@ -72,6 +81,16 @@ SHOTS = {
     # Sena's story (31 Oct): the child leaves for a moment, the figures come alive and talk,
     # freeze when the child comes back, and at night, when the child has gone to bed, the
     # game begins. Shots after 1-arrive, numbered in story order.
+    "0-box": (
+        "the very first moment: top-down, the bare table with the closed printed box in the "
+        "middle; the child's two hands lifting the lid off, the top of the head at the bottom "
+        "edge."),
+    "0b-open": (
+        "top-down: the box lid lies beside the open box; inside, EXACTLY SEVEN toy figures, "
+        "each one different, the seven from the reference images, in a neat moulded tray "
+        "with seven slots, smiling up; the child's hand lifting the first figure out; next "
+        "to the box a bare grey baseplate and bags of loose bricks. NOTHING IS BUILT yet: no "
+        "warehouse, no truck on the table."),
     "1b-leave": (
         "top-down, exactly the table of the first reference image a moment later: NOTHING IS "
         "BUILT, only the bare grey baseplate with three or four bricks clicked on it, the "
@@ -98,14 +117,20 @@ SHOTS = {
 }
 
 
+BOXED = {"0-box", "0b-open", "1-arrive", "1b-leave", "1c-alive"}
+
+
 def draw(name):
     dst = OUT / f"story-{name}.png"
     if dst.exists():
         return
-    refs = [OUT / "story-1-arrive.png"] + REFS if name == "1b-leave" else REFS
+    refs = ([OUT / "story-1-arrive.png"] + REFS if name == "1b-leave"
+            else [OUT / "story-1-arrive.png"] + REFS if name in ("0-box", "0b-open") else REFS)
     body = {"model": "muse-image-1.0", "n": 1, "size": "1792x1024", "output_format": "png",
             "response_format": "b64_json",
-            "prompt": (BASE_NO_CHILD if name in NO_CHILD else BASE) + SHOTS[name],
+            "prompt": ((BASE_NO_CHILD if name in NO_CHILD else BASE) + BOX + SHOTS[name]
+                       if name in BOXED else
+                       (BASE_NO_CHILD if name in NO_CHILD else BASE) + SHOTS[name]),
             "images": [{"image_url": _jpeg(p, 1536)} for p in refs]}
     req = urllib.request.Request(
         BASE_URL + "/images/edits", data=json.dumps(body).encode(), method="POST",
