@@ -291,7 +291,7 @@ gate and the supervisor.
 <td align="center" valign="top" width="20%"><img src="assets/mascots/portraits/wonder.png" alt="Wonder" width="170"><br><b>Wonder</b><br><sub>Muse Wonder</sub><br><br>Checks Spark's reading against the note before a write, and drafts the dispute or the damage report.</td>
 <td align="center" valign="top" width="20%"><img src="assets/mascots/portraits/rover.png" alt="Rover" width="170"><br><b>Rover</b><br><sub>Muse Spark Open</sub><br><br>Reads the note a second time, on his own, with open weights. If he reads it differently, Şef decides.</td>
 <td align="center" valign="top" width="20%"><img src="assets/mascots/portraits/glimmer.png" alt="Glimmer" width="170"><br><b>Glimmer</b><br><sub>Muse Glimmer</sub><br><br>The other open-weight reader we measured. Kept in the comparison.</td>
-<td align="center" valign="top" width="20%"><img src="assets/mascots/portraits/iris.png" alt="Iris" width="170"><br><b>Iris</b><br><sub>Muse Image</sub><br><br>Drew everyone on this page, and the whole cast on the demo site.</td>
+<td align="center" valign="top" width="20%"><img src="assets/mascots/portraits/iris.png" alt="Iris" width="170"><br><b>Iris</b><br><sub>Muse Image</sub><br><br>Drew the whole cast, here and on the demo site. ChatGPT drew the toy box from these drawings.</td>
 <td align="center" valign="top" width="20%"><img src="assets/mascots/portraits/ada.png" alt="Ada" width="170"><br><b>Ada</b><br><sub>Muse Code</sub><br><br>Wrote the ERPNext client, the demo page and the 3D simulator, then worked the dock herself through the gate's MCP server.</td>
 </tr>
 </table>
