@@ -143,7 +143,8 @@ Every step that needs AI runs on Meta's models through the Meta Model API.
 | **ChatGPT** (OpenAI) | The toy box pictures that open and close the demo page and the video (the box closed and open, the night build, the morning), drawn from our Muse Image portraits | `experiments/mockups/story-0*-chatgpt.png`, `story-9-*`, `site/img/toybox*.webp`, `hero-night.webp`, `morning*.webp` |
 | **OpenAI Codex** | The Brick Dock, a second simulator in LEGO bricks, where the page's *Drive the dock* button leads | `site/sim-lego/` |
 | **Claude Code** | The page's toy box opening, the morning ending and the hover cards in the open box, written by hand on 31 Oct when Muse Code was too slow for the evening; marked as such in each commit | `site/index.html` |
-| **Meshy** | The LEGO truck, forklift and meeting table in the simulator; a rigged 3D Glimmer with a wave (Muse Image drew her winking first) | `site/sim/models/`, `experiments/glimmer_farewell.py` |
+| **Meshy** | The LEGO truck, forklift and meeting table in the simulator. A rigged, waving 3D Glimmer was tried and not used (the model lost her orb and her torso bent) | `site/sim/models/`, `experiments/glimmer_farewell.py` |
+| **Higgsfield Genjutsu** | Glimmer's farewell at the end of the demo page: our Muse Image Glimmer, moved by a waving clip from Pixabay (by videoplasty, Pixabay Content License); her one-eye wink drawn by Muse Image on the clip's last frame | `experiments/glimmer-farewell/`, `site/media/glimmer-farewell.webp` |
 
 ### What Muse Code built
 
