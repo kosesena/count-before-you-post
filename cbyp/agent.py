@@ -22,6 +22,7 @@ from .delivery_note import read_note
 from .gate import CONCEPTS, HUMAN, MIN_CONF, POST, SURE, Decision, decide
 from .meta import SPARK, client
 from .purchase_order import open_quantity
+from .pdf_text import invisible_lines
 from .perception import look, point_cartons
 from .sam import segment_image, segment_points, segments
 
@@ -83,11 +84,18 @@ class Session:
     # matches it against the note and the count. The agent never sees or sets it.
     order: dict | None = None
 
+    # Host-supplied evidence: the agent cannot manufacture or disable these checks.
+    last_decision: Decision | None = None
+    spoken: dict | None = None
+    receiver_loader: object = None
+    full_checks: bool = False  # compatibility for labelled legacy experiments only
+
     def log(self, entry):
         """One step on the trace, stamped with the local wall-clock time it was recorded."""
         self.trace.append({**entry, "at": datetime.now().astimezone().isoformat(timespec="seconds")})
 
     def read_delivery_note(self):
+        self.opinions.clear()
         self.note = read_note(self.note_path)["claim"]
         return self.note
 
@@ -125,11 +133,39 @@ class Session:
             why = "Gate: read the note, count the cartons and look at the pallet first."
             self.refused.append((quantity, why))
             return {"posted": False, "gate": why}
+        if self.full_checks:
+            if self.spoken is None and self.receiver_loader:
+                try:
+                    self.spoken = self.receiver_loader()
+                except Exception:
+                    return {"posted": False, "gate": HUMAN, "reason": "Receiver audio could not be verified."}
+            missing = []
+            if self.order is None: missing.append("trusted purchase order")
+            if self.spoken is None: missing.append("receiver voice evidence")
+            if self.second_reader is None or self.auditor is None: missing.append("second reader and audit")
+            if self.concept is None: missing.append("object-level camera evidence")
+            if missing:
+                why = "Required checks unavailable: " + ", ".join(missing)
+                self.refused.append((quantity, why))
+                return {"posted": False, "gate": "human", "reason": why}
+        try:
+            hidden = invisible_lines(self.note_path) if self.note_path.suffix.lower() == ".pdf" else []
+        except Exception:
+            why = "PDF text inspection failed; no receipt permitted."
+            self.refused.append((quantity, why))
+            return {"posted": False, "gate": "human", "reason": why}
+        trusted_order = (self.order | {"require_supplier": True}) if self.full_checks and self.order else self.order
         cross = self.cross()
-        d = decide(self.note, self.sam, self.look, cross, order=self.order)
+        d = decide(self.note, self.sam, self.look, cross, order=trusted_order, spoken=self.spoken, invisible=hidden)
         if d.action == POST and (self.second_reader or self.auditor):
-            d = decide(self.note, self.sam, self.look, cross, order=self.order,
-                       **self._opinions())
+            try:
+                d = decide(self.note, self.sam, self.look, cross, order=trusted_order, spoken=self.spoken, invisible=hidden,
+                           **self._opinions())
+            except Exception:
+                why = "Required second opinion failed; no receipt permitted."
+                self.refused.append((quantity, why))
+                return {"posted": False, "gate": "human", "reason": why}
+        self.last_decision = d
         if d.action == HUMAN and self.signoff is not None:
             d = self._signed_off(d, quantity)
             if isinstance(d, dict):
@@ -159,6 +195,8 @@ class Session:
         a post decision for exactly the quantity they approved, their notes on the receipt.
         Rejected, or another quantity: the refusal, as a tool result for the agent."""
         s = self.signoff
+        if d.rule in {"unit", "invalid_quantity", "unreadable", "invisible_text"}:
+            return {"posted": False, "gate": HUMAN, "reason": "Correct and re-read this evidence before signing off."}
         if not s.get("approve"):
             why = f"The supervisor rejected the receipt: {s.get('notes', '')}".strip()
         elif quantity != s.get("quantity"):

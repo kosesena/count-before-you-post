@@ -4,7 +4,7 @@
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#f5f2eb">
   <title>Count Before You Post · Warehouse Simulator</title>
-  <link rel="stylesheet" href="./style.css?v=dock-3">
+  <link rel="stylesheet" href="./style.css?v=dock-6">
   <script type="importmap">{"imports":{"three":"./vendor/three.module.js"}}</script>
 </head>
 <body>
@@ -20,8 +20,9 @@
     </div>
   </header>
   <aside id="deliveries" aria-label="Deliveries">
-    <p class="caption">RUN LANGUAGE</p>
-    <div id="run-lang" role="group" aria-label="Run language"><button type="button" data-lang="tr" class="active">TR</button><button type="button" data-lang="en">EN</button><button type="button" data-lang="de">DE</button><button type="button" data-lang="zh">ZH</button></div>
+    <p class="caption">RECORDED EVIDENCE LANGUAGE</p>
+    <div id="run-lang" aria-label="Recorded evidence language: Turkish"><span class="language-tag">TR</span><strong>Turkish recording</strong></div>
+    <p class="language-note">Interface: English. This demo replays the Turkish recording.</p>
     <p class="caption">DELIVERIES</p>
     <select id="case" class="visually-hidden" aria-label="Delivery scenario">
       <option value="ok">01 — Matching delivery</option><option value="eksik">02 — Missing carton</option>
@@ -42,12 +43,12 @@
       <section id="match" hidden aria-label="Gate decision and three-way match" aria-live="polite"><div class="match-head"><span id="match-badge"></span><p id="match-say"></p><button id="match-close" aria-label="Close the decision card">×</button></div><p class="eyebrow">THREE-WAY MATCH · ORDER · NOTE · PALLET</p><ol id="match-rows"></ol></section>
       <div id="inspector-agent"><img id="insp-avatar" src="../img/av-kapi.jpg" alt=""><div class="insp-copy"><strong id="insp-name">Kapı</strong><small id="insp-role">Guards the receiving gate</small></div><span id="insp-status" class="pill">READY</span></div>
       <div id="inspector-need" hidden><span class="need-tag">NEEDS YOU</span><p id="insp-need-reason"></p><div class="need-actions"><button type="button" id="insp-review">Review first</button><button type="button" id="insp-approve" class="primary">Approve</button></div></div>
-      <p class="caption">WHAT IT IS ACTUALLY DOING</p>
+      <p class="caption">RECEIVING PROGRESS</p>
       <ol id="receiving-steps" aria-label="Receiving progress"></ol>
       <p id="dock-checks"></p>
       <div id="status" role="status" aria-live="polite"><i></i><span>Ready to explore.</span></div>
       <div id="outcome-actions" hidden>
-        <label for="storage-level">PUT-AWAY LOCATION</label><select id="storage-level"><option value="0">A-01-L0 · Ground slot</option><option value="1">A-01-L1 · Upper shelf</option></select>
+        <label for="storage-level">TEMPORARY A-01 STAGING</label><select id="storage-level"><option value="0">A-01-L0 · Ground slot</option><option value="1">A-01-L1 · Upper shelf</option></select>
         <button id="transfer-load" class="primary">Transfer load</button><button id="manual-transfer" class="secondary">Handle manually</button>
         <div id="review-controls" hidden><p id="review-proposal"></p><label for="review-count">MANUALLY CONFIRMED INTACT CARTONS</label><input id="review-count" type="number" min="0" max="12" value="0"><p>Training decision only. The recorded ERP gate result stays unchanged.</p><button id="review-inspect">Perform recount / document check</button><label class="check-row"><input id="review-inspected" type="checkbox" disabled> Physical check completed</label><label id="review-document-row" class="check-row"><input id="review-document" type="checkbox"> Corrected document independently verified (simulation)</label><button id="review-approve">Confirm simulated acceptance</button><button id="review-return">Return entire load</button></div>
       </div>
@@ -67,7 +68,7 @@
       <button id="ask-send" aria-label="Send message">→</button>
     </div>
     <div id="transport">
-      <button id="prepare-dock" class="transport-btn" title="Prepare the dock and receive the documents"><span class="ico" aria-hidden="true">⚓</span>Prepare</button>
+      <button id="prepare-dock" class="transport-btn primary" title="Prepare the dock and receive the documents">Prepare dock →</button>
       <button id="demo" class="transport-btn primary" title="Play this delivery"><span class="ico" aria-hidden="true">▶</span>Play</button>
       <button id="drive" class="transport-btn icon-only" title="Drive forklift · WASD" aria-label="Drive forklift (W A S D)"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 17V8h6l3 5v4M13 13h3M18 4v13h3"/><circle cx="6.5" cy="17.5" r="1.8"/><circle cx="12" cy="17.5" r="1.8"/></svg></button>
       <div class="playback" hidden><button id="pause-demo">Pause</button><select id="play-speed" aria-label="Playback speed"><option value="0.35">Extra slow</option><option value="0.5" selected>Slow · 0.5×</option><option value="1">Normal · 1×</option><option value="4">Quick walkthrough · 4×</option></select></div>
@@ -94,7 +95,7 @@
   </section>
   <div id="loading"><img id="loading-poster" src="loading-poster.jpg" alt="" fetchpriority="high"><div class="loading-card"><p class="loading-pitch">An AI agent may not post a goods receipt until the evidence agrees.</p><strong>Preparing your warehouse…</strong><div id="loading-bar" role="progressbar" aria-label="Loading the warehouse"><i></i></div><small>COUNT BEFORE YOU POST · META GLOBAL AI HACKATHON</small></div></div>
   <script type="module">
-    import('./main.js?v=dock-3').catch(error => {
+    import('./main.js?v=dock-8').catch(error => {
       console.error(error);
       const loading = document.getElementById('loading');
       if (loading) {

@@ -62,7 +62,21 @@ def same_product(a: str, b: str) -> bool:
     # Labels break words where notes don't ("SONNEN-BLUMENÖL", "葵花籽油 5 升"): compare
     # without spaces too.
     ca, cb = a.replace(" ", ""), b.replace(" ", "")
-    return bool(a and b) and (a == b or a in b or b in a or ca == cb or ca in cb or cb in ca)
+    return bool(a and b) and (a == b or ca == cb)
+
+
+# Explicit aliases, never substring matching or guessed pack conversions.
+UNIT_ALIASES = {
+    "carton": {"koli", "koliler", "carton", "cartons", "box", "boxes", "karton", "kartons", "箱"},
+    "piece": {"adet", "nos", "unit", "units", "piece", "pieces", "stuck", "stück", "个"},
+    "litre": {"l", "litre", "liter", "litres", "liters", "升"},
+}
+
+
+def canonical_unit(value):
+    value = normalize(value) if isinstance(value, str) else ""
+    return next((key for key, aliases in UNIT_ALIASES.items()
+                 if value in {normalize(x) for x in aliases}), None)
 
 
 @dataclass
@@ -75,7 +89,7 @@ class Decision:
 
 
 # The rules in the order they run; Decision.rule names the one that fired.
-RULES = ("instruction", "invisible_text", "unreadable", "not_ordered", "wrong_product", "hidden",
+RULES = ("instruction", "invisible_text", "unreadable", "invalid_quantity", "unit", "supplier", "not_ordered", "wrong_product", "hidden",
          "damaged", "disagree", "receiver", "over_order", "readers_disagree", "audit", "match",
          "mismatch")
 
@@ -89,6 +103,8 @@ def differences(first: dict, second: dict) -> list[str]:
     for x, y in zip(a, b):
         if x["quantity"] != y["quantity"]:
             out.append(f"quantity {x['quantity']} against {y['quantity']}")
+        if canonical_unit(x.get("unit")) != canonical_unit(y.get("unit")):
+            out.append("unit differs between readers")
         if not same_product(x["description"], y["description"]):
             out.append(f"product '{x['description']}' against '{y['description']}'")
         if x.get("legible", False) != y.get("legible", False):
@@ -152,6 +168,15 @@ def decide(note: dict, sam_confs: list[float], look: dict, cross=None,
     if len(items) != 1 or not items[0].get("legible", False):
         return out("unreadable", HUMAN, "Delivery note has no single legible line item.")
     item = items[0]
+    quantities = [item.get("quantity"), look.get("cartons_visible"), look.get("damaged_cartons")]
+    if any(type(q) is not int or q < 0 for q in quantities) or item["quantity"] == 0 or look["damaged_cartons"] > look["cartons_visible"]:
+        return out("invalid_quantity", HUMAN, "Invalid or empty quantity evidence; check the delivery.")
+    expected_unit = canonical_unit(order.get("unit", "carton")) if order else "carton"
+    if expected_unit != "carton" or canonical_unit(item.get("unit")) != expected_unit:
+        return out("unit", HUMAN, "Camera counts cartons. Note and order must explicitly use cartons; no pack conversion is inferred.")
+    if order is not None and order.get("require_supplier"):
+        if not note.get("supplier") or normalize(note["supplier"]) != normalize(order.get("supplier", "")):
+            return out("supplier", BLOCK, "Supplier on the note does not exactly match the trusted purchase order.")
     if order is not None:
         evidence["order"] = {"number": order["number"], "product": order["product"],
                              "ordered": order["ordered"], "open": open_quantity(order)}
@@ -185,7 +210,9 @@ def decide(note: dict, sam_confs: list[float], look: dict, cross=None,
                        f"({look['cartons_visible']}) disagree on the count.")
     if spoken is not None:
         evidence["spoken"] = spoken
-        if not spoken.get("certain", False) or spoken.get("quantity") is None:
+        if "unit" in spoken and canonical_unit(spoken["unit"]) != "carton":
+            return out("receiver", HUMAN, "Receiver count must explicitly refer to cartons, not another or unknown unit.", count)
+        if not spoken.get("certain", False) or type(spoken.get("quantity")) is not int or spoken["quantity"] < 0:
             return out("receiver", HUMAN, "The receiver was not sure of the count.", count)
         if spoken["quantity"] != count:
             return out("receiver", HUMAN, f"The receiver said {spoken['quantity']}, the camera "

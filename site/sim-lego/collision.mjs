@@ -22,13 +22,15 @@ export const solids=[
  // Receiving furniture and waste stations.
  rectangle(4,7,.08,4),rectangle(-5,-4,1.4,.6),rectangle(-7.1,-6.75,.4,.4),rectangle(-5.8,-6.75,.4,.4),
  // Receiving partition: the only vehicle passage is the controlled gate.
- rectangle(-10.775,-7.3,.625,.12),rectangle(-3.325,-7.3,5.625,.12),rectangle(11.65,-7.3,5.35,.12),
+ rectangle(-10.775,-7.3,.625,.12),rectangle(-3.325,-7.3,5.625,.12),rectangle(6.85,-7.3,.55,.12),rectangle(13.8,-7.3,3.2,.12),
  // Dedicated storage rack uprights; the ground slot remains accessible.
- rectangle(2.5,-12.4,.09,1.3),rectangle(5.5,-12.4,.09,1.3),
- rectangle(-17, -2,.175,18),rectangle(0,-20,17,.225),
+ rectangle(2.5,-12.4,.09,.9),rectangle(5.5,-12.4,.09,.9),
+ rectangle(-17, -2,.175,18),rectangle(0,-20.4,17,.225),
  rectangle(17,-13.325,.3,6.675),rectangle(17,8.575,.3,7.425),
  rectangle(-14.235,.3,2.75,10.9),rectangle(-10.4,13.3,1.5,2),
- rectangle(2.3,-18.7,12.85,.94),rectangle(16,-13.7,.94,5.85),
+ rectangle(-4.525,-19.1,7.125,.94),rectangle(9.725,-19.1,4.325,.94),
+ // C-06 is a real accessible pallet bay; posts and rear wall remain solid.
+ rectangle(2.6,-19.1,.09,.94),rectangle(5.4,-19.1,.09,.94),rectangle(16,-13.7,.94,5.85),
  rectangle(16,5.7,.94,4.45),
  rectangle(17.1,-6.65,.3,.22),rectangle(17.1,1.15,.3,.22),
  // Trailer sides, front wall/cab and apron guard rail.
@@ -40,12 +42,14 @@ export const solids=[
  ...[[6,-7.5],[6,-3.5],[-8,10]].map(([x,z])=>rectangle(x,z,.25,.25)),
 ];
 const circles=[{x:-1,z:7,radius:4.35}];
-function supported(x,z){return (x>=-16.8&&x<=17&&z>=-19.75&&z<=15.8)||(x>=16.7&&x<=19.45&&z>=-2&&z<=.7)||(x>=16.7&&x<=24&&z>=-5.45&&z<=-2.55);}
+function supported(x,z){return (x>=-16.8&&x<=17&&z>=-20.15&&z<=15.8)||(x>=16.7&&x<=19.45&&z>=-2&&z<=.7)||(x>=16.7&&x<=24&&z>=-5.45&&z<=-2.55);}
 export function blockedPose(x,z,angle,{held=false,gateClosed=true,pallet=null,obstacles=[]}={}){
  const shapes=forkliftShapes(x,z,angle,held);
+ // The chassis and fixed mast cannot travel beneath the staging deck.
+ if([rectangle(x,z,.8,1.025,angle),rectangle(...offset(x,z,angle,0,-1.25),.675,.11,angle)].some(s=>overlaps(s,rectangle(4,-12.4,1.5,.84))))return true;
  // Check each wheel rather than the vehicle centre at the raised dock edge.
  for(const lx of [-.8,.8])for(const lz of [-.72,.8])if(!supported(...offset(x,z,angle,lx,lz)))return true;
- const walls=gateClosed?[...solids,...obstacles,rectangle(4.35,-7.3,1.95,.12)]:[...solids,...obstacles];
+ const walls=gateClosed?[...solids,...obstacles,rectangle(4.35,-7.3,1.95,.12),rectangle(9,-7.3,1.6,.12)]:[...solids,...obstacles];
  if(shapes.some(s=>walls.some(o=>overlaps(s,o))||circles.some(c=>circleOverlap(s,c))))return true;
  // The empty forks may slide under a pallet, but the chassis cannot pass through it.
  return !!pallet&&overlaps(shapes[0],pallet);

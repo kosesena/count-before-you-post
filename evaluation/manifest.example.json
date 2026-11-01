@@ -1,0 +1,17 @@
+{
+  "description": "Template only. No completed field evaluation is claimed.",
+  "cases": [
+    {
+      "id": "real-001",
+      "split": "held_out",
+      "note": "inputs/real-001-note.jpg",
+      "camera": "inputs/real-001-camera.jpg",
+      "audio": "inputs/real-001-receiver.wav",
+      "language": "Turkish",
+      "order": {"number": "FIELD-001", "supplier": "Exact supplier", "product": "Exact product and pack size", "unit": "carton", "ordered": 12, "received": 0},
+      "truth": {"action": "post", "quantity": 12, "physical_count": 12, "product_matches": true, "reason": "Human counted and checked the order before model run"},
+      "manual_active_seconds": null,
+      "observer": "Fill with the person who counted, not a model"
+    }
+  ]
+}

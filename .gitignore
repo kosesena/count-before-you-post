@@ -23,3 +23,9 @@ site/sim/models/_*.glb
 
 # 3D work files (1.2 GB): the Lego GLBs and their intermediates stay local; web versions are in site/sim/models
 assets/mascots/3d/**/*.glb
+
+# New private delivery inputs and live verification outputs
+.local-verification/
+evaluation/inputs/
+evaluation/sealed*.json
+evaluation/results*.json

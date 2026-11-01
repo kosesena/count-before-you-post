@@ -17,9 +17,11 @@ export function replayLines(entry,followup){
   if(s.tool==='read_delivery_note'){const n=entry.note.items[0];add('spark',null,`The note says ${n.quantity} ${/^kol/i.test(n.unit)?'cartons':n.unit} of ${n.description}.`,source+' / note');}
   else if(s.tool==='look_at_pallet'){const v=Object.keys(r).length?r:entry.spark;add('spark',null,`On the pallet I see ${v.cartons_visible} cartons labelled ${v.product_on_labels}, ${v.damaged_cartons} damaged${v.stacked?', stacked':''}${v.all_cartons_visible?'':', and some are hidden'}.`,source);}
   else if(s.tool==='count_cartons'){add('spark','sam',`Sam, can you count them${a.concept?` as "${a.concept}"`:''}?`,source);add('sam','spark',r.sure!==undefined?`I'm sure of ${r.sure}, ${r.doubtful} doubtful.`:'My result was cut off in the recording; see the evidence.',source);}
-  else if(s.tool==='post_goods_receipt'){add('spark','kapi',`Kapı, please post${a.quantity!==undefined?` ${a.quantity} cartons`:' the receipt'}.${a.reason?` ${a.reason}`:''}`,source);add('kapi','spark',r.posted?`Posted ${r.quantity} cartons as ${r.document}.`:r.reason||entry.gate.reason,source);}
+  else if(s.tool==='post_goods_receipt'){add('spark','kapi',`Kapı, please post${a.quantity!==undefined?` ${a.quantity} cartons`:' the receipt'}.${a.reason?` ${a.reason}`:''}`,source);add('kapi','spark',r.posted?(r.document?`Posted ${r.quantity} cartons as ${r.document}.`:`Dry run: ${r.quantity} cartons approved for posting. No ERP receipt was written.`):r.reason||entry.gate.reason,source);}
   else if(s.tool==='ask_supervisor'){add('spark','sef',a.reason||entry.gate.reason,source);add('sef','spark','I have it. I will review it.',source,{remote:!participants(entry.id).includes('sef')});}
  }
+ // Derived summaries and separate follow-up runs have no trace timestamp of their own.
+ at=undefined;
  if(entry.agent?.answer)add('spark',null,entry.agent.answer,'data.json · agent.answer');
  add('kapi',null,`My decision: ${entry.gate.action==='human'?'ask Şef':entry.gate.action}. ${entry.gate.reason}`,'data.json · gate',{decision:true});
  if(entry.draft)add('wonder','sef',`I drafted a ${String(entry.draft.document).replace(/_/g,' ')} (${entry.draft.status}). ${entry.gate.reason}`,'data.json · draft / gate',{summary:true});

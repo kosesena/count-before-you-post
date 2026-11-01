@@ -669,6 +669,7 @@ footer p { margin: 4px 0; }
 </style>
 </head>
 <body>
+<nav aria-label="Start reviewing" style="position:relative;z-index:50;padding:16px 24px;background:#12323f;color:white;display:flex;gap:24px;flex-wrap:wrap"><a href="review/" style="color:white;font-weight:750">Start here: see the evidence →</a><a href="verify/" style="color:white">Verify a new delivery</a><span>Recorded examples · new-input verification runs locally</span></nav>
 <button id="theme" type="button" aria-label="Toggle colour theme">Dark</button>
 <section class="toybox" aria-label="Count Before You Post toy box">
   <div class="toybox-stage">
@@ -694,8 +695,7 @@ footer p { margin: 4px 0; }
     <p class="kicker">Live demo &middot; recorded runs, no API calls from this page</p>
     <h1>Count Before You Post</h1>
     <p class="lede"><b>A verification gate between AI agents and the ERP.</b>
-      Before a goods receipt is written, the delivery note, the camera, the receiver's voice
-      and a second model must agree. If they don't, nothing is written and a person decides.</p>
+      The agent proposes a receipt; independent evidence and plain-code checks control the write. Explore historical runs below, or verify new evidence with the full-check local workflow.</p>
     <p class="hero-cta"><a class="btn-primary drive" id="driveBtn" href="sim-lego/"><svg class="truck" viewBox="0 0 28 18" aria-hidden="true"><rect x="1" y="3" width="15" height="9" rx="1.5" fill="rgba(255,255,255,.92)"/><path d="M16 6h4.6L25 10.4V12h-9z" fill="rgba(255,255,255,.92)"/><rect x="17.5" y="7.2" width="3.4" height="2.6" fill="#2f6bff"/><g class="ww"><circle cx="7.5" cy="13.6" r="2.8" fill="#1c2430"/><rect x="6.7" y="11.4" width="1.6" height="4.4" rx=".8" fill="#fff"/></g><g class="ww"><circle cx="21" cy="13.6" r="2.8" fill="#1c2430"/><rect x="20.2" y="11.4" width="1.6" height="4.4" rx=".8" fill="#fff"/></g></svg><span>Drive the dock &rarr;</span></a><a class="btn-quiet" href="#h-dock">See the six deliveries</a></p>
     <section class="muse" aria-label="Built with Muse">
       <p class="muse-head"><b>Built with Muse</b><span>Meta's models, on the Meta Model API and on open weights, do every step that needs AI.</span></p>
@@ -795,7 +795,7 @@ footer p { margin: 4px 0; }
         <div class="ch-text">
           <p class="ch-kicker">Chapter 04</p>
           <div class="ch-title-row"><span class="ch-num" aria-hidden="true">04</span><h2 id="h-dock">The gate</h2></div>
-          <p class="ch-intro">Kap&#305; decides: 12 plain-code rules in order. Unsure means the supervisor.</p>
+          <p class="ch-intro">Kap&#305; decides: recorded plain-code checks in order. Unsure means the supervisor.</p>
         </div>
         <div class="ch-fig multi" aria-hidden="true">
           <img id="fig-kapi" src="img/cut-kapi.webp" alt="">
@@ -1414,7 +1414,7 @@ function noGateBlock(c) {
   if (!w) return `<p class="verdict">\u2014</p>`;
   let verdict;
   if ((w.posted || []).length) {
-    verdict = `Posted <b>${esc(w.posted.join(", "))}</b> to the ERP.`;
+    verdict = `Proposed <b>${esc(w.posted.join(", "))}</b> cartons in a dry run. No ERP write.`;
     if (c.expected !== "post") {
       verdict += `<br><span class="flag">Should have been: ${esc(EXPECTED_TEXT[c.expected] || c.expected)}.</span>`;
     }
@@ -1430,7 +1430,7 @@ function behindGateBlock(c) {
   const chips = []
     .concat((a.posted || []).map(p => Array.isArray(p)
       ? `<span class="chip yes">Posted ${esc(p[0])} (${esc(p[1])})</span>`
-      : `<span class="chip yes">Posted ${esc(p)}</span>`))
+      : `<span class="chip yes">Dry run: approved ${esc(p)} · no ERP write</span>`))
     .concat((a.refused || []).map(r => Array.isArray(r)
       ? `<span class="chip no">Tried ${esc(r[0])} \u2014 refused</span>`
       : `<span class="chip no">Refused: ${esc(r)}</span>`))
@@ -1438,7 +1438,7 @@ function behindGateBlock(c) {
   const secs = (a.seconds === null || a.seconds === undefined) ? "" : ` \u00b7 ${Math.round(a.seconds)} s`;
   return `<ol class="timeline">${(a.steps || []).map(stepRow).join("")}</ol>` +
     (chips.length ? `<div class="chips">${chips.join("")}</div>` : "") +
-    `<div class="answer">${esc(a.answer)}${secs ? `<br><span class="mono">${esc(secs.trim())} recorded</span>` : ""}</div>`;
+    `<div class="answer"><strong>Model summary (not the authoritative transaction status):</strong> ${esc(a.answer)}${secs ? `<br><span class="mono">${esc(secs.trim())} recorded</span>` : ""}</div>`;
 }
 
 function renderTabs() {
@@ -2054,7 +2054,7 @@ const TOYBOX_OBJECTS = [
   { box: [990, 595, 1265, 760], href: "#ch-02", colour: "#3b82f6", eyebrow: "Chapter 02", title: "The count",
     line: "Sam counts the dock camera: every “cardboard box”, sure or doubtful.", open: "Read chapter 02" },
   { box: [1345, 455, 1450, 735], href: "#h-dock", colour: "#22c55e", eyebrow: "Chapter 04", title: "The gate",
-    line: "Kapı decides: 12 plain-code rules in order. Unsure means the supervisor.",
+    line: "Kapı decides: recorded plain-code checks in order. Unsure means the supervisor.",
     open: "See the six deliveries" },
   { box: [685, 665, 985, 760], href: "#ch-03", colour: "#60a5fa", eyebrow: "Chapter 03", title: "The receiver",
     line: "Voice writes down what the receiver says at the dock, and notices when they are not sure.",

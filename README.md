@@ -34,11 +34,31 @@ trace, with and without the gate, each step with the time it was recorded.
 Built during the Meta Global AI Developer Hackathon (26 Oct – 4 Nov 2026), theme *Build for
 Your World*. Everything in this repository was written during the event.
 
+## Current verification workflow (1 Nov hardening)
+
+[Read the evidence first](site/review/index.html) · [New-input verification](site/verify/index.html) · [Validation protocol](docs/VALIDATION.md)
+
+Run `.venv/bin/python -m cbyp.verify_server` and open http://127.0.0.1:8768. Supply your own
+trusted order, note, current carton photo and receiver WAV. Pressing **Verify delivery** sends
+the files to Meta/Baseten and may incur API charges. It checks supplier, exact normalized
+product, carton units, physical evidence, voice, PDF text and second opinions. **No ERP writer
+is installed in this UI.** The result and input hashes are saved locally.
+
+The tables below describe **historical core-profile experiments**, not a completed validation
+of the new full-check workflow. Live model validation of this revision and a sealed real-data
+benchmark remain pending. Historical results are preserved, not relabelled as new runs.
+The agent CLI and MCP now require full checks by default; `--legacy-core` on the experiment
+CLI is an explicitly labelled reproduction mode. Supply host-controlled receiver recordings via
+`CBYP_RECEIVER_AUDIO_DIR/<case>.wav`; missing required evidence refuses posting.
+
+A Purchase Receipt updates stock; it does not itself create the supplier payable. That is the
+Purchase Invoice. Reference: [ERPNext Purchase Receipt](https://docs.frappe.io/erpnext/purchase-receipt).
+
 ## In 30 seconds
 
 > **The problem.** At a warehouse dock, the goods receipt is typed from the delivery note. Give
 > that job to an AI agent and it trusts the paper too: whatever the note says, even a line telling
-> "automatic systems" to post 100 without counting, becomes stock and money owed.
+> "automatic systems" to post 100 without counting, can become incorrect stock and affect later invoice matching.
 >
 > **The fix.** The agent may still do the work, but the one write it cannot skip, the ERP
 > receipt, goes through a gate in plain code. The gate posts only when the purchase order, the
@@ -74,7 +94,7 @@ scenes and models); the checks take about a minute and a half.
 ## Why
 
 At a warehouse dock, the goods receipt is typed from the delivery note. Whatever the paper
-says becomes stock, money owed to the supplier, and the next order. Give that job to an AI
+says can become stock and affect later invoice matching and replenishment. Give that job to an AI
 agent and it trusts the paper too.
 
 I got to know this world in my SAP (ABAP) internship, and built in it before:
@@ -124,7 +144,7 @@ Agents Pt. 2, Yash Khare, 28 Oct; the Fireworks workshop, Sinan Ozdemir, 30 Oct)
 | Their term | Here |
 |---|---|
 | A mandatory verification check the agent cannot skip, built into the tool, not offered as a tool it may choose to call | Kapı sits inside `post_goods_receipt`; Spark has no way to write to the ERP around it |
-| Deterministic checks | Kapı's 14 rules in plain code (`cbyp/gate.py`): the purchase order, counts, labels, damage, stacking, instructions to software, invisible text |
+| Deterministic checks | Kapı's ordered policy checks in plain code (`cbyp/gate.py`): the purchase order, counts, labels, damage, stacking, instructions to software, invisible text |
 | LLM as a judge | Muse Wonder judges Spark's reading against the note itself, quoting it |
 | LLM as a jury: several models answer, one adjudicator decides | Spark and Rover (Muse Spark Open) read the note independently; the adjudicator is the gate, plain code, and two readings that differ go to Şef |
 | Human in the loop: escalate when the checks cannot settle it | The run stops at `ask_supervisor`; only Şef's sign-off releases it |
@@ -737,9 +757,8 @@ The first rule that fires decides (`cbyp/gate.py`, offline tests in `tests/`):
   are still ahead.
 - Muse Code ran against the gate in dry-run mode; its run wrote nothing to ERPNext.
 - The purchase orders are our own records (`cbyp/purchase_order.py`), one per language, and the
-  gate matches the order on product and quantity. Spark's reading of the note has no supplier
-  field, so the supplier comes from the order, not from the note; reading it off the note means
-  running the models again. The order was added on 1 Nov, after the measured runs: the six cases
+  historical core matched product and quantity. The current full-check profile also requires the
+  note's supplier to match the trusted order; this new check is not a measured historical result. The order was added on 1 Nov, after the measured runs: the six cases
   were replayed with it (the decisions did not change) and only the ERPNext receipt above was
   written with it.
 

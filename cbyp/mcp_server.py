@@ -26,6 +26,7 @@ from mcp.server.mcpserver import MCPServer
 from mcp.types import ToolAnnotations
 
 from .agent import Session
+from .workflow import full_session
 from .gate import CONCEPTS
 from .purchase_order import order_for
 
@@ -87,9 +88,12 @@ class Dock:
                             "If it went to the supervisor, the supervisor decides."}
         out = _scenes(self.lang)
         writer = self.writer_factory(delivery, self.lang) if self.erp else None
-        self.session = Session(out / f"depo-{delivery}-irsaliye.png",
-                               out / f"depo-{delivery}-kamera.png", gate=True, writer=writer,
-                               order=order_for(self.lang))
+        audio_dir = os.environ.get("CBYP_RECEIVER_AUDIO_DIR")
+        audio = Path(audio_dir) / f"{delivery}.wav" if audio_dir else None
+        self.session = full_session(out / f"depo-{delivery}-irsaliye.png",
+                               out / f"depo-{delivery}-kamera.png", writer=writer,
+                               order=order_for(self.lang), audio=audio,
+                               language={"tr":"Turkish","en":"English","de":"German","zh":"Chinese"}[self.lang])
         self.log = self.results / f"{time.strftime('%Y%m%d-%H%M%S')}-{self.lang}-{delivery}.json"
         self.opened[delivery] = (self.session, self.log)
         return {"delivery": delivery, "status": "at the dock",

@@ -26,7 +26,7 @@ ORDERS = {
 
 def order_for(lang: str = "tr", ordered: int = ORDERED, received: int = 0) -> dict:
     """The open order line a delivery in this language is received against."""
-    return {**ORDERS[lang], "ordered": ordered, "received": received}
+    return {**ORDERS[lang], "ordered": ordered, "received": received, "unit": "carton"}
 
 
 def open_quantity(order: dict) -> int:

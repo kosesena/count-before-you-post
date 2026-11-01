@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import {movePose,blockedPose,rectangle} from './collision.mjs';
-import {collectRoute,destinationRoute,refuseRoute,areas,contained,pickupAligned,placementClear,evidenceRows} from './operations.mjs';
+import {collectRoute,warehouseAisleRoute,warehouseReturnRoute,destinationRoute,refuseRoute,areas,contained,pickupAligned,placementClear,evidenceRows} from './operations.mjs';
 import {readFileSync} from 'node:fs';
 for(const destination of ['accepted','hold','returned']){
  let pose={x:18.2,z:-.6,angle:-Math.PI/2},held=false;
@@ -48,3 +48,25 @@ for(const target of ['accepted','returned']){
  const commands=target==='accepted'?[['move',3],['pickup'],['move',-3.75],['turn',-Math.PI/2],['move',6],['turn',-Math.PI/2],['move',11.15],['drop'],['move',-3]]:[['move',3],['pickup'],['move',5],['drop'],['move',-3]];
  for(const [op,value] of commands){if(op==='pickup'){assert.ok(pickupAligned(pose,{x:10,z:7,angle:-3*Math.PI}));held=true;continue;}if(op==='drop'){assert.ok(contained({x:pose.x-Math.sin(pose.angle)*2.25,z:pose.z-Math.cos(pose.angle)*2.25,angle:pose.angle},areas[target]));held=false;continue;}pose=movePose(pose,op==='move'?value:0,op==='turn'?value:0,{held,gateClosed:target!=='accepted',obstacles:target==='accepted'?[rectangle(13,7,.9,.8)]:[]});assert.equal(pose.hit,false,`review ${target} ${op}`);}
 }
+
+// Parking retraces the empty aisle, leaving the accepted pallet at its address.
+{
+ let pose={x:4,z:-7.15,angle:-2*Math.PI};
+ const pallet=rectangle(4,-12.4,.9,.8,0);
+ const route=[['move',-3.9],...collectRoute.filter(c=>['move','turn'].includes(c[0])).slice().reverse().map(([op,n])=>[op,-n])];
+ for(const [op,value] of route){let remaining=value;while(Math.abs(remaining)>.00001){const delta=Math.sign(remaining)*Math.min(.025,Math.abs(remaining));pose=movePose(pose,op==='move'?delta:0,op==='turn'?delta:0,{held:false,pallet,gateClosed:false});assert.equal(pose.hit,false,'parking route clears the rack and stored load');remaining-=delta;}}
+ assert.ok(Math.hypot(pose.x-18.2,pose.z+.6)<.05,'returns to parking by driving');
+}
+// Temporary A-01 to the real C-06 warehouse bay, then back to parking.
+{
+ let pose={x:4,z:-7.15,angle:0},held=false,pallet=rectangle(4,-12.4,.9,.8,0);
+ const route=[['move',3],['pickup'],['move',-3],...warehouseAisleRoute,['move',2.3],['drop'],['move',-2.3],...warehouseReturnRoute,['move',-3.9],...collectRoute.filter(c=>['move','turn'].includes(c[0])).slice().reverse().map(([op,n])=>[op,-n])];
+ for(const [op,value] of route){
+  if(op==='pickup'){assert.ok(pickupAligned(pose,{x:4,z:-12.4,angle:0}));held=true;continue;}
+  if(op==='drop'){const p={x:pose.x-Math.sin(pose.angle)*2.25,z:pose.z-Math.cos(pose.angle)*2.25,angle:pose.angle};assert.ok(contained(p,areas.storage));assert.ok(placementClear(p));pallet=rectangle(p.x,p.z,.9,.8,p.angle);held=false;continue;}
+  let remaining=value;while(Math.abs(remaining)>.00001){const delta=Math.sign(remaining)*Math.min(.025,Math.abs(remaining));pose=movePose(pose,op==='move'?delta:0,op==='turn'?delta:0,{held,pallet:held?null:pallet,gateClosed:false});assert.equal(pose.hit,false,'warehouse transfer '+op+' '+value+' '+JSON.stringify(pose));remaining-=delta;}
+ }
+ assert.ok(Math.hypot(pose.x-18.2,pose.z+.6)<.05);
+}
+
+assert.equal(blockedPose(4,-12.4,0,{gateClosed:false}),true,'staging deck blocks forklift body');

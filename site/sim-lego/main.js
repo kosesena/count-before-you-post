@@ -1,10 +1,10 @@
 import {openConversation} from './conversation.js?v=layout-1';
-import {buildReceivingScene} from './receiving-scene.js?v=faces-1';
+import {buildReceivingScene} from './receiving-scene.js?v=boarding-2';
 import {receivingSteps,initialDestination,reviewPolicy,canAccept,locationMatches,atRouteStart,reviewRoute} from './receiving.mjs?v=order-1';
 import {participants,names,replayLines,english} from './replay.mjs?v=sentences-1';
 import * as T from 'three';
-import { blockedPose, movePose, rectangle, stairAscent, stairApproach } from './collision.mjs?v=waste-1';
-import {areas,contained,pickupAligned,placementClear,collectRoute,destinationRoute,refuseRoute,evidenceRows} from './operations.mjs?v=waste-1';
+import { blockedPose, movePose, rectangle, stairAscent, stairApproach } from './collision.mjs?v=warehouse-3';
+import {areas,contained,pickupAligned,placementClear,collectRoute,warehouseAisleRoute,warehouseReturnRoute,destinationRoute,refuseRoute,evidenceRows} from './operations.mjs?v=warehouse-3';
 import { GLTFLoader } from './vendor/GLTFLoader.js';
 import { DRACOLoader } from './vendor/DRACOLoader.js';
 import { OrbitControls } from './vendor/OrbitControls.js';
@@ -110,7 +110,7 @@ for(let x=-16.8;x<17;x+=.4)for(let z=-19.8;z<16;z+=.4){if(Math.hypot(x+1,z-7)<4.
 function stripe(x,z,w,d,col=C.yellow){box(world,x,.145,z,w,.065,d,col);}
 stripe(-9,-2,.13,35);stripe(5,-2,.13,35);stripe(-2,-13,14,.13);stripe(10,9.6,9,.13);stripe(14,-1,.13,16);
 // Studded brick walls; open front and open roof allow inspection from above.
-for(let layer=0;layer<19;layer++){const yy=.32+layer*.48;for(let x=-17;x<17;x+=1.6){const xx=x+.8+(layer%2)*.8;if(xx>17)continue;box(world,xx,yy,-20,1.585,.465,.45,layer%7===0?0xc7cccb:C.wall,layer===18);}}
+for(let layer=0;layer<19;layer++){const yy=.32+layer*.48;for(let x=-17;x<17;x+=1.6){const xx=x+.8+(layer%2)*.8;if(xx>17)continue;box(world,xx,yy,-20.4,1.585,.465,.45,layer%7===0?0xc7cccb:C.wall,layer===18);}}
 for(let layer=0;layer<16;layer++)for(let z=-20;z<16;z+=1.6){
  const lo=z+(layer%2)*.8,hi=Math.min(lo+1.6,16);
  const spans=layer<12?[[lo,Math.min(hi,-6.65)],[Math.max(lo,1.15),hi]]:[[lo,hi]];
@@ -120,7 +120,7 @@ for(let layer=0;layer<16;layer++)for(let z=-20;z<16;z+=1.6){
 for(let z=-19.2;z<16;z+=1.6)box(world,17,9.25,z,.45,3.15,1.585,C.wall,true);
 for(let x=-16;x<=16;x+=8){box(world,x,5.2,-19.65,.35,10.4,.6,0xb8bfbe);box(overhead,x,10.6,-2,.26,.35,36,0xb0b7b7,true);}
 for(let z=-19;z<=15;z+=6)box(overhead,0,10.55,z,34,.35,.26,0xaeb6b8,true);
-// Pendant centres never sit inside racks (x≈16 / z≈-18.7) or offices (x<-9.8); only the meeting disk covers one.
+// Pendant centres never sit inside racks (x≈16 / z≈-19.1) or offices (x<-9.8); only the meeting disk covers one.
 for(let x=-7;x<=11;x+=9)for(let z=-16;z<=14;z+=6){cyl(overhead,x,9.95,z,.035,1.05,C.black,8);const shade=new T.Mesh(new T.CylinderGeometry(.22,.65,.45,24),mat(C.black));shade.position.set(x,9.2,z);overhead.add(shade);cyl(overhead,x,8.965,z,.6,.02,pendantGlow,24);cyl(overhead,x,9.5,z,.15,.15,C.black,16);if(Math.hypot(x+1,z-7)>4.4){const pool=new T.Mesh(poolGeo,poolMat);pool.rotation.x=-Math.PI/2;pool.position.set(x,.21,z);world.add(pool);}}
 flush(world);flush(overhead);
 await stage('Placing the bricks…');
@@ -132,9 +132,9 @@ for(let z=-18;z<=14;z+=4)box(ceiling,0,10.9,z,34,.12,3.97,0xc7cbc4);for(let x=-1
 flush(ceiling);ceiling.traverse(o=>{o.castShadow=false;});
 const racks=group();let rackIndex=0;
 function rack(parent,x,z,ry,bays){const g=group(parent,x,0,z,ry);const rackCode=String.fromCharCode(67+rackIndex++);/* C, D, E: B-01 is the arrival bay */const step=2.8;for(let b=0;b<=bays;b++){const xx=(b-bays/2)*step;for(const zz of [-.7,.7]){for(let k=0;k<16;k++)box(g,xx,.25+k*.48,zz,.18,.465,.22,C.blue,k===15);box(g,xx,.16,zz,.45,.16,.45,C.blue);for(let k=0;k<14;k++)cyl(g,xx,.55+k*.48,zz+.115,.035,.012,0x063d79,8,Math.PI/2);}}
- for(let b=0;b<bays;b++){const xx=(b+.5-bays/2)*step;for(let lev=0;lev<4;lev++){const y=.5+lev*1.95;box(g,xx,y,.73,2.8,.18,.18,C.yellow,true);box(g,xx,y,-.73,2.8,.18,.18,C.yellow,true);box(g,xx,y,0,2.66,.12,1.38,0xb7bdc0);for(let c=0;c<3;c++){const h=.6+((b+lev+c)%3)*.12;crate(g,xx+(c-1)*.78,y+.12,0,.68,h,.84);if((b+lev+c)%3===0)crate(g,xx+(c-1)*.78,y+.12+h+.08,0,.55,.48,.65);}for(const side of [1,-1])label(g,`${rackCode}-${String(b+1).padStart(2,'0')}-L${lev}`,xx,y+.22,side*.86,1.2,.18,'#f4f3e9','#263d35',side===1?0:Math.PI).material.side=T.FrontSide;}}
+ for(let b=0;b<bays;b++){const xx=(b+.5-bays/2)*step;for(let lev=0;lev<4;lev++){const y=.5+lev*1.95;box(g,xx,y,.73,2.8,.18,.18,C.yellow,true);box(g,xx,y,-.73,2.8,.18,.18,C.yellow,true);box(g,xx,y,0,2.66,.12,1.38,0xb7bdc0);for(let c=0;c<3;c++){if(rackCode==='C'&&b===5&&lev<2)continue;const h=.6+((b+lev+c)%3)*.12;crate(g,xx+(c-1)*.78,y+.12,0,.68,h,.84);if((b+lev+c)%3===0)crate(g,xx+(c-1)*.78,y+.12+h+.08,0,.55,.48,.65);}for(const side of [1,-1])label(g,`${rackCode}-${String(b+1).padStart(2,'0')}-L${lev}`,xx,y+.22,side*.86,1.2,.18,'#f4f3e9','#263d35',side===1?0:Math.PI).material.side=T.FrontSide;}}
  flush(g);return g;}
-rack(racks,2.3,-18.7,0,9);rack(racks,16,-13.7,-Math.PI/2,4);rack(racks,16,5.7,-Math.PI/2,3);
+rack(racks,1.2,-19.1,0,9);rack(racks,16,-13.7,-Math.PI/2,4);rack(racks,16,5.7,-Math.PI/2,3);
 // Continuous left shell: the office backs sit flush against its inner face.
 for(let layer=0;layer<21;layer++)for(let z=-20;z<16;z+=1.6){
   const start=z+(layer%2)*.8,end=Math.min(start+1.6,16);
@@ -634,16 +634,17 @@ const props=group();for(const [x,z] of [[-4,-10.5],[13,-8]]){pallet(props,x,.16,
 for(const [x,z] of [[6,-7.5],[6,-3.5],[-8,10]]){box(props,x,.2,z,.5,.12,.5,C.orange);const cone=new T.Mesh(new T.CylinderGeometry(.07,.2,.55,16),mat(C.orange));cone.position.set(x,.5,z);props.add(cone);cyl(props,x,.55,z,.12,.1,C.white,16);}flush(props);
 // Marked circulation and receiving partition, matching collision solids.
 const circulation=group();
-for(const [x,w] of [[-10.775,1.25],[-3.325,11.25],[11.65,10.7]]){for(let xx=x-w/2;xx<=x+w/2;xx+=1)box(circulation,xx,.8,-7.3,.1,1.4,.1,C.yellow);box(circulation,x,1.45,-7.3,w,.1,.12,C.yellow);box(circulation,x,.6,-7.3,w,.08,.1,C.black);}
+for(const [x,w] of [[-10.775,1.25],[-3.325,11.25],[6.85,1.1],[13.8,6.4]]){for(let xx=x-w/2;xx<=x+w/2;xx+=1)box(circulation,xx,.8,-7.3,.1,1.4,.1,C.yellow);box(circulation,x,1.45,-7.3,w,.1,.12,C.yellow);box(circulation,x,.6,-7.3,w,.08,.1,C.black);}
 for(let z=-6;z<=11.2;z+=.8)box(circulation,-9.6,.17,z,1.1,.03,.6,0x439b89);
 const walkSign=label(circulation,'PEDESTRIANS',-9.6,.2,4,3,.65,'#287a6d','#ffffff');walkSign.rotation.x=-Math.PI/2;
 const vehicleSign=label(circulation,'FORKLIFT ROUTE',8,.2,1,3,.65,'#ffcc00','#243238');vehicleSign.rotation.x=-Math.PI/2;
 twoSidedLabel(circulation,'CONTROLLED STORAGE',0,1.9,-7.3,3,.4,'#243238','#fff3b2');
 for(const [id,a] of Object.entries(areas)){if(id==='inspection'||id==='refused')continue;const col=id==='accepted'?0x369469:id==='hold'?C.orange:C.red;for(const dz of [-a.hz,a.hz])box(circulation,a.x,.19,a.z+dz,a.hx*2,.04,.09,col);for(const dx of [-a.hx,a.hx])box(circulation,a.x+dx,.19,a.z,.09,.04,a.hz*2,col);const tag=label(circulation,`${id==='returned'?'RETURN':id==='hold'?'HOLD / NO STOCK':id==='arrival'?'UNVERIFIED':'ACCEPTED'} / ${a.address}`,a.x,.22,a.z+a.hz+.5,3.2,.55,'#f4f3e9','#243238');tag.rotation.x=-Math.PI/2;}
 // A dedicated put-away rack, with one empty pallet slot on each level.
-for(const x of [2.5,5.5])for(const z of [-13.65,-11.15])box(circulation,x,2.3,z,.14,4.3,.14,C.blue,true);
-box(circulation,4,2.45,-12.4,3,.16,2.6,C.yellow);box(circulation,4,4.4,-12.4,3,.12,2.6,C.yellow);
-twoSidedLabel(circulation,'A-01 · L0 / L1',4,4.65,-11.08,2.8,.35,'#0055bd','#ffffff');
+for(const x of [2.5,5.5])for(const z of [-13.23,-11.57])box(circulation,x,2.3,z,.14,4.3,.14,C.blue,true);
+box(circulation,4,2.45,-12.4,3,.16,1.68,C.yellow);box(circulation,4,4.4,-12.4,3,.12,1.68,C.yellow);
+twoSidedLabel(circulation,'A-01 · L0 / L1',4,4.65,-11.48,2.8,.35,'#0055bd','#ffffff');
+const aisleBarrier=group(scene,10.6,1.75,-7.3);box(aisleBarrier,-1.6,0,0,3.2,.2,.18,C.white);for(let i=0;i<5;i++)box(aisleBarrier,-.3-i*.6,0,.1,.3,.205,.02,C.red);flush(aisleBarrier);
 // Q-01 markings are provided by the receiving equipment module.
 flush(circulation);
 const receivingScene=buildReceivingScene({T,scene,group,box,cyl,label,twoSidedLabel,flush,sheet,C});
@@ -653,14 +654,17 @@ let caseData;
 try{const res=await fetch('../data.json');if(!res.ok)throw Error('data');caseData=await res.json();}catch{caseData=null;}
 const state={paused:false,speed:.5,mode:'orbit',held:false,running:false,phase:0,t:0,result:null};
 const completedLoads=[];let guided=false,liftTarget=0;let automation=null,transferTarget=null,verified=false,reviewResolved=false,deliveryNumber=1;let forkHeight=0;
+let exerciseFinished=false;
 let dockReady=false,arrivalDone=false,inspectionRun=null,physicalLocation='trailer',locationConfirmed=false,handlingDecision=null,reviewTask=null,receivedQty=null;
 const flowList=$('receiving-steps');receivingSteps.forEach(text=>{const li=document.createElement('li');li.textContent=text;flowList.append(li);});
 const stepAgents=['Receiving','Forklift','Forklift','Spark · Sam · Kapı','Şef','Forklift','Receiving'];
 const stepNotes=new Array(receivingSteps.length).fill('');
+const revealedDeliveries=new Set();
 function renderSteps(active){
+ const prepare=$('prepare-dock');prepare.remove();
  [...flowList.children].forEach((li,i)=>{
   const done=active>receivingSteps.length-1||i<active,current=i===active&&!done;
-  const note=done?(stepNotes[i]||'Done'):current?(stepNotes[i]||'Up next'):'More coming';
+  const note=current?(stepNotes[i]||(i===0?'Check the paperwork and secure the trailer before unloading.':'Ready for the next step.')):'';
   li.replaceChildren();
   const marker=document.createElement('span');marker.className='step-marker';marker.setAttribute('aria-hidden','true');
   const copy=document.createElement('span');copy.className='step-copy';
@@ -668,7 +672,9 @@ function renderSteps(active){
   const agent=document.createElement('small');agent.textContent=stepAgents[i]||'';
   const line=document.createElement('span');line.className='step-note';line.textContent=note;
   copy.append(name,agent,line);
-  if(current){const bar=document.createElement('span');bar.className='step-bar';bar.append(document.createElement('i'));copy.append(bar);}
+  if(i===0)copy.append(prepare);
+  if(current&&i===1&&!state.running){const play=document.createElement('button');play.className='step-action primary';play.textContent='Unload delivery →';play.onclick=()=>{$('demo').click();};copy.append(play);}
+  if(current&&state.running){const bar=document.createElement('span');bar.className='step-bar';bar.append(document.createElement('i'));copy.append(bar);}
   li.append(marker,copy);
  });
 }
@@ -676,7 +682,7 @@ function flowStep(index,text){[...flowList.children].forEach((li,i)=>{li.dataset
 function entryNow(){return caseData?.cases.find(c=>c.id===currentCase);}
 
 const keys=new Set();let cameraTween=null;let barrierTarget=0;
-const views={putaway:{eye:[10,5.2,-4.6],target:[4,2,-12.4]},hero:{eye:[-1,6.5,21],target:[-1,3.5,-4]},gatecheck:{eye:[10.5,6.2,3.2],target:[2.6,1.8,-6.4]},table:{eye:[8,7,18],target:[-1,1.5,7]},rooms:{eye:[4,8,15],target:[-13,3.9,1]},dock:{eye:[18,16,16],target:[8,0,-4]},inspection:{eye:[10,13,17],target:[-2,1,-3]},review:{eye:[10,16,24],target:[10,1,7]},plan:{eye:[31,39,35],target:[6,0,0]},outside:{eye:[33,5.8,10],target:[22,2.7,-4]}};
+const views={conversation:{eye:[-4.8,4.8,2.4],target:[.1,1.5,-4.2]},storage:{eye:[10,6,-11],target:[4,3,-19.1]},putaway:{eye:[10,5.2,-4.6],target:[4,2,-12.4]},hero:{eye:[-1,6.5,21],target:[-1,3.5,-4]},gatecheck:{eye:[10.5,6.2,3.2],target:[2.6,1.8,-6.4]},table:{eye:[8,7,18],target:[-1,1.5,7]},rooms:{eye:[4,8,15],target:[-13,3.9,1]},dock:{eye:[18,16,16],target:[8,0,-4]},inspection:{eye:[10,13,17],target:[-2,1,-3]},review:{eye:[10,16,24],target:[10,1,7]},plan:{eye:[31,39,35],target:[6,0,0]},outside:{eye:[33,5.8,10],target:[22,2.7,-4]}};
 // A live cinematic tour of this exact warehouse, with no external video.
 let introActive=false,introStarted=0;
 const introShots=[
@@ -738,7 +744,7 @@ function pushChatToUI(){
 }
 // The words stay in the chat; the scene keeps only the NEEDS YOU card.
 function sayChatLine(line){
- meetingRun={speaker:line.speaker};
+ meetingRun={speaker:line.speaker,to:line.to,text:line.text};
  updateInspectorSpeaker(line.speaker);
 }
 // Each message stays long enough to read: about 3 s for a short line, up to 7 s for a long reason (Sena, 1 Nov).
@@ -776,6 +782,8 @@ function resetMeeting(){
  openTeamView();
 }
 function resetReceiving(){
+ exerciseFinished=false;$('next-delivery').textContent='Finish exercise';
+ state.running=false;$('demo').hidden=true;
  dockReady=false;arrivalDone=false;inspectionRun=null;reviewTask=null;physicalLocation='trailer';locationConfirmed=false;handlingDecision=null;stepNotes.fill('');
  receivingScene.reset();setDockSignal(false);updatePalletTag('UNVERIFIED');$('prepare-dock').disabled=false;$('prepare-dock').hidden=false;
  $('dock-checks').textContent='Vehicle restraint · bridge plate · driver refuge · delivery note';
@@ -793,7 +801,7 @@ $('prepare-dock').onclick=()=>{
 function updateDock(){
  const t=state.t;
  $('dock-checks').textContent=t<2?`1 / 3 · Driver in refuge; delivery note matched to ${order()?.number||'the purchase order'}.`:t<4?'2 / 3 · Trailer secured; deck and pallet condition checked.':'3 / 3 · Bridge plate in position; unloading route clear.';
- if(t>=6){receivingScene.prepare();dockReady=true;state.running=false;state.phase=0;$('prepare-dock').hidden=true;$('demo').disabled=false;flowStep(1,'Dock ready. Play delivery or drive the forklift to B-01.');}
+ if(t>=6){receivingScene.prepare();dockReady=true;state.running=false;state.phase=0;$('prepare-dock').hidden=true;$('demo').hidden=false;$('demo').disabled=false;flowStep(1,'Dock ready. Play delivery or drive the forklift to B-01.');}
 }
 function deployWorker(id,x,z){
  const slot=castSlots.find(s=>s.id===id);if(!slot?.actor)return;
@@ -809,14 +817,46 @@ function deployWorker(id,x,z){
 function updateWorkActors(dt){
  for(const slot of castSlots){if(!slot.workRoute)continue;const next=slot.workRoute[0];
   if(next){const d=slot.actor.position.distanceTo(next),step=dt*2.8;slot.actor.lookAt(next.x,slot.actor.position.y,next.z);if(d<=step){slot.actor.position.copy(next);slot.workRoute.shift();}else slot.actor.position.addScaledVector(next.clone().sub(slot.actor.position).normalize(),step);}
-  else {slot.walk?.stop();slot.idle?.play();slot.actor.lookAt(slot.id==='sef'?10:4,.18,slot.id==='sef'?7:-5.5);if(slot.working)slot.arms?.forEach((a,i)=>a.rotation.x=-.35-Math.sin(state.t*2+i)*.1);}
+  else {slot.walk?.stop();slot.idle?.play();}
  }
+}
+// Apply conversation poses after the animation mixer so Idle cannot overwrite them.
+const agentSpeech=document.createElement('div');agentSpeech.id='agent-speech';agentSpeech.hidden=true;document.body.append(agentSpeech);
+let gestureTime=0;
+function updateConversationPoses(dt){
+ if(!dt)return;gestureTime+=dt;
+ const speaker=castSlots.find(s=>s.id===meetingRun?.speaker&&s.onFloor);
+ const recipient=castSlots.find(s=>s.id===meetingRun?.to&&s.onFloor);
+ for(const slot of castSlots){
+  if(!slot.onFloor||slot.workRoute?.length||slot.seated)continue;
+  const speaking=slot===speaker&&!!chatLive&&!chatLive.done;
+  const listener=slot!==speaker&&speaker&&!!chatLive&&!chatLive.done;
+  const target=speaking?(recipient?.actor.position||castSlots.find(s=>s.onFloor&&s!==slot&&!s.workRoute?.length)?.actor.position):listener?speaker.actor.position:null;
+  const aim=target||new T.Vector3(slot.id==='sef'?10:4,.18,slot.id==='sef'?7:-5.5);
+  const angle=Math.atan2(aim.x-slot.actor.position.x,aim.z-slot.actor.position.z);
+  slot.actor.rotation.y+=Math.atan2(Math.sin(angle-slot.actor.rotation.y),Math.cos(angle-slot.actor.rotation.y))*(1-Math.exp(-dt*4));
+  slot.gesture??=[0,0];
+  slot.arms?.forEach((arm,i)=>{
+   const goal=speaking?-(i===0?1.0:.55)-.3*Math.sin(gestureTime*3.2+i*1.8):listener?-.18:-.04;
+   slot.gesture[i]=T.MathUtils.damp(slot.gesture[i],goal,7,dt);
+   arm.rotation.x=slot.gesture[i];arm.rotation.z=speaking?(i?1:-1)*(.08+.06*Math.sin(gestureTime*2.4)):0;
+  });
+ }
+}
+function updateAgentSpeech(){
+ const slot=castSlots.find(s=>s.id===meetingRun?.speaker&&s.onFloor);
+ agentSpeech.hidden=!slot||!chatLive||chatLive.done||!!slot.workRoute?.length;
+ if(agentSpeech.hidden)return;
+ const p=slot.actor.position.clone().add(new T.Vector3(0,2.8,0)).project(camera);
+ agentSpeech.hidden=p.z>1||p.z< -1;if(agentSpeech.hidden)return;
+ agentSpeech.textContent=`${names[slot.id]||slot.name}${meetingRun.to?' → '+(names[meetingRun.to]||meetingRun.to):''}: ${String(meetingRun.text||'').slice(0,150)}`;
+ agentSpeech.style.left=`${(p.x*.5+.5)*innerWidth}px`;agentSpeech.style.top=`${(-p.y*.5+.5)*innerHeight}px`;
 }
 function stageSupervisor(){deployWorker('sef',13.2,5);setView('review');}
 function beginInspection(){
  state.mode='orbit';controls.enabled=true;$('touch').hidden=true;setView('inspection');
  inspectionRun={elapsed:0,index:-1};state.phase=6;receivingScene.inspect();
- deployWorker('spark',-2,-4.5);deployWorker('sam',-.5,-1.6);deployWorker('kapi',0,-5.5);
+ deployWorker('spark',-1.2,-4.5);deployWorker('sam',-.2,-2.3);deployWorker('kapi',1.2,-5.9);
  flowStep(3,'Receiver scans the pallet; Spark reads the note, Sam reviews the camera count, Kapı compares the evidence.');
  if(guided){const lines=chatLinesNow();chatLive={lines,current:0,shown:0,timer:0,phase:'typing',started:false,done:lines.length===0};}
  else chatLive=null;
@@ -824,6 +864,7 @@ function beginInspection(){
 function updateInspection(dt){
  const run=inspectionRun;if(!run)return;
  if(receivingScene.receiver.route.length||castSlots.some(s=>s.workRoute?.length))return;
+ if(!run.framed){run.framed=true;setView('conversation');}
  updateChat(dt);
  run.elapsed+=dt;const index=Math.floor(run.elapsed/3);
  const entry=entryNow();if(!entry){inspectionRun=null;finish();return;}
@@ -865,7 +906,7 @@ function pickup(){
   if(id==='arrival'){arrivalDone=true;updatePalletTag('UNVERIFIED B-01');flowStep(2,'B-01: received physically, not yet verified. Move to the yellow inspection bay.');}
   else if(id==='inspection'){updatePalletTag('INSPECTION');if(!verified){state.running=true;state.phase=3;state.t=0;}document.querySelector('.playback').hidden=false;status('Forklift stopped. Receiver and digital checks inspect the load.');}
   else if(id==='refused'){updatePalletTag('REFUSED · RETURN TO SUPPLIER');locationConfirmed=true;handlingDecision='refused';$('outcome-actions').hidden=false;showOutcomeActions(id);if(!automation)$('next-delivery').hidden=false;flowStep(6,`Refused at the dock: the pallet is back on the trailer. Nothing is received against ${order()?.number||'the order'}; the driver takes it back.`);}
-  else {flowStep(id==='hold'?4:6,`Delivery ${deliveryNumber} placed in ${area.address}. ${id==='hold'?'Awaiting a separate handling decision.':'Confirm the location to finish.'}`);$('next-delivery').hidden=true;$('outcome-actions').hidden=false;showOutcomeActions(id);}
+  else {flowStep(id==='hold'?4:id==='accepted'?5:6,`Delivery ${deliveryNumber} placed in ${area.address}. ${id==='hold'?'Awaiting a separate handling decision.':id==='accepted'?'Temporary staging only. Move this pallet to warehouse rack C-06-L1.':'Confirm the warehouse location to finish.'}`);$('next-delivery').hidden=true;$('outcome-actions').hidden=false;showOutcomeActions(id);}
   return true;
  }
  const pos=delivery.getWorldPosition(new T.Vector3());
@@ -875,24 +916,25 @@ function pickup(){
  status('Load secured. Keep it low while travelling.');return true;
 }
 const resultCopy={ok:'12 cartons verified. The receiving gate is open.',eksik:'11 cartons found; the note says 12. ERP write blocked; handling decision pending.',wrong:'The labels say corn oil; the note and the order say sunflower oil. ERP write blocked: refuse it at the dock.',hasarli:'A carton is damaged. Supervisor review required.',talimat:'Injected instructions found in the note. ERP write blocked; handling decision pending.',belirsiz:'Stacked cartons cannot be counted. Supervisor review required.'};
-function renderEvidence(){
+function populateEvidence(){
  const entry=caseData?.cases.find(c=>c.id===currentCase);const list=$('evidence-rows');list.replaceChildren();
  for(const [name,value] of evidenceRows(entry,order())){const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=name;dd.textContent=value;list.append(dt,dd);}
  $('evidence-note').src='../'+(entry?.images.note||'');$('evidence-camera').src='../'+(entry?.images.camera||'');
  $('evidence-warning').textContent=entry?.note.embedded_instructions?.length?'Untrusted document text — instructions below were NOT executed. '+entry.note.embedded_instructions.join(' | '):entry?.what||'';
- switchTab('evidence');
 }
+function renderEvidence(){switchTab('evidence');}
 function finish(){
  const entry=caseData?.cases.find(c=>c.id===currentCase);state.running=false;automation=null;
  if(!entry){status('Recorded evidence unavailable. Delivery remains on hold.','#bd4931');$('demo').disabled=false;$('case').disabled=false;return;}
  if(chatLive&&!chatLive.done){chatLive.shown=chatLive.lines.length;chatLive.done=true;pushChatToUI();}
  const lastSpeaker=meetingRun?.speaker||null;chatLive=null;meetingRun=null;updateInspectorSpeaker(lastSpeaker);
- state.result=entry.gate.action;verified=true;physicalLocation='inspection';barrierTarget=state.result==='post'?-Math.PI*.48:0;
+ state.result=entry.gate.action;revealedDeliveries.add(currentCase);refreshDeliveryCards();verified=true;physicalLocation='inspection';barrierTarget=state.result==='post'?-Math.PI*.48:0;
  setGateSignal({block:0,human:1,post:2}[state.result]);
  status(resultCopy[currentCase]+(currentCase==='hasarli'?' Recorded proposal: accept 11 intact cartons; isolate 1 damaged carton.':''));showMatch(entry);setView('gatecheck');
  flowStep(state.result==='post'?5:4);$('outcome-actions').hidden=false;showOutcomeActions();
  // Guided playback carries on by itself: label and move the load after a short look at the decision (Sena, 1 Nov).
- if(guided)setTimeout(()=>{if(guided&&!state.running&&physicalLocation==='inspection'&&!$('transfer-load').hidden)$('transfer-load').click();},2600);
+ // Continue only when the viewer chooses the visible put-away action.
+ switchTab('inspector');
 }
 // Three-way match (written by hand, Claude Code): what was ordered, what the note says, what is on the pallet.
 function showMatch(entry){const o=order(),n=entry.note?.items?.[0],v=entry.spark,c=entry.cross;if(!o||!n||!v){$('match').hidden=true;return;}
@@ -907,12 +949,13 @@ $('match-close').onclick=()=>{$('match').hidden=true;};
 function showOutcomeActions(location='inspection'){
  const policy=reviewPolicy(currentCase), accepted=state.result==='post'||handlingDecision==='accepted';
  $('manual-transfer').hidden=location!=='inspection';$('storage-level').disabled=location!=='inspection'||!accepted;
- $('transfer-load').hidden=location!=='inspection';$('transfer-load').textContent=accepted?`Label & put away · A-01-L${$('storage-level').value}`:initialDestination(state.result,currentCase)==='refused'?'Refuse at the dock · reload to trailer':'Move to exception hold · H-01';
+ $('transfer-load').hidden=!['inspection','accepted'].includes(location);$('transfer-load').textContent=accepted?`Stage at A-01-L${$('storage-level').value}`:initialDestination(state.result,currentCase)==='refused'?'Refuse at the dock · reload to trailer':'Move to exception hold · H-01';
+ if(location==='accepted'){$('transfer-load').textContent='Move to warehouse rack · C-06-L1';$('manual-transfer').hidden=true;}
  $('review-controls').hidden=location!=='hold';$('review-proposal').textContent=policy.task;
  $('review-approve').hidden=!policy.accept;$('review-count').disabled=!policy.accept;
  $('review-document-row').hidden=!policy.document;
  $('review-inspect').disabled=!!reviewTask;$('review-inspect').textContent=reviewTask?'Receiver is checking…':'Perform recount / document check';
- $('location-confirm').hidden=!['accepted','returned'].includes(location);if(location==='refused'){$('transfer-load').hidden=true;$('manual-transfer').hidden=true;}
+ $('location-confirm').hidden=!['storage','returned'].includes(location);if(location==='refused'){$('transfer-load').hidden=true;$('manual-transfer').hidden=true;}
  $('location-prompt').textContent=`P-${String(deliveryNumber).padStart(3,'0')} → ${areas[location]?.address||''}. Enter the destination address to confirm this simulated scan.`;
  if(location==='hold')stageSupervisor();
  updateSceneNeed();
@@ -923,6 +966,8 @@ function stepCommands(dt){
  const [op,value]=cmd;
  if(op==='wait'){a.remaining=(a.remaining??value)-dt;if(a.remaining<=0){a.index++;a.remaining=null;}return;}
  if(op==='pickup'||op==='drop'){
+  // Settle the pallet onto the destination before detaching it from the forks.
+  if(op==='drop'&&state.held){liftTarget=forkHeight+.06;if(Math.abs(lift.position.y-liftTarget)>.008)return;}
   if(!pickup()){state.paused=true;$('pause-demo').textContent='Resume';return;}
   a.index++;a.remaining=null;return;
  }
@@ -945,7 +990,7 @@ function runDemo(){if(state.running)return;if(physicalLocation!=='trailer'||Math
 // The purchase order the delivery is received against (data.json, the Turkish run), in English.
 function order(){const o=caseData?.order;return o&&{...o,product:english(o.product)};}
 // What this delivery leaves on the order line once it is received.
-function onOrder(){const o=order();if(!o||physicalLocation!=='accepted')return '';const q=receivedQty??12,left=o.ordered-q;return ` Received ${q} of ${o.ordered} on ${o.number}${left>0?`; ${left} still open: claim the shortfall from the supplier or close the line`:'; order line complete'}.`;}
+function onOrder(){const o=order();if(!o||!['accepted','storage'].includes(physicalLocation))return '';const q=receivedQty??12,left=o.ordered-q;return ` Received ${q} of ${o.ordered} on ${o.number}${left>0?`; ${left} still open: claim the shortfall from the supplier or close the line`:'; order line complete'}.`;}
 function chooseDestination(){transferTarget=initialDestination(state.result,currentCase);const upper=$('storage-level').value==='1';areas.accepted.y=upper?2.53:.18;areas.accepted.address=upper?'A-01-L1':'A-01-L0';updatePalletTag(areas[transferTarget].address,state.result==='post'?12:null);}
 // Upper shelf, as a driver would: stop short of the bay, raise the forks, creep in, set down,
 // back out with the forks still up, then lower them clear of the rack (Sena, 1 Nov).
@@ -955,14 +1000,22 @@ function withShelfLift(commands){if(transferTarget!=='accepted'||areas.accepted.
 function forkPose(){return {x:fork.position.x,z:fork.position.z,angle:fork.rotation.y};}
 function manualForTarget(){state.running=false;automation=null;state.mode='orbit';$('drive').click();status(`Manual handling: place the load in ${areas[transferTarget].address}. The selected decision remains separate from the recorded ERP result.`);}
 $('transfer-load').onclick=()=>{
+ if(physicalLocation==='accepted'&&!state.running){
+  if(Math.hypot(fork.position.x-4,fork.position.z+7.15)>.2||Math.cos(fork.rotation.y)<.99){status('Align the forklift at the A-01 approach before the warehouse transfer.');return;}
+  const stagedHeight=areas.accepted.y-.18;transferTarget='storage';updatePalletTag('C-06-L1',receivedQty??12);
+  $('transfer-load').hidden=true;$('manual-transfer').hidden=true;guided=true;state.speed=Math.min(state.speed,1);$('play-speed').value=String(state.speed);switchTab('inspector');
+  flowStep(5,'Collecting from temporary A-01, then carrying the pallet to warehouse rack C-06-L1.');
+  startCommands([['lift',stagedHeight],['move',3],['pickup'],['wait',1],['move',-3],['lift',0],...warehouseAisleRoute,['wait',1.2],['lift',2.35],['wait',1],['move',2.3],['wait',1],['drop'],['wait',1.5],['move',-2.3],['lift',0]],()=>{showOutcomeActions('storage');setView('storage');status('Pallet placed in warehouse rack C-06-L1. Confirm the destination address.');});return;
+ }
  if(!verified||state.running||physicalLocation!=='inspection')return;chooseDestination();$('match').hidden=true;
  $('storage-level').disabled=true;$('transfer-load').hidden=true;$('manual-transfer').hidden=true;$('evidence').hidden=true;
  if(!atRouteStart(forkPose(),'inspection')){manualForTarget();return;}
- if(!guided)setView(transferTarget==='refused'?'dock':'plan');const route=transferTarget==='refused'?refuseRoute.map(c=>[...c]):destinationRoute(transferTarget);if(transferTarget==='hold')route.pop();
+ switchTab('inspector');setView(transferTarget==='accepted'?'putaway':transferTarget==='refused'?'dock':'plan');
+ if(guided){state.speed=Math.min(state.speed,1);$('play-speed').value=String(state.speed);}const route=transferTarget==='refused'?refuseRoute.map(c=>[...c]):destinationRoute(transferTarget);if(transferTarget==='hold')route.pop();
  flowStep(transferTarget==='hold'?4:5,transferTarget==='refused'?'Not what was ordered. Reloading the pallet onto the trailer.':transferTarget==='hold'?'ERP result retained. Moving to H-01 for a handling decision.':'Receiver prints the pallet label. Moving to the selected storage location.');
- startCommands(withShelfLift(route),()=>{showOutcomeActions(transferTarget);if(guided&&transferTarget==='accepted')setView('putaway');if(guided&&['accepted','returned'].includes(physicalLocation))setTimeout(()=>{if(!guided)return;$('location-code').value=areas[physicalLocation].address;$('confirm-location').click();},1800);if(transferTarget==='refused'){$('next-delivery').hidden=false;setView('outside');}});
+ startCommands(withShelfLift(route),()=>{showOutcomeActions(transferTarget);if(guided&&transferTarget==='accepted')setView('putaway');switchTab('inspector');if(transferTarget==='refused'){$('next-delivery').hidden=false;setView('outside');}});
 };
-$('storage-level').onchange=()=>{$('transfer-load').textContent=`Label & put away · A-01-L${$('storage-level').value}`;};
+$('storage-level').onchange=()=>{$('transfer-load').textContent=`Stage at A-01-L${$('storage-level').value}`;};
 $('manual-transfer').onclick=()=>{if(!verified||state.running||physicalLocation!=='inspection')return;chooseDestination();$('match').hidden=true;manualForTarget();};
 $('review-inspect').onclick=()=>{
  if(state.running||physicalLocation!=='hold'||reviewTask)return;
@@ -993,20 +1046,27 @@ $('insp-review').onclick=()=>$('review-inspect').click();
 $('scene-approve').onclick=()=>{switchTab('inspector');$('review-approve').click();};
 $('insp-approve').onclick=()=>$('review-approve').click();
 $('confirm-location').onclick=()=>{
- if(state.running||state.held||!['accepted','returned'].includes(physicalLocation))return;
+ if(state.running||state.held||!['storage','returned'].includes(physicalLocation))return;
  const expected=areas[physicalLocation].address;
  if(!locationMatches($('location-code').value,expected)){status(`Location does not match. Read ${expected} at the destination and try again.`,'#c48223');return;}
  locationConfirmed=true;$('next-delivery').hidden=false;$('location-confirm').hidden=true;
  // Guided playback closes the exercise: the dock is released, the light turns green and the driver boards.
- if(guided)setTimeout(()=>{if(guided&&!$('next-delivery').hidden)$('next-delivery').click();},2600);
+ // Keep the placed load visible until the viewer finishes the exercise.
  flowStep(7,`${expected} confirmed for P-${String(deliveryNumber).padStart(3,'0')}. ${physicalLocation==='returned'?'Awaiting carrier collection.':'Put-away complete.'}${onOrder()} No live inventory update.`);
 };
 $('close-evidence').onclick=()=>switchTab('inspector');$('show-evidence').onclick=()=>{closeMoreMenu();renderEvidence();};
 $('next-delivery').onclick=()=>{
+ if(exerciseFinished){deliveryNumber++;reset();return;}
  if(state.running||state.held||!locationConfirmed)return;
  const li=document.createElement('li');li.textContent=`Delivery ${deliveryNumber} · ${currentCase} · ${transferTarget==='refused'?'refused · back on the trailer':areas[transferTarget].address} · ERP ${state.result} (recorded) · handling ${handlingDecision||transferTarget} (simulated)${currentCase==='hasarli'&&handlingDecision==='accepted'?' · 1 carton remains Q-01 quarantined':''}`;$('delivery-history').prepend(li);
  // End this exercise. This clears its scene, not persistent inventory or an outbound shipment.
- receivingScene.release();setDockSignal(true);setView('outside');state.running=true;state.phase=9;state.t=0;$('next-delivery').hidden=true;status('Exercise saved. Receiver releases the dock; driver receives the green signal.');
+ $('next-delivery').hidden=true;$('outcome-actions').hidden=true;state.speed=Math.min(state.speed,1);$('play-speed').value=String(state.speed);
+ const releaseDock=()=>{receivingScene.release();setDockSignal(true);setView('outside');state.running=true;state.phase=9;state.t=0;status('Forklift clear. Dock released; the driver walks back and climbs into the cab.');};
+ if(physicalLocation==='storage'&&Math.hypot(fork.position.x-4,fork.position.z+14.55)<.2){
+  guided=true;status('Pallet stays in C-06-L1. Forklift backs clear and follows the aisle back to parking.');
+  const back=collectRoute.filter(c=>['move','turn'].includes(c[0])).slice().reverse().map(([op,n])=>[op,-n]);
+  startCommands([['lift',0],...warehouseReturnRoute,['move',-3.9],...back],releaseDock);
+ }else releaseDock();
 };
 
 $('pause-demo').onclick=()=>{state.paused=!state.paused;$('pause-demo').textContent=state.paused?'Resume':'Pause';};$('play-speed').onchange=()=>{state.speed=Number($('play-speed').value);};
@@ -1042,8 +1102,10 @@ let collisionNotice=false;
 const clock=new T.Clock();
 function animate(){requestAnimationFrame(animate);updateHeadlights(performance.now()/1000);const dt=Math.min(clock.getDelta(),.05);
  // The carriage eases to its height and a held pallet rides on it, so picking up and setting down never jump (by hand, 1 Nov).
+ aisleBarrier.rotation.z=barrier.rotation.z;
  lift.position.y=T.MathUtils.damp(lift.position.y,liftTarget,9,state.paused?0:dt*state.speed);if(state.held)delivery.position.y=.12+lift.position.y;
  receivingScene.tick(state.paused?0:dt*state.speed);updateWorkActors(state.paused?0:dt*state.speed);state.t+=state.running?(state.paused?0:dt*state.speed):dt;for(const slot of castSlots)slot.mixer?.update(state.paused&&slot.onFloor?0:dt);for(const slot of castSlots)if(!slot.onFloor||slot.seated)slot.legs?.forEach(leg=>leg.rotation.x=-Math.PI/2);
+ updateConversationPoses(state.paused?0:dt);
  for(const slot of castSlots){if(slot.seated&&slot.id===meetingRun?.speaker&&!state.paused){const t=clock.elapsedTime;slot.arms?.forEach((arm,i)=>{arm.rotation.x=-.18-.12*Math.sin(t*2.8+i);arm.rotation.z=(i?1:-1)*(.04+.035*Math.sin(t*2));});}}
  for(const door of officeDoors)door.rotation.y=T.MathUtils.damp(door.rotation.y,door.userData.open?-Math.PI*.47:0,4,dt);
  if(walkStarted){const t=(performance.now()-walkStarted)/1000;const points=[[-9.6,.18,3],...stairApproach,...stairAscent.slice(1),[-11.2,4.3,9.4],[-11.2,4.3,3]];let duration=0;for(let i=0;i<points.length-1;i++){const a=new T.Vector3(...points[i]),b=new T.Vector3(...points[i+1]),d=a.distanceTo(b)/1.4;if(t>=duration&&t<duration+d){walkingGuide.position.lerpVectors(a,b,(t-duration)/d);walkingGuide.rotation.y=Math.atan2(b.x-a.x,b.z-a.z);break;}duration+=d;}if(t>duration){walkStarted=0;walkingGuide.visible=false;status('Pedestrian route complete: upper office balcony.');}}
@@ -1064,14 +1126,14 @@ function animate(){requestAnimationFrame(animate);updateHeadlights(performance.n
  if(state.mode==='drive'&&!state.running){const turn=(keys.has('a')||keys.has('arrowleft')?1:0)-(keys.has('d')||keys.has('arrowright')?1:0);const speed=(keys.has('w')||keys.has('arrowup')?1:0)-(keys.has('s')||keys.has('arrowdown')?1:0);const next=movePose({x:fork.position.x,z:fork.position.z,angle:fork.rotation.y},(forkHeight>.4?0:speed)*dt*3.2,(forkHeight>.4?0:turn)*dt*1.5,collisionOptions());fork.position.x=next.x;fork.position.z=next.z;fork.rotation.y=next.angle;
  if(next.hit){status('Obstacle ahead. Reverse or change direction.','#d19a31');collisionNotice=true;}else if(collisionNotice&&(speed||turn)){status(state.held?'Load secured. Take it to the yellow zone; press E to set down.':'Use WASD / arrow keys to drive. E picks up or sets down the load.');collisionNotice=false;}
  const follow=new T.Vector3(0,5.5,8).applyAxisAngle(new T.Vector3(0,1,0),fork.rotation.y).add(fork.position);camera.position.lerp(follow,1-Math.exp(-dt*4));controls.target.copy(fork.position).add(new T.Vector3(0,1,0));camera.lookAt(controls.target);}
- if(state.running&&!state.paused){if(automation)stepCommands(dt*state.speed);else if(state.phase===3){beginInspection();}else if(state.phase===6){updateInspection(dt*state.speed);}else if(state.phase===7){updateReview(dt*state.speed);}else if(state.phase===8){updateDock();}else if(state.phase===9&&state.t>=5){deliveryNumber++;reset();status('Exercise saved in session history. Prepare the dock for the next delivery.');}}
- updateSceneNeedPose();syncTransport();
+ if(state.running&&!state.paused){if(automation)stepCommands(dt*state.speed);else if(state.phase===3){beginInspection();}else if(state.phase===6){updateInspection(dt*state.speed);}else if(state.phase===7){updateReview(dt*state.speed);}else if(state.phase===8){updateDock();}else if(state.phase===9&&receivingScene.driver.task==='seated'){state.running=false;state.phase=10;exerciseFinished=true;$('next-delivery').hidden=false;$('next-delivery').textContent='Start a new delivery';document.querySelector('.playback').hidden=true;status('Exercise complete. Pallet remains at its destination; the driver is in the cab. Start a new delivery when ready.');}}
+ updateSceneNeedPose();updateAgentSpeech();syncTransport();
  barrier.rotation.z=T.MathUtils.damp(barrier.rotation.z,barrierTarget,4,dt);
  if(introActive)updateIntro();else if(state.mode!=='drive')controls.update();ceiling.visible=camera.position.y<10.8&&!(state.running||state.mode==='drive');overhead.visible=camera.position.y<10.8;renderer.render(scene,camera);
  document.body.classList.toggle('handling-active',state.running);document.body.dataset.ready='true';document.body.dataset.cameraMoving=String(!!cameraTween);document.body.dataset.result=state.result||'';document.body.dataset.phase=String(state.phase);document.body.dataset.fork=JSON.stringify([fork.position.x,fork.position.z]);
 }
 let activeTab='inspector';
-function switchTab(name){activeTab=name;applyTab();for(const b of document.querySelectorAll('#side-tabs button')){const on=b.dataset.tab===name;b.classList.toggle('active',on);b.setAttribute('aria-selected',String(on));}}
+function switchTab(name){if(name==='evidence')populateEvidence();activeTab=name;applyTab();for(const b of document.querySelectorAll('#side-tabs button')){const on=b.dataset.tab===name;b.classList.toggle('active',on);b.setAttribute('aria-selected',String(on));}}
 function applyTab(){$('tab-inspector').hidden=activeTab!=='inspector';$('meeting-chat').hidden=activeTab!=='team';$('evidence').hidden=activeTab!=='evidence';}
 function closeMoreMenu(){$('more-menu').hidden=true;$('more-btn').setAttribute('aria-expanded','false');}
 const caseIcons={
@@ -1103,8 +1165,9 @@ function refreshDeliveryCards(){
  if(!caseData)return;
  for(const b of document.querySelectorAll('#delivery-list .room')){
   const entry=caseData.cases.find(c=>c.id===b.dataset.case);if(!entry)continue;
-  b.querySelector('small').textContent=`${participants(entry.id).length} agents · ${entry.gate.action==='human'?'ASK ŞEF':entry.gate.action.toUpperCase()}`;
-  b.querySelector('.room-dot').hidden=entry.gate.action!=='human';
+  const revealed=revealedDeliveries.has(entry.id);
+  b.querySelector('small').textContent=revealed?`Reviewed · ${entry.gate.action==='human'?'ASK ŞEF':entry.gate.action.toUpperCase()}`:'Recorded delivery';
+  b.querySelector('.room-dot').hidden=!revealed||entry.gate.action!=='human';
  }
 }
 function updateDeliveryTitle(){
@@ -1112,12 +1175,6 @@ function updateDeliveryTitle(){
  const m=label.match(/(\d+)\s*—\s*(.+)/);
  $('delivery-title').textContent=m?`Delivery ${m[1]} · ${m[2]}`:label;
  $('delivery-sub').textContent=caseData?`${participants(currentCase).length} agents · recorded run`:'recorded run';
-}
-// Run-language switch. Hook only: the page still plays the single recorded run
-// (data.json); a future data swap can read window.__legoRunLang here.
-function setRunLanguage(lang){
- for(const b of document.querySelectorAll('#run-lang button'))b.classList.toggle('active',b.dataset.lang===lang);
- document.documentElement.dataset.runLang=lang;window.__legoRunLang=lang;
 }
 function tickClock(){$('live-time').textContent=new Intl.DateTimeFormat('en-GB',{hour:'2-digit',minute:'2-digit'}).format(new Date());}
 let askAgentId='kapi';
@@ -1166,7 +1223,6 @@ function syncTransport(){
  $('transport').classList.toggle('is-playing',playing);
 }
 document.querySelectorAll('#side-tabs button').forEach(b=>b.onclick=()=>switchTab(b.dataset.tab));
-document.querySelectorAll('#run-lang button').forEach(b=>b.onclick=()=>setRunLanguage(b.dataset.lang));
 window.__legoRunLang='tr';
 $('ask-agent').onclick=()=>{const m=$('ask-menu'),open=m.hidden;m.hidden=!open;$('ask-agent').setAttribute('aria-expanded',String(open));};
 document.addEventListener('pointerdown',e=>{if(!$('ask-menu').hidden&&!$('ask-bar').contains(e.target)){$('ask-menu').hidden=true;$('ask-agent').setAttribute('aria-expanded','false');}});

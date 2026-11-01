@@ -9,8 +9,8 @@ const edge=movePose({x:18.2,z:-.6,angle:-Math.PI/2},20,0,{});
 assert.ok(edge.hit&&edge.x<19);
 const wall=movePose({x:0,z:0,angle:0},40,0,{});
 assert.ok(wall.hit&&wall.z>-17);
-assert.equal(blockedPose(0,-14.8,0),false);
-assert.equal(blockedPose(0,-14.8,0,{held:true}),true);
+assert.equal(blockedPose(0,-15.2,0),false);
+assert.equal(blockedPose(0,-15.2,0,{held:true}),true);
 assert.ok(blockedPose(0,0,0,{pallet:rectangle(0,0,.9,.8)}));
 // A long turn at an edge must stop before any part crosses an obstacle.
 const turn=movePose({x:18.2,z:-.6,angle:-Math.PI/2},0,Math.PI,{});

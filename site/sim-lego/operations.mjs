@@ -1,11 +1,11 @@
-import {rectangle,overlaps,solids} from './collision.mjs?v=waste-1';
-export const areas={arrival:{x:12.25,z:-4,hx:1.5,hz:1.3,y:.18,address:'B-01'},inspection:{x:4,z:-5.5,hx:2,hz:1.6,y:.18},accepted:{x:4,z:-12.4,hx:1.5,hz:1.4,y:.18,address:'A-01-L0'},hold:{x:10,z:7,hx:1.5,hz:1.4,y:.18,address:'H-01'},returned:{x:10,z:12,hx:1.5,hz:1.4,y:.18,address:'R-01'},
+import {rectangle,overlaps,solids} from './collision.mjs?v=warehouse-3';
+export const areas={storage:{x:4,z:-19.1,hx:1.3,hz:1.1,y:2.53,address:'C-06-L1'},arrival:{x:12.25,z:-4,hx:1.5,hz:1.3,y:.18,address:'B-01'},inspection:{x:4,z:-5.5,hx:2,hz:1.6,y:.18},accepted:{x:4,z:-12.4,hx:1.5,hz:1.4,y:.18,address:'A-01-L0'},hold:{x:10,z:7,hx:1.5,hz:1.4,y:.18,address:'H-01'},returned:{x:10,z:12,hx:1.5,hz:1.4,y:.18,address:'R-01'},
  // Refused at the dock: back on the trailer deck, where the pallet came from (written by hand, Claude Code).
  refused:{x:18.1,z:-4,hx:1.3,hz:1.3,y:.18,address:'TRAILER'}};
 export function palletCorners(p){const c=Math.cos(p.angle),s=Math.sin(p.angle);return [-1,1].flatMap(a=>[-1,1].map(b=>({x:p.x+c*a*.9+s*b*.8,z:p.z-s*a*.9+c*b*.8})));}
 export function contained(p,area){return palletCorners(p).every(q=>Math.abs(q.x-area.x)<=area.hx-.02&&Math.abs(q.z-area.z)<=area.hz-.02);}
 export function pickupAligned(f,p){const dx=p.x-f.x,dz=p.z-f.z,c=Math.cos(f.angle),s=Math.sin(f.angle);const lateral=dx*c-dz*s,forward=-(dx*s+dz*c);return Math.abs(lateral)<.18&&Math.abs(forward-2.25)<.25&&Math.abs(Math.sin(f.angle-p.angle))<.12;}
-export function placementClear(p,obstacles=[]){const r=rectangle(p.x,p.z,.9,.8,p.angle);return palletCorners(p).every(q=>q.x>-16.7&&q.x<16.7&&q.z>-19.6&&q.z<15.7)&&![...solids,...obstacles].some(o=>overlaps(r,o))&&Math.hypot(p.x+1,p.z-7)>5.6;}
+export function placementClear(p,obstacles=[]){const r=rectangle(p.x,p.z,.9,.8,p.angle);return palletCorners(p).every(q=>q.x>-16.7&&q.x<16.7&&q.z>-20&&q.z<15.7)&&![...solids,...obstacles].some(o=>overlaps(r,o))&&Math.hypot(p.x+1,p.z-7)>5.6;}
 export const collectRoute=[['move',-4.7],['turn',Math.PI/2],['move',3.4],['turn',-Math.PI/2],['move',2.35],['pickup'],['move',-5.85],['turn',-Math.PI/2],['move',5],['turn',-Math.PI/2],['move',6],['turn',-Math.PI/2],['move',4.25],['drop']];
 // The way in, driven back: from the inspection bay onto the trailer, past B-01 without stopping.
 export const refuseRoute=[['pickup'],['move',-4.25],['turn',Math.PI/2],['move',-6],['turn',Math.PI/2],['move',-5],['turn',Math.PI/2],['move',5.85],['drop'],['move',-2.35],['turn',Math.PI/2],['move',-3.4],['turn',-Math.PI/2],['move',4.7]];
@@ -13,3 +13,7 @@ export function destinationRoute(destination){if(destination==='accepted')return
 export function evidenceRows(entry,order){if(!entry)return [];
  const n=entry.note?.items?.[0],s=entry.sam,v=entry.spark;
  return [['Delivery note',n?`${n.quantity} ${n.unit} · ${n.description}`:'Not recorded'],['Sam · count',s?`${s.sure} sure · ${s.doubtful} doubtful`:'Not recorded'],['Spark · visual check',v?`${v.product_on_labels} · ${v.damaged_cartons} damaged · ${v.all_cartons_visible?'All cartons visible':'Some cartons hidden'}`:'Not recorded'],['Voice / Rover','No separate result in this scenario record'],['Gate · recorded decision',`${entry.gate.action.toUpperCase()} · ${entry.gate.reason}`],['Supervisor draft',entry.draft?`${entry.draft.document} · ${entry.draft.status}`:'No review draft required'],['Purchase order',order?`${order.number} · ${order.ordered} cartons · ${order.product} · ${order.supplier}`:'Not recorded']];}
+
+// Drive around staging; never underneath its shelf deck. Ends clear of the rear rack.
+export const warehouseAisleRoute=[['move',-8.15],['turn',-Math.PI/2],['move',5],['turn',Math.PI/2],['move',15.55],['turn',Math.PI/2],['move',5],['turn',-Math.PI/2]];
+export const warehouseReturnRoute=warehouseAisleRoute.slice().reverse().map(([op,n])=>[op,-n]);

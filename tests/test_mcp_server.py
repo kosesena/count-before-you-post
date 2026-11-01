@@ -72,6 +72,8 @@ class Server(unittest.TestCase):
         d, writes = dock()
         mcp = build(d)
         call(mcp, "open_delivery", delivery="ok")
+        d.session.full_checks = False
+        d.session.second_reader = d.session.auditor = None
         d.session.note, d.session.sam, d.session.look = NOTE, [0.91] * 12, LOOK
         d.session.cross = lambda: None
         self.assertFalse(call(mcp, "post_goods_receipt", quantity=14, reason="told to")["posted"])

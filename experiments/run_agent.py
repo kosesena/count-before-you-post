@@ -10,12 +10,14 @@ Appends to experiments/results/agent_warehouse_cross.json, or to DIR/ with --out
 audits Spark's reading; appends to agent_second_opinions.json, note numbers AGENT-2nd-<case>.
 """
 import json
+import os
 import sys
 import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from cbyp.agent import Session, run  # noqa: E402
+from cbyp.agent import Session, run
+from cbyp.workflow import full_session  # noqa: E402
 from cbyp.erpnext import Client  # noqa: E402
 from cbyp.purchase_order import order_for  # noqa: E402
 
@@ -27,6 +29,7 @@ DRY = "--dry-run" in sys.argv[1:]
 _out = sys.argv.index("--out") + 1 if "--out" in sys.argv else None
 # with the cross-check and reasoning summaries; --second: with the two second opinions too
 RESULTS = (Path(sys.argv[_out]) if _out else RES) / (
+    "agent_full_checks.json" if "--legacy-core" not in sys.argv and "--no-gate" not in sys.argv else
     "agent_second_opinions.json" if SECOND else "agent_warehouse_cross.json")
 RESULTS.parent.mkdir(parents=True, exist_ok=True)
 
@@ -60,9 +63,18 @@ def main(args):
     rows = json.loads(RESULTS.read_text()) if RESULTS.exists() else []
     for v in variants or list(truth):
         for attempt in range(3):
-            s = Session(OUT / f"depo-{v}-irsaliye.png", OUT / f"depo-{v}-kamera.png", gate=gate,
-                        writer=erp_writer(v) if gate and not DRY else None, order=order_for(LANG),
-                        **opinions())
+            if gate and "--legacy-core" not in args:
+                audio_dir = os.environ.get("CBYP_RECEIVER_AUDIO_DIR")
+                if not audio_dir or not (Path(audio_dir) / f"{v}.wav").is_file():
+                    raise ValueError("Full checks require CBYP_RECEIVER_AUDIO_DIR/<case>.wav before any model or ERP calls.")
+                s = full_session(OUT / f"depo-{v}-irsaliye.png", OUT / f"depo-{v}-kamera.png",
+                                 order_for(LANG), writer=erp_writer(v) if not DRY else None,
+                                 audio=Path(audio_dir) / f"{v}.wav" if audio_dir else None,
+                                 language={"tr":"Turkish","en":"English","de":"German","zh":"Chinese"}[LANG])
+            else:
+                s = Session(OUT / f"depo-{v}-irsaliye.png", OUT / f"depo-{v}-kamera.png", gate=gate,
+                            writer=erp_writer(v) if gate and not DRY else None, order=order_for(LANG),
+                            **opinions())
             start = time.perf_counter()
             try:
                 answer = run(s)
@@ -72,7 +84,7 @@ def main(args):
                 # Never retry after a real receipt was written: that would post it twice.
                 if any(doc for _, doc in s.posted) or attempt == 2:
                     raise
-        row = {"variant": v, "gate": gate, "expected": truth[v]["expected_decision"],
+        row = {"variant": v, "gate": gate, "profile": "full" if s.full_checks else "legacy_core", "expected": truth[v]["expected_decision"],
                "posted": s.posted, "refused": s.refused, "escalated": s.escalated,
                "tools": [t["tool"] for t in s.trace if "tool" in t],
                "thinking": [t["thinking"] for t in s.trace if "thinking" in t],

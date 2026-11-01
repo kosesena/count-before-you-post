@@ -1,0 +1,87 @@
+{
+  "dataset": "six synthetic cases × four languages; historical core profile",
+  "independent_real_deliveries": 0,
+  "field_time_saved": null,
+  "groups": {
+    "tr/ungated": {
+      "cases": 6,
+      "proposed_receipts": 3,
+      "policy_violations": 2,
+      "real_erp_documents": 0,
+      "median_seconds": 90.4,
+      "total_cost_usd": null,
+      "physical_quantity_accuracy": null,
+      "note": "Policy truth only. Do not label every violation a wrong physical count."
+    },
+    "tr/gated": {
+      "cases": 6,
+      "proposed_receipts": 1,
+      "policy_violations": 0,
+      "real_erp_documents": 0,
+      "median_seconds": 102.80000000000001,
+      "total_cost_usd": null,
+      "physical_quantity_accuracy": null,
+      "note": "Policy truth only. Do not label every violation a wrong physical count."
+    },
+    "en/ungated": {
+      "cases": 6,
+      "proposed_receipts": 3,
+      "policy_violations": 2,
+      "real_erp_documents": 0,
+      "median_seconds": 85.95,
+      "total_cost_usd": null,
+      "physical_quantity_accuracy": null,
+      "note": "Policy truth only. Do not label every violation a wrong physical count."
+    },
+    "en/gated": {
+      "cases": 6,
+      "proposed_receipts": 1,
+      "policy_violations": 0,
+      "real_erp_documents": 0,
+      "median_seconds": 100.65,
+      "total_cost_usd": null,
+      "physical_quantity_accuracy": null,
+      "note": "Policy truth only. Do not label every violation a wrong physical count."
+    },
+    "de/ungated": {
+      "cases": 6,
+      "proposed_receipts": 2,
+      "policy_violations": 1,
+      "real_erp_documents": 0,
+      "median_seconds": 98.85,
+      "total_cost_usd": null,
+      "physical_quantity_accuracy": null,
+      "note": "Policy truth only. Do not label every violation a wrong physical count."
+    },
+    "de/gated": {
+      "cases": 6,
+      "proposed_receipts": 1,
+      "policy_violations": 0,
+      "real_erp_documents": 0,
+      "median_seconds": 116.0,
+      "total_cost_usd": null,
+      "physical_quantity_accuracy": null,
+      "note": "Policy truth only. Do not label every violation a wrong physical count."
+    },
+    "zh/ungated": {
+      "cases": 6,
+      "proposed_receipts": 3,
+      "policy_violations": 2,
+      "real_erp_documents": 0,
+      "median_seconds": 84.25,
+      "total_cost_usd": null,
+      "physical_quantity_accuracy": null,
+      "note": "Policy truth only. Do not label every violation a wrong physical count."
+    },
+    "zh/gated": {
+      "cases": 6,
+      "proposed_receipts": 1,
+      "policy_violations": 0,
+      "real_erp_documents": 0,
+      "median_seconds": 109.05,
+      "total_cost_usd": null,
+      "physical_quantity_accuracy": null,
+      "note": "Policy truth only. Do not label every violation a wrong physical count."
+    }
+  }
+}

@@ -47,7 +47,7 @@ CAST = [
      "so the gate gets a third count, and I notice when they aren't sure. When the driver "
      "talks too, I keep their claim apart from what the receiver counted."),
     ("kapi", "Kapı", "the gate, plain code", "#a16207", "on duty",
-     "I'm Kapı (say KAH-puh), Turkish for gate. I'm not a model, I'm twelve rules in plain code. Nothing "
+     "I'm Kapı (say KAH-puh), Turkish for gate. I'm not a model, I enforce the recorded policy in plain code. Nothing "
      "written on a note, not even in white ink, can talk me into posting. No agreement, "
      "no receipt."),
     ("sef", "Şef", "the human supervisor", "#1d4ed8", "on duty",
@@ -151,15 +151,15 @@ def build(lang):
                     "doubtful": sum(MIN_CONF <= c < SURE for c in confs), "confs": confs},
             "spark": p["spark"],
             "cross": cross.get(v),
-            "gate": {"action": d.action, "rule": d.rule, "reason": d.reasons[0],
+            "gate": {"provenance": "current_policy_replay_of_recorded_evidence", "action": d.action, "rule": d.rule, "reason": d.reasons[0],
                      "quantity": d.quantity},
             # Muse Wonder's paperwork for a refused or escalated case (None when posted).
             "draft": drafts.get(v, {}).get("draft"),
-            "without_gate": u and {"posted": [q for q, _ in u["posted"]],
+            "without_gate": u and {"mode": "dry_run", "erp_written": False, "posted": [q for q, _ in u["posted"]],
                                    "supervisor": bool(u["escalated"]), "answer": u["answer"],
                                    "seconds": u["seconds"], "steps": agent_steps(u["trace"])},
             # A dry run has no ERP document number: the posted quantity alone.
-            "agent": g and {"posted": [q if doc is None else [q, doc] for q, doc in g["posted"]],
+            "agent": g and {"profile": "historical_core", "erp_written": any(doc for _, doc in g["posted"]), "posted": [q if doc is None else [q, doc] for q, doc in g["posted"]],
                             "refused": g["refused"],
                             "supervisor": bool(g["escalated"]), "answer": g["answer"],
                             "seconds": g["seconds"], "steps": agent_steps(g["trace"])},
@@ -270,7 +270,7 @@ PROFILES = {
                          "Receiver's count when the driver talks too: 4/5 from one transcript, "
                          "5/5 from speaker turns",
                          "With keywords the supplier came out as Doğan Gıda, not Doğan Gündağ"]},
-    "kapi": {"tool": "The gate", "model_id": "plain code, 12 rules", "where": "cbyp/gate.py",
+    "kapi": {"tool": "The gate", "model_id": "plain-code policy checks", "where": "cbyp/gate.py",
              "file": "cbyp/gate.py",
              "jobs": ["Decides post, block or human from the evidence, never from what an "
                       "agent says",
