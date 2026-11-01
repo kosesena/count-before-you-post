@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import {movePose,blockedPose,rectangle} from './collision.mjs';
-import {collectRoute,destinationRoute,areas,contained,pickupAligned,placementClear,evidenceRows} from './operations.mjs';
+import {collectRoute,destinationRoute,refuseRoute,areas,contained,pickupAligned,placementClear,evidenceRows} from './operations.mjs';
 import {readFileSync} from 'node:fs';
 for(const destination of ['accepted','hold','returned']){
  let pose={x:18.2,z:-.6,angle:-Math.PI/2},held=false;
@@ -18,7 +18,19 @@ assert.equal(pickupAligned({x:15.85,z:-4,angle:0},{x:18.1,z:-4,angle:Math.PI/2})
 assert.equal(contained({x:5.7,z:-5.5,angle:0},areas.inspection),false);
 assert.equal(placementClear({x:10,z:7,angle:0},[rectangle(10,7,.9,.8)]),false);
 const cases=JSON.parse(readFileSync(new URL('../data.json',import.meta.url))).cases;
-for(const entry of cases){assert.equal(evidenceRows(entry).length,6);assert.ok(evidenceRows(entry)[4][1].includes(entry.gate.reason));}
+const order=JSON.parse(readFileSync(new URL('../data.json',import.meta.url))).order;
+for(const entry of cases){assert.equal(evidenceRows(entry,order).length,7);assert.ok(evidenceRows(entry,order)[4][1].includes(entry.gate.reason));assert.ok(evidenceRows(entry,order)[6][1].includes(order.number));}
+// Refused at the dock: in, then the same way back onto the trailer, frame by frame, without a collision.
+{let pose={x:18.2,z:-.6,angle:-Math.PI/2},held=false,pallet=rectangle(18.1,-4,.9,.8,Math.PI/2),drops=[];
+ for(const [op,value] of [...collectRoute,...refuseRoute]){
+  if(op==='pickup'){assert.ok(pickupAligned(pose,{x:pallet.x,z:pallet.z,angle:pallet.angle}),'pickup '+drops.length);held=true;continue;}
+  if(op==='drop'){const p={x:pose.x-Math.sin(pose.angle)*2.25,z:pose.z-Math.cos(pose.angle)*2.25,angle:pose.angle};drops.push(p);pallet=rectangle(p.x,p.z,.9,.8,p.angle);held=false;continue;}
+  let remaining=value;
+  while(Math.abs(remaining)>.00001){const delta=Math.sign(remaining)*Math.min(.025,Math.abs(remaining));pose=movePose(pose,op==='move'?delta:0,op==='turn'?delta:0,{held,pallet:held?null:pallet,gateClosed:true});assert.equal(pose.hit,false,`refuse ${op} ${value}`);remaining-=delta;}
+ }
+ assert.ok(contained(drops[0],areas.inspection),'inspected first');assert.ok(contained(drops[1],areas.refused),'back on the trailer');
+ assert.ok(Math.hypot(pose.x-18.2,pose.z+.6)<.05,'forklift back at its start');}
+console.log('Refused at the dock: back onto the trailer, no collision.');
 console.log('Routes, fence, placement, alignment and all six evidence records passed.');
 // Frame-sized movement, including physical pallet collision, matches the command routes.
 for(const destination of ['accepted','hold','returned']){

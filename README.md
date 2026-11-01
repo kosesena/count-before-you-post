@@ -41,8 +41,9 @@ Your World*. Everything in this repository was written during the event.
 > "automatic systems" to post 100 without counting, becomes stock and money owed.
 >
 > **The fix.** The agent may still do the work, but the one write it cannot skip, the ERP
-> receipt, goes through a gate in plain code. The gate posts only when the note, the camera
-> (SAM 3.1 and Muse Spark, carton by carton), the receiver's voice and a second reader agree.
+> receipt, goes through a gate in plain code. The gate posts only when the purchase order, the
+> note, the camera (SAM 3.1 and Muse Spark, carton by carton), the receiver's voice and a second
+> reader agree.
 >
 > **The proof.** 24/24 gate decisions right across six dock cases in four languages; **0** wrong
 > receipts from any agent behind the gate, including Meta's own Muse Code working the dock
@@ -58,14 +59,14 @@ Your World*. Everything in this repository was written during the event.
 ```bash
 git clone --depth 1 https://github.com/kosesena/count-before-you-post && cd count-before-you-post
 python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
-.venv/bin/python -m unittest discover tests      # 76 tests, offline
-for l in tr en de zh; do CBYP_LANG=$l .venv/bin/python experiments/run_gate.py | tail -2; done
+.venv/bin/python -m unittest discover tests      # 87 tests, offline
+for l in tr en de zh; do CBYP_LANG=$l .venv/bin/python experiments/run_gate.py | grep -E "checks|matches|receipts"; done
 node --test site/sim-lego/*.test.mjs              # the Brick Dock's logic (Node 20+)
 git status --short experiments/results            # empty: the gate's results came out the same
 ```
 
-You should see `gate matches expected: 6/6` and `without gate 5/6, with gate 0/6` in each of
-the four languages (24/24 in all). The gate replays the recorded model outputs in
+You should see `order checks: 4/4`, `gate matches expected: 6/6` and `without gate 5/6, with
+gate 0/6` in each of the four languages (24/24 in all, and 16/16 against other orders). The gate replays the recorded model outputs in
 `experiments/results/` (Spark's readings, SAM's masks and points), so no Meta API call is made
 here; the model runs themselves need a key ([Run](#run)). The clone is about 2 GB (rendered
 scenes and models); the checks take about a minute and a half.
@@ -99,6 +100,9 @@ One delivery, three independent readings, one gate:
 3. **The receiver.** Muse Voice Transcribe writes down what the receiver says they counted,
    and tells the receiver apart from the driver.
 
+4. **The purchase order.** What the company ordered, from its own records, never from the
+   agent or the note: the order, the note and the count must agree (the three-way match).
+
 **The gate** (`cbyp/gate.py`) is plain code, not a model, so nothing written on a note can
 talk it into anything. It sits at the one tool call the agent cannot skip, the ERP write,
 and decides:
@@ -120,7 +124,7 @@ Agents Pt. 2, Yash Khare, 28 Oct; the Fireworks workshop, Sinan Ozdemir, 30 Oct)
 | Their term | Here |
 |---|---|
 | A mandatory verification check the agent cannot skip, built into the tool, not offered as a tool it may choose to call | Kapı sits inside `post_goods_receipt`; Spark has no way to write to the ERP around it |
-| Deterministic checks | Kapı's 12 rules in plain code (`cbyp/gate.py`): counts, labels, damage, stacking, instructions to software, invisible text |
+| Deterministic checks | Kapı's 14 rules in plain code (`cbyp/gate.py`): the purchase order, counts, labels, damage, stacking, instructions to software, invisible text |
 | LLM as a judge | Muse Wonder judges Spark's reading against the note itself, quoting it |
 | LLM as a jury: several models answer, one adjudicator decides | Spark and Rover (Muse Spark Open) read the note independently; the adjudicator is the gate, plain code, and two readings that differ go to Şef |
 | Human in the loop: escalate when the checks cannot settle it | The run stops at `ask_supervisor`; only Şef's sign-off releases it |
@@ -140,6 +144,8 @@ Agents Pt. 2, Yash Khare, 28 Oct; the Fireworks workshop, Sinan Ozdemir, 30 Oct)
 | Wonder auditing Spark's reading, readings changed on purpose | **36/36 caught** |
 | Receiver's count from a driver-and-receiver conversation | 4/5 from a plain transcript, **5/5** from speaker turns |
 | Supervisor sign-off, live in ERPNext | 2 held deliveries released, each for exactly the quantity Şef approved |
+| Three-way match with the purchase order: the same readings against other orders, four languages | **16/16** |
+| Receipt against a real Purchase Order in ERPNext | received in full (12 of 12); a second delivery on it stopped by the gate |
 
 Six synthetic Blender scenes, synthetic voices and machine-written attacks: this shows that
 the rules do what they say, not how accurate they are on real docks. See
@@ -361,6 +367,37 @@ run, not a translation of the Turkish one (`experiments/results/<lang>/`):
 
 Behind the gate, against a real ERPNext (v16, Docker), the agent wrote exactly one Purchase
 Receipt per language: 12 cartons, the `ok` case. Nothing else reached the ERP.
+
+### Three-way match: the purchase order
+
+A goods receipt is posted against what the company ordered, not only against what the
+supplier's note says. In SAP terms it is the three-way match at receiving: the purchase order,
+the delivery note and the counted quantity must agree. The gate reads the order line from the
+company's records (`cbyp/purchase_order.py`; the agent never sees or sets it) and adds two rules:
+
+- **`not_ordered`**: the note's product is not on the order. Block, and refuse the load at the
+  dock: it goes back on the truck. The wrong-product case is refused the same way when the
+  labels contradict the note.
+- **`over_order`**: more cartons than the order has open. Şef receives what is open and returns
+  the rest, or purchasing raises the order. A sign-off can never receive more than is open.
+
+The six recorded cases, replayed with their orders, decide exactly as before (24/24). The same
+recorded readings of the matching delivery, against other orders, in four languages (no model
+asked again, only the order changes), `experiments/results/*/gate_orders.json`:
+
+| Order | Gate |
+|---|---|
+| 12 ordered, 12 arrive | **post** |
+| 10 ordered, 12 arrive | **human**, `over_order`: receive 10 |
+| 20 ordered, 10 already received, 12 arrive | **human**, `over_order`: receive 10 |
+| Corn oil ordered, the note says sunflower oil | **block**, `not_ordered` |
+
+In ERPNext the order is a real Purchase Order (`PUR-ORD-2026-00001`, our PO-2026-1047 in its
+Order Confirmation No) and the matching delivery was received against its line
+(`MAT-PRE-2026-00011`, 12 of 12): ERPNext shows the order fully received, and the receipt's
+remarks carry the gate's reason. A second delivery of 12 on the same order was stopped by the
+gate (`over_order`, 0 open) and never sent (`experiments/post_against_order.py`,
+`experiments/results/erp_against_order.json`).
 
 ### The agent picks its tools, the gate holds the pen
 
@@ -640,14 +677,16 @@ The first rule that fires decides (`cbyp/gate.py`, offline tests in `tests/`):
 | `instruction` | The note tries to instruct the system ("post 100") | **block**, Şef notified |
 | `invisible_text` | A PDF note carries invisible text (white, or under 4 pt) | **human** |
 | `unreadable` | The note has no single legible line | **human** |
-| `wrong_product` | Label product ≠ note product | **block** |
+| `not_ordered` | The note's product is not on the purchase order | **block**, refused at the dock |
+| `wrong_product` | Label product ≠ note product | **block**, refused at the dock |
 | `hidden` | Cartons stacked or hidden from the camera | **human** |
 | `damaged` | Damaged cartons | **human**, partial receipt of the intact ones proposed |
 | `disagree` | SAM and Spark disagree on the count, or carton by carton | **human** |
 | `receiver` | The receiver is unsure, or says another number | **human** |
+| `over_order` | More cartons than the order has open | **human**, Şef receives what is open |
 | `readers_disagree` | Before a post: Spark Open reads the note differently | **human** |
 | `audit` | Before a post: Wonder can't confirm Spark's reading from the note | **human** |
-| `match` | Everything agrees with the note | **post** |
+| `match` | Everything agrees with the note, within the order | **post** |
 | `mismatch` | The evidence agrees, and differs from the note | **block**, dispute drafted |
 
 ## Honest limits
@@ -659,6 +698,12 @@ The first rule that fires decides (`cbyp/gate.py`, offline tests in `tests/`):
   none, and the gate sent all three photos to Şef. Real deliveries, handwriting and dock noise
   are still ahead.
 - Muse Code ran against the gate in dry-run mode; its run wrote nothing to ERPNext.
+- The purchase orders are our own records (`cbyp/purchase_order.py`), one per language, and the
+  gate matches the order on product and quantity. Spark's reading of the note has no supplier
+  field, so the supplier comes from the order, not from the note; reading it off the note means
+  running the models again. The order was added on 1 Nov, after the measured runs: the six cases
+  were replayed with it (the decisions did not change) and only the ERPNext receipt above was
+  written with it.
 
 Every experiment, with its numbers and its failures, is in **[docs/JOURNAL.md](docs/JOURNAL.md)**.
 
@@ -676,6 +721,7 @@ Every experiment, with its numbers and its failures, is in **[docs/JOURNAL.md](d
 | Path | What it is |
 |---|---|
 | `cbyp/gate.py` | The gate rules |
+| `cbyp/purchase_order.py` | The order lines the deliveries are received against (three-way match) |
 | `cbyp/agent.py` | The Spark receiving agent; the ERP tool sits behind the gate; stop and resume for Şef |
 | `cbyp/mcp_server.py` | The same tools and gate as an MCP server, for agents we did not write |
 | `cbyp/delivery_note.py`, `pdf_text.py` | Spark's note reader (Files API) and the invisible-text check |
@@ -712,6 +758,7 @@ cp .env.example .env   # add your META_API_KEY (ERPNEXT_* for the ERP runs)
 .venv/bin/python experiments/run_gate.py                # the gate on those readings
 .venv/bin/python experiments/run_agent.py              # the Spark agent behind the gate (real ERPNext)
 .venv/bin/python experiments/run_signoff.py             # stop for Şef, resume with the sign-off
+.venv/bin/python experiments/post_against_order.py      # a Purchase Order in ERPNext, received against it
 .venv/bin/python experiments/voice_dialogue.py check    # driver and receiver: plain vs diarized
 CBYP_MCP_ERP=0 demo/muse-dock/muse-dock.sh              # Muse Code at the dock, behind the gate (dry run)
 .venv/bin/python experiments/build_site.py              # rebuild the demo page's data

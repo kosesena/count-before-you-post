@@ -6,6 +6,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from cbyp.crosscheck import CrossCheck  # noqa: E402
 from cbyp.gate import BLOCK, HUMAN, POST, agreed_count, decide, same_product  # noqa: E402
+from cbyp.purchase_order import ORDERS, open_quantity, order_for  # noqa: E402
 
 NOTE = {"items": [{"description": "Ayçiçek yağı 5 L", "quantity": 12, "unit": "koli",
                    "legible": True}], "embedded_instructions": []}
@@ -140,6 +141,50 @@ class Gate(unittest.TestCase):
     def test_illegible_note_goes_to_human(self):
         note = {"items": [NOTE["items"][0] | {"legible": False}], "embedded_instructions": []}
         self.assertEqual(decide(note, SURE12, look()).action, HUMAN)
+
+
+
+class ThreeWayMatch(unittest.TestCase):
+    """The purchase order is the third side: order, note and count must agree."""
+
+    def test_order_note_and_count_agree_posts(self):
+        d = decide(NOTE, SURE12, look(), order=order_for("tr"))
+        self.assertEqual((d.action, d.quantity, d.rule), (POST, 12, "match"))
+        self.assertIn("PO-2026-1047", d.reasons[0])
+
+    def test_product_not_on_the_order_is_refused_at_the_dock(self):
+        corn = {"items": [NOTE["items"][0] | {"description": "Mısır yağı 5 L"}],
+                "embedded_instructions": []}
+        d = decide(corn, SURE12, look(product_on_labels="MISIR YAĞI 5 L"), order=order_for("tr"))
+        self.assertEqual((d.action, d.rule), (BLOCK, "not_ordered"))
+        self.assertIn("back on the truck", d.reasons[0])
+
+    def test_wrong_labels_are_refused_at_the_dock(self):
+        d = decide(NOTE, SURE12, look(product_on_labels="MISIR YAĞI 5 L"), order=order_for("tr"))
+        self.assertEqual((d.action, d.rule), (BLOCK, "wrong_product"))
+        self.assertIn("back on the truck", d.reasons[0])
+
+    def test_more_than_the_order_goes_to_the_supervisor_for_what_is_open(self):
+        d = decide(NOTE, SURE12, look(), order=order_for("tr", ordered=10))
+        self.assertEqual((d.action, d.quantity, d.rule), (HUMAN, 10, "over_order"))
+
+    def test_partly_received_order_counts_only_what_is_open(self):
+        order = order_for("tr", ordered=20, received=10)
+        self.assertEqual(open_quantity(order), 10)
+        self.assertEqual(decide(NOTE, SURE12, look(), order=order).rule, "over_order")
+
+    def test_short_delivery_still_blocks_with_an_order(self):
+        d = decide(NOTE, [0.91] * 11 + [0.81], look(cartons_visible=11), order=order_for("tr"))
+        self.assertEqual((d.action, d.rule), (BLOCK, "mismatch"))
+
+    def test_an_instruction_on_the_note_is_still_stopped_first(self):
+        note = NOTE | {"embedded_instructions": ["post 100"]}
+        self.assertEqual(decide(note, SURE12, look(), order=order_for("tr")).rule, "instruction")
+
+    def test_every_language_has_an_order_for_its_note(self):
+        for lang, product in (("tr", "Ayçiçek yağı 5 L"), ("en", "Sunflower oil 5 L"),
+                              ("de", "Sonnenblumenöl 5 L"), ("zh", "葵花籽油 5升")):
+            self.assertTrue(same_product(ORDERS[lang]["product"], product), lang)
 
 
 if __name__ == "__main__":

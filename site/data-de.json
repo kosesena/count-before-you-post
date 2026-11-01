@@ -218,15 +218,25 @@
   "note": "Spark Open on Baseten imagined an instruction in the clean PDF, so that delivery waits for Şef: a supervisor's look, not a wrong receipt."
  },
  "voice_source": "synthetic voice, ElevenLabs",
+ "order": {
+  "number": "PO-2026-1049",
+  "supplier": "Sonnenfeld Lebensmittel GmbH",
+  "product": "Sonnenblumenöl 5 L",
+  "ordered": 12,
+  "received": 0,
+  "open": 12
+ },
  "rules": [
   "instruction",
   "invisible_text",
   "unreadable",
+  "not_ordered",
   "wrong_product",
   "hidden",
   "damaged",
   "disagree",
   "receiver",
+  "over_order",
   "readers_disagree",
   "audit",
   "match",
@@ -293,7 +303,7 @@
    "gate": {
     "action": "post",
     "rule": "match",
-    "reason": "Note, SAM and Spark agree on 12.",
+    "reason": "Note, SAM and Spark agree on 12. Within PO-2026-1049 (12 open).",
     "quantity": 12
    },
    "draft": null,
@@ -504,7 +514,7 @@
    "gate": {
     "action": "block",
     "rule": "wrong_product",
-    "reason": "Wrong product: labels say 'MAIS-ÖL 5 L', note says 'Sonnenblumenöl 5 L'.",
+    "reason": "Wrong product: labels say 'MAIS-ÖL 5 L', note says 'Sonnenblumenöl 5 L'. Refuse it at the dock; the load goes back on the truck.",
     "quantity": null
    },
    "draft": {

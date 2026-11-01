@@ -4,6 +4,8 @@ Inputs are three independent readings of one delivery:
   note   what Spark read on the delivery note (read_note()["claim"])
   sam    SAM 3.1 detections of "cardboard box" on the ceiling camera, as confidences
   look   what Spark saw on the same frame (product, count, damage, stacking)
+and, from the company's own records, the purchase order line it is received against
+(purchase_order.order_for): the order, the note and the count must agree.
 
 The gate is plain code, not a model: no text on the note or in a model answer can
 change a rule. Rules run in order and the first one that fires decides.
@@ -11,11 +13,14 @@ change a rule. Rules run in order and the first one that fires decides.
   instruction on the note        -> block   (never follow it; quantity stays from the table)
   invisible text in a PDF note   -> human   (white or tiny text no person and no Spark saw)
   note unreadable                -> human
-  label product != note product  -> block
+  note product not on the order  -> block   (not what we ordered: refuse it at the dock)
+  label product != note product  -> block   (wrong product: refuse it at the dock)
   stacked / cartons hidden       -> human   (count cannot be verified)
   damaged cartons                -> human   (propose partial receipt of the intact ones)
   SAM and Spark disagree         -> human   (carton by carton when a cross-check is given)
   receiver unsure or says other  -> human   (when a spoken count is given)
+  count above the order's open   -> human   (over-delivery: receive what was ordered, or
+    quantity                                 return the rest; the supervisor decides)
   second reading disagrees       -> human   (only before a post: the open-weight second
                                              reader saw another line, quantity or product,
                                              or an instruction Spark did not report)
@@ -26,6 +31,8 @@ change a rule. Rules run in order and the first one that fires decides.
 """
 import unicodedata
 from dataclasses import dataclass, field
+
+from .purchase_order import open_quantity
 
 POST, BLOCK, HUMAN = "post", "block", "human"
 
@@ -68,8 +75,9 @@ class Decision:
 
 
 # The rules in the order they run; Decision.rule names the one that fired.
-RULES = ("instruction", "invisible_text", "unreadable", "wrong_product", "hidden", "damaged",
-         "disagree", "receiver", "readers_disagree", "audit", "match", "mismatch")
+RULES = ("instruction", "invisible_text", "unreadable", "not_ordered", "wrong_product", "hidden",
+         "damaged", "disagree", "receiver", "over_order", "readers_disagree", "audit", "match",
+         "mismatch")
 
 
 def differences(first: dict, second: dict) -> list[str]:
@@ -117,12 +125,14 @@ def cross_count(cross) -> int | None:
 
 def decide(note: dict, sam_confs: list[float], look: dict, cross=None,
            spoken: dict | None = None, invisible: list[str] | None = None,
-           second: dict | None = None, audit: dict | None = None) -> Decision:
+           second: dict | None = None, audit: dict | None = None,
+           order: dict | None = None) -> Decision:
     """cross: an optional crosscheck.CrossCheck; when given it replaces the count bands.
     spoken: an optional voice.understand() result, the receiver's own count.
     invisible: pdf_text.invisible_lines() of a PDF note, found in code, not by Spark.
     second: the open-weight second reader's claim on the same note (second_reader).
-    audit: Muse Wonder's check of Spark's reading against the note (wonder.audit_note)."""
+    audit: Muse Wonder's check of Spark's reading against the note (wonder.audit_note).
+    order: the purchase order line from the company's records (purchase_order.order_for)."""
     items = note.get("items") or []
     sure, doubtful = sam_bands(sam_confs)
     evidence = {"note": [(i["quantity"], i["description"]) for i in items],
@@ -142,9 +152,17 @@ def decide(note: dict, sam_confs: list[float], look: dict, cross=None,
     if len(items) != 1 or not items[0].get("legible", False):
         return out("unreadable", HUMAN, "Delivery note has no single legible line item.")
     item = items[0]
+    if order is not None:
+        evidence["order"] = {"number": order["number"], "product": order["product"],
+                             "ordered": order["ordered"], "open": open_quantity(order)}
+        if not same_product(order["product"], item["description"]):
+            return out("not_ordered", BLOCK, f"Not on the order: {order['number']} is for "
+                       f"'{order['product']}', the note says '{item['description']}'. Refuse it "
+                       "at the dock; the load goes back on the truck.")
     if not same_product(look["product_on_labels"], item["description"]):
         return out("wrong_product", BLOCK, f"Wrong product: labels say '{look['product_on_labels']}', "
-                   f"note says '{item['description']}'.")
+                   f"note says '{item['description']}'. Refuse it at the dock; the load goes back "
+                   "on the truck.")
     if look["stacked"] or not look["all_cartons_visible"]:
         return out("hidden", HUMAN, "Cartons are stacked or hidden; the count cannot be verified "
                    "from the camera.")
@@ -172,6 +190,11 @@ def decide(note: dict, sam_confs: list[float], look: dict, cross=None,
         if spoken["quantity"] != count:
             return out("receiver", HUMAN, f"The receiver said {spoken['quantity']}, the camera "
                        f"counted {count}.", count)
+    if order is not None and count > open_quantity(order):
+        left = open_quantity(order)
+        return out("over_order", HUMAN, f"Over-delivery: counted {count}, {order['number']} has "
+                   f"{left} open. The supervisor receives {left} and returns the rest, or asks "
+                   "purchasing to raise the order.", left)
     if count == item["quantity"] and second is not None:
         # Asked only here, before a write: an open-weight reading is noisier than Spark's
         # (experiments/results/second_reader.json), so it may stop a receipt, never decide one.
@@ -194,6 +217,7 @@ def decide(note: dict, sam_confs: list[float], look: dict, cross=None,
             return out("audit", HUMAN, "Before posting, Wonder could not confirm Spark's reading "
                        "of the note: " + "; ".join(problems) + ".", count)
     if count == item["quantity"]:
-        return out("match", POST, f"Note, SAM and Spark agree on {count}.", count)
+        on_order = f" Within {order['number']} ({open_quantity(order)} open)." if order else ""
+        return out("match", POST, f"Note, SAM and Spark agree on {count}.{on_order}", count)
     return out("mismatch", BLOCK, f"Counted {count}, note says {item['quantity']}; draft a "
                f"discrepancy for the supplier.", count)

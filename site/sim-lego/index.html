@@ -4,7 +4,7 @@
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#f5f2eb">
   <title>Count Before You Post · Warehouse Simulator</title>
-  <link rel="stylesheet" href="./style.css?v=first-seconds-1">
+  <link rel="stylesheet" href="./style.css?v=order-1">
   <script type="importmap">{"imports":{"three":"./vendor/three.module.js"}}</script>
 </head>
 <body>
@@ -37,7 +37,7 @@
 <div id="location-confirm" hidden><p id="location-prompt"></p><label for="location-code">DESTINATION SCAN (SIMULATED)</label><input id="location-code" placeholder="e.g. A-01-L0" autocomplete="off"><button id="confirm-location" class="primary">Confirm pallet &amp; location</button></div><button id="next-delivery" hidden>Finish exercise &amp; next delivery</button>
 <div class="operation-tools"><button id="show-meeting">Recorded conversation</button><button id="show-evidence">Recorded evidence</button><button id="office-doors" aria-pressed="false">Office doors</button><button id="walk-route">Walk upstairs</button></div>
 <details><summary>Delivery history</summary><ol id="delivery-history"></ol></details>
-</div><div id="status" role="status" aria-live="polite"><i></i><span>Ready to explore.</span></div>
+</div><div id="match" hidden aria-label="Three-way match"><p class="eyebrow">THREE-WAY MATCH · ORDER · NOTE · PALLET</p><ol id="match-rows"></ol></div><div id="status" role="status" aria-live="polite"><i></i><span>Ready to explore.</span></div>
     <p class="footnote">Recorded verification results.<br>No live ERP writes.<br>This scene was built with OpenAI Codex.</p>
   </aside>
   <button id="open-nav" aria-controls="scene-nav" aria-expanded="false">Explore <span>☰</span></button><nav id="scene-nav" aria-label="Explore the warehouse" hidden><div class="nav-heading"><h2>Where to?</h2><button id="close-nav" aria-label="Close navigation">×</button></div>
@@ -63,7 +63,7 @@
   </section>
   <div id="loading"><img id="loading-poster" src="loading-poster.jpg" alt="" fetchpriority="high"><div class="loading-card"><p class="loading-pitch">An AI agent may not post a goods receipt until the evidence agrees.</p><strong>Preparing your warehouse…</strong><div id="loading-bar" role="progressbar" aria-label="Loading the warehouse"><i></i></div><small>COUNT BEFORE YOU POST · META GLOBAL AI HACKATHON</small></div></div>
   <script type="module">
-    import('./main.js?v=briefing-sign-1').catch(error => {
+    import('./main.js?v=order-3').catch(error => {
       console.error(error);
       const loading = document.getElementById('loading');
       if (loading) {

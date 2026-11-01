@@ -16,6 +16,7 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 from cbyp.gate import MIN_CONF, RULES, SURE, decide  # noqa: E402
+from cbyp.purchase_order import open_quantity, order_for  # noqa: E402
 from experiments.paths import LANGS, out, results  # noqa: E402
 from experiments.run_gate import cached_cross  # noqa: E402
 
@@ -135,7 +136,8 @@ def build(lang):
     cases = []
     for v, p in perception.items():
         confs = p["sam"]["cardboard box conf"]
-        d = decide(p["note"], confs, p["spark"], cached_cross(v, RES / "sam_raw"))
+        d = decide(p["note"], confs, p["spark"], cached_cross(v, RES / "sam_raw"),
+                   order=order_for(lang))
         g, u, so = gated.get(v), ungated.get(v), signoffs.get(v)
         so_at = so and next(i for i, t in enumerate(so["trace"]) if "signoff" in t)
         cases.append({
@@ -206,6 +208,7 @@ def build(lang):
 
     data = {"lang": lang, "dock": dock, **extras(),
             "voice_source": "synthetic voice, ElevenLabs",
+            "order": order_for(lang) | {"open": open_quantity(order_for(lang))},
             "rules": list(RULES), "cases": cases, "voice": clips, "characters": cast,
             "cast": jpg(ROOT / "assets" / "mascots" / "cast.jpg", "cast.jpg", 1600),
             # The ten as rigged Lego figures, walking then waving (8 s, two rows); site/media

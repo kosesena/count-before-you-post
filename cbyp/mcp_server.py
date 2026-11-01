@@ -27,6 +27,7 @@ from mcp.types import ToolAnnotations
 
 from .agent import Session
 from .gate import CONCEPTS
+from .purchase_order import order_for
 
 ROOT = Path(__file__).resolve().parent.parent
 LANGS = ("tr", "en", "de", "zh")
@@ -44,11 +45,12 @@ def _erp_writer(delivery, lang):
     from .erpnext import Client
     erp = Client()
     ids = erp.ensure_master_data()
+    ref = erp.ensure_order(order_for(lang), ids)
 
     def write(decision, quantity, reason):
         return erp.post_receipt(decision, supplier=ids["supplier"], item_code=ids["item_code"],
                                 warehouse=ids["warehouse"],
-                                note_number=f"MCP-{lang}-{delivery}")
+                                note_number=f"MCP-{lang}-{delivery}", order_ref=ref)
     return write
 
 
@@ -86,7 +88,8 @@ class Dock:
         out = _scenes(self.lang)
         writer = self.writer_factory(delivery, self.lang) if self.erp else None
         self.session = Session(out / f"depo-{delivery}-irsaliye.png",
-                               out / f"depo-{delivery}-kamera.png", gate=True, writer=writer)
+                               out / f"depo-{delivery}-kamera.png", gate=True, writer=writer,
+                               order=order_for(self.lang))
         self.log = self.results / f"{time.strftime('%Y%m%d-%H%M%S')}-{self.lang}-{delivery}.json"
         self.opened[delivery] = (self.session, self.log)
         return {"delivery": delivery, "status": "at the dock",

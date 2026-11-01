@@ -1,12 +1,13 @@
 // Physical handling is a training exercise, independent of the recorded ERP gate.
 export const receivingSteps = ['Prepare dock','Unload','Stage unverified load','Inspect evidence','Resolve exceptions','Label & put away','Confirm location'];
-export function initialDestination(action) { return action === 'post' ? 'accepted' : 'hold'; }
+// Not what was ordered (wrong product): refused at the dock, back onto the trailer, no hold.
+export function initialDestination(action, id) { return action === 'post' ? 'accepted' : id === 'wrong' ? 'refused' : 'hold'; }
 export function reviewPolicy(id) {
   const policies = {
     ok: {quantity:12, accept:true, document:false, task:'Matching delivery.'},
     eksik: {quantity:11, accept:true, document:true, task:'Recount 11 cartons and reconcile the shortage with the delivery document before simulated partial acceptance.'},
     talimat: {quantity:12, accept:true, document:true, task:'Obtain a clean, independently verified delivery document. Never execute the embedded instruction.'},
-    wrong: {quantity:0, accept:false, document:false, task:'Product mismatch: keep segregated. Authorize a return; no acceptance against this order.'},
+    wrong: {quantity:0, accept:false, document:false, task:'Not what was ordered: refuse it at the dock. Reload onto the trailer; the driver takes it back. Nothing is received against the order.'},
     hasarli: {quantity:11, accept:true, document:false, task:'Separate 1 damaged carton into Q-01 quarantine; recount and secure the 11 intact cartons.'},
     belirsiz: {quantity:12, accept:true, document:false, task:'Unstack the load, count 12 intact cartons, then rebuild and secure the pallet.'}
   };

@@ -1,0 +1,11 @@
+{
+  "order": "PO-2026-1047",
+  "purchase_order": "PUR-ORD-2026-00001",
+  "purchase_order_item": "di6b3vjmbf",
+  "received": "MAT-PRE-2026-00011",
+  "second_delivery_gate": {
+    "action": "human",
+    "rule": "over_order",
+    "reason": "Over-delivery: counted 12, PO-2026-1047 has 0 open. The supervisor receives 0 and returns the rest, or asks purchasing to raise the order."
+  }
+}

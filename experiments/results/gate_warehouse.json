@@ -7,7 +7,7 @@
     "action": "post",
     "quantity": 12,
     "reasons": [
-      "Note, SAM and Spark agree on 12."
+      "Note, SAM and Spark agree on 12. Within PO-2026-1047 (12 open)."
     ],
     "evidence": {
       "note": [
@@ -20,6 +20,12 @@
       "sam_doubtful": 0,
       "spark_count": 12,
       "label": "AYÇİÇEK YAĞI 5 L",
+      "order": {
+        "number": "PO-2026-1047",
+        "product": "Ayçiçek yağı 5 L",
+        "ordered": 12,
+        "open": 12
+      },
       "cross": {
         "agreed": 12,
         "sam_only": 0,
@@ -37,7 +43,7 @@
     "action": "block",
     "quantity": null,
     "reasons": [
-      "Wrong product: labels say 'MISIR YAĞI 5 L', note says 'Ayçiçek yağı 5 L'."
+      "Wrong product: labels say 'MISIR YAĞI 5 L', note says 'Ayçiçek yağı 5 L'. Refuse it at the dock; the load goes back on the truck."
     ],
     "evidence": {
       "note": [
@@ -49,7 +55,13 @@
       "sam_sure": 12,
       "sam_doubtful": 0,
       "spark_count": 12,
-      "label": "MISIR YAĞI 5 L"
+      "label": "MISIR YAĞI 5 L",
+      "order": {
+        "number": "PO-2026-1047",
+        "product": "Ayçiçek yağı 5 L",
+        "ordered": 12,
+        "open": 12
+      }
     },
     "rule": "wrong_product"
   },
@@ -74,6 +86,12 @@
       "sam_doubtful": 1,
       "spark_count": 11,
       "label": "AYÇİÇEK YAĞI 5 L",
+      "order": {
+        "number": "PO-2026-1047",
+        "product": "Ayçiçek yağı 5 L",
+        "ordered": 12,
+        "open": 12
+      },
       "cross": {
         "agreed": 11,
         "sam_only": 1,
@@ -127,7 +145,13 @@
       "sam_sure": 11,
       "sam_doubtful": 1,
       "spark_count": 12,
-      "label": "AYÇİÇEK YAĞI 5 L"
+      "label": "AYÇİÇEK YAĞI 5 L",
+      "order": {
+        "number": "PO-2026-1047",
+        "product": "Ayçiçek yağı 5 L",
+        "ordered": 12,
+        "open": 12
+      }
     },
     "rule": "damaged"
   },
@@ -151,7 +175,13 @@
       "sam_sure": 0,
       "sam_doubtful": 11,
       "spark_count": 12,
-      "label": "AYÇİÇEK YAĞI 5 L"
+      "label": "AYÇİÇEK YAĞI 5 L",
+      "order": {
+        "number": "PO-2026-1047",
+        "product": "Ayçiçek yağı 5 L",
+        "ordered": 12,
+        "open": 12
+      }
     },
     "rule": "hidden"
   }

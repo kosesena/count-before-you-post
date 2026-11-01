@@ -284,3 +284,12 @@ body.cast-focus #panel{display:none}
 #loading-bar{width:min(300px,70vw);height:5px;border-radius:5px;background:#dcd8cb;overflow:hidden}
 #loading-bar i{display:block;height:100%;width:4%;border-radius:5px;background:#263d35;transition:width .35s ease}
 @media(prefers-reduced-motion:reduce){#loading-bar i{transition:none}}
+
+/* Three-way match (written by hand, Claude Code): ordered, noted, counted. */
+#match{margin-top:14px;padding:10px 12px;border-radius:10px;background:#f3f1e7;border:1px solid #dcd8cb}
+#match .eyebrow{margin:0 0 8px}
+#match-rows{list-style:none;margin:0;padding:0;display:grid;gap:5px}
+#match-rows li{display:grid;grid-template-columns:58px 1fr 16px;align-items:center;gap:8px;font-size:11px;color:#26332f}
+#match-rows li b{font-size:9px;letter-spacing:1.2px;text-transform:uppercase;color:#6e7973}
+#match-rows li i{font-style:normal;font-weight:800;text-align:center}
+#match-rows li.ok i{color:#2f8a4a}#match-rows li.bad{color:#9b2c1f}#match-rows li.bad i{color:#c0392b}

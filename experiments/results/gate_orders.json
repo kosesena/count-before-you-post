@@ -1,0 +1,136 @@
+[
+  {
+    "order": "ordered 10, 12 arrived",
+    "expected": "human",
+    "ok": true,
+    "action": "human",
+    "quantity": 10,
+    "reasons": [
+      "Over-delivery: counted 12, PO-2026-1047 has 10 open. The supervisor receives 10 and returns the rest, or asks purchasing to raise the order."
+    ],
+    "evidence": {
+      "note": [
+        [
+          12,
+          "Ayçiçek yağı 5 L"
+        ]
+      ],
+      "sam_sure": 12,
+      "sam_doubtful": 0,
+      "spark_count": 12,
+      "label": "AYÇİÇEK YAĞI 5 L",
+      "order": {
+        "number": "PO-2026-1047",
+        "product": "Ayçiçek yağı 5 L",
+        "ordered": 10,
+        "open": 10
+      },
+      "cross": {
+        "agreed": 12,
+        "sam_only": 0,
+        "spark_only": 0,
+        "doubled": 0
+      }
+    },
+    "rule": "over_order"
+  },
+  {
+    "order": "ordered 20, 10 already received",
+    "expected": "human",
+    "ok": true,
+    "action": "human",
+    "quantity": 10,
+    "reasons": [
+      "Over-delivery: counted 12, PO-2026-1047 has 10 open. The supervisor receives 10 and returns the rest, or asks purchasing to raise the order."
+    ],
+    "evidence": {
+      "note": [
+        [
+          12,
+          "Ayçiçek yağı 5 L"
+        ]
+      ],
+      "sam_sure": 12,
+      "sam_doubtful": 0,
+      "spark_count": 12,
+      "label": "AYÇİÇEK YAĞI 5 L",
+      "order": {
+        "number": "PO-2026-1047",
+        "product": "Ayçiçek yağı 5 L",
+        "ordered": 20,
+        "open": 10
+      },
+      "cross": {
+        "agreed": 12,
+        "sam_only": 0,
+        "spark_only": 0,
+        "doubled": 0
+      }
+    },
+    "rule": "over_order"
+  },
+  {
+    "order": "ordered 'MISIR YAĞI 5 L'",
+    "expected": "block",
+    "ok": true,
+    "action": "block",
+    "quantity": null,
+    "reasons": [
+      "Not on the order: PO-2026-1047 is for 'MISIR YAĞI 5 L', the note says 'Ayçiçek yağı 5 L'. Refuse it at the dock; the load goes back on the truck."
+    ],
+    "evidence": {
+      "note": [
+        [
+          12,
+          "Ayçiçek yağı 5 L"
+        ]
+      ],
+      "sam_sure": 12,
+      "sam_doubtful": 0,
+      "spark_count": 12,
+      "label": "AYÇİÇEK YAĞI 5 L",
+      "order": {
+        "number": "PO-2026-1047",
+        "product": "MISIR YAĞI 5 L",
+        "ordered": 12,
+        "open": 12
+      }
+    },
+    "rule": "not_ordered"
+  },
+  {
+    "order": "ordered 12, 12 arrived",
+    "expected": "post",
+    "ok": true,
+    "action": "post",
+    "quantity": 12,
+    "reasons": [
+      "Note, SAM and Spark agree on 12. Within PO-2026-1047 (12 open)."
+    ],
+    "evidence": {
+      "note": [
+        [
+          12,
+          "Ayçiçek yağı 5 L"
+        ]
+      ],
+      "sam_sure": 12,
+      "sam_doubtful": 0,
+      "spark_count": 12,
+      "label": "AYÇİÇEK YAĞI 5 L",
+      "order": {
+        "number": "PO-2026-1047",
+        "product": "Ayçiçek yağı 5 L",
+        "ordered": 12,
+        "open": 12
+      },
+      "cross": {
+        "agreed": 12,
+        "sam_only": 0,
+        "spark_only": 0,
+        "doubled": 0
+      }
+    },
+    "rule": "match"
+  }
+]

@@ -888,16 +888,21 @@ const RULE_LABEL = {
   instruction: "Hidden instruction in the note",
   invisible_text: "Invisible text in a PDF note",
   unreadable: "Note has no legible line",
+  not_ordered: "Note product is not on the purchase order",
   wrong_product: "Label product differs from the note",
   hidden: "Cartons stacked or hidden",
   damaged: "Damaged cartons",
   disagree: "The counts disagree",
   receiver: "Receiver unsure or says another number",
-  match: "Camera and note agree",
+  over_order: "More than the purchase order has open",
+  readers_disagree: "A second reader of the note disagrees",
+  audit: "Wonder cannot confirm Spark's reading",
+  match: "Order, note and camera agree",
   mismatch: "Count confirmed, differs from the note"
 };
-const RULE_ARROW = { instruction: "block", invisible_text: "human", unreadable: "human", wrong_product: "block",
-  hidden: "human", damaged: "human", disagree: "human", receiver: "human",
+const RULE_ARROW = { instruction: "block", invisible_text: "human", unreadable: "human", not_ordered: "block",
+  wrong_product: "block", hidden: "human", damaged: "human", disagree: "human", receiver: "human",
+  over_order: "human", readers_disagree: "human", audit: "human",
   match: "post", mismatch: "block" };
 const ACTION = { post: "POST", block: "BLOCK", human: "ASK THE SUPERVISOR" };
 const EXPECTED_TEXT = { post: "post to the ERP", block: "block (no receipt)", human: "ask the supervisor" };

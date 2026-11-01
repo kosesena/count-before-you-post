@@ -1,10 +1,10 @@
 import {openConversation} from './conversation.js?v=bilingual-1';
 import {buildReceivingScene} from './receiving-scene.js?v=briefing-sign-1';
-import {receivingSteps,initialDestination,reviewPolicy,canAccept,locationMatches,atRouteStart,reviewRoute} from './receiving.mjs?v=receiving-9';
-import {participants,names,replayLines} from './replay.mjs?v=chat-3';
+import {receivingSteps,initialDestination,reviewPolicy,canAccept,locationMatches,atRouteStart,reviewRoute} from './receiving.mjs?v=order-1';
+import {participants,names,replayLines,english} from './replay.mjs?v=chat-3';
 import * as T from 'three';
 import { blockedPose, movePose, rectangle, stairAscent, stairApproach } from './collision.mjs?v=fire-stairs-1';
-import {areas,contained,pickupAligned,placementClear,collectRoute,destinationRoute,evidenceRows} from './operations.mjs?v=receiving-9';
+import {areas,contained,pickupAligned,placementClear,collectRoute,destinationRoute,refuseRoute,evidenceRows} from './operations.mjs?v=order-1';
 import { GLTFLoader } from './vendor/GLTFLoader.js';
 import { DRACOLoader } from './vendor/DRACOLoader.js';
 import { OrbitControls } from './vendor/OrbitControls.js';
@@ -426,7 +426,7 @@ for(let z=-6;z<=11.2;z+=.8)box(circulation,-9.6,.17,z,1.1,.03,.6,0x439b89);
 const walkSign=label(circulation,'PEDESTRIANS',-9.6,.2,4,3,.65,'#287a6d','#ffffff');walkSign.rotation.x=-Math.PI/2;
 const vehicleSign=label(circulation,'FORKLIFT ROUTE',8,.2,1,3,.65,'#ffcc00','#243238');vehicleSign.rotation.x=-Math.PI/2;
 twoSidedLabel(circulation,'CONTROLLED STORAGE',0,1.9,-7.3,3,.4,'#243238','#fff3b2');
-for(const [id,a] of Object.entries(areas)){if(id==='inspection')continue;const col=id==='accepted'?0x369469:id==='hold'?C.orange:C.red;for(const dz of [-a.hz,a.hz])box(circulation,a.x,.19,a.z+dz,a.hx*2,.04,.09,col);for(const dx of [-a.hx,a.hx])box(circulation,a.x+dx,.19,a.z,.09,.04,a.hz*2,col);const tag=label(circulation,`${id==='returned'?'RETURN':id==='hold'?'HOLD / NO STOCK':id==='arrival'?'UNVERIFIED':'ACCEPTED'} / ${a.address}`,a.x,.22,a.z+a.hz+.5,3.2,.55,'#f4f3e9','#243238');tag.rotation.x=-Math.PI/2;}
+for(const [id,a] of Object.entries(areas)){if(id==='inspection'||id==='refused')continue;const col=id==='accepted'?0x369469:id==='hold'?C.orange:C.red;for(const dz of [-a.hz,a.hz])box(circulation,a.x,.19,a.z+dz,a.hx*2,.04,.09,col);for(const dx of [-a.hx,a.hx])box(circulation,a.x+dx,.19,a.z,.09,.04,a.hz*2,col);const tag=label(circulation,`${id==='returned'?'RETURN':id==='hold'?'HOLD / NO STOCK':id==='arrival'?'UNVERIFIED':'ACCEPTED'} / ${a.address}`,a.x,.22,a.z+a.hz+.5,3.2,.55,'#f4f3e9','#243238');tag.rotation.x=-Math.PI/2;}
 // A dedicated put-away rack, with one empty pallet slot on each level.
 for(const x of [2.5,5.5])for(const z of [-13.65,-11.15])box(circulation,x,2.3,z,.14,4.3,.14,C.blue,true);
 box(circulation,4,2.45,-12.4,3,.16,2.6,C.yellow);box(circulation,4,4.4,-12.4,3,.12,2.6,C.yellow);
@@ -440,7 +440,7 @@ let caseData;
 try{const res=await fetch('../data.json');if(!res.ok)throw Error('data');caseData=await res.json();}catch{caseData=null;}
 const state={paused:false,speed:.5,mode:'orbit',held:false,running:false,phase:0,t:0,result:null};
 const completedLoads=[];let automation=null,transferTarget=null,verified=false,reviewResolved=false,deliveryNumber=1;let forkHeight=0;
-let dockReady=false,arrivalDone=false,inspectionRun=null,physicalLocation='trailer',locationConfirmed=false,handlingDecision=null,reviewTask=null;
+let dockReady=false,arrivalDone=false,inspectionRun=null,physicalLocation='trailer',locationConfirmed=false,handlingDecision=null,reviewTask=null,receivedQty=null;
 const flowList=$('receiving-steps');receivingSteps.forEach(text=>{const li=document.createElement('li');li.textContent=text;flowList.append(li);});
 function flowStep(index,text){[...flowList.children].forEach((li,i)=>{li.dataset.state=i<index?'done':i===index?'active':'pending';if(i===index)li.setAttribute('aria-current','step');else li.removeAttribute('aria-current');});if(text)status(text);}
 function entryNow(){return caseData?.cases.find(c=>c.id===currentCase);}
@@ -506,7 +506,7 @@ $('prepare-dock').onclick=()=>{
 };
 function updateDock(){
  const t=state.t;
- $('dock-checks').textContent=t<2?'1 / 3 · Driver in refuge; delivery note received.':t<4?'2 / 3 · Trailer secured; deck and pallet condition checked.':'3 / 3 · Bridge plate in position; unloading route clear.';
+ $('dock-checks').textContent=t<2?`1 / 3 · Driver in refuge; delivery note matched to ${order()?.number||'the purchase order'}.`:t<4?'2 / 3 · Trailer secured; deck and pallet condition checked.':'3 / 3 · Bridge plate in position; unloading route clear.';
  if(t>=6){receivingScene.prepare();dockReady=true;state.running=false;state.phase=0;$('prepare-dock').textContent='Dock prepared';$('demo').disabled=false;flowStep(1,'Dock ready. Play delivery or drive the forklift to B-01.');}
 }
 function deployWorker(id,x,z){
@@ -538,8 +538,8 @@ function updateInspection(dt){
  if(receivingScene.receiver.route.length||castSlots.some(s=>s.workRoute?.length))return;
  run.elapsed+=dt;const index=Math.floor(run.elapsed/3);
  const entry=entryNow();if(!entry){inspectionRun=null;finish();return;}
- const rows=evidenceRows(entry);
- const steps=[['Delivery note',rows[0][1]],['Camera count · recorded',rows[1][1]],['Visual inspection · recorded',rows[2][1]],['Receiver / Voice','Physical work is illustrative. No independent voice result was recorded in this scenario.'],['Gate · recorded',rows[4][1]]];
+ const rows=evidenceRows(entry,order());
+ const steps=[['Delivery note',rows[0][1]],['Camera count · recorded',rows[1][1]],['Visual inspection · recorded',rows[2][1]],['Receiver / Voice','Physical work is illustrative. No independent voice result was recorded in this scenario.'],['Purchase order',rows[6][1]],['Gate · recorded',rows[4][1]]];
  if(index>=steps.length){inspectionRun=null;finish();return;}
  if(index!==run.index){run.index=index;flowStep(3,steps[index].join(' — '));}
 }
@@ -562,7 +562,7 @@ function showRecordedConversation(){
  document.body.classList.add('conversation-open');
 }
 $('show-meeting').onclick=showRecordedConversation;
-function reset(){resetReceiving();resetMeeting();buildLoad();for(const load of completedLoads){scene.remove(load.object);disposeLoadGraphics(load.object);}completedLoads.length=0;automation=null;transferTarget=null;verified=false;reviewResolved=false;forkHeight=0;$('evidence').hidden=true;$('outcome-actions').hidden=true;$('next-delivery').hidden=true;document.querySelector('.playback').hidden=true;state.paused=false;$('pause-demo').textContent='Pause';state.running=false;state.held=false;state.phase=0;state.result=null;state.mode='orbit';state.t=0;delivery.parent?.remove(delivery);scene.add(delivery);delivery.position.set(18.1,.18,-4);delivery.rotation.set(0,Math.PI/2,0);fork.position.set(18.2,.18,-.6);fork.rotation.y=-Math.PI/2;lift.position.y=0;barrierTarget=0;signals.forEach(s=>s.material.emissiveIntensity=.06);$('demo').disabled=false;$('case').disabled=false;status('Ready to explore.');setView('hero');}
+function reset(){$('match').hidden=true;receivedQty=null;resetReceiving();resetMeeting();buildLoad();for(const load of completedLoads){scene.remove(load.object);disposeLoadGraphics(load.object);}completedLoads.length=0;automation=null;transferTarget=null;verified=false;reviewResolved=false;forkHeight=0;$('evidence').hidden=true;$('outcome-actions').hidden=true;$('next-delivery').hidden=true;document.querySelector('.playback').hidden=true;state.paused=false;$('pause-demo').textContent='Pause';state.running=false;state.held=false;state.phase=0;state.result=null;state.mode='orbit';state.t=0;delivery.parent?.remove(delivery);scene.add(delivery);delivery.position.set(18.1,.18,-4);delivery.rotation.set(0,Math.PI/2,0);fork.position.set(18.2,.18,-.6);fork.rotation.y=-Math.PI/2;lift.position.y=0;barrierTarget=0;signals.forEach(s=>s.material.emissiveIntensity=.06);$('demo').disabled=false;$('case').disabled=false;status('Ready to explore.');setView('hero');}
 function pickup(){
  const pose={x:fork.position.x,z:fork.position.z,angle:fork.rotation.y};
  if(physicalLocation==='hold'&&!handlingDecision&&!state.held){status('Resolve the hold before collecting this load.');return false;}
@@ -572,10 +572,11 @@ function pickup(){
   const id=transferTarget||(arrivalDone?'inspection':'arrival'),area=areas[id];
   if(!contained(p,area)){status(`Place the whole pallet inside ${area.address||'the inspection bay'}.`,'#c48223');return false;}
   if(Math.abs(forkHeight-(area.y-.18))>.12){status('Lower / raise the forks to the selected shelf level.','#c48223');return false;}
-  if(!placementClear(p,completedLoads.map(o=>rectangle(o.x,o.z,.9,.8,o.angle)))){status('The placement area is occupied or obstructed.','#c48223');return false;}
+  if(id!=='refused'&&!placementClear(p,completedLoads.map(o=>rectangle(o.x,o.z,.9,.8,o.angle)))){status('The placement area is occupied or obstructed.','#c48223');return false;}
   scene.attach(delivery);delivery.position.y=area.y;delivery.rotation.y=pose.angle;state.held=false;physicalLocation=id;locationConfirmed=false;forkHeight=0;lift.position.y=0;
   if(id==='arrival'){arrivalDone=true;updatePalletTag('UNVERIFIED B-01');flowStep(2,'B-01: received physically, not yet verified. Move to the yellow inspection bay.');}
   else if(id==='inspection'){updatePalletTag('INSPECTION');if(!verified){state.running=true;state.phase=3;state.t=0;}document.querySelector('.playback').hidden=false;status('Forklift stopped. Receiver and digital checks inspect the load.');}
+  else if(id==='refused'){updatePalletTag('REFUSED');locationConfirmed=true;handlingDecision='refused';$('outcome-actions').hidden=false;showOutcomeActions(id);if(!automation)$('next-delivery').hidden=false;flowStep(6,`Refused at the dock: the pallet is back on the trailer. Nothing is received against ${order()?.number||'the order'}; the driver takes it back.`);}
   else {flowStep(id==='hold'?4:6,`Delivery ${deliveryNumber} placed in ${area.address}. ${id==='hold'?'Awaiting a separate handling decision.':'Confirm the location to finish.'}`);$('next-delivery').hidden=true;$('outcome-actions').hidden=false;showOutcomeActions(id);}
   return true;
  }
@@ -585,10 +586,10 @@ function pickup(){
  fork.attach(delivery);delivery.position.set(0,.42+forkHeight,-2.25);delivery.rotation.set(0,0,0);state.held=true;physicalLocation='forklift';lift.position.y=forkHeight+.3;
  status('Load secured. Keep it low while travelling.');return true;
 }
-const resultCopy={ok:'12 cartons verified. The receiving gate is open.',eksik:'11 cartons found; the note says 12. ERP write blocked; handling decision pending.',wrong:'The product label does not match the note. ERP write blocked; handling decision pending.',hasarli:'A carton is damaged. Supervisor review required.',talimat:'Injected instructions found in the note. ERP write blocked; handling decision pending.',belirsiz:'Stacked cartons cannot be counted. Supervisor review required.'};
+const resultCopy={ok:'12 cartons verified. The receiving gate is open.',eksik:'11 cartons found; the note says 12. ERP write blocked; handling decision pending.',wrong:'The labels say corn oil; the note and the order say sunflower oil. ERP write blocked: refuse it at the dock.',hasarli:'A carton is damaged. Supervisor review required.',talimat:'Injected instructions found in the note. ERP write blocked; handling decision pending.',belirsiz:'Stacked cartons cannot be counted. Supervisor review required.'};
 function renderEvidence(){
  const entry=caseData?.cases.find(c=>c.id===currentCase);const list=$('evidence-rows');list.replaceChildren();
- for(const [name,value] of evidenceRows(entry)){const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=name;dd.textContent=value;list.append(dt,dd);}
+ for(const [name,value] of evidenceRows(entry,order())){const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=name;dd.textContent=value;list.append(dt,dd);}
  $('evidence-note').src='../'+(entry?.images.note||'');$('evidence-camera').src='../'+(entry?.images.camera||'');
  $('evidence-warning').textContent=entry?.note.embedded_instructions?.length?'Untrusted document text — instructions below were NOT executed. '+entry.note.embedded_instructions.join(' | '):entry?.what||'';
  $('evidence').hidden=false;
@@ -598,18 +599,26 @@ function finish(){
  if(!entry){status('Recorded evidence unavailable. Delivery remains on hold.','#bd4931');$('demo').disabled=false;$('case').disabled=false;return;}
  state.result=entry.gate.action;verified=true;physicalLocation='inspection';barrierTarget=state.result==='post'?-Math.PI*.48:0;
  signals.forEach((s,i)=>s.material.emissiveIntensity=i===({block:0,human:1,post:2}[state.result])?2.5:.06);
- status(resultCopy[currentCase]+(currentCase==='hasarli'?' Recorded proposal: accept 11 intact cartons; isolate 1 damaged carton.':''));
+ status(resultCopy[currentCase]+(currentCase==='hasarli'?' Recorded proposal: accept 11 intact cartons; isolate 1 damaged carton.':''));showMatch(entry);
  flowStep(state.result==='post'?5:4);$('outcome-actions').hidden=false;showOutcomeActions();
 }
+// Three-way match (written by hand, Claude Code): what was ordered, what the note says, what is on the pallet.
+function showMatch(entry){const o=order(),n=entry.note?.items?.[0],v=entry.spark,c=entry.cross;if(!o||!n||!v){$('match').hidden=true;return;}
+ const counted=c?c.agreed:v.cartons_visible,label=english(v.product_on_labels),same=(a,b)=>english(a).toLowerCase().replace(/\s+/g,'')===english(b).toLowerCase().replace(/\s+/g,'');
+ const hidden=v.stacked||!v.all_cartons_visible,damaged=v.damaged_cartons||0,told=(entry.note?.embedded_instructions||[]).length>0;
+ const palletNote=hidden?' · stacked, some hidden':damaged?` · ${damaged} damaged`:'';
+ const rows=[['Ordered',o.number,`${o.ordered} × ${o.product}`,true],['Note','delivery note',`${n.quantity} × ${english(n.description)}${told?' · hidden instruction':''}`,!told&&n.quantity<=o.ordered&&same(n.description,o.product)],['Pallet','camera',`${hidden?counted+' visible':counted} × ${label}${palletNote}`,!hidden&&!damaged&&counted===n.quantity&&same(label,n.description)]];
+ $('match-rows').replaceChildren(...rows.map(([k,src,val,ok])=>{const li=document.createElement('li');li.className=ok?'ok':'bad';li.innerHTML=`<b></b><span></span><i></i>`;li.children[0].textContent=k;li.children[1].textContent=val;li.children[2].textContent=ok?'✓':'✗';li.title=src;return li;}));
+ $('match').hidden=false;}
 function showOutcomeActions(location='inspection'){
  const policy=reviewPolicy(currentCase), accepted=state.result==='post'||handlingDecision==='accepted';
  $('manual-transfer').hidden=location!=='inspection';$('storage-level').disabled=location!=='inspection'||!accepted;
- $('transfer-load').hidden=location!=='inspection';$('transfer-load').textContent=accepted?`Label & put away · A-01-L${$('storage-level').value}`:'Move to exception hold · H-01';
+ $('transfer-load').hidden=location!=='inspection';$('transfer-load').textContent=accepted?`Label & put away · A-01-L${$('storage-level').value}`:initialDestination(state.result,currentCase)==='refused'?'Refuse at the dock · reload to trailer':'Move to exception hold · H-01';
  $('review-controls').hidden=location!=='hold';$('review-proposal').textContent=policy.task;
  $('review-approve').hidden=!policy.accept;$('review-count').disabled=!policy.accept;
  $('review-document-row').hidden=!policy.document;
  $('review-inspect').disabled=!!reviewTask;$('review-inspect').textContent=reviewTask?'Receiver is checking…':'Perform recount / document check';
- $('location-confirm').hidden=!['accepted','returned'].includes(location);
+ $('location-confirm').hidden=!['accepted','returned'].includes(location);if(location==='refused'){$('transfer-load').hidden=true;$('manual-transfer').hidden=true;}
  $('location-prompt').textContent=`P-${String(deliveryNumber).padStart(3,'0')} → ${areas[location]?.address||''}. Enter the destination address to confirm this simulated scan.`;
  if(location==='hold')stageSupervisor();
 }
@@ -631,7 +640,11 @@ function stepCommands(dt){
  a.remaining-=delta;if(Math.abs(a.remaining)<.0001){a.index++;a.remaining=null;}
 }
 function runDemo(){if(state.running)return;if(physicalLocation!=='trailer'||Math.hypot(fork.position.x-18.2,fork.position.z+.6)>.1||Math.cos(fork.rotation.y+Math.PI/2)<.999){status('Continue manual handling, or press R and prepare the next exercise before guided playback.');return;}if(!dockReady){status('Complete dock preparation first.');return;}setView('dock');$('demo').disabled=true;$('case').disabled=true;flowStep(1,'Unload to B-01; the pallet is not accepted stock yet.');const commands=collectRoute.map(c=>[...c]);commands.splice(7,0,['drop'],['wait',3],['pickup']);startCommands(commands,()=>{state.running=true;state.phase=3;state.t=0;});}
-function chooseDestination(){transferTarget=initialDestination(state.result);const upper=$('storage-level').value==='1';areas.accepted.y=upper?2.53:.18;areas.accepted.address=upper?'A-01-L1':'A-01-L0';updatePalletTag(areas[transferTarget].address,state.result==='post'?12:null);}
+// The purchase order the delivery is received against (data.json, the Turkish run), in English.
+function order(){const o=caseData?.order;return o&&{...o,product:english(o.product)};}
+// What this delivery leaves on the order line once it is received.
+function onOrder(){const o=order();if(!o||physicalLocation!=='accepted')return '';const q=receivedQty??12,left=o.ordered-q;return ` Received ${q} of ${o.ordered} on ${o.number}${left>0?`; ${left} still open: claim the shortfall from the supplier or close the line`:'; order line complete'}.`;}
+function chooseDestination(){transferTarget=initialDestination(state.result,currentCase);const upper=$('storage-level').value==='1';areas.accepted.y=upper?2.53:.18;areas.accepted.address=upper?'A-01-L1':'A-01-L0';updatePalletTag(areas[transferTarget].address,state.result==='post'?12:null);}
 function withShelfLift(commands){if(transferTarget!=='accepted'||areas.accepted.y<1)return commands;const copy=commands.map(c=>[...c]),i=copy.findIndex(c=>c[0]==='drop');copy.splice(i,0,['lift',2.35]);return copy;}
 function forkPose(){return {x:fork.position.x,z:fork.position.z,angle:fork.rotation.y};}
 function manualForTarget(){state.running=false;automation=null;state.mode='orbit';$('drive').click();status(`Manual handling: place the load in ${areas[transferTarget].address}. The selected decision remains separate from the recorded ERP result.`);}
@@ -639,9 +652,9 @@ $('transfer-load').onclick=()=>{
  if(!verified||state.running||physicalLocation!=='inspection')return;chooseDestination();
  $('storage-level').disabled=true;$('transfer-load').hidden=true;$('manual-transfer').hidden=true;$('evidence').hidden=true;
  if(!atRouteStart(forkPose(),'inspection')){manualForTarget();return;}
- setView('plan');const route=destinationRoute(transferTarget);if(transferTarget==='hold')route.pop();
- flowStep(transferTarget==='hold'?4:5,transferTarget==='hold'?'ERP result retained. Moving to H-01 for a handling decision.':'Receiver prints the pallet label. Moving to the selected storage location.');
- startCommands(withShelfLift(route),()=>showOutcomeActions(transferTarget));
+ setView(transferTarget==='refused'?'dock':'plan');const route=transferTarget==='refused'?refuseRoute.map(c=>[...c]):destinationRoute(transferTarget);if(transferTarget==='hold')route.pop();
+ flowStep(transferTarget==='hold'?4:5,transferTarget==='refused'?'Not what was ordered. Reloading the pallet onto the trailer.':transferTarget==='hold'?'ERP result retained. Moving to H-01 for a handling decision.':'Receiver prints the pallet label. Moving to the selected storage location.');
+ startCommands(withShelfLift(route),()=>{showOutcomeActions(transferTarget);if(transferTarget==='refused')$('next-delivery').hidden=false;});
 };
 $('storage-level').onchange=()=>{$('transfer-load').textContent=`Label & put away · A-01-L${$('storage-level').value}`;};
 $('manual-transfer').onclick=()=>{if(!verified||state.running||physicalLocation!=='inspection')return;chooseDestination();manualForTarget();};
@@ -655,10 +668,10 @@ $('review-approve').onclick=()=>{
  if(state.running||physicalLocation!=='hold'||state.held)return;
  const count=Number($('review-count').value);
  if(!canAccept(currentCase,{count,inspected:$('review-inspected').checked,document:$('review-document').checked})){status('Complete the physical check, reconcile the document when required, and confirm the intact count.','#c48223');return;}
- reviewResolved=true;handlingDecision='accepted';barrierTarget=-Math.PI*.48;transferTarget='accepted';areas.accepted.y=.18;areas.accepted.address='A-01-L0';
+ receivedQty=count;reviewResolved=true;handlingDecision='accepted';barrierTarget=-Math.PI*.48;transferTarget='accepted';areas.accepted.y=.18;areas.accepted.address='A-01-L0';
  buildLoad(count);updatePalletTag('A-01-L0',count);
  if(currentCase==='hasarli'){const isolated=group(scene,13,.18,7);pallet(isolated,0,0,0);crate(isolated,0,.36,0,.51,.26,.64);twoSidedLabel(isolated,'Q-01 · 1 DAMAGED',0,1,0,1.5,.3,'#c48223','#ffffff');flush(isolated);completedLoads.push({object:isolated,x:13,z:7,angle:0});}
- $('review-controls').hidden=true;flowStep(5,'Supervisor authorizes simulated acceptance. Label and secure the load. Recorded ERP result is unchanged.');
+ $('review-controls').hidden=true;flowStep(5,reviewPolicy(currentCase).document?`Corrected note verified on its own: it now says ${count}, as counted. Not an override of the blocked receipt: a new check, where note, order and count agree. Label and secure the load.`:`Supervisor signs off ${count} (the gate sent this delivery to a person). Label and secure the load.`);
  if(!atRouteStart(forkPose(),'hold')){manualForTarget();return;}
  setView('plan');startCommands(reviewRoute('accepted'),()=>showOutcomeActions('accepted'));
 };
@@ -674,12 +687,12 @@ $('confirm-location').onclick=()=>{
  const expected=areas[physicalLocation].address;
  if(!locationMatches($('location-code').value,expected)){status(`Location does not match. Read ${expected} at the destination and try again.`,'#c48223');return;}
  locationConfirmed=true;$('next-delivery').hidden=false;$('location-confirm').hidden=true;
- flowStep(7,`${expected} confirmed for P-${String(deliveryNumber).padStart(3,'0')}. ${physicalLocation==='returned'?'Awaiting carrier collection.':'Put-away complete.'} No live inventory update.`);
+ flowStep(7,`${expected} confirmed for P-${String(deliveryNumber).padStart(3,'0')}. ${physicalLocation==='returned'?'Awaiting carrier collection.':'Put-away complete.'}${onOrder()} No live inventory update.`);
 };
 $('close-evidence').onclick=()=>$('evidence').hidden=true;$('show-evidence').onclick=renderEvidence;
 $('next-delivery').onclick=()=>{
  if(state.running||state.held||!locationConfirmed)return;
- const li=document.createElement('li');li.textContent=`Delivery ${deliveryNumber} · ${currentCase} · ${areas[transferTarget].address} · ERP ${state.result} (recorded) · handling ${handlingDecision||transferTarget} (simulated)${currentCase==='hasarli'&&handlingDecision==='accepted'?' · 1 carton remains Q-01 quarantined':''}`;$('delivery-history').prepend(li);
+ const li=document.createElement('li');li.textContent=`Delivery ${deliveryNumber} · ${currentCase} · ${transferTarget==='refused'?'refused · back on the trailer':areas[transferTarget].address} · ERP ${state.result} (recorded) · handling ${handlingDecision||transferTarget} (simulated)${currentCase==='hasarli'&&handlingDecision==='accepted'?' · 1 carton remains Q-01 quarantined':''}`;$('delivery-history').prepend(li);
  // End this exercise. This clears its scene, not persistent inventory or an outbound shipment.
  receivingScene.release();setDockSignal(true);setView('outside');state.running=true;state.phase=9;state.t=0;$('next-delivery').hidden=true;status('Exercise saved. Receiver releases the dock; driver receives the green signal.');
 };

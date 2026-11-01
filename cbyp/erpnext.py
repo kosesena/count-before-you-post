@@ -4,6 +4,7 @@ This module is the only code in the project allowed to write to the ERP.
 Every HTTP call goes through Client.send; post_receipt refuses anything the
 gate did not approve before any request is made.
 """
+import datetime
 import json
 import os
 import urllib.error
@@ -136,8 +137,39 @@ class Client:
         self.send("GET", f"/api/resource/Warehouse/{_quote(warehouse)}")
         return {"supplier": SUPPLIER, "item_code": ITEM_CODE, "warehouse": warehouse}
 
-    def post_receipt(self, decision, *, supplier, item_code, warehouse, note_number):
-        """Create and submit a Purchase Receipt; refuse anything but a post decision."""
+    def ensure_order(self, order, ids):
+        """The submitted Purchase Order for this order line, created once and found again by
+        its number (kept in Order Confirmation No). Returns the fields that tie a receipt line
+        to it, so ERPNext itself also refuses a receipt above what was ordered."""
+        doctype = _quote("Purchase Order")
+        filters = json.dumps([["order_confirmation_no", "=", order["number"]],
+                              ["docstatus", "=", 1]])
+        found = self.send("GET", f"/api/resource/{doctype}?filters={_quote(filters)}"
+                                 f"&fields={_quote(json.dumps(['name']))}")
+        rows = found.get("data") or []
+        if rows:
+            name = rows[0]["name"]
+        else:
+            today = datetime.date.today().isoformat()
+            created = self.send("POST", f"/api/resource/{doctype}", {
+                "supplier": ids["supplier"], "order_confirmation_no": order["number"],
+                "transaction_date": today, "schedule_date": today,
+                "items": [{"item_code": ids["item_code"], "qty": order["ordered"], "rate": 0,
+                           "schedule_date": today, "warehouse": ids["warehouse"]}]})
+            name = (created.get("data") or {}).get("name")
+            if not name:
+                raise ERPNextError("ERPNext did not return a Purchase Order name.")
+            self.send("PUT", f"/api/resource/{doctype}/{_quote(name)}", {"docstatus": 1})
+        doc = self.send("GET", f"/api/resource/{doctype}/{_quote(name)}").get("data") or {}
+        lines = doc.get("items") or []
+        if len(lines) != 1:
+            raise ERPNextError(f"Purchase Order {name} should have one line, has {len(lines)}.")
+        return {"purchase_order": name, "purchase_order_item": lines[0]["name"]}
+
+    def post_receipt(self, decision, *, supplier, item_code, warehouse, note_number,
+                     order_ref=None):
+        """Create and submit a Purchase Receipt; refuse anything but a post decision.
+        order_ref: ensure_order()'s result, to receive against the Purchase Order line."""
         if decision.action != "post":
             _refuse(decision)
         if decision.quantity is None:
@@ -152,7 +184,7 @@ class Client:
                "remarks": "\n".join(decision.reasons),
                "items": [{"item_code": item_code, "qty": decision.quantity,
                           "received_qty": decision.quantity, "rate": 0,
-                          "warehouse": warehouse}]}
+                          "warehouse": warehouse, **(order_ref or {})}]}
         created = self.send("POST", f"/api/resource/{_quote('Purchase Receipt')}", doc)
         name = (created.get("data") or {}).get("name")
         if not name:
@@ -167,10 +199,11 @@ def ensure_master_data(client=None):
     return (client or Client()).ensure_master_data()
 
 
-def post_receipt(decision, *, supplier, item_code, warehouse, note_number, client=None):
+def post_receipt(decision, *, supplier, item_code, warehouse, note_number, client=None,
+                 order_ref=None):
     """Module-level wrapper; the gate check runs before any client or request exists."""
     if decision.action != "post":
         _refuse(decision)
     return (client or Client()).post_receipt(
         decision, supplier=supplier, item_code=item_code,
-        warehouse=warehouse, note_number=note_number)
+        warehouse=warehouse, note_number=note_number, order_ref=order_ref)

@@ -20,6 +20,7 @@ from .crosscheck import cross_check
 from .delivery_note import read_note
 from .gate import CONCEPTS, HUMAN, MIN_CONF, POST, SURE, Decision, decide
 from .meta import SPARK, client
+from .purchase_order import open_quantity
 from .perception import look, point_cartons
 from .sam import segment_image, segment_points, segments
 
@@ -77,6 +78,9 @@ class Session:
     second_reader: object = None
     auditor: object = None
     opinions: dict = field(default_factory=dict)
+    # The purchase order line from the company's records (purchase_order.order_for); the gate
+    # matches it against the note and the count. The agent never sees or sets it.
+    order: dict | None = None
 
     def read_delivery_note(self):
         self.note = read_note(self.note_path)["claim"]
@@ -117,9 +121,10 @@ class Session:
             self.refused.append((quantity, why))
             return {"posted": False, "gate": why}
         cross = self.cross()
-        d = decide(self.note, self.sam, self.look, cross)
+        d = decide(self.note, self.sam, self.look, cross, order=self.order)
         if d.action == POST and (self.second_reader or self.auditor):
-            d = decide(self.note, self.sam, self.look, cross, **self._opinions())
+            d = decide(self.note, self.sam, self.look, cross, order=self.order,
+                       **self._opinions())
         if d.action == HUMAN and self.signoff is not None:
             d = self._signed_off(d, quantity)
             if isinstance(d, dict):
@@ -153,6 +158,9 @@ class Session:
             why = f"The supervisor rejected the receipt: {s.get('notes', '')}".strip()
         elif quantity != s.get("quantity"):
             why = f"The supervisor approved {s.get('quantity')}, not {quantity}."
+        elif self.order is not None and quantity > open_quantity(self.order):
+            why = (f"{self.order['number']} has {open_quantity(self.order)} open; a sign-off "
+                   "cannot receive more than was ordered.")
         else:
             return Decision(POST, quantity, [d.reasons[0], "Signed off by the supervisor: "
                                              + s.get("notes", "")], d.evidence, d.rule)

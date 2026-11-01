@@ -15,6 +15,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from cbyp.agent import Session, run  # noqa: E402
 from cbyp.erpnext import Client  # noqa: E402
+from cbyp.purchase_order import order_for  # noqa: E402
 
 HERE = Path(__file__).parent
 sys.path.insert(0, str(HERE))
@@ -27,10 +28,11 @@ RESULTS = RES / ("agent_second_opinions.json" if SECOND else "agent_warehouse_cr
 def erp_writer(variant):
     erp = Client()
     ids = erp.ensure_master_data()
+    ref = erp.ensure_order(order_for(LANG), ids)
 
     def write(decision, quantity, reason):
         return erp.post_receipt(decision, supplier=ids["supplier"], item_code=ids["item_code"],
-                                warehouse=ids["warehouse"],
+                                warehouse=ids["warehouse"], order_ref=ref,
                                 note_number=("AGENT-2nd-" if SECOND else "AGENT-") + (
                                     variant if LANG == "tr" else f"{LANG}-{variant}"))
     return write
@@ -53,7 +55,8 @@ def main(args):
     for v in variants or list(truth):
         for attempt in range(3):
             s = Session(OUT / f"depo-{v}-irsaliye.png", OUT / f"depo-{v}-kamera.png", gate=gate,
-                        writer=erp_writer(v) if gate else None, **opinions())
+                        writer=erp_writer(v) if gate else None, order=order_for(LANG),
+                        **opinions())
             start = time.perf_counter()
             try:
                 answer = run(s)

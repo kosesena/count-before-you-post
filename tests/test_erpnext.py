@@ -99,5 +99,41 @@ class Writer(unittest.TestCase):
         self.assertTrue(all(c["method"] == "GET" for c in fake.calls[2:]))
 
 
+
+class Orders(unittest.TestCase):
+    ORDER = {"number": "PO-2026-1047", "ordered": 12, "received": 0}
+    IDS = {"supplier": "Doğan Gıda", "item_code": "AYC-5L", "warehouse": "Stores - DG"}
+
+    def test_existing_order_is_found_again_not_created(self):
+        fake = Fake([ok({"data": [{"name": "PUR-ORD-1"}]}),
+                     ok({"data": {"name": "PUR-ORD-1", "items": [{"name": "row-1"}]}})])
+        ref = client_for(fake).ensure_order(self.ORDER, self.IDS)
+        self.assertEqual(ref, {"purchase_order": "PUR-ORD-1", "purchase_order_item": "row-1"})
+        self.assertEqual([c["method"] for c in fake.calls], ["GET", "GET"])
+        self.assertIn("PO-2026-1047", urllib.parse.unquote(fake.calls[0]["url"]))
+
+    def test_missing_order_is_created_and_submitted(self):
+        fake = Fake([ok({"data": []}), ok({"data": {"name": "PUR-ORD-2"}}),
+                     ok({"data": {"name": "PUR-ORD-2", "docstatus": 1}}),
+                     ok({"data": {"name": "PUR-ORD-2", "items": [{"name": "row-2"}]}})])
+        ref = client_for(fake).ensure_order(self.ORDER, self.IDS)
+        self.assertEqual(ref["purchase_order"], "PUR-ORD-2")
+        create, submit = fake.calls[1], fake.calls[2]
+        self.assertEqual(create["body"]["order_confirmation_no"], "PO-2026-1047")
+        self.assertEqual(create["body"]["items"][0]["qty"], 12)
+        self.assertEqual(submit["body"], {"docstatus": 1})
+
+    def test_receipt_line_is_tied_to_the_order_line(self):
+        fake = Fake([ok({"data": []}), ok({"data": {"name": "MAT-PRE-0002"}}),
+                     ok({"data": {"name": "MAT-PRE-0002", "docstatus": 1}})])
+        client_for(fake).post_receipt(POST, supplier="Doğan Gıda", item_code="AYC-5L",
+                                      warehouse="Stores - DG", note_number="IRS-43",
+                                      order_ref={"purchase_order": "PUR-ORD-1",
+                                                 "purchase_order_item": "row-1"})
+        line = fake.calls[1]["body"]["items"][0]
+        self.assertEqual((line["purchase_order"], line["purchase_order_item"]),
+                         ("PUR-ORD-1", "row-1"))
+
+
 if __name__ == "__main__":
     unittest.main()

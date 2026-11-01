@@ -520,6 +520,33 @@ pieces were missing and are now in:
 
 ---
 
+## 1 Nov: the purchase order, the third side of a receipt
+
+A receipt is posted against what was ordered, not only against the note: the three-way match
+(order, note, counted quantity). Until now the gate never looked at an order; the word did not
+appear in the repository. Added by hand (Claude Code), no model run:
+
+- `cbyp/purchase_order.py`: one order line per language (PO-2026-1047 to -1050, 12 cartons of
+  the product on the note, from the supplier on the note). The gate takes it as `order=`; the
+  agent never sees it. Two rules: `not_ordered` (the note's product is not on the order: block,
+  refuse at the dock) and `over_order` (more than the order has open: human, Şef receives what
+  is open). A sign-off cannot receive more than is open.
+- The six recorded cases with their orders, four languages: decisions unchanged, 24/24. The
+  matching delivery's recorded readings against other orders (10 ordered; 20 ordered with 10
+  received; corn oil ordered; 12 ordered): 16/16 as expected (`gate_orders.json`).
+- ERPNext: `ensure_order` creates the Purchase Order once and finds it again by its number in
+  Order Confirmation No; the receipt line carries `purchase_order` / `purchase_order_item`.
+  `PUR-ORD-2026-00001` (PO-2026-1047), received as `MAT-PRE-2026-00011`, 12 of 12; ERPNext
+  shows the order 100 % received. A second 12 on it: the gate says `over_order`, nothing sent.
+  ERPNext was not asked to write it (a refused submit could leave a draft behind).
+- Limit: Spark's note reading has no supplier field, so the order is matched on product and
+  quantity; the supplier is the order's.
+- Brick Dock: the wrong product is refused at the dock (the pallet is driven back onto the
+  trailer along the way it came, tested frame by frame for collisions), and the decision shows
+  a three-way match panel: ordered, note, pallet. All six cases played end to end in a browser:
+  each ends where it should (A-01, the trailer, or H-01 then A-01), with what is left open on the
+  order.
+
 ## Open
 - Spark Open (open weights) as a second reader: Baseten credits requested on 27 Oct, waiting for the email.
 - One real handwritten delivery note photo.
