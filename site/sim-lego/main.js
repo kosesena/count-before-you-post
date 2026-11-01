@@ -161,6 +161,8 @@ const offices=group(scene,OFFICE_WALL_SHIFT);
 const BALCONY_DEPTH=1.8;
 const roomDefs=[['Spark',C.orange,0xd95c16],['Şef',C.blue,0x26231d],['Sam',0x369ce5,0x42352b],['Voice',0x2b62ca,0x252521],['Kapı',0x26589c,0x43302a],['Iris',C.pink,0xa91c81],['Ada',C.teal,0x171b20],['Glimmer',C.purple,0xc4a3df],['Wonder',0xe7b82a,0x784322],['Rover',0x287a6d,0x994422]];
 await stage('Preparing the crew…');
+// Soft emissive plastic for small lit bits (lamp bulbs, Kapı's green lamp); no new lights.
+function glowMat(color,intensity=1.1){const m=new T.MeshStandardMaterial({color,emissive:color,emissiveIntensity:intensity,roughness:.4});m.toneMapped=false;return m;}
 for(let floor=0;floor<2;floor++)for(let n=0;n<5;n++){
  const [name,color,hair]=roomDefs[floor*5+n], room=group(offices,-14.1,.16+floor*3.85,9-n*4.35,Math.PI/2);
  box(room,0,.02,0,4.35,.22,5.4,0xc4c9c8,true);box(room,0,1.85,-2.5,4.35,3.6,.26,color);
@@ -171,16 +173,161 @@ for(let floor=0;floor<2;floor++)for(let n=0;n<5;n++){
  const pane=new T.Mesh(new T.PlaneGeometry(2,3.35),glass);pane.position.set(-1.05,1.85,2.6);room.add(pane);
  const door=group(room,2.08,0,2.61);const doorGlass=new T.Mesh(new T.PlaneGeometry(1.98,3.3),glass);doorGlass.position.set(-1,1.83,0);door.add(doorGlass);box(door,-1.98,1.84,0,.07,3.35,.1,C.black);box(door,-1.7,1.4,.07,.055,.36,.08,0xd7dadd);flush(door);officeDoors.push(door);
  litName(room,name,color);
- // Light tiled floors, desk, monitor, keyboard, paperwork, bookcase.
+ // Light tiled floors stay everywhere; the five ground-floor rooms get their own concepts.
  for(let xx=-1.8;xx<2;xx+=.6)for(let zz=-2;zz<2.4;zz+=.6)box(room,xx,.155,zz,.585,.04,.585,floor?0xdacdb3:0xe7e5dc,true);
- box(room,.1,1.2,.7,2.8,.14,1.25,0xc6ac83);for(const xx of [-1.1,1.3])for(const zz of [.22,1.15])box(room,xx,.68,zz,.1,1.05,.1,0x58636c);
- box(room,.65,1.66,.6,.85,.6,.09,C.black);box(room,.65,1.68,.545,.75,.47,.015,name==='Ada'?0x123e3d:0x3b5668);box(room,.65,1.34,.6,.08,.24,.1,C.black);box(room,.65,1.28,.7,.4,.045,.3,C.black);
- for(let k=0;k<4;k++)box(room,.65,1.8-k*.08,.53,.52-k*.08,.015,.012,name==='Ada'?0x67dba9:0xa7c5cb);
- box(room,.55,1.3,.25,.65,.04,.23,0xe1e4e0);sheet(room,-.65,1.3,1.0,.5,.55);cyl(room,-1,1.4,.45,.09,.24,C.white,16);
- box(room,1.65,1.45,-1.5,.5,2.7,1.55,0xc6ad7e);for(let lev=0;lev<3;lev++){box(room,1.32,.6+lev*.8,-1.5,.22,.08,1.5,0xf0d4a1);for(let b=0;b<5;b++)box(room,1.3,.87+lev*.8,-2.05+b*.25,.25,.48,.15,[C.blue,C.yellow,C.red,C.teal,C.white][(b+lev)%5]);}
- box(room,-.65,.5,-.85,.85,.13,.85,C.black);box(room,-.65,.32,-.85,.12,.35,.12,C.black);box(room,-.65,.93,-1.25,.85,.8,.12,C.black);
- plant(room,-1.65,.22,1.9);label(room,name==='Iris'?'✦':String(floor*5+n+1).padStart(2,'0'),-.8,2.45,-2.39,1.4,.85,'#faf4df','#617c87');
- if(name==='Iris'){for(let i=0;i<3;i++)label(room,['ART','COLOR','FORM'][i],-.9+i*.85,2.5,-2.38,.7,.9,['#ffc839','#fa9cb4','#6bb5c0'][i],'#ffffff');}
+ if(floor===0){
+  // Chair and number label stay in place; the chair takes the room's accent colour.
+  const CH=name==='Spark'?C.orange:name==='Kapı'?C.tan:C.black;
+  if(name==='Spark'){
+   // Cosy reading office: crowded cork board, wooden desk, anglepoise lamp.
+   roomLight.color.setHex(0xffc98a);roomLight.intensity=10;
+   box(room,-.2,1.32,-2.335,3.42,1.36,.04,C.orange);
+   box(room,-.2,1.32,-2.31,3.3,1.24,.08,C.tan);
+   for(let i=0;i<4;i++){const cx=-1.4+i*.7;
+    box(room,cx,1.3,-2.25,.36,.46,.03,C.white);
+    box(room,cx-.06,1.37,-2.23,.09,.035,.012,C.green);
+    box(room,cx-.06,1.26,-2.23,.09,.035,.012,0x65727d);}
+   const st=[[-1.62,1.72],[-.92,1.74],[-.22,1.72],[.48,1.74],[1.12,1.72],[-1.27,.92],[-.27,.9],[.83,.92]];
+   st.forEach(([sx,sy],i)=>box(room,sx,sy,-2.25,.17,.17,.025,i%2?C.yellow:C.orange));
+   box(room,-.3,1.2,.7,2.5,.14,1.2,C.tan);
+   box(room,-1.4,.62,.7,.12,1.0,1.0,C.tan);
+   box(room,.75,.62,.7,.7,1.0,1.0,C.tan);
+   box(room,.75,.82,.19,.5,.3,.03,C.tan);box(room,.75,.42,.19,.5,.3,.03,C.tan);
+   cyl(room,.75,.82,.22,.035,.05,C.black,8,Math.PI/2);cyl(room,.75,.42,.22,.035,.05,C.black,8,Math.PI/2);
+   cyl(room,-1.15,1.32,.25,.12,.06,C.black,16);
+   cyl(room,-1.12,1.58,.28,.035,.55,C.black,8,.25,0,-.3);
+   cyl(room,-.98,1.86,.3,.035,.5,C.black,8,.2,0,-.9);
+   cyl(room,-.78,1.92,.32,.11,.2,C.black,12,0,0,1.1);
+   cyl(room,-.7,1.86,.33,.05,.06,glowMat(C.white,1),12);
+   cyl(room,.35,1.31,.98,.03,.3,C.tan,8,Math.PI/2);
+   cyl(room,.35,1.31,.68,.13,.035,C.white,16);
+   box(room,-.55,1.29,.95,.5,.03,.65,C.tan);
+   sheet(room,-.55,1.32,.95,.4,.5);
+   box(room,-.55,1.35,1.2,.16,.04,.06,C.black);
+   cyl(room,.7,1.42,.35,.09,.22,C.orange,12);
+   cyl(room,.66,1.56,.33,.018,.26,C.black,8,0,0,.12);
+   cyl(room,.74,1.56,.37,.018,.26,C.red,8,0,0,-.12);
+   cyl(room,.7,1.57,.3,.018,.26,C.blue,8,.12,0,0);
+  }else if(name==='Şef'){
+   // Tidy supervisor's booth: shift planner, steel counter, stamp, hard hat, hi-vis.
+   roomLight.color.setHex(0xdfe8ff);roomLight.intensity=9;
+   box(room,-.2,1.32,-2.335,3.3,1.4,.04,C.blue);
+   box(room,-.2,1.32,-2.31,3.14,1.28,.08,C.tan);
+   const cols=[C.red,C.yellow,C.green,C.white];
+   for(let r=0;r<3;r++)for(let c=0;c<4;c++)box(room,-1.28+c*.68,1.62-r*.42,-2.25,.52,.3,.03,cols[(r+c)%4]);
+   box(room,1.55,1.3,-2.3,.3,.5,.12,C.floor);
+   box(room,1.55,1.42,-2.22,.16,.42,.1,C.black);
+   cyl(room,1.61,1.78,-2.22,.025,.3,C.black,8);
+   box(room,-.3,1.2,.7,2.5,.14,1.2,C.floor);
+   box(room,-.3,.62,.18,2.5,1.0,.1,C.floor);
+   box(room,-.3,1.08,.24,2.5,.07,.02,C.yellow);
+   box(room,-.9,1.33,.5,.34,.1,.34,C.red);
+   cyl(room,-.9,1.45,.5,.07,.15,C.black,12);
+   cyl(room,-.9,1.6,.5,.12,.12,C.black,16);
+   sheet(room,-.15,1.3,1.0,.5,.55);
+   sheet(room,-.1,1.34,1.02,.5,.55);
+   cyl(room,.6,1.47,.4,.09,.36,C.floor,16);
+   cyl(room,.6,1.69,.4,.06,.08,C.black,12);
+   cyl(room,1.95,1.95,-1.6,.03,.18,C.black,8,0,0,Math.PI/2);
+   cyl(room,1.82,2.02,-1.6,.2,.16,C.yellow,16);
+   cyl(room,1.82,1.94,-1.6,.28,.05,C.yellow,16);
+   cyl(room,1.95,1.95,-1.0,.03,.18,C.black,8,0,0,Math.PI/2);
+   box(room,1.98,1.5,-1.0,.1,.7,.55,C.orange);
+   box(room,1.92,1.62,-1.0,.03,.1,.5,C.yellow);
+   box(room,1.92,1.38,-1.0,.03,.1,.5,C.yellow);
+  }else if(name==='Sam'){
+   // Clean counting studio: carton grid, white desk, tripod camera, mini pallet, flip counter.
+   roomLight.color.setHex(0xf2f6ff);roomLight.intensity=10;
+   for(let r=0;r<2;r++)for(let c=0;c<5;c++){const gx=-1.56+c*.78,gy=1.02+r*.68;
+    box(room,gx,gy,-2.35,.62,.6,.03,C.white);
+    box(room,gx,gy-.02,-2.33,.36,.38,.02,C.tan);
+    box(room,gx,gy-.02,-2.315,.36,.06,.012,C.white);}
+   box(room,-.3,1.2,.7,2.5,.14,1.2,C.white);
+   box(room,-1.45,.62,.7,.12,1.0,1.0,C.white);
+   box(room,.85,.62,.7,.12,1.0,1.0,C.white);
+   cyl(room,-1.37,1.03,1.5,.035,1.85,C.black,8,0,0,.2);
+   cyl(room,-1.7,1.03,1.62,.035,1.85,C.black,8,-.15,0,-.17);
+   cyl(room,-1.7,1.03,1.38,.035,1.85,C.black,8,.15,0,-.17);
+   cyl(room,-1.55,1.92,1.5,.09,.14,C.black,12);
+   box(room,-1.45,2.06,1.42,.34,.24,.4,C.black);
+   cyl(room,-1.24,2.02,1.3,.09,.3,C.black,16,0,0,Math.PI/2-.25);
+   box(room,-.5,1.31,.75,.7,.05,.5,C.tan);
+   box(room,-.62,1.5,.75,.28,.3,.4,C.tan);
+   box(room,-.32,1.5,.75,.28,.3,.4,C.tan);
+   box(room,-.47,1.8,.75,.28,.3,.4,C.tan);
+   box(room,.6,1.3,.35,.6,.06,.2,C.black);
+   box(room,.6,1.56,.35,.6,.45,.14,C.black);
+   box(room,.45,1.58,.43,.2,.28,.02,C.white);
+   box(room,.75,1.58,.43,.2,.28,.02,C.white);
+   box(room,.45,1.58,.445,.05,.2,.012,C.black);
+   box(room,.75,1.68,.445,.12,.04,.012,C.black);
+   box(room,.75,1.58,.445,.12,.04,.012,C.black);
+   box(room,.75,1.48,.445,.12,.04,.012,C.black);
+   box(room,.79,1.63,.445,.04,.1,.012,C.black);
+   box(room,.71,1.53,.445,.04,.1,.012,C.black);
+  }else if(name==='Voice'){
+   // Warm dim listening room: acoustic pads, reel-to-reel, cream-shade lamp, phone.
+   roomLight.color.setHex(0xffb46b);roomLight.intensity=5;
+   for(let r=0;r<2;r++)for(let c=0;c<4;c++)box(room,-1.55+c*.8,1.0+r*.68,-2.31,.74,.62,.1,(r+c)%2?C.black:C.navy);
+   const vn=[[1.45,1.6],[1.7,1.35],[1.4,1.08],[1.66,.85],[1.52,1.86]];
+   vn.forEach(([vx,vy],i)=>box(room,vx,vy,-2.33,.17,.17,.025,i%2?C.white:C.yellow));
+   box(room,-.3,1.2,.7,2.5,.14,1.2,0x6b4f35);
+   box(room,-1.45,.62,.7,.12,1.0,1.0,0x6b4f35);
+   box(room,.85,.62,.7,.12,1.0,1.0,0x6b4f35);
+   box(room,-.5,1.68,.3,1.3,.8,.4,C.black);
+   cyl(room,-.82,1.72,.53,.3,.08,C.floor,24,Math.PI/2);
+   cyl(room,-.18,1.72,.53,.3,.08,C.floor,24,Math.PI/2);
+   cyl(room,-.82,1.72,.58,.07,.1,C.black,12,Math.PI/2);
+   cyl(room,-.18,1.72,.58,.07,.1,C.black,12,Math.PI/2);
+   box(room,-.5,1.42,.53,.64,.035,.02,C.black);
+   cyl(room,.78,1.32,.32,.11,.06,C.black,16);
+   cyl(room,.78,1.56,.32,.035,.45,C.black,8);
+   cyl(room,.78,1.85,.32,.2,.24,C.white,16);
+   cyl(room,.78,1.76,.32,.06,.08,glowMat(C.white,1),12);
+   box(room,-1.28,1.4,.85,.12,.2,.25,C.black);
+   box(room,-1.0,1.4,.85,.12,.2,.25,C.black);
+   box(room,-1.14,1.52,.85,.4,.06,.25,C.black);
+   box(room,.72,1.33,.95,.3,.1,.4,C.black);
+   box(room,.72,1.43,.95,.34,.08,.16,C.black);
+  }else{
+   // Kapı: everything cardboard, signal panel, rule-book lectern, barrier post.
+   roomLight.color.setHex(0xffe0b8);roomLight.intensity=8;
+   for(let i=0;i<3;i++)box(room,-1.36+i*1.36,1.05,-2.335,1.32,1.8,.05,C.tan);
+   box(room,-.68,1.05,-2.3,.12,1.8,.02,C.white);
+   box(room,.68,1.05,-2.3,.12,1.8,.02,C.white);
+   box(room,-2.02,1.05,-1.2,.05,1.8,1.3,C.tan);
+   box(room,-2.02,1.05,.2,.05,1.8,1.3,C.tan);
+   box(room,-1.99,1.05,-.5,.02,1.8,.12,C.white);
+   box(room,2.02,1.05,-1.5,.05,1.8,1.4,C.tan);
+   box(room,1.99,1.05,-1.5,.02,1.8,.12,C.white);
+   box(room,-.3,.64,.7,2.2,.96,1.0,C.tan);
+   box(room,-.3,1.13,.7,.14,.02,1.0,C.white);
+   cyl(room,.45,1.2,.5,.12,.1,C.tan,16);
+   cyl(room,.45,1.24,.5,.05,.11,C.black,12);
+   box(room,1.2,2.15,-2.3,.5,1.1,.12,C.black);
+   cyl(room,1.2,2.42,-2.22,.13,.07,C.red,16,Math.PI/2);
+   cyl(room,1.2,2.15,-2.22,.13,.07,C.yellow,16,Math.PI/2);
+   cyl(room,1.2,1.88,-2.22,.13,.07,glowMat(C.green,1.2),16,Math.PI/2);
+   box(room,1.0,.66,1.6,.34,1.0,.34,C.tan);
+   box(room,1.0,1.2,1.6,.95,.08,.7,C.tan);
+   box(room,.76,1.27,1.6,.44,.05,.6,C.white);
+   box(room,1.24,1.27,1.6,.44,.05,.6,C.white);
+   box(room,1.0,1.26,1.6,.06,.06,.6,C.red);
+   cyl(room,-1.9,.22,2.2,.16,.12,C.black,12);
+   for(let k=0;k<6;k++)cyl(room,-1.9,.37+k*.18,2.2,.09,.17,k%2?C.white:C.red,12);
+  }
+  box(room,-.65,.5,-.85,.85,.13,.85,CH);box(room,-.65,.32,-.85,.12,.35,.12,CH);box(room,-.65,.93,-1.25,.85,.8,.12,CH);
+  label(room,String(floor*5+n+1).padStart(2,'0'),-.8,2.45,-2.39,1.4,.85,'#faf4df','#617c87');
+ }else{
+  box(room,.1,1.2,.7,2.8,.14,1.25,0xc6ac83);for(const xx of [-1.1,1.3])for(const zz of [.22,1.15])box(room,xx,.68,zz,.1,1.05,.1,0x58636c);
+  box(room,.65,1.66,.6,.85,.6,.09,C.black);box(room,.65,1.68,.545,.75,.47,.015,name==='Ada'?0x123e3d:0x3b5668);box(room,.65,1.34,.6,.08,.24,.1,C.black);box(room,.65,1.28,.7,.4,.045,.3,C.black);
+  for(let k=0;k<4;k++)box(room,.65,1.8-k*.08,.53,.52-k*.08,.015,.012,name==='Ada'?0x67dba9:0xa7c5cb);
+  box(room,.55,1.3,.25,.65,.04,.23,0xe1e4e0);sheet(room,-.65,1.3,1.0,.5,.55);cyl(room,-1,1.4,.45,.09,.24,C.white,16);
+  box(room,1.65,1.45,-1.5,.5,2.7,1.55,0xc6ad7e);for(let lev=0;lev<3;lev++){box(room,1.32,.6+lev*.8,-1.5,.22,.08,1.5,0xf0d4a1);for(let b=0;b<5;b++)box(room,1.3,.87+lev*.8,-2.05+b*.25,.25,.48,.15,[C.blue,C.yellow,C.red,C.teal,C.white][(b+lev)%5]);}
+  box(room,-.65,.5,-.85,.85,.13,.85,C.black);box(room,-.65,.32,-.85,.12,.35,.12,C.black);box(room,-.65,.93,-1.25,.85,.8,.12,C.black);
+  plant(room,-1.65,.22,1.9);label(room,name==='Iris'?'✦':String(floor*5+n+1).padStart(2,'0'),-.8,2.45,-2.39,1.4,.85,'#faf4df','#617c87');
+  if(name==='Iris'){for(let i=0;i<3;i++)label(room,['ART','COLOR','FORM'][i],-.9+i*.85,2.5,-2.38,.7,.9,['#ffc839','#fa9cb4','#6bb5c0'][i],'#ffffff');}
+ }
  // Balcony: deep enough to walk past an open door; the stair landing opens onto its full depth.
  if(floor===1){const edge=2.65+BALCONY_DEPTH-.1;box(room,0,.2,2.65+BALCONY_DEPTH/2,4.35,.18,BALCONY_DEPTH,0xa8b2b6,true);for(const xx of [-2,-1,0,1,2])box(room,xx,.85,edge,.06,1.2,.06,C.black);for(const y of [1.45,.73])box(room,0,y,edge,4.3,y>1?.09:.055,y>1?.1:.06,C.black);
   const ends=n===4?[[2.15,2.65]]:[];for(const [xx,from] of ends){const mid=(from+edge)/2,len=edge-from;box(room,xx,.85,mid,.06,1.2,.06,C.black);for(const y of [1.45,.73])box(room,xx,y,mid,.1,y>1?.09:.055,len,C.black);}}
