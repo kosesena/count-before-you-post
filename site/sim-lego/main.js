@@ -1,5 +1,5 @@
 import {openConversation} from './conversation.js?v=bilingual-1';
-import {buildReceivingScene} from './receiving-scene.js?v=waste-1';
+import {buildReceivingScene} from './receiving-scene.js?v=rooms-2';
 import {receivingSteps,initialDestination,reviewPolicy,canAccept,locationMatches,atRouteStart,reviewRoute} from './receiving.mjs?v=order-1';
 import {participants,names,replayLines,english} from './replay.mjs?v=chat-3';
 import * as T from 'three';
@@ -53,7 +53,7 @@ function halo(root,x,y,z,s=1){const h=new T.Sprite(haloMat);h.position.set(x,y,z
 const poolTex=(()=>{const c=document.createElement('canvas');c.width=c.height=256;const g=c.getContext('2d'),r=g.createRadialGradient(128,128,0,128,128,128);r.addColorStop(0,'rgba(255,255,255,.42)');r.addColorStop(.4,'rgba(255,255,255,.18)');r.addColorStop(.75,'rgba(255,255,255,.05)');r.addColorStop(1,'rgba(255,255,255,0)');g.fillStyle=r;g.fillRect(0,0,256,256);const t=new T.CanvasTexture(c);t.colorSpace=T.SRGBColorSpace;return t;})();
 const poolMat=new T.MeshBasicMaterial({map:poolTex,transparent:true,opacity:.7,blending:T.AdditiveBlending,depthWrite:false,toneMapped:false});
 const poolGeo=new T.PlaneGeometry(6.5,6.5);
-function geom(type,w=1,h=1,d=1){const key=[type,w,h,d].join(':');if(!geoCache.has(key)){let g;if(type==='box')g=new RoundedBoxGeometry(w,h,d,1,Math.min(.035,w*.1,h*.1,d*.1));else if(type==='cyl')g=new T.CylinderGeometry(w,w,h,d);else if(type==='sphere')g=new T.SphereGeometry(w,12,8);else if(type==='torus')g=new T.TorusGeometry(w,h,8,d);geoCache.set(key,g);}return geoCache.get(key);}
+function geom(type,w=1,h=1,d=1){const key=[type,w,h,d].join(':');if(!geoCache.has(key)){let g;if(type==='box')g=new RoundedBoxGeometry(w,h,d,1,Math.min(.035,w*.1,h*.1,d*.1));else if(type==='dome')g=new T.SphereGeometry(.16,32,12,0,Math.PI*2,0,Math.PI/2);else if(type==='cyl')g=new T.CylinderGeometry(w,w,h,d);else if(type==='sphere')g=new T.SphereGeometry(w,12,8);else if(type==='torus')g=new T.TorusGeometry(w,h,8,d);geoCache.set(key,g);}return geoCache.get(key);}
 // Static meshes are instanced by geometry and material: thousands of physical studs, few draw calls.
 const temp = new T.Object3D();
 function piece(root,g,m,x,y,z,rx=0,ry=0,rz=0){let groups=batches.get(root);if(!groups){groups=new Map();batches.set(root,groups);}const key=g.uuid+m.uuid;let b=groups.get(key);if(!b){b={g,m,transforms:[]};groups.set(key,b);}temp.position.set(x,y,z);temp.rotation.set(rx,ry,rz);temp.scale.set(1,1,1);temp.updateMatrix();b.transforms.push(temp.matrix.clone());}
@@ -159,7 +159,8 @@ function person(parent,x,y,z,color,hair=0x39271e,hat=false,scale=1,ry=0){const g
 const OFFICE_WALL_SHIFT = -.20; // Back face -16.825 matches the wall inner face.
 const offices=group(scene,OFFICE_WALL_SHIFT);
 const BALCONY_DEPTH=1.8;
-const roomDefs=[['Spark',C.orange,0xd95c16],['Şef',C.blue,0x26231d],['Sam',0x369ce5,0x42352b],['Voice',0x2b62ca,0x252521],['Kapı',0x26589c,0x43302a],['Iris',C.pink,0xa91c81],['Ada',C.teal,0x171b20],['Glimmer',C.purple,0xc4a3df],['Wonder',0xe7b82a,0x784322],['Rover',0x287a6d,0x994422]];
+// Kapı's room is cardboard and Voice's deep navy, so four blue rooms no longer sit side by side (Sena, 1 Nov).
+const roomDefs=[['Spark',C.orange,0xd95c16],['Şef',C.blue,0x26231d],['Sam',0x369ce5,0x42352b],['Voice',C.navy,0x252521],['Kapı',0xb98a52,0x43302a],['Iris',C.pink,0xa91c81],['Ada',C.teal,0x171b20],['Glimmer',C.purple,0xc4a3df],['Wonder',0xe7b82a,0x784322],['Rover',0x287a6d,0x994422]];
 await stage('Preparing the crew…');
 // Soft emissive plastic for small lit bits (lamp bulbs, Kapı's green lamp); no new lights.
 function glowMat(color,intensity=1.1){const m=new T.MeshStandardMaterial({color,emissive:color,emissiveIntensity:intensity,roughness:.4});m.toneMapped=false;return m;}
@@ -176,6 +177,9 @@ for(let floor=0;floor<2;floor++)for(let n=0;n<5;n++){
  // Light tiled floors stay everywhere; the five ground-floor rooms get their own concepts.
  for(let xx=-1.8;xx<2;xx+=.6)for(let zz=-2;zz<2.4;zz+=.6)box(room,xx,.155,zz,.585,.04,.585,floor?0xdacdb3:0xe7e5dc,true);
  if(floor===0){
+  // A flowering pot in the back-right corner of every ground-floor room, beside the desk and in no one's line of sight (Sena, 1 Nov).
+  {const px=1.72,pz=-1.95;plant(room,px,.22,pz);
+   for(const [fx,fz,fc] of [[.1,.06,C.pink],[-.09,.08,C.yellow],[.02,-.1,C.white],[-.07,-.05,C.pink],[.11,-.07,C.yellow]]){cyl(room,px+fx,1.02+fx*.4,pz+fz,.065,.05,fc,12);cyl(room,px+fx,1.05+fx*.4,pz+fz,.025,.02,C.orange,8);}}
   // Chair and number label stay in place; the chair takes the room's accent colour.
   const CH=name==='Spark'?C.orange:name==='Kapı'?C.tan:C.black;
   if(name==='Spark'){
@@ -194,11 +198,15 @@ for(let floor=0;floor<2;floor++)for(let n=0;n<5;n++){
    box(room,.75,.62,.7,.7,1.0,1.0,C.tan);
    box(room,.75,.82,.19,.5,.3,.03,C.tan);box(room,.75,.42,.19,.5,.3,.03,C.tan);
    cyl(room,.75,.82,.22,.035,.05,C.black,8,Math.PI/2);cyl(room,.75,.42,.22,.035,.05,C.black,8,Math.PI/2);
-   cyl(room,-1.15,1.32,.25,.12,.06,C.black,16);
-   cyl(room,-1.12,1.58,.28,.035,.55,C.black,8,.25,0,-.3);
-   cyl(room,-.98,1.86,.3,.035,.5,C.black,8,.2,0,-.9);
-   cyl(room,-.78,1.92,.32,.11,.2,C.black,12,0,0,1.1);
-   cyl(room,-.7,1.86,.33,.05,.06,glowMat(C.white,1),12);
+   // A cordless touch lamp like the ones on restaurant tables, at the desk's left end, clear of
+   // Spark's face (by hand, Sena 1 Nov): round base with a touch ring, slim brass stem, an opal
+   // mushroom dome that glows softly, and the warm light under its rim.
+   {const lx=-1.3,lz=.3,top=1.27,brass=0xb8955a,opal=glowMat(0xfff1dc,.55);
+    cyl(room,lx,top+.015,lz,.11,.03,brass,32);cyl(room,lx,top+.032,lz,.075,.006,0xe9dcc0,32);
+    cyl(room,lx,top+.22,lz,.016,.36,brass,12);
+    cyl(room,lx,top+.405,lz,.03,.03,brass,16);
+    piece(room,geom('dome',1,1,1),opal,lx,top+.41,lz);
+    cyl(room,lx,top+.405,lz,.15,.006,glowMat(0xffe6bf,1.3),32);}
    cyl(room,.35,1.31,.98,.03,.3,C.tan,8,Math.PI/2);
    cyl(room,.35,1.31,.68,.13,.035,C.white,16);
    box(room,-.55,1.29,.95,.5,.03,.65,C.tan);
@@ -245,16 +253,17 @@ for(let floor=0;floor<2;floor++)for(let n=0;n<5;n++){
    box(room,-.3,1.2,.7,2.5,.14,1.2,C.white);
    box(room,-1.45,.62,.7,.12,1.0,1.0,C.white);
    box(room,.85,.62,.7,.12,1.0,1.0,C.white);
-   cyl(room,-1.37,1.03,1.5,.035,1.85,C.black,8,0,0,.2);
-   cyl(room,-1.7,1.03,1.62,.035,1.85,C.black,8,-.15,0,-.17);
-   cyl(room,-1.7,1.03,1.38,.035,1.85,C.black,8,.15,0,-.17);
-   cyl(room,-1.55,1.92,1.5,.09,.14,C.black,12);
-   box(room,-1.45,2.06,1.42,.34,.24,.4,C.black);
-   cyl(room,-1.24,2.02,1.3,.09,.3,C.black,16,0,0,Math.PI/2-.25);
-   box(room,-.5,1.31,.75,.7,.05,.5,C.tan);
-   box(room,-.62,1.5,.75,.28,.3,.4,C.tan);
-   box(room,-.32,1.5,.75,.28,.3,.4,C.tan);
-   box(room,-.47,1.8,.75,.28,.3,.4,C.tan);
+   // Tripod in the back-left corner and the mini pallet beside Sam, so nothing stands in front of the face (Sena, 1 Nov).
+   cyl(room,-1.72,1.03,-1.2,.035,1.85,C.black,8,0,0,.2);
+   cyl(room,-2.05,1.03,-1.08,.035,1.85,C.black,8,-.15,0,-.17);
+   cyl(room,-2.05,1.03,-1.32,.035,1.85,C.black,8,.15,0,-.17);
+   cyl(room,-1.9,1.92,-1.2,.09,.14,C.black,12);
+   box(room,-1.8,2.06,-1.2,.34,.24,.4,C.black);
+   cyl(room,-1.59,2.02,-1.2,.09,.3,C.black,16,0,0,Math.PI/2-.25);
+   box(room,.05,1.31,.75,.7,.05,.5,C.tan);
+   box(room,-.07,1.5,.75,.28,.3,.4,C.tan);
+   box(room,.23,1.5,.75,.28,.3,.4,C.tan);
+   box(room,.08,1.8,.75,.28,.3,.4,C.tan);
    box(room,.6,1.3,.35,.6,.06,.2,C.black);
    box(room,.6,1.56,.35,.6,.45,.14,C.black);
    box(room,.45,1.58,.43,.2,.28,.02,C.white);
@@ -274,16 +283,22 @@ for(let floor=0;floor<2;floor++)for(let n=0;n<5;n++){
    box(room,-.3,1.2,.7,2.5,.14,1.2,0x6b4f35);
    box(room,-1.45,.62,.7,.12,1.0,1.0,0x6b4f35);
    box(room,.85,.62,.7,.12,1.0,1.0,0x6b4f35);
-   box(room,-.5,1.68,.3,1.3,.8,.4,C.black);
-   cyl(room,-.82,1.72,.53,.3,.08,C.floor,24,Math.PI/2);
-   cyl(room,-.18,1.72,.53,.3,.08,C.floor,24,Math.PI/2);
-   cyl(room,-.82,1.72,.58,.07,.1,C.black,12,Math.PI/2);
-   cyl(room,-.18,1.72,.58,.07,.1,C.black,12,Math.PI/2);
-   box(room,-.5,1.42,.53,.64,.035,.02,C.black);
-   cyl(room,.78,1.32,.32,.11,.06,C.black,16);
-   cyl(room,.78,1.56,.32,.035,.45,C.black,8);
-   cyl(room,.78,1.85,.32,.2,.24,C.white,16);
-   cyl(room,.78,1.76,.32,.06,.08,glowMat(C.white,1),12);
+   // The big reel-to-reel stands on the floor at the front of the room, a portable speaker sits
+   // on the desk, and the lamp is at the desk's left, so Voice's face stays clear (Sena, 1 Nov).
+   {const rx=-1.35,ry=.16,rz=1.95;
+    box(room,rx,ry+.06,rz,1.0,.12,.42,0x2a2d31);                       // low plinth
+    box(room,rx,ry+.52,rz,1.0,.8,.4,C.black);
+    for(const dx of [-.25,.25]){cyl(room,rx+dx,ry+.6,rz+.23,.24,.08,C.floor,24,Math.PI/2);cyl(room,rx+dx,ry+.6,rz+.28,.07,.1,C.black,12,Math.PI/2);}
+    box(room,rx,ry+.25,rz+.23,.5,.035,.02,C.black);}
+   {const sx=.45,sy=1.27,sz=.45;                                       // portable cylinder speaker
+    cyl(room,sx,sy+.11,sz,.11,.46,0x1f2124,24,0,0,Math.PI/2);
+    for(const e of [-1,1])cyl(room,sx+e*.235,sy+.11,sz,.095,.02,0x3a3d42,24,0,0,Math.PI/2);
+    box(room,sx,sy+.11,sz+.105,.09,.045,.012,C.orange);
+    box(room,sx,sy+.005,sz,.3,.01,.12,0x2a2d31);}
+   cyl(room,-1.42,1.32,.32,.11,.06,C.black,16);
+   cyl(room,-1.42,1.56,.32,.035,.45,C.black,8);
+   cyl(room,-1.42,1.85,.32,.2,.24,C.white,16);
+   cyl(room,-1.42,1.76,.32,.06,.08,glowMat(C.white,1),12);
    box(room,-1.28,1.4,.85,.12,.2,.25,C.black);
    box(room,-1.0,1.4,.85,.12,.2,.25,C.black);
    box(room,-1.14,1.52,.85,.4,.06,.25,C.black);
@@ -413,35 +428,18 @@ cyl(meeting,0,.4,0,1,.27,C.black,48);for(let i=0;i<7;i++)cyl(meeting,0,.57+i*.19
 for(let x=-2.4;x<=2.4;x+=.6){const len=Math.sqrt(2.48**2-x*x)*2;box(meeting,x,2.077,0,.012,.003,len,0xb96c2b);box(meeting,0,2.078,x,len,.003,.012,0xb96c2b);}
 const stools=Array.from({length:5},(_,i)=>{const a=Math.PI+i*Math.PI*2/5;return [Math.cos(a)*3.15,Math.sin(a)*3.15,[C.yellow,C.blue,C.teal,C.orange,0x9853bf][i]];});
 for(const [x,z,c] of stools){cyl(meeting,x,.36,z,.5,.15,c,40);for(let i=0;i<5;i++)cyl(meeting,x,.5+i*.19,z,.105,.18,C.black,20);ring(meeting,x,.58,z,.34,.055,C.black);cyl(meeting,x,1.45,z,.51,.21,c,48);cyl(meeting,x,1.565,z,.46,.035,c,48);for(let i=0;i<4;i++){const a=i*Math.PI/2;cyl(meeting,x+Math.cos(a)*.32,1.6,z+Math.sin(a)*.32,.065,.045,c,12);}}
-// Briefing set: a place setting per stool, the delivery model in the middle, note and status in reach.
+// Briefing set, kept calm (Sena, 1 Nov): a real-sized mug at each stool and the delivery model in the middle.
 const tableTopY=2.08;
-for(const [sx,sz,c] of stools){const L=Math.hypot(sx,sz),dx=sx/L,dz=sz/L,tx=-dz,tz=dx;
- cyl(meeting,dx*2.0,tableTopY+.07,dz*2.0,.07,.14,c,16);
- cyl(meeting,dx*2.0,tableTopY+.141,dz*2.0,.055,.012,0x3d2b1f,12);
- box(meeting,dx*2.0+tx*.085,tableTopY+.07,dz*2.0+tz*.085,.05,.08,.05,c);
- const g0=group(meeting,dx*1.65,tableTopY,dz*1.65,Math.atan2(dx,dz));
- for(const s of [-1,1]){const g=group(g0,0,0,0);g.rotation.x=-s*.32;
-  box(g,0,.07,s*.05,.3,.17,.015,C.white);box(g,0,.085,s*.06,.3,.045,.008,c);}}
+for(const [sx,sz,c] of stools){const L=Math.hypot(sx,sz),dx=sx/L,dz=sz/L,tx=-dz,tz=dx,mx=dx*1.85,mz=dz*1.85;
+ cyl(meeting,mx,tableTopY+.012,mz,.115,.024,0xe9e6dc,32);                 // foot ring
+ cyl(meeting,mx,tableTopY+.15,mz,.13,.26,c,32);                           // body in the stool's colour
+ cyl(meeting,mx,tableTopY+.282,mz,.13,.012,0xf4f1e8,32);                  // glazed rim
+ cyl(meeting,mx,tableTopY+.262,mz,.112,.012,0x3d2414,32);                 // coffee, a little below the rim
+ piece(meeting,geom('torus',.065,.02,32),mat(c),mx+tx*.17,tableTopY+.16,mz+tz*.17,0,Math.atan2(-tz,tx),0);}   // handle
 for(let i=-1;i<=1;i++)box(meeting,i*.3,tableTopY+.0175,0,.1,.035,.7,0xa97b45);
 box(meeting,0,tableTopY+.0525,0,.9,.035,.7,0xbd965f);
 for(let ix=0;ix<3;ix++)for(let iz=0;iz<4;iz++){const cx=(ix-1)*.28,cz=(iz-1.5)*.165;
  box(meeting,cx,tableTopY+.15,cz,.26,.16,.15,C.tan);box(meeting,cx,tableTopY+.232,cz,.07,.008,.15,0xc5a06d);}
-const cb=group(meeting,-1.0,tableTopY,.75,.35);
-box(cb,0,.015,0,.5,.03,.65,0x6b4f35);sheet(cb,0,.038,0,.42,.55);box(cb,0,.062,-.26,.16,.028,.08,C.black);
-const tabScr=glowMat(0x24404d,.5);
-box(meeting,.95,tableTopY+.03,.37,.34,.06,.12,C.black);
-const tb=group(meeting,.95,tableTopY,.45);tb.rotation.x=-.3;
-box(tb,0,.15,0,.42,.3,.03,C.black);box(tb,0,.15,.018,.36,.24,.008,tabScr);
-for(let k=0;k<3;k++)box(tb,(k-1)*.11,.21,.024,.07,.05,.006,glowMat([C.green,C.orange,C.red][k],1.1));
-box(tb,0,.1,.024,.24,.03,.006,0x9fb6bf);box(tb,0,.045,.024,.16,.03,.006,0x9fb6bf);
-cyl(meeting,0,tableTopY+.03,-1.0,.26,.06,C.black,3,0,.5,0);
-for(let k=0;k<3;k++){const a=k*Math.PI*2/3+.5;cyl(meeting,Math.cos(a)*.12,tableTopY+.062,-1.0+Math.sin(a)*.12,.022,.012,0x81888b,8);}
-cyl(meeting,0,tableTopY+.062,-1.0,.025,.014,glowMat(C.green,1.2),8);
-cyl(meeting,-.95,tableTopY+.08,-.75,.11,.16,C.blue,16);
-for(let k=0;k<3;k++){const a=k*2.1+.4;cyl(meeting,-.95+Math.cos(a)*.04,tableTopY+.19,-.75+Math.sin(a)*.04,.018,.2,[C.red,C.yellow,C.green][k],8,Math.cos(a)*.18,0,Math.sin(a)*.18);}
-const s1=group(meeting,.05,tableTopY,1.05,-.3);sheet(s1,0,.02,0,.55,.7);
-const s2=group(meeting,.55,tableTopY,-1.55,.5);sheet(s2,0,.02,0,.55,.7);
-for(const [qx,qz,qr,qc] of [[1.35,.1,.3,C.yellow],[-1.35,-.5,-.25,C.pink],[-.35,-.75,.15,C.green]]){const g=group(meeting,qx,tableTopY,qz,qr);box(g,0,.008,0,.14,.016,.14,qc);}
 flush(meeting);
 await stage('Parking the vehicles…');
 function wheel(parent,x,y,z,r=.55){
