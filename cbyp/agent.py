@@ -14,6 +14,7 @@ quantity the supervisor approved, never a "block".
 """
 import json
 from dataclasses import dataclass, field
+from datetime import datetime
 from pathlib import Path
 
 from .crosscheck import cross_check
@@ -82,6 +83,10 @@ class Session:
     # matches it against the note and the count. The agent never sees or sets it.
     order: dict | None = None
 
+    def log(self, entry):
+        """One step on the trace, stamped with the local wall-clock time it was recorded."""
+        self.trace.append({**entry, "at": datetime.now().astimezone().isoformat(timespec="seconds")})
+
     def read_delivery_note(self):
         self.note = read_note(self.note_path)["claim"]
         return self.note
@@ -146,7 +151,7 @@ class Session:
             self.opinions["second"] = self.second_reader(self.note_path)
         if "audit" not in self.opinions and self.auditor:
             self.opinions["audit"] = self.auditor(self.note_path, self.note)
-        self.trace.append({"second_opinions": self.opinions})
+        self.log({"second_opinions": self.opinions})
         return self.opinions
 
     def _signed_off(self, d, quantity):
@@ -174,7 +179,7 @@ class Session:
         points = point_cartons(self.camera_path)
         probes = segments(segment_points(self.camera_path, points))
         result = cross_check(self.concept, points, probes)
-        self.trace.append({"gate_cross_check": {
+        self.log({"gate_cross_check": {
             "agreed": len(result.agreed), "sam_only": len(result.sam_only),
             "spark_only": len(result.spark_only), "doubled": len(result.doubled)}})
         return result
@@ -239,7 +244,7 @@ def resume(session, signoff, max_steps=8, api=None):
     session.signoff = signoff
     verdict = (f"approved a receipt of {signoff['quantity']} cartons" if signoff.get("approve")
                else "rejected the receipt")
-    session.trace.append({"signoff": signoff})
+    session.log({"signoff": signoff})
     resp = api.responses.create(
         model=SPARK, instructions=INSTRUCTIONS, tools=TOOLS, reasoning=REASONING,
         max_output_tokens=16000,
@@ -253,14 +258,14 @@ def resume(session, signoff, max_steps=8, api=None):
 def _loop(session, resp, api, max_steps, wait):
     for _ in range(max_steps):
         for t in _thoughts(resp):
-            session.trace.append({"thinking": t})
+            session.log({"thinking": t})
         calls = [o for o in resp.output if o.type == "function_call"]
         if not calls:
             return resp.output_text
         outputs = []
         for c in calls:
             result = session.call(c.name, c.arguments)
-            session.trace.append({"tool": c.name, "args": c.arguments, "result": result})
+            session.log({"tool": c.name, "args": c.arguments, "result": result})
             outputs.append({"type": "function_call_output", "call_id": c.call_id,
                             "output": json.dumps(result, ensure_ascii=False)})
         if wait and session.escalated and not session.posted:

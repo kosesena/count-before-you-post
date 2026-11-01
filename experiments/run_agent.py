@@ -1,9 +1,11 @@
 """Run the Spark receiving agent on the dock cases, with and without the gate.
 
-Usage: .venv/bin/python experiments/run_agent.py [--no-gate | --second] [variant ...]
+Usage: .venv/bin/python experiments/run_agent.py [--no-gate | --second | --dry-run]
+       [--out DIR] [variant ...]
 Gated runs write to the real ERPNext (only a gate-approved receipt can be written).
 Ungated runs record what the agent would have written, without touching the ERP.
-Appends to experiments/results/agent_warehouse_cross.json.
+--dry-run: gated, but the approved receipt is not written (no document number).
+Appends to experiments/results/agent_warehouse_cross.json, or to DIR/ with --out.
 --second: gated, and before any post Spark Open (second_reader) reads the note again and Wonder
 audits Spark's reading; appends to agent_second_opinions.json, note numbers AGENT-2nd-<case>.
 """
@@ -21,8 +23,12 @@ HERE = Path(__file__).parent
 sys.path.insert(0, str(HERE))
 from paths import LANG, OUT, RAW, RES  # noqa: E402
 SECOND = "--second" in sys.argv[1:]
+DRY = "--dry-run" in sys.argv[1:]
+_out = sys.argv.index("--out") + 1 if "--out" in sys.argv else None
 # with the cross-check and reasoning summaries; --second: with the two second opinions too
-RESULTS = RES / ("agent_second_opinions.json" if SECOND else "agent_warehouse_cross.json")
+RESULTS = (Path(sys.argv[_out]) if _out else RES) / (
+    "agent_second_opinions.json" if SECOND else "agent_warehouse_cross.json")
+RESULTS.parent.mkdir(parents=True, exist_ok=True)
 
 
 def erp_writer(variant):
@@ -49,13 +55,13 @@ def opinions():
 
 def main(args):
     gate = "--no-gate" not in args
-    variants = [a for a in args if not a.startswith("--")]
+    variants = [a for i, a in enumerate(args) if not a.startswith("--") and i + 1 != _out]
     truth = json.loads((OUT / "depo-truth.json").read_text())
     rows = json.loads(RESULTS.read_text()) if RESULTS.exists() else []
     for v in variants or list(truth):
         for attempt in range(3):
             s = Session(OUT / f"depo-{v}-irsaliye.png", OUT / f"depo-{v}-kamera.png", gate=gate,
-                        writer=erp_writer(v) if gate else None, order=order_for(LANG),
+                        writer=erp_writer(v) if gate and not DRY else None, order=order_for(LANG),
                         **opinions())
             start = time.perf_counter()
             try:
@@ -64,7 +70,7 @@ def main(args):
             except Exception as e:  # e.g. the previous response expired on a slow link
                 print(f"{v}: attempt {attempt + 1} failed: {e}", flush=True)
                 # Never retry after a real receipt was written: that would post it twice.
-                if s.posted or attempt == 2:
+                if any(doc for _, doc in s.posted) or attempt == 2:
                     raise
         row = {"variant": v, "gate": gate, "expected": truth[v]["expected_decision"],
                "posted": s.posted, "refused": s.refused, "escalated": s.escalated,
