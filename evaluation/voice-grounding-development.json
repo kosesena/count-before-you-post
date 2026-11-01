@@ -1,0 +1,102 @@
+{
+  "context": "Development checks on known/authored text, not fresh audio or held-out accuracy. Original failed run retained.",
+  "rows": [
+    {
+      "case": "recorded_ambiguous",
+      "input": [
+        {
+          "speaker": "A",
+          "transcript": "On iki kolay çiçek yağı, doğan gıda."
+        },
+        {
+          "speaker": "B",
+          "transcript": "Saydım, on iki. iki. Tamam."
+        }
+      ],
+      "output": {
+        "count_candidates": [
+          12,
+          2
+        ],
+        "driver_quantity": 12,
+        "receiver": {
+          "certain": false,
+          "product": "",
+          "quantity": 12,
+          "supplier": "",
+          "unit": ""
+        },
+        "receiver_speaker": "B",
+        "receiver_turn": "Saydım, on iki. iki. Tamam.",
+        "voice_validation": {
+          "source_turn_matched": true,
+          "single_supported_count": false
+        }
+      }
+    },
+    {
+      "case": "clean_authored",
+      "input": [
+        {
+          "speaker": "A",
+          "transcript": "On iki koli getirdim."
+        },
+        {
+          "speaker": "B",
+          "transcript": "Kendim saydım, on iki koli var."
+        }
+      ],
+      "output": {
+        "count_candidates": [
+          12
+        ],
+        "driver_quantity": 12,
+        "receiver": {
+          "certain": true,
+          "product": "",
+          "quantity": 12,
+          "supplier": "",
+          "unit": "koli"
+        },
+        "receiver_speaker": "B",
+        "receiver_turn": "Kendim saydım, on iki koli var.",
+        "voice_validation": {
+          "source_turn_matched": true,
+          "single_supported_count": true
+        }
+      }
+    },
+    {
+      "case": "explicit_correction_authored",
+      "input": [
+        {
+          "speaker": "A",
+          "transcript": "On iki koli getirdim."
+        },
+        {
+          "speaker": "B",
+          "transcript": "On iki sandım, tekrar saydım, düzeltiyorum: on bir koli var."
+        }
+      ],
+      "output": {
+        "count_candidates": [
+          11
+        ],
+        "driver_quantity": 12,
+        "receiver": {
+          "certain": true,
+          "product": "",
+          "quantity": 11,
+          "supplier": "",
+          "unit": "koli"
+        },
+        "receiver_speaker": "B",
+        "receiver_turn": "On iki sandım, tekrar saydım, düzeltiyorum: on bir koli var.",
+        "voice_validation": {
+          "source_turn_matched": true,
+          "single_supported_count": true
+        }
+      }
+    }
+  ]
+}

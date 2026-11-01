@@ -98,3 +98,18 @@ integration, **not** successful automatic acceptance or real-world accuracy. Sec
 checks were not reached because the earlier receiver check already held the delivery.
 No retry was used to replace this unfavorable result. The complete local trace is at
 `.local-verification/synthetic-full-smoke.json` (ignored, not published).
+
+## Follow-up: grounded voice interpretation — 1 Nov 2026
+
+The first smoke test's ASR text was “Saydım, on iki. iki. Tamam.”. The interpretation now
+reports all plausible final counts and quotes the complete supporting receiver turn.
+Code verifies that the quote belongs to that speaker and requires one supported count
+before preserving certainty. Repetition alone is not treated as an explicit correction.
+The full workflow report retains this interpretation alongside the original speaker turns.
+
+Three development-only text checks used real Spark calls: the recorded ambiguous text
+returned candidates [12, 2] and uncertain; a clean authored statement returned 12 and certain;
+an authored explicit recount/correction returned 11 and certain. These are known/authored
+transcripts, not fresh ASR, a held-out set, or evidence that transcription accuracy improved.
+Candidate extraction and role assignment are still model judgments. The original failed
+smoke test remains intact. Results: `evaluation/voice-grounding-development.json`.

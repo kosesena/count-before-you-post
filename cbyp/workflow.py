@@ -54,7 +54,7 @@ def verify(note, camera, audio, order, language="Turkish", progress=None):
     return {"mode": "dry_run", "erp_written": False, "result": result,
             "decision": asdict(s.last_decision) if s.last_decision else None,
             "note": s.note, "camera": s.look, "receiver": s.spoken,
-            "speaker_turns": spoken_turns, "second_opinions": s.opinions,
+            "speaker_turns": spoken_turns, "speech_interpretation": speech, "second_opinions": s.opinions,
             "trace": s.trace, "timings": timings,
             "seconds": round(time.perf_counter()-started, 3),
             "total_cost_usd": None, "cost_status": "Not measured: provider-wide billing required; not agent-token cost.",
