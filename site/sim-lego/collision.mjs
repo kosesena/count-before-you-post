@@ -20,7 +20,7 @@ export const stairApproach=[[-9.6,.18,9.4],[-9.6,.18,11.8]];
 export const stairAscent=[[-9.6,.18,11.8],[-9.6,2.24,14.4],[-9.6,2.24,14.8],[-11.2,2.24,14.8],[-11.2,2.24,14.4],[-11.2,4.3,11.8],[-11.2,4.3,10.65]];
 export const solids=[
  // Receiving furniture and waste stations.
- rectangle(4,7,.08,4),rectangle(-5,-4,1.4,.6),rectangle(-5,-.8,1.4,.6),rectangle(-7.1,1.1,.4,.4),rectangle(-5.8,1.1,.4,.4),
+ rectangle(4,7,.08,4),rectangle(-5,-4,1.4,.6),rectangle(-7.1,1.1,.4,.4),rectangle(-5.8,1.1,.4,.4),
  // Receiving partition: the only vehicle passage is the controlled gate.
  rectangle(-10.775,-7.3,.625,.12),rectangle(-3.325,-7.3,5.625,.12),rectangle(11.65,-7.3,5.35,.12),
  // Dedicated storage rack uprights; the ground slot remains accessible.
@@ -35,8 +35,8 @@ export const solids=[
  rectangle(21,-5.55,4,.12),rectangle(21,-2.45,4,.12),rectangle(25.8,-4,1.9,1.8),
  rectangle(17.55,.65,.6,.06),
  rectangle(6.3,-7.3,.3,.3),rectangle(1.6,-7.4,.25,.25),
- rectangle(1.6,-5.5,.1,.1),rectangle(6.4,-5.5,.1,.1),rectangle(7,-5.9,.6,.16),
- ...[[-4,-10.5],[14,9],[13,-8]].map(([x,z])=>rectangle(x,z,1,.8)),
+ rectangle(1.6,-5.5,.1,.1),rectangle(6.4,-5.5,.1,.1),
+ ...[[-4,-10.5],[13,-8]].map(([x,z])=>rectangle(x,z,1,.8)),
  ...[[6,-7.5],[6,-3.5],[-8,10]].map(([x,z])=>rectangle(x,z,.25,.25)),
 ];
 const circles=[{x:-1,z:7,radius:4.35}];

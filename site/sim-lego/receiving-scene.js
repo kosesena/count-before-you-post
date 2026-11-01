@@ -24,8 +24,8 @@ export function buildReceivingScene({T,scene,group,box,cyl,label,twoSidedLabel,f
     flush(sign);return sign;
   }
   const floorTag=(text,x,z,w=3,color='#167c70')=>{const p=label(equipment,text,x,.24,z,w,.48,color,'#ffffff');p.rotation.x=-Math.PI/2;};
-  // Receiving desk, handheld scanner, printer, paperwork tray and recount bench.
-  for(const [x,z,w] of [[-5,-4,2.8],[-5,-.8,2.8]]){
+  // Receiving desk, handheld scanner, printer and paperwork tray.
+  for(const [x,z,w] of [[-5,-4,2.8]]){
     box(equipment,x,1.35,z,w,.18,1.2,C.tan);for(const dx of [-1.2,1.2])for(const dz of [-.45,.45])box(equipment,x+dx,.75,z+dz,.1,1.2,.1,C.black);
   }
   hangingSign(['RECEIVING','DOCUMENTS'],-5,-4.5,3.2,'#174c3b');
@@ -33,8 +33,8 @@ export function buildReceivingScene({T,scene,group,box,cyl,label,twoSidedLabel,f
   box(equipment,-4.4,1.7,-4,.8,.55,.6,C.white);box(equipment,-4.4,1.77,-3.68,.55,.07,.03,C.black);
   const printed=label(root,'PALLET / P-001',-4.4,1.56,-3.61,.65,.21,'#ffffff','#202326');
   const scanner=group(root,-5.3,1.55,-3.65);box(scanner,0,0,0,.15,.3,.15,C.black);box(scanner,0,.2,0,.32,.18,.3,C.teal);flush(scanner);
-  hangingSign(['RECOUNT','REPACK'],-5,-1.3,3.2,'#174c3b');
-  for(const x of [-5.8,-5.3])cyl(equipment,x,1.65,-.8,.15,.5,C.white,16);
+  // Recount and repack happen in H-01, so the sign hangs there (Sena, 1 Nov).
+  hangingSign(['RECOUNT · REPACK','H-01'],10,7,3.4,'#174c3b',5.2);
   // Waste stations by the receiving desk, in bricks (written by hand, Claude Code): a wheelie bin
   // for stretch film and a roll cage for flattened cardboard. Each stays inside its old 0.8 m footprint.
   const filmMat=new T.MeshStandardMaterial({color:0xf4f8ff,transparent:true,opacity:.55,roughness:.1,side:T.DoubleSide,depthWrite:false});
@@ -88,7 +88,7 @@ export function buildReceivingScene({T,scene,group,box,cyl,label,twoSidedLabel,f
   // remains red while the receiving team works; green is only shown after release.
   const bridge=group(root,17.5,.22,-4);box(bridge,0,0,0,1.25,.1,2.6,0x6b7c81);for(const z of [-1.2,1.2])box(bridge,0,.07,z,1.25,.025,.08,C.yellow);flush(bridge);bridge.visible=false;
   const chocks=group(root);for(const x of [19.8,20.4])box(chocks,x,-.8,-5.68,.35,.35,.42,C.yellow);flush(chocks);chocks.visible=false;
-  const signal=new T.Mesh(new T.SphereGeometry(.18,12,8),new T.MeshStandardMaterial({color:C.red,emissive:C.red,emissiveIntensity:1.5}));signal.position.set(17.8,2.8,-1.1);root.add(signal);
+  const signal=new T.Mesh(new T.SphereGeometry(.18,12,8),new T.MeshStandardMaterial({color:C.red,emissive:C.red,emissiveIntensity:1.5}));signal.position.set(17.8,2.8,-1.1);signal.visible=false;root.add(signal);
   hangingSign(['DRIVER','WAIT FOR RELEASE'],18.4,-.9,3.1,'#243238',4.3,6.05,Math.PI/2);
   // Marked driver refuge on the ground-level yard, separated from the apron.
   for(const z of [3,5.4])box(equipment,20.8,-1.04,z,3,.06,.08,C.green);

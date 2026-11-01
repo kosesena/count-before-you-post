@@ -1,4 +1,4 @@
-import {rectangle,overlaps,solids} from './collision.mjs?v=receiving-9';
+import {rectangle,overlaps,solids} from './collision.mjs?v=tidy-1';
 export const areas={arrival:{x:12.25,z:-4,hx:1.5,hz:1.3,y:.18,address:'B-01'},inspection:{x:4,z:-5.5,hx:2,hz:1.6,y:.18},accepted:{x:4,z:-12.4,hx:1.5,hz:1.4,y:.18,address:'A-01-L0'},hold:{x:10,z:7,hx:1.5,hz:1.4,y:.18,address:'H-01'},returned:{x:10,z:12,hx:1.5,hz:1.4,y:.18,address:'R-01'},
  // Refused at the dock: back on the trailer deck, where the pallet came from (written by hand, Claude Code).
  refused:{x:18.1,z:-4,hx:1.3,hz:1.3,y:.18,address:'TRAILER'}};

@@ -1,10 +1,10 @@
 import {openConversation} from './conversation.js?v=bilingual-1';
-import {buildReceivingScene} from './receiving-scene.js?v=briefing-sign-1';
+import {buildReceivingScene} from './receiving-scene.js?v=tidy-1';
 import {receivingSteps,initialDestination,reviewPolicy,canAccept,locationMatches,atRouteStart,reviewRoute} from './receiving.mjs?v=order-1';
 import {participants,names,replayLines,english} from './replay.mjs?v=chat-3';
 import * as T from 'three';
-import { blockedPose, movePose, rectangle, stairAscent, stairApproach } from './collision.mjs?v=fire-stairs-1';
-import {areas,contained,pickupAligned,placementClear,collectRoute,destinationRoute,refuseRoute,evidenceRows} from './operations.mjs?v=order-1';
+import { blockedPose, movePose, rectangle, stairAscent, stairApproach } from './collision.mjs?v=tidy-1';
+import {areas,contained,pickupAligned,placementClear,collectRoute,destinationRoute,refuseRoute,evidenceRows} from './operations.mjs?v=tidy-1';
 import { GLTFLoader } from './vendor/GLTFLoader.js';
 import { DRACOLoader } from './vendor/DRACOLoader.js';
 import { OrbitControls } from './vendor/OrbitControls.js';
@@ -101,7 +101,7 @@ box(world,0,-.22,-2,35,.4,37,0x9da6aa);
 for(let x=-17;x<17;x+=2)for(let z=-20;z<16;z+=2)box(world,x+1,0,z+1,1.985,.12,1.985,C.floor);
 for(let x=-16.8;x<17;x+=.4)for(let z=-19.8;z<16;z+=.4){if(Math.hypot(x+1,z-7)<4.4)continue;cyl(world,x,.11,z,.115,.08,C.floor,12);}
 function stripe(x,z,w,d,col=C.yellow){box(world,x,.145,z,w,.065,d,col);}
-stripe(-9,-2,.13,35);stripe(5,-2,.13,35);stripe(-2,-13,14,.13);stripe(10,7,9,.13);stripe(14,-1,.13,16);
+stripe(-9,-2,.13,35);stripe(5,-2,.13,35);stripe(-2,-13,14,.13);stripe(10,9.6,9,.13);stripe(14,-1,.13,16);
 // Studded brick walls; open front and open roof allow inspection from above.
 for(let layer=0;layer<19;layer++){const yy=.32+layer*.48;for(let x=-17;x<17;x+=1.6){const xx=x+.8+(layer%2)*.8;if(xx>17)continue;box(world,xx,yy,-20,1.585,.465,.45,layer%7===0?0xc7cccb:C.wall,layer===18);}}
 for(let layer=0;layer<16;layer++)for(let z=-20;z<16;z+=1.6){
@@ -123,7 +123,7 @@ for(let z=-18;z<=14;z+=4)box(ceiling,0,10.9,z,34,.12,3.97,0xc7cbc4);for(let x=-1
 }
 flush(ceiling);ceiling.traverse(o=>{o.castShadow=false;});
 const racks=group();let rackIndex=0;
-function rack(parent,x,z,ry,bays){const g=group(parent,x,0,z,ry);const rackCode=String.fromCharCode(66+rackIndex++);const step=2.8;for(let b=0;b<=bays;b++){const xx=(b-bays/2)*step;for(const zz of [-.7,.7]){for(let k=0;k<16;k++)box(g,xx,.25+k*.48,zz,.18,.465,.22,C.blue,k===15);box(g,xx,.16,zz,.45,.16,.45,C.blue);for(let k=0;k<14;k++)cyl(g,xx,.55+k*.48,zz+.115,.035,.012,0x063d79,8,Math.PI/2);}}
+function rack(parent,x,z,ry,bays){const g=group(parent,x,0,z,ry);const rackCode=String.fromCharCode(67+rackIndex++);/* C, D, E: B-01 is the arrival bay */const step=2.8;for(let b=0;b<=bays;b++){const xx=(b-bays/2)*step;for(const zz of [-.7,.7]){for(let k=0;k<16;k++)box(g,xx,.25+k*.48,zz,.18,.465,.22,C.blue,k===15);box(g,xx,.16,zz,.45,.16,.45,C.blue);for(let k=0;k<14;k++)cyl(g,xx,.55+k*.48,zz+.115,.035,.012,0x063d79,8,Math.PI/2);}}
  for(let b=0;b<bays;b++){const xx=(b+.5-bays/2)*step;for(let lev=0;lev<4;lev++){const y=.5+lev*1.95;box(g,xx,y,.73,2.8,.18,.18,C.yellow,true);box(g,xx,y,-.73,2.8,.18,.18,C.yellow,true);box(g,xx,y,0,2.66,.12,1.38,0xb7bdc0);for(let c=0;c<3;c++){const h=.6+((b+lev+c)%3)*.12;crate(g,xx+(c-1)*.78,y+.12,0,.68,h,.84);if((b+lev+c)%3===0)crate(g,xx+(c-1)*.78,y+.12+h+.08,0,.55,.48,.65);}for(const side of [1,-1])label(g,`${rackCode}-${String(b+1).padStart(2,'0')}-L${lev}`,xx,y+.22,side*.86,1.2,.18,'#f4f3e9','#263d35',side===1?0:Math.PI).material.side=T.FrontSide;}}
  flush(g);return g;}
 rack(racks,2.3,-18.7,0,9);rack(racks,16,-13.7,-Math.PI/2,4);rack(racks,16,5.7,-Math.PI/2,3);
@@ -170,7 +170,7 @@ for(let floor=0;floor<2;floor++)for(let n=0;n<5;n++){
  box(room,.55,1.3,.25,.65,.04,.23,0xe1e4e0);sheet(room,-.65,1.3,1.0,.5,.55);cyl(room,-1,1.4,.45,.09,.24,C.white,16);
  box(room,1.65,1.45,-1.5,.5,2.7,1.55,0xc6ad7e);for(let lev=0;lev<3;lev++){box(room,1.32,.6+lev*.8,-1.5,.22,.08,1.5,0xf0d4a1);for(let b=0;b<5;b++)box(room,1.3,.87+lev*.8,-2.05+b*.25,.25,.48,.15,[C.blue,C.yellow,C.red,C.teal,C.white][(b+lev)%5]);}
  box(room,-.65,.5,-.85,.85,.13,.85,C.black);box(room,-.65,.32,-.85,.12,.35,.12,C.black);box(room,-.65,.93,-1.25,.85,.8,.12,C.black);
- plant(room,-1.65,.22,1.9);label(room,name==='Iris'?'✦':'01',-.8,2.45,-2.39,1.4,.85,'#faf4df','#617c87');
+ plant(room,-1.65,.22,1.9);label(room,name==='Iris'?'✦':String(floor*5+n+1).padStart(2,'0'),-.8,2.45,-2.39,1.4,.85,'#faf4df','#617c87');
  if(name==='Iris'){for(let i=0;i<3;i++)label(room,['ART','COLOR','FORM'][i],-.9+i*.85,2.5,-2.38,.7,.9,['#ffc839','#fa9cb4','#6bb5c0'][i],'#ffffff');}
  if(floor===1){box(room,0,.2,3.1,4.35,.18,.9,0xa8b2b6,true);for(const xx of (n===0?[-1,0,1,2]:[-2,-1,0,1,2]))box(room,xx,.85,3.5,.06,1.2,.06,C.black);box(room,n===0?.55:0,1.45,3.5,n===0?3.2:4.3,.09,.1,C.black);box(room,n===0?.55:0,.73,3.5,n===0?3.2:4.3,.055,.06,C.black);}
  const placeholder=person(room,-.65,.18,.05,color,hair,name==='Sam'||name==='Şef',.9);
@@ -295,7 +295,7 @@ box(truck,0,4.74,3.45,2.8,.18,2.85,C.red,true);
 for(let xx=0;xx<4;xx++)for(let zz=0;zz<4;zz++)box(truck,(xx-1.5)*.69,4.85,2.35+zz*.72,.675,.055,.705,C.red);
 box(truck,0,1.6,3.5,2.5,.2,2.4,C.black,true);box(truck,0,3.02,4.35,2.45,.16,.35,C.black);
 box(truck,.65,2.55,3.55,.7,.14,.7,C.black);box(truck,.65,2.85,3.2,.7,.65,.12,C.black);
-person(truck,.65,2.05,3.5,C.blue,0x31251d,false,.7);
+
 const truckSteering=new T.Mesh(new T.TorusGeometry(.2,.03,8,20),mat(C.black));truckSteering.position.set(.65,3.05,4.15);truckSteering.rotation.x=.8;truck.add(truckSteering);
 vehicleWindow(truck,0,3.72,4.87,2.35,1.2);
 vehicleWindow(truck,1.45,3.72,3.75,1.1,1.2,Math.PI/2);
@@ -358,7 +358,7 @@ const dockGlow=new T.PointLight(0xff3b2a,14,5,2);dockGlow.position.set(0,.35,.6)
 const lampOn=[0xff2a1a,0xffc21a,0x2dff4a],lampOff=[0x3a1210,0x3a2c0c,0x0f2a14];
 function setDockSignal(go){dockLamps.forEach((m,i)=>{const on=i===(go?2:0);m.color.setHex(on?lampOn[i]:lampOff[i]);m.emissive.setHex(on?lampOn[i]:0x000000);m.emissiveIntensity=on?4:0;});dockGlow.color.setHex(go?0x45ff5c:0xff3b2a);dockGlow.position.y=go?-.35:.35;}
 setDockSignal(false);
-person(yard,28,-1.05,-.25,C.orange,0x242521,false,1,1.1);person(yard,17.9,-1.05,2.4,0x72933d,0x242521,true,.9,1.1);flush(yard);
+person(yard,17.9,-1.05,2.4,0x72933d,0x242521,true,.9,1.1);flush(yard);
 // Driveable forklift. Front is local -Z; mast and lifting carriage are separate.
 const fork=group(scene,18.2,.18,-.6,-Math.PI/2);const lift=group(fork,0,0,-1.45);
 box(fork,0,.7,.1,1.5,.6,2.2,C.yellow,true);box(fork,0,1.06,.65,1.5,.25,.85,C.yellow,true);box(fork,0,1.25,-.2,.66,.16,.7,C.black);box(fork,0,1.57,.15,.66,.55,.16,C.black);
@@ -413,11 +413,9 @@ const barrier=group(gate,2.3,1.75,-1.8);box(barrier,-1.95,0,0,3.9,.2,.18,C.white
 box(gate,-2.4,1.4,-1.9,.14,2.8,.14,C.black);box(gate,-2.4,2.85,-1.9,.48,1.2,.35,C.black);
 const signals=[];for(let i=0;i<3;i++){const material=new T.MeshStandardMaterial({color:[0xd62e1e,0xf9b722,0x40a34d][i],emissive:[0xd62e1e,0xf9b722,0x40a34d][i],emissiveIntensity:.06,roughness:.2});const light=new T.Mesh(new T.CylinderGeometry(.14,.14,.06,24),material);light.rotation.x=Math.PI/2;light.position.set(-2.4,3.2-i*.35,-1.69);gate.add(light);signals.push(light);}
 box(gate,0,4.1,0,4.8,.18,.18,C.white,true);for(const x of [-2.4,2.4])box(gate,x,2.1,0,.14,4.2,.14,C.white);box(gate,0,3.9,0,.55,.35,.45,C.white);cyl(gate,0,3.68,.02,.12,.12,C.black,16);twoSidedLabel(gate,'RECEIVING',0,4.4,.12,2.5,.4,'#ffcc00','#243238');flush(gate);
-// A compact receiving terminal; the mobile receiver works here during inspection.
-const terminal=group(scene,7,.2,-5.9);box(terminal,0,.85,0,.13,1.7,.13,C.black);box(terminal,0,1.85,0,1.1,.75,.15,C.black);twoSidedLabel(terminal,'CHECK',0,1.86,.085,.95,.55,'#174c3b','#ddf7d9',0,.18);flush(terminal);
 
 // Spare cartons and safety cones stay at the edges.
-const props=group();for(const [x,z] of [[-4,-10.5],[14,9],[13,-8]]){pallet(props,x,.16,z);for(let i=0;i<3;i++)crate(props,x+(i-1)*.55,.52,z,.5,.6,.65);}
+const props=group();for(const [x,z] of [[-4,-10.5],[13,-8]]){pallet(props,x,.16,z);for(let i=0;i<3;i++)crate(props,x+(i-1)*.55,.52,z,.5,.6,.65);}
 for(const [x,z] of [[6,-7.5],[6,-3.5],[-8,10]]){box(props,x,.2,z,.5,.12,.5,C.orange);const cone=new T.Mesh(new T.CylinderGeometry(.07,.2,.55,16),mat(C.orange));cone.position.set(x,.5,z);props.add(cone);cyl(props,x,.55,z,.12,.1,C.white,16);}flush(props);
 // Marked circulation and receiving partition, matching collision solids.
 const circulation=group();
@@ -526,7 +524,7 @@ function updateWorkActors(dt){
   else {slot.walk?.stop();slot.idle?.play();slot.actor.lookAt(slot.id==='sef'?10:4,.18,slot.id==='sef'?7:-5.5);if(slot.working)slot.arms?.forEach((a,i)=>a.rotation.x=-.35-Math.sin(state.t*2+i)*.1);}
  }
 }
-function stageSupervisor(){deployWorker('sef',12.2,5);setView('review');}
+function stageSupervisor(){deployWorker('sef',13.2,5);setView('review');}
 function beginInspection(){
  state.mode='orbit';controls.enabled=true;$('touch').hidden=true;setView('inspection');
  inspectionRun={elapsed:0,index:-1};state.phase=6;receivingScene.inspect();
