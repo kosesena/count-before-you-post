@@ -396,3 +396,5 @@ body.left-hidden #dock{--l:16px}body.right-hidden #dock{--r:16px}
 #outcome-actions label[hidden]{display:none!important}
 body.awaiting-location .step-bar i{animation:none;width:100%}
 #scan-location{width:100%;margin:8px 0}
+
+#run-language{width:100%;border:0;background:transparent;color:var(--ink);font:inherit;font-weight:700;padding:3px;cursor:pointer}#run-language:disabled{cursor:default;opacity:.6}

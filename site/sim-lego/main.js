@@ -653,8 +653,14 @@ flush(circulation);
 const receivingScene=buildReceivingScene({T,scene,group,box,cyl,label,twoSidedLabel,flush,sheet,C});
 const walkingGuide=person(scene,-9.6,.18,3,0x72933d,0x242521,false,.8);let walkStarted=0;walkingGuide.visible=false;   // only shown while the 'Walk upstairs' route plays (Sena, 1 Nov)
 await stage('Finishing the details…');
-let caseData;
-try{const res=await fetch('../data.json');if(!res.ok)throw Error('data');caseData=await res.json();}catch{caseData=null;}
+const recordingFiles={tr:'data.json',en:'data-en.json',de:'data-de.json',zh:'data-zh.json'};
+const recordingNames={tr:'Turkish',en:'English',de:'German',zh:'Chinese'};
+const recordings={};let recordingLanguage='tr';
+await Promise.all(Object.entries(recordingFiles).map(async([lang,file])=>{
+ try{const res=await fetch('../'+file);if(!res.ok)throw Error('data');const data=await res.json();if(data.lang!==lang||data.cases?.length!==6)throw Error('recording');recordings[lang]=data;}
+ catch{const option=$('run-language').querySelector(`option[value="${lang}"]`);option.disabled=true;option.textContent+=' · unavailable';}
+}));
+let caseData=recordings.tr||null;
 const state={paused:false,speed:.5,mode:'orbit',held:false,running:false,phase:0,t:0,result:null};
 const completedLoads=[];let guided=false,liftTarget=0;let automation=null,transferTarget=null,verified=false,reviewResolved=false,deliveryNumber=1;let forkHeight=0;
 let exerciseFinished=false;
@@ -724,7 +730,7 @@ function setView(name){if(introActive)endIntro(false);$('scene-nav').hidden=true
 let meetingRun=null;
 let chatLive=null;
 const CHAT_TYPING=1;
-function chatLinesNow(){const entry=entryNow();return entry?replayLines(entry,followupData?.cases.find(c=>c.id===currentCase)?.signoff):[];}
+function chatLinesNow(){const entry=entryNow();return entry?replayLines(entry,entry.signoff,{language:recordingLanguage,dataFile:recordingFiles[recordingLanguage]}):[];}
 function updateInspectorSpeaker(id){
  updateInspectorSpeaker.current=id;
  const slot=castSlots.find(s=>s.id===id);
@@ -770,7 +776,7 @@ function updateChat(dt){
 }
 function chatReady(){return !chatLive||chatLive.done;}
 const castHomes=new Map(castSlots.filter(s=>s.actor).map(s=>[s.id,{position:s.actor.position.clone(),rotation:s.actor.rotation.clone()}]));
-let followupData=null;try{const r=await fetch('../data-en.json');if(r.ok)followupData=await r.json();}catch{}
+
 function openTeamView(forceLive=false){
  const entry=entryNow();if(!entry)return;
  const root=$('meeting-chat');
@@ -785,6 +791,7 @@ function resetMeeting(){
  openTeamView();
 }
 function resetReceiving(){
+ $('run-language').disabled=!caseData;
  document.body.classList.remove('awaiting-location');exerciseFinished=false;$('next-delivery').textContent='Finish exercise';
  state.running=false;$('demo').hidden=true;
  dockReady=false;arrivalDone=false;inspectionRun=null;reviewTask=null;physicalLocation='trailer';locationConfirmed=false;handlingDecision=null;stepNotes.fill('');
@@ -798,7 +805,7 @@ $('prepare-dock').onclick=()=>{
  if(state.running||dockReady)return;
  if(!entryNow()){status('Recorded delivery data is unavailable. Refresh before starting.','#bd4931');return;}
  if(introActive)endIntro(false);setView('outside');state.running=true;state.phase=8;state.t=0;state.paused=false;
- $('prepare-dock').disabled=true;$('case').disabled=true;document.querySelector('.playback').hidden=false;
+ $('run-language').disabled=true;$('prepare-dock').disabled=true;$('case').disabled=true;document.querySelector('.playback').hidden=false;
  flowStep(0,'Driver waits in the marked refuge. Receiver checks the note, vehicle restraint and dock bridge.');
 };
 function updateDock(){
@@ -910,7 +917,7 @@ function finish(){
  if(!entry){status('Recorded evidence unavailable. Delivery remains on hold.','#bd4931');$('demo').disabled=false;$('case').disabled=false;return;}
  if(chatLive&&!chatLive.done){chatLive.shown=chatLive.lines.length;chatLive.done=true;pushChatToUI();}
  const lastSpeaker=meetingRun?.speaker||null;chatLive=null;meetingRun=null;updateInspectorSpeaker(lastSpeaker);
- state.result=entry.gate.action;revealedDeliveries.add(currentCase);refreshDeliveryCards();verified=true;physicalLocation='inspection';barrierTarget=state.result==='post'?-Math.PI*.48:0;
+ state.result=entry.gate.action;revealedDeliveries.add(recordingLanguage+':'+currentCase);refreshDeliveryCards();verified=true;physicalLocation='inspection';barrierTarget=state.result==='post'?-Math.PI*.48:0;
  setGateSignal({block:0,human:1,post:2}[state.result]);
  status(resultCopy[currentCase]+(currentCase==='hasarli'?' Recorded proposal: accept 11 intact cartons; isolate 1 damaged carton.':''));showMatch(entry);setView('gatecheck');
  flowStep(state.result==='post'?5:4);$('outcome-actions').hidden=false;showOutcomeActions();
@@ -920,7 +927,7 @@ function finish(){
 }
 // Three-way match (written by hand, Claude Code): what was ordered, what the note says, what is on the pallet.
 function showMatch(entry){const o=order(),n=entry.note?.items?.[0],v=entry.spark,c=entry.cross;if(!o||!n||!v){$('match').hidden=true;return;}
- const counted=c?c.agreed:v.cartons_visible,label=english(v.product_on_labels),same=(a,b)=>english(a).toLowerCase().replace(/\s+/g,'')===english(b).toLowerCase().replace(/\s+/g,'');
+ const counted=c?c.agreed:v.cartons_visible,label=english(v.product_on_labels),same=(a,b)=>english(a).toLowerCase().replace(/[\s-]+/g,'')===english(b).toLowerCase().replace(/[\s-]+/g,'');
  const hidden=v.stacked||!v.all_cartons_visible,damaged=v.damaged_cartons||0,told=(entry.note?.embedded_instructions||[]).length>0;
  const palletNote=hidden?' · stacked, some hidden':damaged?` · ${damaged} damaged`:'';
  const rows=[['Ordered',o.number,`${o.ordered} × ${o.product}`,true],['Note','delivery note',`${n.quantity} × ${english(n.description)}${told?' · hidden instruction':''}`,!told&&n.quantity<=o.ordered&&same(n.description,o.product)],['Pallet','camera',`${hidden?counted+' visible':counted} × ${label}${palletNote}`,!hidden&&!damaged&&counted===n.quantity&&same(label,n.description)]];
@@ -973,7 +980,7 @@ $('toggle-left').onclick=()=>setColumn('left',!document.body.classList.contains(
 $('toggle-right').onclick=()=>setColumn('right',!document.body.classList.contains('right-hidden'));
 const DRIVE_ICON='<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 17V8h6l3 5v4M13 13h3M18 4v13h3"/><circle cx="6.5" cy="17.5" r="1.8"/><circle cx="12" cy="17.5" r="1.8"/></svg>';
 function runDemo(){if(state.running)return;if(physicalLocation!=='trailer'||Math.hypot(fork.position.x-18.2,fork.position.z+.6)>.1||Math.cos(fork.rotation.y+Math.PI/2)<.999){status('Continue manual handling, or press R and prepare the next exercise before guided playback.');return;}if(!dockReady){status('Complete dock preparation first.');return;}guided=true;setColumn('left',true);setView('dock');$('demo').disabled=true;$('case').disabled=true;flowStep(1,'Unload to B-01; the pallet is not accepted stock yet.');chatLive=null;showRecordedConversation({team:true,live:true,force:true});const commands=collectRoute.map(c=>[...c]);commands.splice(7,0,['drop'],['wait',3],['pickup']);startCommands(commands,()=>{state.running=true;state.phase=3;state.t=0;});}
-// The purchase order the delivery is received against (data.json, the Turkish run), in English.
+// The purchase order belongs to the selected recorded run.
 function order(){const o=caseData?.order;return o&&{...o,product:english(o.product)};}
 // What this delivery leaves on the order line once it is received.
 function onOrder(){const o=order();if(!o||!['accepted','storage'].includes(physicalLocation))return '';const q=receivedQty??12,left=o.ordered-q;return ` Received ${q} of ${o.ordered} on ${o.number}${left>0?`; ${left} still open: claim the shortfall from the supplier or close the line`:'; order line complete'}.`;}
@@ -1046,7 +1053,7 @@ $('close-evidence').onclick=()=>switchTab('inspector');$('show-evidence').onclic
 $('next-delivery').onclick=()=>{
  if(exerciseFinished){deliveryNumber++;reset();return;}
  if(state.running||state.held||!locationConfirmed)return;
- const li=document.createElement('li');li.textContent=`Delivery ${deliveryNumber} · ${currentCase} · ${transferTarget==='refused'?'refused · back on the trailer':areas[transferTarget].address} · Gate ${state.result} (recorded; no live ERP write) · handling ${handlingDecision||transferTarget} (simulated)${currentCase==='hasarli'&&handlingDecision==='accepted'?' · 1 carton remains Q-01 quarantined':''}`;$('delivery-history').prepend(li);
+ const li=document.createElement('li');li.textContent=`Delivery ${deliveryNumber} · ${recordingLanguage.toUpperCase()} · ${currentCase} · ${transferTarget==='refused'?'refused · back on the trailer':areas[transferTarget].address} · Gate ${state.result} (recorded; no live ERP write) · handling ${handlingDecision||transferTarget} (simulated)${currentCase==='hasarli'&&handlingDecision==='accepted'?' · 1 carton remains Q-01 quarantined':''}`;$('delivery-history').prepend(li);
  // End this exercise. This clears its scene, not persistent inventory or an outbound shipment.
  $('next-delivery').hidden=true;$('outcome-actions').hidden=true;state.speed=Math.min(state.speed,1);$('play-speed').value=String(state.speed);
  const releaseDock=()=>{receivingScene.release();setDockSignal(true);setView('outside');state.running=true;state.phase=9;state.t=0;status('Forklift clear. Dock released; the driver walks back and climbs into the cab.');};
@@ -1058,6 +1065,12 @@ $('next-delivery').onclick=()=>{
 };
 
 $('pause-demo').onclick=()=>{state.paused=!state.paused;$('pause-demo').textContent=state.paused?'Resume':'Pause';};$('play-speed').onchange=()=>{state.speed=Number($('play-speed').value);};
+$('run-language').onchange=()=>{
+ const lang=$('run-language').value;
+ if(state.running||$('case').disabled||!recordings[lang]){$('run-language').value=recordingLanguage;return;}
+ recordingLanguage=lang;caseData=recordings[lang];reset();refreshDeliveryCards();populateEvidence();
+ status(`${recordingNames[lang]} recorded run loaded. Interface and narrated summaries remain English.`);
+};
 $('demo').onclick=runDemo;$('case').onchange=()=>{currentCase=$('case').value;reset();buildLoad();};
 $('drive').onclick=()=>{if(state.running)return;if(!dockReady){status('Prepare the dock before driving.');return;}if(state.mode==='drive'){setView('hero');return;}cameraTween=null;state.mode='drive';controls.enabled=false;$('touch').hidden=false;$('drive').innerHTML='Exit driving <span>ESC</span>';$('drive').classList.remove('icon-only');status('Use WASD / arrow keys to drive. E picks up or sets down the load.');document.querySelectorAll('[data-view]').forEach(b=>b.classList.remove('active'));};
 document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>setView(b.dataset.view));
@@ -1152,7 +1165,7 @@ function refreshDeliveryCards(){
  if(!caseData)return;
  for(const b of document.querySelectorAll('#delivery-list .room')){
   const entry=caseData.cases.find(c=>c.id===b.dataset.case);if(!entry)continue;
-  const revealed=revealedDeliveries.has(entry.id);
+  const revealed=revealedDeliveries.has(recordingLanguage+':'+entry.id);
   b.querySelector('small').textContent=revealed?`Reviewed · ${entry.gate.action==='human'?'ASK ŞEF':entry.gate.action.toUpperCase()}`:'Recorded delivery';
   b.querySelector('.room-dot').hidden=!revealed||entry.gate.action!=='human';
  }
@@ -1161,7 +1174,7 @@ function updateDeliveryTitle(){
  const opt=$('case').selectedOptions[0],label=opt?opt.textContent:'';
  const m=label.match(/(\d+)\s*—\s*(.+)/);
  $('delivery-title').textContent=m?`Delivery ${m[1]} · ${m[2]}`:label;
- $('delivery-sub').textContent=caseData?`${participants(currentCase).length} agents · recorded run`:'recorded run';
+ $('delivery-sub').textContent=caseData?`${participants(currentCase).length} agents · ${recordingNames[recordingLanguage]} recording`:'recorded run';
 }
 function tickClock(){$('live-time').textContent=new Intl.DateTimeFormat('en-GB',{hour:'2-digit',minute:'2-digit'}).format(new Date());}
 let askAgentId='kapi';

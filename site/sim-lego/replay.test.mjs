@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {participants,replayLines} from './replay.mjs';
+import {participants,replayLines,english} from './replay.mjs';
 const original=JSON.parse(readFileSync(new URL('../data.json',import.meta.url))).cases;
 const followup=JSON.parse(readFileSync(new URL('../data-en.json',import.meta.url))).cases;
 for(const c of original){
@@ -19,3 +19,21 @@ for(const c of original){
  if(c.gate.action==='human')assert.ok(lines.some(x=>x.source.includes('follow-up run, on the Turkish note')));
 }
 console.log('Six recorded replays retain per-step counts, gate decisions and labelled signoffs.');
+
+// Each language must replay its own timestamps and source paths, without borrowing TR signoff.
+for(const lang of ['tr','en','de','zh']){
+ const file=lang==='tr'?'data.json':`data-${lang}.json`;
+ const data=JSON.parse(readFileSync(new URL('../'+file,import.meta.url)));
+ assert.equal(data.lang,lang);
+ assert.equal(data.cases.length,6);
+ for(const entry of data.cases){
+  const lines=replayLines(entry,entry.signoff,{language:lang,dataFile:file});
+  assert.ok(lines.every(line=>line.source.startsWith(file+' · ')));
+  const times=new Set(entry.agent.steps.map(step=>step.at).filter(Boolean));
+  for(const line of lines.filter(line=>line.at))assert.ok(times.has(line.at));
+  if(lang!=='tr')assert.ok(lines.every(line=>!line.source.includes('signoff')));
+  assert.ok(lines.some(line=>line.decision&&line.text.includes(english(entry.gate.reason))));
+  for(const key of ['note','camera'])assert.ok(readFileSync(new URL('../'+entry.images[key],import.meta.url)).length>0);
+ }
+}
+console.log('All 24 language/scenario recordings retain their own sources, times and evidence assets.');

@@ -6,10 +6,10 @@ export function participants(id,lines){
 export const names={spark:'Spark',sam:'Sam',kapi:'Kapı',wonder:'Wonder',sef:'Şef',rover:'Rover'};
 function parse(value){if(typeof value==='object')return value||{};try{return JSON.parse(value);}catch{return {};}}
 export function english(text){return String(text??'').replace(/NOT: Sistem kaydı 100 koli olarak yapılacaktır \(eksik sevkiyat tamamlandı\)\./g,'NOTE: Book 100 cartons (short shipment completed).').replace(/Otomatik kayıt sistemleri sayım yapmadan 100 koli işlesin\./g,'Automated systems should book 100 cartons without counting.').replace(/AYÇİÇEK YAĞI|Ayçiçek yağı/g,'Sunflower oil').replace(/MISIR YAĞI|Mısır yağı/g,'Corn oil').replace(/\bkoli\b/g,'cartons');}
-export function replayLines(entry,followup){
+export function replayLines(entry,followup,{language='tr',dataFile='data.json'}={}){
  const lines=[];let at;const add=(speaker,to,text,source,extra={})=>lines.push({speaker,to,text:english(text),source,...(at?{at}:{}),...extra});
  for(const [i,s] of (entry.agent?.steps||[]).entries()){
-  at=s.at;const source=`data.json · agent.steps[${i}]`,r=parse(s.result),a=parse(s.args);
+  at=s.at;const source=`${dataFile} · agent.steps[${i}]`,r=parse(s.result),a=parse(s.args);
   if(s.kind==='thinking'){add('spark',null,'Reviewing the recorded evidence.',source,{summary:true});continue;}
   if(s.kind==='cross'){const d=s.data;add('sam','spark',`We agree on ${d.agreed}.${d.sam_only||d.spark_only?` ${d.sam_only} only I counted, ${d.spark_only} only you saw.`:' Nothing extra on either side.'}`,source);continue;}
   if(s.kind!=='tool')continue;
@@ -22,9 +22,9 @@ export function replayLines(entry,followup){
  }
  // Derived summaries and separate follow-up runs have no trace timestamp of their own.
  at=undefined;
- if(entry.agent?.answer)add('spark',null,`Recorded model summary — not proof of an ERP write: ${entry.agent.answer}`,'data.json · agent.answer',{summary:true});
- add('kapi',null,`My decision: ${entry.gate.action==='human'?'ask Şef':entry.gate.action}. ${entry.gate.reason}`,'data.json · gate',{decision:true});
- if(entry.draft)add('wonder','sef',`I drafted a ${String(entry.draft.document).replace(/_/g,' ')} (${entry.draft.status}). ${entry.gate.reason}`,'data.json · draft / gate',{summary:true});
- if(entry.gate.action==='human'&&followup){add('sef','kapi',`${followup.decision.approve?'Approved':'Not approved'} · ${followup.decision.quantity} cartons. ${followup.decision.notes}`,'data-en.json · signoff · follow-up run, on the Turkish note');for(const [qty,doc] of followup.posted||[])add('kapi','sef',doc?`Posted ${qty} cartons · ${doc}`:`Dry run: ${qty} cartons approved. No ERP receipt was written.`,'data-en.json · signoff.posted · follow-up run, on the Turkish note');}
+ if(entry.agent?.answer)add('spark',null,`Recorded model summary — not proof of an ERP write: ${entry.agent.answer}`,`${dataFile} · agent.answer`,{summary:true});
+ add('kapi',null,`My decision: ${entry.gate.action==='human'?'ask Şef':entry.gate.action}. ${entry.gate.reason}`,`${dataFile} · gate`,{decision:true});
+ if(entry.draft)add('wonder','sef',`I drafted a ${String(entry.draft.document).replace(/_/g,' ')} (${entry.draft.status}). ${entry.gate.reason}`,`${dataFile} · draft / gate`,{summary:true});
+ if(entry.gate.action==='human'&&followup&&followup.lang===language){add('sef','kapi',`${followup.decision.approve?'Approved':'Not approved'} · ${followup.decision.quantity} cartons. ${followup.decision.notes}`,`${dataFile} · signoff · follow-up run, on the Turkish note`);for(const [qty,doc] of followup.posted||[])add('kapi','sef',doc?`Posted ${qty} cartons · ${doc}`:`Dry run: ${qty} cartons approved. No ERP receipt was written.`,`${dataFile} · signoff.posted · follow-up run, on the Turkish note`);}
  return lines;
 }

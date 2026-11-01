@@ -10,7 +10,7 @@ From the repository root:
 python3 -m http.server 8767 --bind 127.0.0.1 --directory site
 ```
 
-Open http://localhost:8767/sim-lego/ . Deploy the whole `site/` directory: this page depends on `../data.json` and the ten GLB character assets in `../sim/models/`.
+Open http://localhost:8767/sim-lego/ . Deploy the whole `site/` directory: this page depends on `../data.json`, `../data-en.json`, `../data-de.json`, `../data-zh.json` and the ten GLB character assets in `../sim/models/`.
 
 ## Features
 
@@ -19,7 +19,7 @@ Open http://localhost:8767/sim-lego/ . Deploy the whole `site/` directory: this 
 - Live 20-second opening camera tour using this scene. Skip with Enter warehouse or Escape; replay from Explore.
 - English collapsible receiving controls and navigation drawer.
 - WASD / arrow-key forklift driving; E picks up or sets down pallets. Collision checks include the forklift, forks and carried load.
-- Recorded delivery decisions from data.json. No model calls or live ERP writes. Playback can be paused or slowed.
+- Recorded delivery decisions from the selected TR/EN/DE/ZH data file. No model calls or live ERP writes. Playback can be paused or slowed.
 - H toggles the interface; R resets the scene.
 
 Three.js 0.170.0 and its loaders are vendored under `vendor/`; see `vendor/LICENSE-three.txt`.
@@ -74,3 +74,10 @@ message appears above it. The warehouse receiver still walks to inspect/recount 
 No agent deployment route crosses the forklift aisle. Final scans show the actual destination
 address; temporary staging controls disappear once the pallet reaches its final location.
 Recorded model summaries are explicitly labelled as model text, not proof of an ERP write.
+
+### Recorded evidence languages
+The language selector switches the six-case recording, purchase order, evidence images,
+agent traces and timestamps together. The interface and generated narration remain English;
+this selects a real recorded run, not a UI translation. It is locked from dock preparation
+until a new exercise is started. Reviewed badges are scoped by language. The bundled
+Turkish signoff follow-up is shown only with the Turkish recording, never as EN/DE/ZH proof.
