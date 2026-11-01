@@ -4,7 +4,7 @@
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#f5f2eb">
   <title>Count Before You Post · Warehouse Simulator</title>
-  <link rel="stylesheet" href="./style.css?v=card-2">
+  <link rel="stylesheet" href="./style.css?v=panel-4">
   <script type="importmap">{"imports":{"three":"./vendor/three.module.js"}}</script>
 </head>
 <body>
@@ -12,6 +12,7 @@
   <header>
     <a class="brand" href="./" aria-label="Return to the warehouse"><span class="brand-icon"><i></i><i></i><i></i><i></i></span><span>COUNT BEFORE YOU POST<small>META GLOBAL AI HACKATHON · PROJECT DEMO</small></span></a>
     <div class="edition"><span></span> WAREHOUSE <b>01</b></div>
+    <button id="agents-top" aria-label="Open the agent panel"><span class="stack"><img src="../img/av-spark.jpg" alt=""><img src="../img/av-kapi.jpg" alt=""><img src="../img/av-sef.jpg" alt=""></span>Agents</button>
     <button id="help" class="round" aria-label="Show controls" title="Controls">?</button>
   </header>
   <aside id="panel">
@@ -61,7 +62,7 @@
   </section>
   <div id="loading"><img id="loading-poster" src="loading-poster.jpg" alt="" fetchpriority="high"><div class="loading-card"><p class="loading-pitch">An AI agent may not post a goods receipt until the evidence agrees.</p><strong>Preparing your warehouse…</strong><div id="loading-bar" role="progressbar" aria-label="Loading the warehouse"><i></i></div><small>COUNT BEFORE YOU POST · META GLOBAL AI HACKATHON</small></div></div>
   <script type="module">
-    import('./main.js?v=release-3').catch(error => {
+    import('./main.js?v=panel-3').catch(error => {
       console.error(error);
       const loading = document.getElementById('loading');
       if (loading) {

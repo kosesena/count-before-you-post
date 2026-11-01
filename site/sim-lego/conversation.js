@@ -1,7 +1,7 @@
 import {deliveryReply} from './chat-replies.mjs?v=bilingual-1';
 import {names,participants} from './replay.mjs?v=chat-3';
 const drafts=new Map();
-const avatar=id=>`./assets/${id}.png`;
+const avatar=id=>`../img/av-${id}.jpg`;   // the site's own 160 px avatars
 const demoTime=index=>{const minutes=8*60+index;return `${String(Math.floor(minutes/60)%24).padStart(2,'0')}:${String(minutes%60).padStart(2,'0')}`;};
 const now=()=>new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Istanbul',hour:'2-digit',minute:'2-digit'}).format(new Date());
 function el(tag,className,text){const node=document.createElement(tag);if(className)node.className=className;if(text!==undefined)node.textContent=text;return node;}

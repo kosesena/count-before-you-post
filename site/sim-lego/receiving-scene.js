@@ -106,6 +106,9 @@ export function buildReceivingScene({T,scene,group,box,cyl,label,twoSidedLabel,f
     const g=group(root,x,y,z);box(g,0,1.15,0,.66,.65,.4,color);box(g,0,1.14,.22,.68,.09,.025,C.white);
     for(const dx of [-.23,.23])box(g,dx,1.15,.22,.07,.6,.025,C.white);
     cyl(g,0,1.75,0,.25,.4,0xffce44,20);cyl(g,0,2,0,.29,.15,C.yellow,20);
+    // A minifigure face: two round eyes and a smile on the side the figure walks towards (Sena, 1 Nov).
+    for(const ex of [-.085,.085])cyl(g,ex,1.8,.245,.035,.02,C.black,12,Math.PI/2);
+    box(g,0,1.67,.247,.13,.022,.012,C.black);for(const ex of [-.075,.075])box(g,ex,1.685,.246,.03,.03,.012,C.black);
     const legs=[-.18,.18].map(x=>{const l=group(g,x,.8,0);box(l,0,-.32,0,.25,.64,.3,C.navy);flush(l);return l;});
     const arms=[-.43,.43].map(x=>{const a=group(g,x,1.4,0);box(a,0,-.25,0,.2,.55,.25,color);flush(a);return a;});
     if(name)twoSidedLabel(g,name,0,2.45,0,2.2,.3,'#243238','#ffffff');flush(g);return {g,legs,arms,home:new T.Vector3(x,y,z),route:[],task:'idle'};

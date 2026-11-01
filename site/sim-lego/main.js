@@ -1,5 +1,5 @@
-import {openConversation} from './conversation.js?v=bilingual-1';
-import {buildReceivingScene} from './receiving-scene.js?v=release-1';
+import {openConversation} from './conversation.js?v=panel-2';
+import {buildReceivingScene} from './receiving-scene.js?v=faces-1';
 import {receivingSteps,initialDestination,reviewPolicy,canAccept,locationMatches,atRouteStart,reviewRoute} from './receiving.mjs?v=order-1';
 import {participants,names,replayLines,english} from './replay.mjs?v=chat-3';
 import * as T from 'three';
@@ -776,7 +776,7 @@ function showRecordedConversation(){
   onWorkflow:()=>{$('meeting-chat').hidden=true;document.body.classList.remove('conversation-open');document.body.classList.remove('cast-focus');}});
  document.body.classList.add('conversation-open');
 }
-$('show-meeting').onclick=showRecordedConversation;
+$('show-meeting').onclick=showRecordedConversation;$('agents-top').onclick=showRecordedConversation;
 function reset(){guided=false;setGateSignal(-1);$('match').hidden=true;receivedQty=null;resetReceiving();resetMeeting();buildLoad();for(const load of completedLoads){scene.remove(load.object);disposeLoadGraphics(load.object);}completedLoads.length=0;automation=null;transferTarget=null;verified=false;reviewResolved=false;forkHeight=0;$('evidence').hidden=true;$('outcome-actions').hidden=true;$('next-delivery').hidden=true;document.querySelector('.playback').hidden=true;state.paused=false;$('pause-demo').textContent='Pause';state.running=false;state.held=false;state.phase=0;state.result=null;state.mode='orbit';state.t=0;delivery.parent?.remove(delivery);scene.add(delivery);delivery.position.set(18.1,.18,-4);delivery.rotation.set(0,Math.PI/2,0);fork.position.set(18.2,.18,-.6);fork.rotation.y=-Math.PI/2;liftTarget=0;barrierTarget=0;signals.forEach(s=>s.material.emissiveIntensity=.06);$('demo').disabled=false;$('case').disabled=false;status('Ready to explore.');setView('hero');}
 function pickup(){
  const pose={x:fork.position.x,z:fork.position.z,angle:fork.rotation.y};
@@ -788,7 +788,7 @@ function pickup(){
   if(!contained(p,area)){status(`Place the whole pallet inside ${area.address||'the inspection bay'}.`,'#c48223');return false;}
   if(Math.abs(forkHeight-(area.y-.18))>.12){status('Lower / raise the forks to the selected shelf level.','#c48223');return false;}
   if(id!=='refused'&&!placementClear(p,completedLoads.map(o=>rectangle(o.x,o.z,.9,.8,o.angle)))){status('The placement area is occupied or obstructed.','#c48223');return false;}
-  scene.attach(delivery);delivery.position.y=area.y;delivery.rotation.y=pose.angle;state.held=false;physicalLocation=id;locationConfirmed=false;forkHeight=0;liftTarget=0;
+  scene.attach(delivery);delivery.position.y=area.y;delivery.rotation.y=pose.angle;state.held=false;physicalLocation=id;locationConfirmed=false;forkHeight=0;if(area.y<1)liftTarget=0;
   if(id==='arrival'){arrivalDone=true;updatePalletTag('UNVERIFIED B-01');flowStep(2,'B-01: received physically, not yet verified. Move to the yellow inspection bay.');}
   else if(id==='inspection'){updatePalletTag('INSPECTION');if(!verified){state.running=true;state.phase=3;state.t=0;}document.querySelector('.playback').hidden=false;status('Forklift stopped. Receiver and digital checks inspect the load.');}
   else if(id==='refused'){updatePalletTag('REFUSED · RETURN TO SUPPLIER');locationConfirmed=true;handlingDecision='refused';$('outcome-actions').hidden=false;showOutcomeActions(id);if(!automation)$('next-delivery').hidden=false;flowStep(6,`Refused at the dock: the pallet is back on the trailer. Nothing is received against ${order()?.number||'the order'}; the driver takes it back.`);}
@@ -850,8 +850,9 @@ function stepCommands(dt){
   if(!pickup()){state.paused=true;$('pause-demo').textContent='Resume';return;}
   a.index++;a.remaining=null;return;
  }
+ if(op==='lower'){liftTarget=0;a.index++;a.remaining=null;return;}
  if(op==='lift'){if(a.remaining===null)a.remaining=0;// a steady hydraulic climb, about five seconds to the upper shelf
-  forkHeight+=Math.sign(value-forkHeight)*Math.min(Math.abs(value-forkHeight),dt*.48);liftTarget=forkHeight+.3;if(state.held)delivery.position.y=.42+forkHeight;if(Math.abs(forkHeight-value)<.02){forkHeight=value;a.index++;}return;}
+  forkHeight+=Math.sign(value-forkHeight)*Math.min(Math.abs(value-forkHeight),dt*.48);liftTarget=forkHeight+.3;if(state.held)delivery.position.y=.42+forkHeight;if(Math.abs(forkHeight-value)<.02){forkHeight=value;a.index++;a.remaining=null;}return;}
  if(a.remaining===null)a.remaining=value;
  const delta=Math.sign(a.remaining)*Math.min(Math.abs(a.remaining),dt*(op==='turn'?.8:2.4));
  const next=movePose({x:fork.position.x,z:fork.position.z,angle:fork.rotation.y},op==='move'?delta:0,op==='turn'?delta:0,collisionOptions());
@@ -865,7 +866,11 @@ function order(){const o=caseData?.order;return o&&{...o,product:english(o.produ
 // What this delivery leaves on the order line once it is received.
 function onOrder(){const o=order();if(!o||physicalLocation!=='accepted')return '';const q=receivedQty??12,left=o.ordered-q;return ` Received ${q} of ${o.ordered} on ${o.number}${left>0?`; ${left} still open: claim the shortfall from the supplier or close the line`:'; order line complete'}.`;}
 function chooseDestination(){transferTarget=initialDestination(state.result,currentCase);const upper=$('storage-level').value==='1';areas.accepted.y=upper?2.53:.18;areas.accepted.address=upper?'A-01-L1':'A-01-L0';updatePalletTag(areas[transferTarget].address,state.result==='post'?12:null);}
-function withShelfLift(commands){if(transferTarget!=='accepted'||areas.accepted.y<1)return commands;const copy=commands.map(c=>[...c]),i=copy.findIndex(c=>c[0]==='drop');copy.splice(i,0,['wait',1.4],['lift',2.35],['wait',.9]);return copy;}
+// Upper shelf, as a driver would: stop short of the bay, raise the forks, creep in, set down,
+// back out with the forks still up, then lower them clear of the rack (Sena, 1 Nov).
+function withShelfLift(commands){if(transferTarget!=='accepted'||areas.accepted.y<1)return commands;const copy=commands.map(c=>[...c]),i=copy.findIndex(c=>c[0]==='drop'),approach=copy[i-1];
+ if(approach?.[0]!=='move')return copy;const creep=1.8;approach[1]-=creep;
+ copy.splice(i,0,['wait',1.2],['lift',2.35],['wait',.6],['move',creep],['wait',.4]);copy.push(['wait',.4],['lower']);return copy;}
 function forkPose(){return {x:fork.position.x,z:fork.position.z,angle:fork.rotation.y};}
 function manualForTarget(){state.running=false;automation=null;state.mode='orbit';$('drive').click();status(`Manual handling: place the load in ${areas[transferTarget].address}. The selected decision remains separate from the recorded ERP result.`);}
 $('transfer-load').onclick=()=>{
