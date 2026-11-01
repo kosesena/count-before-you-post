@@ -4,7 +4,7 @@
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#f5f2eb">
   <title>Count Before You Post · Warehouse Simulator</title>
-  <link rel="stylesheet" href="./style.css?v=card-1">
+  <link rel="stylesheet" href="./style.css?v=card-2">
   <script type="importmap">{"imports":{"three":"./vendor/three.module.js"}}</script>
 </head>
 <body>
@@ -53,7 +53,6 @@
   <aside id="evidence" hidden aria-label="Recorded delivery evidence"><button id="close-evidence" aria-label="Close evidence">×</button><p class="eyebrow">RECORDED EVIDENCE · NOT A LIVE AI RUN</p><h2>Why this decision?</h2><p id="evidence-warning"></p><dl id="evidence-rows"></dl><details open><summary>Original delivery note</summary><img id="evidence-note" alt="Recorded delivery note"></details><details><summary>Recorded counting-camera image</summary><img id="evidence-camera" alt="Recorded pallet camera evidence"></details><p>Images are from the recorded trial, not the current 3D camera. Document instructions are treated as untrusted data.</p></aside>
 <aside id="cast-card" hidden><label for="cast-select">MEET THE CREW</label><select id="cast-select" aria-label="Choose an agent"></select><p id="cast-caption"></p></aside>
   <div id="hint">Drag to look around <b>·</b> Scroll to zoom <b>·</b> Right-drag to pan</div>
-  <p id="codex-credit">Built with OpenAI Codex</p>
   <button id="clean" title="Hide / show interface (H)" aria-label="Hide or show interface">◩</button>
   <div id="touch" hidden><button data-key="w" aria-label="Forward">↑</button><div><button data-key="a" aria-label="Turn left">←</button><button data-key="s" aria-label="Reverse">↓</button><button data-key="d" aria-label="Turn right">→</button></div><button id="lift-up">Lift + (Q)</button><button id="lift-down">Lower − (Z)</button><button id="touch-load">Pick up / set down</button></div>
   <dialog id="instructions"><button id="close-help" aria-label="Close">×</button><div class="eyebrow">WAREHOUSE GUIDE</div><h2>Small pieces.<br>A bigger picture.</h2><p>Drag to orbit the scene, scroll to zoom, and right-drag to pan.</p><p><b>Forklift:</b> Select “Drive forklift”. Use W/S or ↑/↓ to move and A/D or ←/→ to turn. Press E to pick up or set down a pallet. Prepare the dock first. Set the pallet down in B-01 (unverified), then move it to the yellow inspection zone. Q/Z raise and lower the forks.</p><p><b>H</b> hides the interface. <b>R</b> resets the scene. “Play delivery” starts physical handling with recorded evidence. Blocked ERP writes go to H-01 for a separate handling decision. Use Pause and Playback speed to read at your own pace.</p><p class="footnote">A hackathon project demo using recorded decisions. It does not write to a live ERP.</p></dialog>
