@@ -35,11 +35,6 @@ export function buildReceivingScene({T,scene,group,box,cyl,label,twoSidedLabel,f
   const scanner=group(root,-5.3,1.55,-3.65);box(scanner,0,0,0,.15,.3,.15,C.black);box(scanner,0,.2,0,.32,.18,.3,C.teal);flush(scanner);
   hangingSign(['RECOUNT','REPACK'],-5,-1.3,3.2,'#174c3b');
   for(const x of [-5.8,-5.3])cyl(equipment,x,1.65,-.8,.15,.5,C.white,16);
-  // Hand pallet truck, parked with forks down in its own marked pocket.
-  const jack=group(equipment,-7.3,.2,-5.1);
-  for(const x of [-.34,.34]){box(jack,x,.18,.3,.22,.16,1.8,C.yellow);cyl(jack,x,.12,.95,.12,.16,C.black,16,0,0,Math.PI/2);}
-  box(jack,0,.3,-.55,.9,.32,.5,C.yellow);box(jack,0,.9,-.65,.08,1.2,.08,C.black);
-  box(jack,0,1.52,-.65,.55,.08,.08,C.black);flush(jack);floorTag('PALLET TRUCK',-7.2,-3.7,2);
   // Waste stations by the receiving desk, in bricks (written by hand, Claude Code): a wheelie bin
   // for stretch film and a roll cage for flattened cardboard. Each stays inside its old 0.8 m footprint.
   const filmMat=new T.MeshStandardMaterial({color:0xf4f8ff,transparent:true,opacity:.55,roughness:.1,side:T.DoubleSide,depthWrite:false});

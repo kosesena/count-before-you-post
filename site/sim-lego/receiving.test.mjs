@@ -40,7 +40,7 @@ for(const [op,value] of reviewRoute('accepted')){
  if(op==='drop'){load=rectangle(pose.x-Math.sin(pose.angle)*2.25,pose.z-Math.cos(pose.angle)*2.25,.9,.8,pose.angle);assert.ok(contained(load,areas.accepted));held=false;continue;}
  pose=movePose(pose,op==='move'?value:0,op==='turn'?value:0,{held,pallet:held?null:load,gateClosed:false,obstacles:[rectangle(13,7,.9,.8)]});assert.equal(pose.hit,false);
 }
-for(const [x,z] of [[-5,-4],[-5,-.8],[-7.3,-5.1]])assert.ok(blockedPose(x,z,0),'new equipment is solid');
+for(const [x,z] of [[-5,-4],[-5,-.8]])assert.ok(blockedPose(x,z,0),'new equipment is solid');
 console.log('Six handling policies, document/recount guards, B-01 staging, review routes and destination scans passed.');
 
 // Include workers at their final stations: the review return turn sweeps the

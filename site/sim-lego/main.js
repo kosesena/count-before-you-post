@@ -405,7 +405,7 @@ function buildLoad(overrideCount=null,spread=false){
 }
 buildLoad();
 const palletTag=twoSidedLabel(delivery,'UNVERIFIED',0,1.7,.87,1.7,.3,'#243238','#ffffff');
-function updatePalletTag(destination,quantity=null){const text=`P-${String(deliveryNumber).padStart(3,'0')} / ${destination}${quantity===null?'':' / '+quantity}`;for(const tag of [palletTag,receivingScene.printed]){const cv=tag.material.map.image,ctx=cv.getContext('2d');ctx.fillStyle='#ffffff';ctx.fillRect(0,0,cv.width,cv.height);ctx.fillStyle='#153d30';ctx.font=`bold ${Math.round(cv.height*.44)}px Arial`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(text,cv.width/2,cv.height/2,cv.width-12);tag.material.map.needsUpdate=true;}}
+function updatePalletTag(destination,quantity=null){const text=`P-${String(deliveryNumber).padStart(3,'0')} / ${destination}${quantity===null?'':' / '+quantity}`;for(const tag of [palletTag,receivingScene.printed]){const cv=tag.material.map.image,ctx=cv.getContext('2d');const refused=destination.startsWith('REFUSED');ctx.fillStyle=refused?'#c0392b':'#ffffff';ctx.fillRect(0,0,cv.width,cv.height);ctx.fillStyle=refused?'#ffffff':'#153d30';ctx.font=`bold ${Math.round(cv.height*.44)}px Arial`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(text,cv.width/2,cv.height/2,cv.width-12);tag.material.map.needsUpdate=true;}}
 const zone={x:4,z:-5.5};const gate=group(scene,zone.x,.18,zone.z);
 for(const z of [-1.6,1.6])box(gate,0,.03,z,4,.06,.12,C.yellow);for(const x of [-2,2])box(gate,x,.03,0,.12,.06,3.2,C.yellow);
 box(gate,2.3,.75,-1.8,.5,1.5,.55,C.black,true);box(gate,2.3,1.6,-1.8,.45,.3,.5,C.yellow);
@@ -446,7 +446,7 @@ function flowStep(index,text){[...flowList.children].forEach((li,i)=>{li.dataset
 function entryNow(){return caseData?.cases.find(c=>c.id===currentCase);}
 
 const keys=new Set();let cameraTween=null;let barrierTarget=0;
-const views={hero:{eye:[-1,6.5,21],target:[-1,3.5,-4]},table:{eye:[8,7,18],target:[-1,1.5,7]},rooms:{eye:[4,8,15],target:[-13,3.9,1]},dock:{eye:[18,16,16],target:[8,0,-4]},inspection:{eye:[10,13,17],target:[-2,1,-3]},review:{eye:[10,16,24],target:[10,1,7]},plan:{eye:[31,39,35],target:[6,0,0]},outside:{eye:[33,5.8,10],target:[22,2.7,-4]}};
+const views={hero:{eye:[-1,6.5,21],target:[-1,3.5,-4]},gatecheck:{eye:[10.5,6.2,3.2],target:[2.6,1.8,-6.4]},table:{eye:[8,7,18],target:[-1,1.5,7]},rooms:{eye:[4,8,15],target:[-13,3.9,1]},dock:{eye:[18,16,16],target:[8,0,-4]},inspection:{eye:[10,13,17],target:[-2,1,-3]},review:{eye:[10,16,24],target:[10,1,7]},plan:{eye:[31,39,35],target:[6,0,0]},outside:{eye:[33,5.8,10],target:[22,2.7,-4]}};
 // A live cinematic tour of this exact warehouse, with no external video.
 let introActive=false,introStarted=0;
 const introShots=[
@@ -576,7 +576,7 @@ function pickup(){
   scene.attach(delivery);delivery.position.y=area.y;delivery.rotation.y=pose.angle;state.held=false;physicalLocation=id;locationConfirmed=false;forkHeight=0;lift.position.y=0;
   if(id==='arrival'){arrivalDone=true;updatePalletTag('UNVERIFIED B-01');flowStep(2,'B-01: received physically, not yet verified. Move to the yellow inspection bay.');}
   else if(id==='inspection'){updatePalletTag('INSPECTION');if(!verified){state.running=true;state.phase=3;state.t=0;}document.querySelector('.playback').hidden=false;status('Forklift stopped. Receiver and digital checks inspect the load.');}
-  else if(id==='refused'){updatePalletTag('REFUSED');locationConfirmed=true;handlingDecision='refused';$('outcome-actions').hidden=false;showOutcomeActions(id);if(!automation)$('next-delivery').hidden=false;flowStep(6,`Refused at the dock: the pallet is back on the trailer. Nothing is received against ${order()?.number||'the order'}; the driver takes it back.`);}
+  else if(id==='refused'){updatePalletTag('REFUSED · RETURN TO SUPPLIER');locationConfirmed=true;handlingDecision='refused';$('outcome-actions').hidden=false;showOutcomeActions(id);if(!automation)$('next-delivery').hidden=false;flowStep(6,`Refused at the dock: the pallet is back on the trailer. Nothing is received against ${order()?.number||'the order'}; the driver takes it back.`);}
   else {flowStep(id==='hold'?4:6,`Delivery ${deliveryNumber} placed in ${area.address}. ${id==='hold'?'Awaiting a separate handling decision.':'Confirm the location to finish.'}`);$('next-delivery').hidden=true;$('outcome-actions').hidden=false;showOutcomeActions(id);}
   return true;
  }
@@ -599,7 +599,7 @@ function finish(){
  if(!entry){status('Recorded evidence unavailable. Delivery remains on hold.','#bd4931');$('demo').disabled=false;$('case').disabled=false;return;}
  state.result=entry.gate.action;verified=true;physicalLocation='inspection';barrierTarget=state.result==='post'?-Math.PI*.48:0;
  signals.forEach((s,i)=>s.material.emissiveIntensity=i===({block:0,human:1,post:2}[state.result])?2.5:.06);
- status(resultCopy[currentCase]+(currentCase==='hasarli'?' Recorded proposal: accept 11 intact cartons; isolate 1 damaged carton.':''));showMatch(entry);
+ status(resultCopy[currentCase]+(currentCase==='hasarli'?' Recorded proposal: accept 11 intact cartons; isolate 1 damaged carton.':''));showMatch(entry);setView('gatecheck');
  flowStep(state.result==='post'?5:4);$('outcome-actions').hidden=false;showOutcomeActions();
 }
 // Three-way match (written by hand, Claude Code): what was ordered, what the note says, what is on the pallet.
@@ -609,7 +609,9 @@ function showMatch(entry){const o=order(),n=entry.note?.items?.[0],v=entry.spark
  const palletNote=hidden?' · stacked, some hidden':damaged?` · ${damaged} damaged`:'';
  const rows=[['Ordered',o.number,`${o.ordered} × ${o.product}`,true],['Note','delivery note',`${n.quantity} × ${english(n.description)}${told?' · hidden instruction':''}`,!told&&n.quantity<=o.ordered&&same(n.description,o.product)],['Pallet','camera',`${hidden?counted+' visible':counted} × ${label}${palletNote}`,!hidden&&!damaged&&counted===n.quantity&&same(label,n.description)]];
  $('match-rows').replaceChildren(...rows.map(([k,src,val,ok])=>{const li=document.createElement('li');li.className=ok?'ok':'bad';li.innerHTML=`<b></b><span></span><i></i>`;li.children[0].textContent=k;li.children[1].textContent=val;li.children[2].textContent=ok?'✓':'✗';li.title=src;return li;}));
+ $('match-badge').textContent={post:'POST',block:'BLOCK',human:'ASK ŞEF'}[state.result]||'';$('match-badge').className=state.result||'';$('match-say').textContent=resultCopy[currentCase]||'';
  $('match').hidden=false;}
+$('match-close').onclick=()=>{$('match').hidden=true;};
 function showOutcomeActions(location='inspection'){
  const policy=reviewPolicy(currentCase), accepted=state.result==='post'||handlingDecision==='accepted';
  $('manual-transfer').hidden=location!=='inspection';$('storage-level').disabled=location!=='inspection'||!accepted;
@@ -649,15 +651,15 @@ function withShelfLift(commands){if(transferTarget!=='accepted'||areas.accepted.
 function forkPose(){return {x:fork.position.x,z:fork.position.z,angle:fork.rotation.y};}
 function manualForTarget(){state.running=false;automation=null;state.mode='orbit';$('drive').click();status(`Manual handling: place the load in ${areas[transferTarget].address}. The selected decision remains separate from the recorded ERP result.`);}
 $('transfer-load').onclick=()=>{
- if(!verified||state.running||physicalLocation!=='inspection')return;chooseDestination();
+ if(!verified||state.running||physicalLocation!=='inspection')return;chooseDestination();$('match').hidden=true;
  $('storage-level').disabled=true;$('transfer-load').hidden=true;$('manual-transfer').hidden=true;$('evidence').hidden=true;
  if(!atRouteStart(forkPose(),'inspection')){manualForTarget();return;}
  setView(transferTarget==='refused'?'dock':'plan');const route=transferTarget==='refused'?refuseRoute.map(c=>[...c]):destinationRoute(transferTarget);if(transferTarget==='hold')route.pop();
  flowStep(transferTarget==='hold'?4:5,transferTarget==='refused'?'Not what was ordered. Reloading the pallet onto the trailer.':transferTarget==='hold'?'ERP result retained. Moving to H-01 for a handling decision.':'Receiver prints the pallet label. Moving to the selected storage location.');
- startCommands(withShelfLift(route),()=>{showOutcomeActions(transferTarget);if(transferTarget==='refused')$('next-delivery').hidden=false;});
+ startCommands(withShelfLift(route),()=>{showOutcomeActions(transferTarget);if(transferTarget==='refused'){$('next-delivery').hidden=false;setView('outside');}});
 };
 $('storage-level').onchange=()=>{$('transfer-load').textContent=`Label & put away · A-01-L${$('storage-level').value}`;};
-$('manual-transfer').onclick=()=>{if(!verified||state.running||physicalLocation!=='inspection')return;chooseDestination();manualForTarget();};
+$('manual-transfer').onclick=()=>{if(!verified||state.running||physicalLocation!=='inspection')return;chooseDestination();$('match').hidden=true;manualForTarget();};
 $('review-inspect').onclick=()=>{
  if(state.running||physicalLocation!=='hold'||reviewTask)return;
  $('review-inspected').checked=false;receivingScene.repack();stageSupervisor();

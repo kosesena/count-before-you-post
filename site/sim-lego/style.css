@@ -285,11 +285,18 @@ body.cast-focus #panel{display:none}
 #loading-bar i{display:block;height:100%;width:4%;border-radius:5px;background:#263d35;transition:width .35s ease}
 @media(prefers-reduced-motion:reduce){#loading-bar i{transition:none}}
 
-/* Three-way match (written by hand, Claude Code): ordered, noted, counted. */
-#match{margin-top:14px;padding:10px 12px;border-radius:10px;background:#f3f1e7;border:1px solid #dcd8cb}
-#match .eyebrow{margin:0 0 8px}
-#match-rows{list-style:none;margin:0;padding:0;display:grid;gap:5px}
-#match-rows li{display:grid;grid-template-columns:58px 1fr 16px;align-items:center;gap:8px;font-size:11px;color:#26332f}
+/* Gate decision card (written by hand, Claude Code): the decision and the three-way match, over
+   the scene where it can be seen, not at the bottom of the panel. */
+#match{position:fixed;top:84px;left:50%;transform:translateX(-50%);width:min(460px,calc(100vw - 32px));z-index:6;padding:14px 16px 12px;border-radius:14px;background:#faf9f1f4;border:1px solid #fff;box-shadow:0 18px 50px #1f2e2a33;backdrop-filter:blur(12px)}
+#match .match-head{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:start;margin-bottom:10px}
+#match-badge{font-size:10px;font-weight:800;letter-spacing:1.4px;padding:5px 9px;border-radius:6px;color:#fff;background:#56645e;white-space:nowrap}
+#match-badge.post{background:#2f8a4a}#match-badge.block{background:#c0392b}#match-badge.human{background:#c48223}
+#match-say{margin:0;font-size:12px;line-height:1.45;color:#26332f}
+#match-close{border:0;background:none;font-size:20px;line-height:1;color:#6e7973;padding:0 2px}
+#match .eyebrow{margin:0 0 7px}
+#match-rows{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+#match-rows li{display:grid;grid-template-columns:62px 1fr 18px;align-items:center;gap:8px;font-size:12px;color:#26332f;padding:6px 8px;border-radius:7px;background:#fff}
 #match-rows li b{font-size:9px;letter-spacing:1.2px;text-transform:uppercase;color:#6e7973}
 #match-rows li i{font-style:normal;font-weight:800;text-align:center}
-#match-rows li.ok i{color:#2f8a4a}#match-rows li.bad{color:#9b2c1f}#match-rows li.bad i{color:#c0392b}
+#match-rows li.ok i{color:#2f8a4a}#match-rows li.bad{background:#fbecea;color:#9b2c1f}#match-rows li.bad i{color:#c0392b}
+@media(max-width:900px){#match{top:auto;bottom:96px}}
