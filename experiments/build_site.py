@@ -108,6 +108,8 @@ def agent_steps(trace):
             steps.append({"kind": "tool", "tool": t["tool"], "args": t["args"],
                           "result": short(r), "refused": refused,
                           "posted": isinstance(r, dict) and r.get("posted") is True})
+        if "at" in t:  # the wall-clock time the step was recorded (runs from 1 Nov on)
+            steps[-1]["at"] = t["at"]
     return steps
 
 
@@ -118,15 +120,13 @@ def build(lang):
         (SITE / sub / pre).mkdir(parents=True, exist_ok=True)
     perception = {r["variant"]: r for r in json.loads((RES / "check_warehouse.json").read_text())}
     cross = {r["variant"]: r for r in json.loads((RES / "cross_check.json").read_text())}
-    # Turkish: the ungated run is in agent_warehouse.json; other languages keep both runs
-    # in agent_warehouse_cross.json.
-    ungated_file = RES / ("agent_warehouse.json" if lang == "tr" else "agent_warehouse_cross.json")
-    ungated = {r["variant"]: r for r in json.loads(ungated_file.read_text()) if not r["gate"]}
+    # The agent runs on the page are the timed dry re-runs (every step has its time "at"; the
+    # gated receipt was not written to the ERP); the first recordings stay in RES.
+    runs = json.loads(agent_runs(lang).read_text())
+    ungated = {r["variant"]: r for r in runs if not r["gate"]}
     dfile = RES / "wonder_drafts.json"
     drafts = {r["variant"]: r for r in json.loads(dfile.read_text())} if dfile.exists() else {}
-    gated = {r["variant"]: r
-             for r in json.loads((RES / "agent_warehouse_cross.json").read_text())
-             if r["gate"] and "note" not in r}
+    gated = {r["variant"]: r for r in runs if r["gate"] and "note" not in r}
 
     # Şef's sign-off was recorded once, on the Turkish notes (run_signoff.py); every language
     # shows it as a follow-up of that Turkish run, labelled so.
@@ -158,7 +158,9 @@ def build(lang):
             "without_gate": u and {"posted": [q for q, _ in u["posted"]],
                                    "supervisor": bool(u["escalated"]), "answer": u["answer"],
                                    "seconds": u["seconds"], "steps": agent_steps(u["trace"])},
-            "agent": g and {"posted": g["posted"], "refused": g["refused"],
+            # A dry run has no ERP document number: the posted quantity alone.
+            "agent": g and {"posted": [q if doc is None else [q, doc] for q, doc in g["posted"]],
+                            "refused": g["refused"],
                             "supervisor": bool(g["escalated"]), "answer": g["answer"],
                             "seconds": g["seconds"], "steps": agent_steps(g["trace"])},
             # What happened after Şef answered (separate run, on the Turkish note).
@@ -438,14 +440,16 @@ def extras():
     return {"outside_agent": outside, "dialogue": dialogue, "second_reader": second}
 
 
+def agent_runs(lang):
+    return RES_TR / "timed" / lang / "agent_warehouse_cross.json"
+
+
 def complete(lang):
     """A language goes on the page once all six cases have both agent runs."""
-    f = results(lang) / "agent_warehouse_cross.json"
+    f = agent_runs(lang)
     if not f.exists():
         return False
     rows = json.loads(f.read_text())
-    if lang == "tr":
-        return True
     variants = {r["variant"] for r in json.loads((results(lang) / "check_warehouse.json").read_text())}
     return all({r["variant"] for r in rows if r["gate"] == g} >= variants for g in (True, False))
 
