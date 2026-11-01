@@ -671,7 +671,7 @@ const introShots=[
 function startIntro(){
  if(state.running)reset();
  cameraTween=null;keys.clear();state.mode='orbit';introStarted=performance.now();introActive=true;
- closeNavigation();$('cast-card').hidden=true;$('touch').hidden=true;
+ closeNavigation();$('touch').hidden=true;
  document.body.classList.remove('cast-focus','clean');document.body.classList.add('intro-playing');
  $('warehouse-intro').hidden=false;controls.enabled=false;$('skip-intro').focus();
 }
@@ -767,9 +767,11 @@ function updateReview(dt){
  status('Physical check complete (illustrative). Confirm the intact count; a corrected document is still required where indicated.');showOutcomeActions('hold');
 }
 function showRecordedConversation(){
+ const root=$('meeting-chat');
+ if(!root.hidden){if(root._close)root._close();else{root.hidden=true;document.body.classList.remove('conversation-open');}return;}
  const entry=entryNow();if(!entry)return;
  meetingRun=null;
- openConversation({root:$('meeting-chat'),entry,lines:replayLines(entry,followupData?.cases.find(c=>c.id===currentCase)?.signoff),
+ openConversation({root,entry,lines:replayLines(entry,followupData?.cases.find(c=>c.id===currentCase)?.signoff),cast:castSlots.map(s=>({id:s.id,name:s.name,job:castJobs[s.index]})),
   onClose:()=>document.body.classList.remove('conversation-open'),onEvidence:()=>{$('meeting-chat').hidden=true;document.body.classList.remove('conversation-open');renderEvidence();},onLocate:focusCast,
   onWorkflow:()=>{$('meeting-chat').hidden=true;document.body.classList.remove('conversation-open');document.body.classList.remove('cast-focus');}});
  document.body.classList.add('conversation-open');
@@ -921,20 +923,15 @@ $('pause-demo').onclick=()=>{state.paused=!state.paused;$('pause-demo').textCont
 $('demo').onclick=runDemo;$('case').onchange=()=>{currentCase=$('case').value;reset();buildLoad();};
 $('drive').onclick=()=>{if(state.running)return;if(!dockReady){status('Prepare the dock before driving.');return;}if(state.mode==='drive'){setView('hero');return;}cameraTween=null;state.mode='drive';controls.enabled=false;$('touch').hidden=false;$('drive').innerHTML='Exit driving <span>ESC</span>';status('Use WASD / arrow keys to drive. E picks up or sets down the load.');document.querySelectorAll('[data-view]').forEach(b=>b.classList.remove('active'));};
 document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>setView(b.dataset.view));
-const castSelect=$('cast-select');
-castSlots.forEach(slot=>{const option=document.createElement('option');option.value=slot.id;option.textContent=slot.name+(slot.loaded?'':' — unavailable');castSelect.appendChild(option);});
 function focusCast(id){
  const slot=castSlots.find(s=>s.id===id);if(!slot)return;
  setView('rooms');document.body.classList.add('cast-focus');scene.updateMatrixWorld(true);
  const pos=(slot.actor||slot.placeholder).getWorldPosition(new T.Vector3());
  const target=pos.clone().add(new T.Vector3(0,1.35,0));
  cameraTween={from:camera.position.clone(),targetFrom:controls.target.clone(),to:target.clone().add(new T.Vector3(5.3,.75,1.4)),targetTo:target,t:0};
- $('cast-caption').textContent=castJobs[slot.index];
  if(slot.wave){const action=slot.mixer.clipAction(slot.wave);action.reset().setLoop(T.LoopOnce,1);action.clampWhenFinished=false;action.play();}
  status(`${slot.name} · ${castJobs[slot.index]}`);
 }
-$('crew').onclick=()=>{const card=$('cast-card');card.hidden=!card.hidden;if(!card.hidden)focusCast(castSelect.value);else document.body.classList.remove('cast-focus');};
-castSelect.onchange=()=>focusCast(castSelect.value);
 function closeNavigation(){ $('scene-nav').hidden=true; $('open-nav').setAttribute('aria-expanded','false'); }
 $('open-nav').onclick=()=>{if(!$('scene-nav').hidden){closeNavigation();return;}$('scene-nav').hidden=false;$('open-nav').setAttribute('aria-expanded','true');$('close-nav').focus();};
 $('close-nav').onclick=()=>{closeNavigation();$('open-nav').focus();};
