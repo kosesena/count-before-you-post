@@ -150,6 +150,7 @@ function person(parent,x,y,z,color,hair=0x39271e,hat=false,scale=1,ry=0){const g
 // Two-storey office wing: fronts face the central warehouse, as in the reference.
 const OFFICE_WALL_SHIFT = -.20; // Back face -16.825 matches the wall inner face.
 const offices=group(scene,OFFICE_WALL_SHIFT);
+const BALCONY_DEPTH=1.8;
 const roomDefs=[['Spark',C.orange,0xd95c16],['Şef',C.blue,0x26231d],['Sam',0x369ce5,0x42352b],['Voice',0x2b62ca,0x252521],['Kapı',0x26589c,0x43302a],['Iris',C.pink,0xa91c81],['Ada',C.teal,0x171b20],['Glimmer',C.purple,0xc4a3df],['Wonder',0xe7b82a,0x784322],['Rover',0x287a6d,0x994422]];
 await stage('Preparing the crew…');
 for(let floor=0;floor<2;floor++)for(let n=0;n<5;n++){
@@ -172,7 +173,9 @@ for(let floor=0;floor<2;floor++)for(let n=0;n<5;n++){
  box(room,-.65,.5,-.85,.85,.13,.85,C.black);box(room,-.65,.32,-.85,.12,.35,.12,C.black);box(room,-.65,.93,-1.25,.85,.8,.12,C.black);
  plant(room,-1.65,.22,1.9);label(room,name==='Iris'?'✦':String(floor*5+n+1).padStart(2,'0'),-.8,2.45,-2.39,1.4,.85,'#faf4df','#617c87');
  if(name==='Iris'){for(let i=0;i<3;i++)label(room,['ART','COLOR','FORM'][i],-.9+i*.85,2.5,-2.38,.7,.9,['#ffc839','#fa9cb4','#6bb5c0'][i],'#ffffff');}
- if(floor===1){box(room,0,.2,3.1,4.35,.18,.9,0xa8b2b6,true);for(const xx of (n===0?[-1,0,1,2]:[-2,-1,0,1,2]))box(room,xx,.85,3.5,.06,1.2,.06,C.black);box(room,n===0?.55:0,1.45,3.5,n===0?3.2:4.3,.09,.1,C.black);box(room,n===0?.55:0,.73,3.5,n===0?3.2:4.3,.055,.06,C.black);}
+ // Balcony: deep enough to walk past an open door; the stair landing opens onto its full depth.
+ if(floor===1){const edge=2.65+BALCONY_DEPTH-.1;box(room,0,.2,2.65+BALCONY_DEPTH/2,4.35,.18,BALCONY_DEPTH,0xa8b2b6,true);for(const xx of [-2,-1,0,1,2])box(room,xx,.85,edge,.06,1.2,.06,C.black);for(const y of [1.45,.73])box(room,0,y,edge,4.3,y>1?.09:.055,y>1?.1:.06,C.black);
+  const ends=n===4?[[2.15,2.65]]:[];for(const [xx,from] of ends){const mid=(from+edge)/2,len=edge-from;box(room,xx,.85,mid,.06,1.2,.06,C.black);for(const y of [1.45,.73])box(room,xx,y,mid,.1,y>1?.09:.055,len,C.black);}}
  const placeholder=person(room,-.65,.18,.05,color,hair,name==='Sam'||name==='Şef',.9);
  castSlots.push({id:castIds[floor*5+n],name,room,placeholder,index:floor*5+n});
  flush(room);
@@ -231,17 +234,18 @@ function stairFlight(a,b){
 }
 stairFlight(stairAscent[0],stairAscent[1]);stairFlight(stairAscent[4],stairAscent[5]);
 box(stairs,-10.4,2.16,14.8,2.85,.16,1.05,steel);
-box(stairs,-11.2,4.22,11.15,1.25,.16,1.3,steel);
+box(stairs,-10.86,4.22,11.49,1.93,.16,.62,steel); // Top landing spans the full balcony depth and starts where the balcony ends, so the two floors never overlap.
 for(let x=-11.75;x<=-9.05;x+=.15)box(stairs,x,2.248,14.8,.035,.015,.95,rail);
 for(const x of [-11.82,-8.98]){
  for(const z of [14.35,15.25]){stairBeam([x,.18,z],[x,3.24,z],.12,steel);box(stairs,x,.2,z,.32,.08,.32,steel);}
  for(const y of [2.74,3.24])stairBeam([x,y,14.35],[x,y,15.25]);
 }
 for(const y of [2.74,3.24])stairBeam([-11.82,y,15.25],[-8.98,y,15.25]);
-for(const x of [-11.82,-10.58]){
+for(const x of [-11.82,-9.9]){
  stairBeam([x,.18,11.6],[x,5.3,11.6],.12,steel);
- for(const y of [4.8,5.3])stairBeam([x,y,10.65],[x,y,11.8]);
+ for(const y of [4.8,5.3])stairBeam([x,y,x>-11?11.18:10.65],[x,y,11.8]);
 }
+for(const y of [4.8,5.3])stairBeam([-10.58,y,11.8],[-9.9,y,11.8]);
 stairBeam([-11.82,.3,14.35],[-11.82,2.12,15.25],.08,steel);
 flush(stairs);
 // Meeting island: navy disk, yellow segmented ring, orange tiled round tabletop.
