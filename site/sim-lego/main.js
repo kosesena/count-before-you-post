@@ -24,7 +24,7 @@ const scene = new T.Scene(); scene.background = new T.Color(0xe7e9df);
 const renderer = new T.WebGLRenderer({antialias:true,alpha:false});
 renderer.setPixelRatio(Math.min(devicePixelRatio,1.7)); renderer.setSize(innerWidth,innerHeight);
 renderer.shadowMap.enabled = true; renderer.shadowMap.type = T.PCFSoftShadowMap;
-renderer.toneMapping = T.ACESFilmicToneMapping; renderer.toneMappingExposure = .95;
+renderer.toneMapping = T.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.;
 $('world').appendChild(renderer.domElement);
 const camera = new T.PerspectiveCamera(46,innerWidth/innerHeight,.15,180);
 const controls = new OrbitControls(camera,renderer.domElement);
@@ -33,19 +33,25 @@ controls.minDistance = 3; controls.maxDistance = 64; controls.target.set(-1,3.5,
 camera.position.set(-1,6.5,21);
 const pmrem = new T.PMREMGenerator(renderer);
 const env = new RoomEnvironment(); const envTarget = pmrem.fromScene(env,.04);
-scene.environment = envTarget.texture; scene.environmentIntensity = .48; env.dispose(); pmrem.dispose();
-scene.add(new T.HemisphereLight(0xeaf5ff,0xa3906e,.8));
-const sun = new T.DirectionalLight(0xffedcf,2.5); sun.position.set(18,22,8); sun.castShadow=true;
+scene.environment = envTarget.texture; scene.environmentIntensity = .33; env.dispose(); pmrem.dispose();
+scene.add(new T.HemisphereLight(0xeaf5ff,0xa3906e,.42));
+const sun = new T.DirectionalLight(0xffdfb2,2.05); sun.position.set(18,22,8); sun.castShadow=true;
 sun.shadow.mapSize.set(2048,2048); Object.assign(sun.shadow.camera,{left:-27,right:27,top:24,bottom:-24,near:1,far:65});
 sun.shadow.normalBias=.035; sun.shadow.bias=-.0001; scene.add(sun);
-const fill = new T.DirectionalLight(0xd8e7ff,.6);fill.position.set(-14,12,12);scene.add(fill);
+const fill = new T.DirectionalLight(0xd8e7ff,.32);fill.position.set(-14,12,12);scene.add(fill);
+// Round 2: no per-pendant lights; lamp pools are fake additive floor decals below.
 const matCache = new Map(), geoCache = new Map(), batches = new Map();
 function mat(color,rough=.25){const k=color+':'+rough;if(!matCache.has(k))matCache.set(k,new T.MeshPhysicalMaterial({color,roughness:rough,metalness:0,clearcoat:.24,clearcoatRoughness:.16}));return matCache.get(k);}
 const glass = new T.MeshPhysicalMaterial({color:0xd9f4fa,transparent:true,opacity:.12,roughness:.08,depthWrite:false,side:T.DoubleSide});
 const glow = new T.MeshStandardMaterial({color:0xfff1c8,emissive:0xffd27a,emissiveIntensity:5});
+const pendantGlow = new T.MeshStandardMaterial({color:0xfff1c8,emissive:0xffc27a,emissiveIntensity:3.2,roughness:.4});pendantGlow.toneMapped=false;
 // A soft additive halo around the small lamps, so they read as lit from a distance (written by hand, Claude Code).
 const haloMat=(()=>{const c=document.createElement('canvas');c.width=c.height=64;const g=c.getContext('2d'),r=g.createRadialGradient(32,32,0,32,32,32);r.addColorStop(0,'rgba(255,240,200,1)');r.addColorStop(.22,'rgba(255,214,140,.6)');r.addColorStop(1,'rgba(255,200,120,0)');g.fillStyle=r;g.fillRect(0,0,64,64);return new T.SpriteMaterial({map:new T.CanvasTexture(c),blending:T.AdditiveBlending,depthWrite:false,transparent:true});})();
 function halo(root,x,y,z,s=1){const h=new T.Sprite(haloMat);h.position.set(x,y,z);h.scale.set(s,s,1);root.add(h);}
+// Fake lamp pools: one shared warm radial decal, additive, no light cost.
+const poolTex=(()=>{const c=document.createElement('canvas');c.width=c.height=256;const g=c.getContext('2d'),r=g.createRadialGradient(128,128,0,128,128,128);r.addColorStop(0,'rgba(255,214,148,.5)');r.addColorStop(.4,'rgba(255,204,132,.22)');r.addColorStop(.75,'rgba(255,196,120,.06)');r.addColorStop(1,'rgba(255,190,115,0)');g.fillStyle=r;g.fillRect(0,0,256,256);const t=new T.CanvasTexture(c);t.colorSpace=T.SRGBColorSpace;return t;})();
+const poolMat=new T.MeshBasicMaterial({map:poolTex,transparent:true,opacity:.45,blending:T.AdditiveBlending,depthWrite:false,toneMapped:false});
+const poolGeo=new T.PlaneGeometry(6.5,6.5);
 function geom(type,w=1,h=1,d=1){const key=[type,w,h,d].join(':');if(!geoCache.has(key)){let g;if(type==='box')g=new RoundedBoxGeometry(w,h,d,1,Math.min(.035,w*.1,h*.1,d*.1));else if(type==='cyl')g=new T.CylinderGeometry(w,w,h,d);else if(type==='sphere')g=new T.SphereGeometry(w,12,8);else if(type==='torus')g=new T.TorusGeometry(w,h,8,d);geoCache.set(key,g);}return geoCache.get(key);}
 // Static meshes are instanced by geometry and material: thousands of physical studs, few draw calls.
 const temp = new T.Object3D();
@@ -113,7 +119,8 @@ for(let layer=0;layer<16;layer++)for(let z=-20;z<16;z+=1.6){
 for(let z=-19.2;z<16;z+=1.6)box(world,17,9.25,z,.45,3.15,1.585,C.wall,true);
 for(let x=-16;x<=16;x+=8){box(world,x,5.2,-19.65,.35,10.4,.6,0xb8bfbe);box(overhead,x,10.6,-2,.26,.35,36,0xb0b7b7,true);}
 for(let z=-19;z<=15;z+=6)box(overhead,0,10.55,z,34,.35,.26,0xaeb6b8,true);
-for(let x=-7;x<=11;x+=9)for(let z=-16;z<=14;z+=6){cyl(overhead,x,9.95,z,.035,1.05,C.black,8);const shade=new T.Mesh(new T.CylinderGeometry(.22,.65,.45,24),mat(C.black));shade.position.set(x,9.2,z);overhead.add(shade);cyl(overhead,x,8.98,z,.57,.045,glow,24);cyl(overhead,x,9.5,z,.15,.15,C.black,16);}
+// Pendant centres never sit inside racks (x≈16 / z≈-18.7) or offices (x<-9.8); only the meeting disk covers one.
+for(let x=-7;x<=11;x+=9)for(let z=-16;z<=14;z+=6){cyl(overhead,x,9.95,z,.035,1.05,C.black,8);const shade=new T.Mesh(new T.CylinderGeometry(.22,.65,.45,24),mat(C.black));shade.position.set(x,9.2,z);overhead.add(shade);cyl(overhead,x,8.98,z,.57,.045,pendantGlow,24);cyl(overhead,x,9.5,z,.15,.15,C.black,16);halo(overhead,x,8.8,z,2.2);if(Math.hypot(x+1,z-7)>4.4){const pool=new T.Mesh(poolGeo,poolMat);pool.rotation.x=-Math.PI/2;pool.position.set(x,.21,z);world.add(pool);}}
 flush(world);flush(overhead);
 await stage('Placing the bricks…');
 // Shelving sits flush to the perimeter; no islands in the central aisle.
