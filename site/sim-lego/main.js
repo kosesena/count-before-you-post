@@ -22,7 +22,7 @@ async function stage(text) { loadingText.textContent=text;stageAt=performance.no
 const C = {floor:0xc5c9cc,wall:0xd9dbd8,blue:0x0055bd,yellow:0xffcc00,orange:0xf47b13,navy:0x163360,teal:0x009e95,black:0x202326,red:0xc91a09,tan:0xd9b576,white:0xf4f3e9,pink:0xdc2485,purple:0x8553bf,green:0x438b40};
 const scene = new T.Scene(); scene.background = new T.Color(0xe7e9df);
 const renderer = new T.WebGLRenderer({antialias:true,alpha:false});
-renderer.setPixelRatio(Math.min(devicePixelRatio,1.7)); renderer.setSize(innerWidth,innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio,2)); renderer.setSize(innerWidth,innerHeight);
 renderer.shadowMap.enabled = true; renderer.shadowMap.type = T.PCFSoftShadowMap;
 renderer.toneMapping = T.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.;
 $('world').appendChild(renderer.domElement);
@@ -553,7 +553,8 @@ for(const z of [-6.7,-1.3])for(let x=18;x<35;x+=1.4)box(yard,x,-1.05,z,1.1,.07,.
 for(let z=-19;z<=15;z+=1)if(z<-7||z>1.6)box(yard,17.8,-1.02,z,1.4,.18,.98,0xbdc4c5);
 // Loading portal, rubber bumpers, awning and ribbed exterior cladding.
 for(const z of [-6.65,1.15]){box(yard,17.1,2.85,z,.55,5.7,.38,C.black,true);box(yard,17.35,.6,z,.25,1.15,.45,C.black);box(yard,17.55,-.4,z,.2,1.4,.2,C.yellow);}
-box(yard,17.1,5.65,-2.75,.65,.5,8.4,C.black,true);box(yard,17.6,6.1,-2.75,1.8,.18,8.6,0x4d5960,true);
+// Keep the portal faces clear of the wall at x=16.775: coplanar faces shimmer while orbiting.
+box(yard,17.1,5.65,-2.75,.71,.5,8.4,C.black,true);box(yard,17.6,6.1,-2.75,1.8,.18,8.6,0x4d5960,true);
 for(let z=-19.5;z<15.5;z+=.32)if(z<-7||z>1.6)box(yard,17.26,5.1,z,.075,10.2,.06,0xa9b0b1);
 // Raised side apron leaves the trailer deck clear; the parked forklift is visible outside.
 box(yard,17.1,.12,-2.75,.5,.18,7.3,0x8b969e,true);
