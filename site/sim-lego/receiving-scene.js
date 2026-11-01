@@ -91,16 +91,16 @@ export function buildReceivingScene({T,scene,group,box,cyl,label,twoSidedLabel,f
   const chocks=group(root);for(const x of [19.8,20.4])box(chocks,x,-.8,-5.68,.35,.35,.42,C.yellow);flush(chocks);chocks.visible=false;
   const signal=new T.Mesh(new T.SphereGeometry(.18,12,8),new T.MeshStandardMaterial({color:C.red,emissive:C.red,emissiveIntensity:1.5}));signal.position.set(17.8,2.8,-1.1);signal.visible=false;root.add(signal);
   hangingSign(['DRIVER','WAIT FOR RELEASE'],18.4,-.9,3.1,'#243238',4.3,6.05,Math.PI/2);
-  // Marked driver refuge on the ground-level yard, separated from the apron.
+  // Marked driver refuge on the ground-level yard, separated from the apron; the sign over the
+  // door says it, so the floor frame carries no second sign (Sena, 1 Nov).
   for(const z of [3,5.4])box(equipment,20.8,-1.04,z,3,.06,.08,C.green);
   for(const x of [19.3,22.3])box(equipment,x,-1.04,4.2,.08,.06,2.4,C.green);
-  twoSidedLabel(equipment,'DRIVER WAITING',20.8,1.7,5.35,3,.35,'#167443','#ffffff');
   box(equipment,20.8,-.55,5,.9,.6,.45,C.blue);
   const workLight=new T.Mesh(new T.CircleGeometry(.55,24),new T.MeshBasicMaterial({color:0x80eddd,transparent:true,opacity:.38,depthWrite:false}));workLight.rotation.x=-Math.PI/2;workLight.position.set(4,.2,-5.5);root.add(workLight);workLight.visible=false;
   // Briefing is a protected visitor area, not a required receiving operation.
   for(const z of [3,5,7,9,11])box(equipment,4,.85,z,.1,1.4,.1,C.teal);
   box(equipment,4,1.5,7,.1,.1,8,C.teal);box(equipment,4,.7,7,.1,.08,8,C.teal);
-  hangingSign(['BRIEFING','PEDESTRIANS ONLY'],-1,7,4.2,'#167c70',6.2);   // over the meeting table's centre (Sena, 1 Nov)
+  hangingSign(['BRIEFING','PEDESTRIANS ONLY'],-1,7,3.2,'#167c70',7.1);   // over the meeting table's centre, high and narrow so it does not hide the offices (Sena, 1 Nov)
   flush(equipment);
   function worker(name,x,y,z,color){
     const g=group(root,x,y,z);box(g,0,1.15,0,.66,.65,.4,color);box(g,0,1.14,.22,.68,.09,.025,C.white);
@@ -108,19 +108,21 @@ export function buildReceivingScene({T,scene,group,box,cyl,label,twoSidedLabel,f
     cyl(g,0,1.75,0,.25,.4,0xffce44,20);cyl(g,0,2,0,.29,.15,C.yellow,20);
     const legs=[-.18,.18].map(x=>{const l=group(g,x,.8,0);box(l,0,-.32,0,.25,.64,.3,C.navy);flush(l);return l;});
     const arms=[-.43,.43].map(x=>{const a=group(g,x,1.4,0);box(a,0,-.25,0,.2,.55,.25,color);flush(a);return a;});
-    twoSidedLabel(g,name,0,2.45,0,2.2,.3,'#243238','#ffffff');flush(g);return {g,legs,arms,home:new T.Vector3(x,y,z),route:[],task:'idle'};
+    if(name)twoSidedLabel(g,name,0,2.45,0,2.2,.3,'#243238','#ffffff');flush(g);return {g,legs,arms,home:new T.Vector3(x,y,z),route:[],task:'idle'};
   }
   const receiver=worker('RECEIVER',-5, .18,-2.7,C.orange);
-  const driver=worker('DRIVER',20.8,-1.05,4.1,C.orange);
+  const driver=worker(null,20.8,-1.05,4.1,C.orange);
   const workers=[receiver,driver];let elapsed=0;
   return {
     receiver,driver,scanner,printed,
     prepare(){chocks.visible=true;bridge.visible=true;signal.material.color.setHex(C.red);signal.material.emissive.setHex(C.red);receiver.task='documents';},
     inspect(){receiver.route=[new T.Vector3(-2,.18,-2.7),new T.Vector3(1,.18,-4.5)];receiver.task='scan';workLight.visible=true;},
     repack(){receiver.route=[new T.Vector3(1,.18,-2),new T.Vector3(12,.18,-2),new T.Vector3(12,.18,4.5)];receiver.task='repack';},
-    release(){signal.material.color.setHex(C.green);signal.material.emissive.setHex(C.green);bridge.visible=false;chocks.visible=false;},
-    reset(){for(const w of workers){w.g.position.copy(w.home);w.route=[];w.task='idle';}scanner.position.set(-5.3,1.55,-3.65);workLight.visible=false;bridge.visible=false;chocks.visible=false;signal.material.color.setHex(C.red);signal.material.emissive.setHex(C.red);},
-    tick(dt){elapsed+=dt;for(const w of workers){const next=w.route[0];if(next){const d=w.g.position.distanceTo(next),step=dt*2;w.g.lookAt(next.x,w.g.position.y,next.z);if(d<=step){w.g.position.copy(next);w.route.shift();}else w.g.position.addScaledVector(next.clone().sub(w.g.position).normalize(),step);w.legs.forEach((l,i)=>l.rotation.x=Math.sin(elapsed*7+i*Math.PI)*.35);}else{w.legs.forEach(l=>l.rotation.x=0);w.arms.forEach((a,i)=>a.rotation.x=w.task==='idle'?0:-.5+Math.sin(elapsed*3+i)*.1);}}
+    release(){signal.material.color.setHex(C.green);signal.material.emissive.setHex(C.green);bridge.visible=false;chocks.visible=false;
+      // On the green signal the driver leaves the refuge and climbs into the cab (Sena, 1 Nov).
+      driver.route=[new T.Vector3(23.6,-1.05,3.2),new T.Vector3(24.9,-1.05,-1.6)];driver.task='board';},
+    reset(){for(const w of workers){w.g.position.copy(w.home);w.route=[];w.task='idle';w.g.visible=true;}scanner.position.set(-5.3,1.55,-3.65);workLight.visible=false;bridge.visible=false;chocks.visible=false;signal.material.color.setHex(C.red);signal.material.emissive.setHex(C.red);},
+    tick(dt){elapsed+=dt;for(const w of workers){const next=w.route[0];if(!next&&w.task==='board'){w.g.visible=false;continue;}if(next){const d=w.g.position.distanceTo(next),step=dt*2;w.g.lookAt(next.x,w.g.position.y,next.z);if(d<=step){w.g.position.copy(next);w.route.shift();}else w.g.position.addScaledVector(next.clone().sub(w.g.position).normalize(),step);w.legs.forEach((l,i)=>l.rotation.x=Math.sin(elapsed*7+i*Math.PI)*.35);}else{w.legs.forEach(l=>l.rotation.x=0);w.arms.forEach((a,i)=>a.rotation.x=w.task==='idle'?0:-.5+Math.sin(elapsed*3+i)*.1);}}
       if(receiver.task==='scan'||receiver.task==='repack'){scanner.position.copy(receiver.g.position).add(new T.Vector3(.45,1.3,.1));receiver.g.lookAt(receiver.task==='scan'?4:10,.18,receiver.task==='scan'?-5.5:7);}workLight.material.opacity=.25+.13*Math.sin(elapsed*3);
     }
   };

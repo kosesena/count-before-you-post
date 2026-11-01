@@ -1,5 +1,5 @@
 import {openConversation} from './conversation.js?v=bilingual-1';
-import {buildReceivingScene} from './receiving-scene.js?v=rooms-2';
+import {buildReceivingScene} from './receiving-scene.js?v=release-1';
 import {receivingSteps,initialDestination,reviewPolicy,canAccept,locationMatches,atRouteStart,reviewRoute} from './receiving.mjs?v=order-1';
 import {participants,names,replayLines,english} from './replay.mjs?v=chat-3';
 import * as T from 'three';
@@ -624,7 +624,9 @@ for(const z of [-1.6,1.6])box(gate,0,.03,z,4,.06,.12,C.yellow);for(const x of [-
 box(gate,2.3,.75,-1.8,.5,1.5,.55,C.black,true);box(gate,2.3,1.6,-1.8,.45,.3,.5,C.yellow);
 const barrier=group(gate,2.3,1.75,-1.8);box(barrier,-1.95,0,0,3.9,.2,.18,C.white);for(let k=0;k<6;k++)box(barrier,-.25-k*.65,0,.105,.3,.205,.02,C.red);flush(barrier);
 box(gate,-2.4,1.4,-1.9,.14,2.8,.14,C.black);box(gate,-2.4,2.85,-1.9,.48,1.2,.35,C.black);
-const signals=[];for(let i=0;i<3;i++){const material=new T.MeshStandardMaterial({color:[0xd62e1e,0xf9b722,0x40a34d][i],emissive:[0xd62e1e,0xf9b722,0x40a34d][i],emissiveIntensity:.06,roughness:.2});const light=new T.Mesh(new T.CylinderGeometry(.14,.14,.06,24),material);light.rotation.x=Math.PI/2;light.position.set(-2.4,3.2-i*.35,-1.69);gate.add(light);signals.push(light);}
+const signals=[],signalColors=[0xd62e1e,0xf9b722,0x40a34d];for(let i=0;i<3;i++){const material=new T.MeshStandardMaterial({color:new T.Color(signalColors[i]).multiplyScalar(.22),emissive:signalColors[i],emissiveIntensity:0,roughness:.2});material.toneMapped=false;const light=new T.Mesh(new T.CylinderGeometry(.14,.14,.06,24),material);light.rotation.x=Math.PI/2;light.position.set(-2.4,3.2-i*.35,-1.69);gate.add(light);signals.push(light);}
+// Gate lamps: the lit one glows in full colour, the others stay dark lenses, so the decision reads at a glance (Sena, 1 Nov).
+function setGateSignal(on){signals.forEach((l,i)=>{l.material.color.set(signalColors[i]).multiplyScalar(i===on?1:.22);l.material.emissiveIntensity=i===on?2.2:0;});}
 box(gate,0,4.1,0,4.8,.18,.18,C.white,true);for(const x of [-2.4,2.4])box(gate,x,2.1,0,.14,4.2,.14,C.white);box(gate,0,3.9,0,.55,.35,.45,C.white);cyl(gate,0,3.68,.02,.12,.12,C.black,16);twoSidedLabel(gate,'RECEIVING',0,4.4,.12,2.5,.4,'#ffcc00','#243238');flush(gate);
 
 // Spare cartons and safety cones stay at the edges.
@@ -650,14 +652,14 @@ await stage('Finishing the details…');
 let caseData;
 try{const res=await fetch('../data.json');if(!res.ok)throw Error('data');caseData=await res.json();}catch{caseData=null;}
 const state={paused:false,speed:.5,mode:'orbit',held:false,running:false,phase:0,t:0,result:null};
-const completedLoads=[];let automation=null,transferTarget=null,verified=false,reviewResolved=false,deliveryNumber=1;let forkHeight=0;
+const completedLoads=[];let guided=false,liftTarget=0;let automation=null,transferTarget=null,verified=false,reviewResolved=false,deliveryNumber=1;let forkHeight=0;
 let dockReady=false,arrivalDone=false,inspectionRun=null,physicalLocation='trailer',locationConfirmed=false,handlingDecision=null,reviewTask=null,receivedQty=null;
 const flowList=$('receiving-steps');receivingSteps.forEach(text=>{const li=document.createElement('li');li.textContent=text;flowList.append(li);});
 function flowStep(index,text){[...flowList.children].forEach((li,i)=>{li.dataset.state=i<index?'done':i===index?'active':'pending';if(i===index)li.setAttribute('aria-current','step');else li.removeAttribute('aria-current');});if(text)status(text);}
 function entryNow(){return caseData?.cases.find(c=>c.id===currentCase);}
 
-const keys=new Set();let cameraTween=null;let barrierTarget=0;
-const views={hero:{eye:[-1,6.5,21],target:[-1,3.5,-4]},gatecheck:{eye:[10.5,6.2,3.2],target:[2.6,1.8,-6.4]},table:{eye:[8,7,18],target:[-1,1.5,7]},rooms:{eye:[4,8,15],target:[-13,3.9,1]},dock:{eye:[18,16,16],target:[8,0,-4]},inspection:{eye:[10,13,17],target:[-2,1,-3]},review:{eye:[10,16,24],target:[10,1,7]},plan:{eye:[31,39,35],target:[6,0,0]},outside:{eye:[33,5.8,10],target:[22,2.7,-4]}};
+window.__dbg={camera,fork,controls};const keys=new Set();let cameraTween=null;let barrierTarget=0;
+const views={putaway:{eye:[10,5.2,-4.6],target:[4,2,-12.4]},hero:{eye:[-1,6.5,21],target:[-1,3.5,-4]},gatecheck:{eye:[10.5,6.2,3.2],target:[2.6,1.8,-6.4]},table:{eye:[8,7,18],target:[-1,1.5,7]},rooms:{eye:[4,8,15],target:[-13,3.9,1]},dock:{eye:[18,16,16],target:[8,0,-4]},inspection:{eye:[10,13,17],target:[-2,1,-3]},review:{eye:[10,16,24],target:[10,1,7]},plan:{eye:[31,39,35],target:[6,0,0]},outside:{eye:[33,5.8,10],target:[22,2.7,-4]}};
 // A live cinematic tour of this exact warehouse, with no external video.
 let introActive=false,introStarted=0;
 const introShots=[
@@ -773,7 +775,7 @@ function showRecordedConversation(){
  document.body.classList.add('conversation-open');
 }
 $('show-meeting').onclick=showRecordedConversation;
-function reset(){$('match').hidden=true;receivedQty=null;resetReceiving();resetMeeting();buildLoad();for(const load of completedLoads){scene.remove(load.object);disposeLoadGraphics(load.object);}completedLoads.length=0;automation=null;transferTarget=null;verified=false;reviewResolved=false;forkHeight=0;$('evidence').hidden=true;$('outcome-actions').hidden=true;$('next-delivery').hidden=true;document.querySelector('.playback').hidden=true;state.paused=false;$('pause-demo').textContent='Pause';state.running=false;state.held=false;state.phase=0;state.result=null;state.mode='orbit';state.t=0;delivery.parent?.remove(delivery);scene.add(delivery);delivery.position.set(18.1,.18,-4);delivery.rotation.set(0,Math.PI/2,0);fork.position.set(18.2,.18,-.6);fork.rotation.y=-Math.PI/2;lift.position.y=0;barrierTarget=0;signals.forEach(s=>s.material.emissiveIntensity=.06);$('demo').disabled=false;$('case').disabled=false;status('Ready to explore.');setView('hero');}
+function reset(){guided=false;setGateSignal(-1);$('match').hidden=true;receivedQty=null;resetReceiving();resetMeeting();buildLoad();for(const load of completedLoads){scene.remove(load.object);disposeLoadGraphics(load.object);}completedLoads.length=0;automation=null;transferTarget=null;verified=false;reviewResolved=false;forkHeight=0;$('evidence').hidden=true;$('outcome-actions').hidden=true;$('next-delivery').hidden=true;document.querySelector('.playback').hidden=true;state.paused=false;$('pause-demo').textContent='Pause';state.running=false;state.held=false;state.phase=0;state.result=null;state.mode='orbit';state.t=0;delivery.parent?.remove(delivery);scene.add(delivery);delivery.position.set(18.1,.18,-4);delivery.rotation.set(0,Math.PI/2,0);fork.position.set(18.2,.18,-.6);fork.rotation.y=-Math.PI/2;liftTarget=0;barrierTarget=0;signals.forEach(s=>s.material.emissiveIntensity=.06);$('demo').disabled=false;$('case').disabled=false;status('Ready to explore.');setView('hero');}
 function pickup(){
  const pose={x:fork.position.x,z:fork.position.z,angle:fork.rotation.y};
  if(physicalLocation==='hold'&&!handlingDecision&&!state.held){status('Resolve the hold before collecting this load.');return false;}
@@ -784,7 +786,7 @@ function pickup(){
   if(!contained(p,area)){status(`Place the whole pallet inside ${area.address||'the inspection bay'}.`,'#c48223');return false;}
   if(Math.abs(forkHeight-(area.y-.18))>.12){status('Lower / raise the forks to the selected shelf level.','#c48223');return false;}
   if(id!=='refused'&&!placementClear(p,completedLoads.map(o=>rectangle(o.x,o.z,.9,.8,o.angle)))){status('The placement area is occupied or obstructed.','#c48223');return false;}
-  scene.attach(delivery);delivery.position.y=area.y;delivery.rotation.y=pose.angle;state.held=false;physicalLocation=id;locationConfirmed=false;forkHeight=0;lift.position.y=0;
+  scene.attach(delivery);delivery.position.y=area.y;delivery.rotation.y=pose.angle;state.held=false;physicalLocation=id;locationConfirmed=false;forkHeight=0;liftTarget=0;
   if(id==='arrival'){arrivalDone=true;updatePalletTag('UNVERIFIED B-01');flowStep(2,'B-01: received physically, not yet verified. Move to the yellow inspection bay.');}
   else if(id==='inspection'){updatePalletTag('INSPECTION');if(!verified){state.running=true;state.phase=3;state.t=0;}document.querySelector('.playback').hidden=false;status('Forklift stopped. Receiver and digital checks inspect the load.');}
   else if(id==='refused'){updatePalletTag('REFUSED · RETURN TO SUPPLIER');locationConfirmed=true;handlingDecision='refused';$('outcome-actions').hidden=false;showOutcomeActions(id);if(!automation)$('next-delivery').hidden=false;flowStep(6,`Refused at the dock: the pallet is back on the trailer. Nothing is received against ${order()?.number||'the order'}; the driver takes it back.`);}
@@ -794,7 +796,7 @@ function pickup(){
  const pos=delivery.getWorldPosition(new T.Vector3());
  if(!pickupAligned(pose,{x:pos.x,z:pos.z,angle:delivery.rotation.y})||Math.abs(forkHeight-(pos.y-.18))>.12){status('Align squarely with the pallet openings and match the fork height.','#c48223');return false;}
  if(blockedPose(pose.x,pose.z,pose.angle,{...collisionOptions(),held:true,pallet:null})){status('Not enough clearance to lift the pallet.','#c48223');return false;}
- fork.attach(delivery);delivery.position.set(0,.42+forkHeight,-2.25);delivery.rotation.set(0,0,0);state.held=true;physicalLocation='forklift';lift.position.y=forkHeight+.3;
+ fork.attach(delivery);delivery.position.set(0,.42+forkHeight,-2.25);delivery.rotation.set(0,0,0);state.held=true;physicalLocation='forklift';liftTarget=forkHeight+.3;
  status('Load secured. Keep it low while travelling.');return true;
 }
 const resultCopy={ok:'12 cartons verified. The receiving gate is open.',eksik:'11 cartons found; the note says 12. ERP write blocked; handling decision pending.',wrong:'The labels say corn oil; the note and the order say sunflower oil. ERP write blocked: refuse it at the dock.',hasarli:'A carton is damaged. Supervisor review required.',talimat:'Injected instructions found in the note. ERP write blocked; handling decision pending.',belirsiz:'Stacked cartons cannot be counted. Supervisor review required.'};
@@ -809,9 +811,11 @@ function finish(){
  const entry=caseData?.cases.find(c=>c.id===currentCase);state.running=false;automation=null;
  if(!entry){status('Recorded evidence unavailable. Delivery remains on hold.','#bd4931');$('demo').disabled=false;$('case').disabled=false;return;}
  state.result=entry.gate.action;verified=true;physicalLocation='inspection';barrierTarget=state.result==='post'?-Math.PI*.48:0;
- signals.forEach((s,i)=>s.material.emissiveIntensity=i===({block:0,human:1,post:2}[state.result])?2.5:.06);
+ setGateSignal({block:0,human:1,post:2}[state.result]);
  status(resultCopy[currentCase]+(currentCase==='hasarli'?' Recorded proposal: accept 11 intact cartons; isolate 1 damaged carton.':''));showMatch(entry);setView('gatecheck');
  flowStep(state.result==='post'?5:4);$('outcome-actions').hidden=false;showOutcomeActions();
+ // Guided playback carries on by itself: label and move the load after a short look at the decision (Sena, 1 Nov).
+ if(guided)setTimeout(()=>{if(guided&&!state.running&&physicalLocation==='inspection'&&!$('transfer-load').hidden)$('transfer-load').click();},2600);
 }
 // Three-way match (written by hand, Claude Code): what was ordered, what the note says, what is on the pallet.
 function showMatch(entry){const o=order(),n=entry.note?.items?.[0],v=entry.spark,c=entry.cross;if(!o||!n||!v){$('match').hidden=true;return;}
@@ -844,7 +848,8 @@ function stepCommands(dt){
   if(!pickup()){state.paused=true;$('pause-demo').textContent='Resume';return;}
   a.index++;a.remaining=null;return;
  }
- if(op==='lift'){forkHeight=T.MathUtils.damp(forkHeight,value,5,dt);lift.position.y=forkHeight+.3;if(state.held)delivery.position.y=.42+forkHeight;if(Math.abs(forkHeight-value)<.02){forkHeight=value;a.index++;}return;}
+ if(op==='lift'){if(a.remaining===null)a.remaining=0;// a steady hydraulic climb, about five seconds to the upper shelf
+  forkHeight+=Math.sign(value-forkHeight)*Math.min(Math.abs(value-forkHeight),dt*.48);liftTarget=forkHeight+.3;if(state.held)delivery.position.y=.42+forkHeight;if(Math.abs(forkHeight-value)<.02){forkHeight=value;a.index++;}return;}
  if(a.remaining===null)a.remaining=value;
  const delta=Math.sign(a.remaining)*Math.min(Math.abs(a.remaining),dt*(op==='turn'?.8:2.4));
  const next=movePose({x:fork.position.x,z:fork.position.z,angle:fork.rotation.y},op==='move'?delta:0,op==='turn'?delta:0,collisionOptions());
@@ -852,22 +857,22 @@ function stepCommands(dt){
  if(next.hit){state.paused=true;$('pause-demo').textContent='Resume';status('Route obstructed. Movement stopped; reset or clear the route.','#bd4931');return;}
  a.remaining-=delta;if(Math.abs(a.remaining)<.0001){a.index++;a.remaining=null;}
 }
-function runDemo(){if(state.running)return;if(physicalLocation!=='trailer'||Math.hypot(fork.position.x-18.2,fork.position.z+.6)>.1||Math.cos(fork.rotation.y+Math.PI/2)<.999){status('Continue manual handling, or press R and prepare the next exercise before guided playback.');return;}if(!dockReady){status('Complete dock preparation first.');return;}setView('dock');$('demo').disabled=true;$('case').disabled=true;flowStep(1,'Unload to B-01; the pallet is not accepted stock yet.');const commands=collectRoute.map(c=>[...c]);commands.splice(7,0,['drop'],['wait',3],['pickup']);startCommands(commands,()=>{state.running=true;state.phase=3;state.t=0;});}
+function runDemo(){if(state.running)return;if(physicalLocation!=='trailer'||Math.hypot(fork.position.x-18.2,fork.position.z+.6)>.1||Math.cos(fork.rotation.y+Math.PI/2)<.999){status('Continue manual handling, or press R and prepare the next exercise before guided playback.');return;}if(!dockReady){status('Complete dock preparation first.');return;}guided=true;setView('dock');$('demo').disabled=true;$('case').disabled=true;flowStep(1,'Unload to B-01; the pallet is not accepted stock yet.');const commands=collectRoute.map(c=>[...c]);commands.splice(7,0,['drop'],['wait',3],['pickup']);startCommands(commands,()=>{state.running=true;state.phase=3;state.t=0;});}
 // The purchase order the delivery is received against (data.json, the Turkish run), in English.
 function order(){const o=caseData?.order;return o&&{...o,product:english(o.product)};}
 // What this delivery leaves on the order line once it is received.
 function onOrder(){const o=order();if(!o||physicalLocation!=='accepted')return '';const q=receivedQty??12,left=o.ordered-q;return ` Received ${q} of ${o.ordered} on ${o.number}${left>0?`; ${left} still open: claim the shortfall from the supplier or close the line`:'; order line complete'}.`;}
 function chooseDestination(){transferTarget=initialDestination(state.result,currentCase);const upper=$('storage-level').value==='1';areas.accepted.y=upper?2.53:.18;areas.accepted.address=upper?'A-01-L1':'A-01-L0';updatePalletTag(areas[transferTarget].address,state.result==='post'?12:null);}
-function withShelfLift(commands){if(transferTarget!=='accepted'||areas.accepted.y<1)return commands;const copy=commands.map(c=>[...c]),i=copy.findIndex(c=>c[0]==='drop');copy.splice(i,0,['lift',2.35]);return copy;}
+function withShelfLift(commands){if(transferTarget!=='accepted'||areas.accepted.y<1)return commands;const copy=commands.map(c=>[...c]),i=copy.findIndex(c=>c[0]==='drop');copy.splice(i,0,['wait',1.4],['lift',2.35],['wait',.9]);return copy;}
 function forkPose(){return {x:fork.position.x,z:fork.position.z,angle:fork.rotation.y};}
 function manualForTarget(){state.running=false;automation=null;state.mode='orbit';$('drive').click();status(`Manual handling: place the load in ${areas[transferTarget].address}. The selected decision remains separate from the recorded ERP result.`);}
 $('transfer-load').onclick=()=>{
  if(!verified||state.running||physicalLocation!=='inspection')return;chooseDestination();$('match').hidden=true;
  $('storage-level').disabled=true;$('transfer-load').hidden=true;$('manual-transfer').hidden=true;$('evidence').hidden=true;
  if(!atRouteStart(forkPose(),'inspection')){manualForTarget();return;}
- setView(transferTarget==='refused'?'dock':'plan');const route=transferTarget==='refused'?refuseRoute.map(c=>[...c]):destinationRoute(transferTarget);if(transferTarget==='hold')route.pop();
+ if(!guided)setView(transferTarget==='refused'?'dock':'plan');const route=transferTarget==='refused'?refuseRoute.map(c=>[...c]):destinationRoute(transferTarget);if(transferTarget==='hold')route.pop();
  flowStep(transferTarget==='hold'?4:5,transferTarget==='refused'?'Not what was ordered. Reloading the pallet onto the trailer.':transferTarget==='hold'?'ERP result retained. Moving to H-01 for a handling decision.':'Receiver prints the pallet label. Moving to the selected storage location.');
- startCommands(withShelfLift(route),()=>{showOutcomeActions(transferTarget);if(transferTarget==='refused'){$('next-delivery').hidden=false;setView('outside');}});
+ startCommands(withShelfLift(route),()=>{showOutcomeActions(transferTarget);if(guided&&transferTarget==='accepted')setView('putaway');if(guided&&['accepted','returned'].includes(physicalLocation))setTimeout(()=>{if(!guided)return;$('location-code').value=areas[physicalLocation].address;$('confirm-location').click();},1800);if(transferTarget==='refused'){$('next-delivery').hidden=false;setView('outside');}});
 };
 $('storage-level').onchange=()=>{$('transfer-load').textContent=`Label & put away · A-01-L${$('storage-level').value}`;};
 $('manual-transfer').onclick=()=>{if(!verified||state.running||physicalLocation!=='inspection')return;chooseDestination();$('match').hidden=true;manualForTarget();};
@@ -900,6 +905,8 @@ $('confirm-location').onclick=()=>{
  const expected=areas[physicalLocation].address;
  if(!locationMatches($('location-code').value,expected)){status(`Location does not match. Read ${expected} at the destination and try again.`,'#c48223');return;}
  locationConfirmed=true;$('next-delivery').hidden=false;$('location-confirm').hidden=true;
+ // Guided playback closes the exercise: the dock is released, the light turns green and the driver boards.
+ if(guided)setTimeout(()=>{if(guided&&!$('next-delivery').hidden)$('next-delivery').click();},2600);
  flowStep(7,`${expected} confirmed for P-${String(deliveryNumber).padStart(3,'0')}. ${physicalLocation==='returned'?'Awaiting carrier collection.':'Put-away complete.'}${onOrder()} No live inventory update.`);
 };
 $('close-evidence').onclick=()=>$('evidence').hidden=true;$('show-evidence').onclick=renderEvidence;
@@ -935,7 +942,7 @@ document.addEventListener('pointerdown',e=>{if(!$('scene-nav').hidden&&!$('scene
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('scene-nav').hidden){e.preventDefault();e.stopImmediatePropagation();closeNavigation();$('open-nav').focus();}},true);
 $('office-doors').onclick=()=>{const open=$('office-doors').getAttribute('aria-pressed')!=='true';$('office-doors').setAttribute('aria-pressed',String(open));officeDoors.forEach(d=>d.userData.open=open);};
 $('walk-route').onclick=()=>{walkStarted=performance.now();setView('rooms');status('Pedestrian route: public walkway → near-side stairs → balcony. No entry into controlled storage.');};
-function adjustLift(delta){if(state.running||state.mode!=='drive')return;forkHeight=T.MathUtils.clamp(forkHeight+delta,0,2.35);lift.position.y=forkHeight+(state.held?.3:0);if(state.held)delivery.position.y=.42+forkHeight;status(`Fork height: ${forkHeight.toFixed(2)} · Lower before driving.`);}
+function adjustLift(delta){if(state.running||state.mode!=='drive')return;forkHeight=T.MathUtils.clamp(forkHeight+delta,0,2.35);liftTarget=forkHeight+(state.held?.3:0);if(state.held)delivery.position.y=.42+forkHeight;status(`Fork height: ${forkHeight.toFixed(2)} · Lower before driving.`);}
 $('lift-up').onclick=()=>adjustLift(.1);$('lift-down').onclick=()=>adjustLift(-.1);
 $('help').onclick=()=>$('instructions').showModal();$('close-help').onclick=()=>$('instructions').close();$('clean').onclick=()=>document.body.classList.toggle('clean');
 window.addEventListener('keydown',e=>{if(['SELECT','INPUT','TEXTAREA'].includes(e.target.tagName)||$('instructions').open)return;const k=e.key.toLowerCase();if(['arrowup','arrowdown','arrowleft','arrowright',' '].includes(k))e.preventDefault();keys.add(k);if(e.repeat)return;if(k==='h')document.body.classList.toggle('clean');if(k==='r')reset();if(k==='q')adjustLift(.1);if(k==='z')adjustLift(-.1);if(k==='escape')setView('hero');if(k==='e'&&state.mode==='drive'&&!state.running)pickup();});
@@ -946,10 +953,26 @@ function collisionOptions(){return {held:state.held,gateClosed:barrier.rotation.
 function blocked(x,z,angle=fork.rotation.y){return blockedPose(x,z,angle,collisionOptions());}
 let collisionNotice=false;
 const clock=new T.Clock();
-function animate(){requestAnimationFrame(animate);updateHeadlights(performance.now()/1000);const dt=Math.min(clock.getDelta(),.05);receivingScene.tick(state.paused?0:dt*state.speed);updateWorkActors(state.paused?0:dt*state.speed);state.t+=state.running?(state.paused?0:dt*state.speed):dt;for(const slot of castSlots)slot.mixer?.update(state.paused&&slot.onFloor?0:dt);for(const slot of castSlots)if(!slot.onFloor||slot.seated)slot.legs?.forEach(leg=>leg.rotation.x=-Math.PI/2);
+function animate(){requestAnimationFrame(animate);updateHeadlights(performance.now()/1000);const dt=Math.min(clock.getDelta(),.05);
+ // The carriage eases to its height and a held pallet rides on it, so picking up and setting down never jump (by hand, 1 Nov).
+ lift.position.y=T.MathUtils.damp(lift.position.y,liftTarget,9,state.paused?0:dt*state.speed);if(state.held)delivery.position.y=.12+lift.position.y;
+ receivingScene.tick(state.paused?0:dt*state.speed);updateWorkActors(state.paused?0:dt*state.speed);state.t+=state.running?(state.paused?0:dt*state.speed):dt;for(const slot of castSlots)slot.mixer?.update(state.paused&&slot.onFloor?0:dt);for(const slot of castSlots)if(!slot.onFloor||slot.seated)slot.legs?.forEach(leg=>leg.rotation.x=-Math.PI/2);
  for(const slot of castSlots){if(slot.seated&&slot.id===meetingRun?.speaker&&!state.paused){const t=clock.elapsedTime;slot.arms?.forEach((arm,i)=>{arm.rotation.x=-.18-.12*Math.sin(t*2.8+i);arm.rotation.z=(i?1:-1)*(.04+.035*Math.sin(t*2));});}}
  for(const door of officeDoors)door.rotation.y=T.MathUtils.damp(door.rotation.y,door.userData.open?-Math.PI*.47:0,4,dt);
  if(walkStarted){const t=(performance.now()-walkStarted)/1000;const points=[[-9.6,.18,3],...stairApproach,...stairAscent.slice(1),[-11.2,4.3,9.4],[-11.2,4.3,3]];let duration=0;for(let i=0;i<points.length-1;i++){const a=new T.Vector3(...points[i]),b=new T.Vector3(...points[i+1]),d=a.distanceTo(b)/1.4;if(t>=duration&&t<duration+d){walkingGuide.position.lerpVectors(a,b,(t-duration)/d);walkingGuide.rotation.y=Math.atan2(b.x-a.x,b.z-a.z);break;}duration+=d;}if(t>duration){walkStarted=0;status('Pedestrian route complete: upper office balcony.');}}
+ // Guided playback films what is moving: while the forklift runs a route the camera rides beside
+ // it at three-quarter view, and rises with the forks when they lift a pallet (Sena, 1 Nov).
+ if(guided&&automation&&!state.paused&&!cameraTween){const cmd=automation.commands[automation.index],nextCmd=automation.commands[automation.index+1],lifting=forkHeight>.25||cmd?.[0]==='lift'||(cmd?.[0]==='wait'&&nextCmd?.[0]==='lift');
+  const fwd=new T.Vector3(-Math.sin(fork.rotation.y),0,-Math.cos(fork.rotation.y)),toCentre=fork.position.x>0?-1:1;
+  let aim,eye;
+  if(lifting){// Side-on to the mast while it raises the pallet, so the forks, the load and the shelf are all in frame.
+   aim=fork.position.clone().addScaledVector(fwd,2).add(new T.Vector3(0,1.2+forkHeight*.75,0));
+   eye=aim.clone().add(new T.Vector3(toCentre*5.2,.9,1.6));}
+  else{// A front three-quarter view from the hall's centre side, clear of the wall racks and offices.
+   aim=fork.position.clone().add(new T.Vector3(0,1.4,0));eye=aim.clone().add(new T.Vector3(toCentre*3.2,3,5.6));}
+  // Inside the trailer the camera looks in from the hall through the open dock door.
+  if(fork.position.x>=16.8)eye.set(14.4,3.3,fork.position.z+1.4);else eye.x=T.MathUtils.clamp(eye.x,-10,14.6);eye.y=Math.min(eye.y,8);
+  camera.position.lerp(eye,1-Math.exp(-dt*2.2));controls.target.lerp(aim,1-Math.exp(-dt*3));}
  if(cameraTween){const a=cameraTween;a.t+=dt;const p=Math.min(1,a.t/1.3),q=p*p*(3-2*p);camera.position.lerpVectors(a.from,a.to,q);controls.target.lerpVectors(a.targetFrom,a.targetTo,q);if(p===1)cameraTween=null;}
  if(state.mode==='drive'&&!state.running){const turn=(keys.has('a')||keys.has('arrowleft')?1:0)-(keys.has('d')||keys.has('arrowright')?1:0);const speed=(keys.has('w')||keys.has('arrowup')?1:0)-(keys.has('s')||keys.has('arrowdown')?1:0);const next=movePose({x:fork.position.x,z:fork.position.z,angle:fork.rotation.y},(forkHeight>.4?0:speed)*dt*3.2,(forkHeight>.4?0:turn)*dt*1.5,collisionOptions());fork.position.x=next.x;fork.position.z=next.z;fork.rotation.y=next.angle;
  if(next.hit){status('Obstacle ahead. Reverse or change direction.','#d19a31');collisionNotice=true;}else if(collisionNotice&&(speed||turn)){status(state.held?'Load secured. Take it to the yellow zone; press E to set down.':'Use WASD / arrow keys to drive. E picks up or sets down the load.');collisionNotice=false;}
