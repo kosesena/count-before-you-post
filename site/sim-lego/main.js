@@ -1,4 +1,4 @@
-import {openConversation} from './conversation.js?v=sentences-1';
+import {openConversation} from './conversation.js?v=layout-1';
 import {buildReceivingScene} from './receiving-scene.js?v=faces-1';
 import {receivingSteps,initialDestination,reviewPolicy,canAccept,locationMatches,atRouteStart,reviewRoute} from './receiving.mjs?v=order-1';
 import {participants,names,replayLines,english} from './replay.mjs?v=sentences-1';
@@ -647,7 +647,7 @@ twoSidedLabel(circulation,'A-01 · L0 / L1',4,4.65,-11.08,2.8,.35,'#0055bd','#ff
 // Q-01 markings are provided by the receiving equipment module.
 flush(circulation);
 const receivingScene=buildReceivingScene({T,scene,group,box,cyl,label,twoSidedLabel,flush,sheet,C});
-const walkingGuide=person(scene,-9.6,.18,3,0x72933d,0x242521,false,.8);let walkStarted=0;
+const walkingGuide=person(scene,-9.6,.18,3,0x72933d,0x242521,false,.8);let walkStarted=0;walkingGuide.visible=false;   // only shown while the 'Walk upstairs' route plays (Sena, 1 Nov)
 await stage('Finishing the details…');
 let caseData;
 try{const res=await fetch('../data.json');if(!res.ok)throw Error('data');caseData=await res.json();}catch{caseData=null;}
@@ -655,10 +655,27 @@ const state={paused:false,speed:.5,mode:'orbit',held:false,running:false,phase:0
 const completedLoads=[];let guided=false,liftTarget=0;let automation=null,transferTarget=null,verified=false,reviewResolved=false,deliveryNumber=1;let forkHeight=0;
 let dockReady=false,arrivalDone=false,inspectionRun=null,physicalLocation='trailer',locationConfirmed=false,handlingDecision=null,reviewTask=null,receivedQty=null;
 const flowList=$('receiving-steps');receivingSteps.forEach(text=>{const li=document.createElement('li');li.textContent=text;flowList.append(li);});
-function flowStep(index,text){[...flowList.children].forEach((li,i)=>{li.dataset.state=i<index?'done':i===index?'active':'pending';if(i===index)li.setAttribute('aria-current','step');else li.removeAttribute('aria-current');});if(text)status(text);}
+const stepAgents=['Receiving','Forklift','Forklift','Spark · Sam · Kapı','Şef','Forklift','Receiving'];
+const stepNotes=new Array(receivingSteps.length).fill('');
+function renderSteps(active){
+ [...flowList.children].forEach((li,i)=>{
+  const done=active>receivingSteps.length-1||i<active,current=i===active&&!done;
+  const note=done?(stepNotes[i]||'Done'):current?(stepNotes[i]||'Up next'):'More coming';
+  li.replaceChildren();
+  const marker=document.createElement('span');marker.className='step-marker';marker.setAttribute('aria-hidden','true');
+  const copy=document.createElement('span');copy.className='step-copy';
+  const name=document.createElement('strong');name.textContent=receivingSteps[i];
+  const agent=document.createElement('small');agent.textContent=stepAgents[i]||'';
+  const line=document.createElement('span');line.className='step-note';line.textContent=note;
+  copy.append(name,agent,line);
+  if(current){const bar=document.createElement('span');bar.className='step-bar';bar.append(document.createElement('i'));copy.append(bar);}
+  li.append(marker,copy);
+ });
+}
+function flowStep(index,text){[...flowList.children].forEach((li,i)=>{li.dataset.state=i<index?'done':i===index?'active':'pending';if(i===index)li.setAttribute('aria-current','step');else li.removeAttribute('aria-current');});if(text){status(text);stepNotes[Math.min(index,stepNotes.length-1)]=text;}renderSteps(index);}
 function entryNow(){return caseData?.cases.find(c=>c.id===currentCase);}
 
-window.__dbg={camera,fork,controls,get slots(){return castSlots},get rs(){return receivingScene}};const keys=new Set();let cameraTween=null;let barrierTarget=0;
+const keys=new Set();let cameraTween=null;let barrierTarget=0;
 const views={putaway:{eye:[10,5.2,-4.6],target:[4,2,-12.4]},hero:{eye:[-1,6.5,21],target:[-1,3.5,-4]},gatecheck:{eye:[10.5,6.2,3.2],target:[2.6,1.8,-6.4]},table:{eye:[8,7,18],target:[-1,1.5,7]},rooms:{eye:[4,8,15],target:[-13,3.9,1]},dock:{eye:[18,16,16],target:[8,0,-4]},inspection:{eye:[10,13,17],target:[-2,1,-3]},review:{eye:[10,16,24],target:[10,1,7]},plan:{eye:[31,39,35],target:[6,0,0]},outside:{eye:[33,5.8,10],target:[22,2.7,-4]}};
 // A live cinematic tour of this exact warehouse, with no external video.
 let introActive=false,introStarted=0;
@@ -694,23 +711,35 @@ function updateIntro(){
 $('skip-intro').onclick=()=>endIntro();$('replay-intro').onclick=startIntro;
 document.addEventListener('keydown',e=>{if(introActive&&e.key==='Escape'){e.preventDefault();e.stopImmediatePropagation();endIntro();}},true);
 function status(text,color='#799c70'){$('status').querySelector('span').textContent=text;$('status').querySelector('i').style.background=color;}
-function setView(name){if(introActive)endIntro(false);$('scene-nav').hidden=true;$('open-nav').setAttribute('aria-expanded','false');document.body.classList.remove('cast-focus');state.mode='orbit';$('touch').hidden=true;$('drive').innerHTML='Drive forklift <span>W A S D</span>';const v=views[name];const aim=new T.Vector3(...v.target);const eye=new T.Vector3(...v.eye);if(camera.aspect<1.25)eye.sub(aim).multiplyScalar(Math.min(1.75,1.25/camera.aspect)).add(aim);cameraTween={from:camera.position.clone(),targetFrom:controls.target.clone(),to:eye,targetTo:aim,t:0};document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===name));controls.enabled=true;}
+function setView(name){if(introActive)endIntro(false);$('scene-nav').hidden=true;$('open-nav').setAttribute('aria-expanded','false');document.body.classList.remove('cast-focus');state.mode='orbit';$('touch').hidden=true;$('drive').innerHTML=DRIVE_ICON;$('drive').classList.add('icon-only');$('drive').title='Drive forklift · WASD';const v=views[name];const aim=new T.Vector3(...v.target);const eye=new T.Vector3(...v.eye);if(camera.aspect<1.25)eye.sub(aim).multiplyScalar(Math.min(1.75,1.25/camera.aspect)).add(aim);cameraTween={from:camera.position.clone(),targetFrom:controls.target.clone(),to:eye,targetTo:aim,t:0};document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===name));controls.enabled=true;}
 let meetingRun=null;
 let chatLive=null;
 const CHAT_TYPING=1;
 function chatLinesNow(){const entry=entryNow();return entry?replayLines(entry,followupData?.cases.find(c=>c.id===currentCase)?.signoff):[];}
+function updateInspectorSpeaker(id){
+ updateInspectorSpeaker.current=id;
+ const slot=castSlots.find(s=>s.id===id);
+ const avatarId=slot?.id||id||'kapi';
+ $('insp-avatar').src=`../img/av-${avatarId}.jpg`;
+ $('insp-avatar').alt=slot?.name||names[id]||'';
+ $('insp-name').textContent=slot?.name||names[id]||'Kapı';
+ $('insp-role').textContent=slot?castJobs[slot.index]||'':'';
+ const pill=$('insp-status');
+ const holdPending=!$('review-controls').hidden&&physicalLocation==='hold';
+ const speaking=!!(id&&chatLive&&!chatLive.done);
+ pill.textContent=speaking?'WORKING':holdPending?'WAITING':'READY';
+ pill.className='pill'+(speaking?' working':holdPending?' waiting':'');
+}
 function pushChatToUI(){
  const root=$('meeting-chat');
  if(!root._setTeamLive||!chatLive)return;
  root._setTeamLive(chatLive.shown,chatLive.done||chatLive.phase!=='typing'?null:chatLive.lines[chatLive.current]?.speaker||null);
+ updateInspectorSpeaker(root._getTeamLive?.().active||null);
 }
+// The words stay in the chat; the scene keeps only the NEEDS YOU card.
 function sayChatLine(line){
- const slot=castSlots.find(s=>s.id===line.speaker);
- if(!slot?.actor)return;
  meetingRun={speaker:line.speaker};
- $('speech-name').textContent=slot.name||names[line.speaker]||line.speaker;
- $('speech-text').textContent=line.text;
- $('speech').hidden=false;
+ updateInspectorSpeaker(line.speaker);
 }
 // Each message stays long enough to read: about 3 s for a short line, up to 7 s for a long reason (Sena, 1 Nov).
 function readTime(line){return Math.min(7,Math.max(3,1.4+String(line?.text||'').length*.045));}
@@ -733,17 +762,26 @@ function updateChat(dt){
 function chatReady(){return !chatLive||chatLive.done;}
 const castHomes=new Map(castSlots.filter(s=>s.actor).map(s=>[s.id,{position:s.actor.position.clone(),rotation:s.actor.rotation.clone()}]));
 let followupData=null;try{const r=await fetch('../data-en.json');if(r.ok)followupData=await r.json();}catch{}
+function openTeamView(forceLive=false){
+ const entry=entryNow();if(!entry)return;
+ const root=$('meeting-chat');
+ openConversation({root,entry,lines:chatLinesNow(),cast:castSlots.map(s=>({id:s.id,name:s.name,job:castJobs[s.index]})),initialView:'team',live:forceLive||(!!chatLive&&!chatLive.done),
+  onClose:()=>switchTab('inspector'),onEvidence:()=>renderEvidence(),onLocate:focusCast,
+  onWorkflow:()=>switchTab('inspector')});
+ applyTab();
+}
 function resetMeeting(){
- meetingRun=null;document.body.classList.remove('conversation-open');$('meeting-chat').hidden=true;$('speech').hidden=true;
+ meetingRun=null;
  for(const slot of castSlots){const home=castHomes.get(slot.id);if(!home)continue;slot.room.add(slot.actor);slot.actor.position.copy(home.position);slot.actor.rotation.copy(home.rotation);slot.onFloor=false;slot.route=null;slot.seated=false;slot.walk?.stop();slot.idle?.play();}
+ openTeamView();
 }
 function resetReceiving(){
- dockReady=false;arrivalDone=false;inspectionRun=null;reviewTask=null;physicalLocation='trailer';locationConfirmed=false;handlingDecision=null;
- receivingScene.reset();setDockSignal(false);updatePalletTag('UNVERIFIED');$('prepare-dock').disabled=false;$('prepare-dock').textContent='Prepare dock & receive documents';
+ dockReady=false;arrivalDone=false;inspectionRun=null;reviewTask=null;physicalLocation='trailer';locationConfirmed=false;handlingDecision=null;stepNotes.fill('');
+ receivingScene.reset();setDockSignal(false);updatePalletTag('UNVERIFIED');$('prepare-dock').disabled=false;$('prepare-dock').hidden=false;
  $('dock-checks').textContent='Vehicle restraint · bridge plate · driver refuge · delivery note';
- $('review-inspected').checked=false;$('review-document').checked=false;$('review-count').value='0';$('location-code').value='';$('location-confirm').hidden=true;
+ $('review-inspected').checked=false;$('review-document').checked=false;$('review-count').value='0';$('location-code').value='';$('location-confirm').hidden=true;$('review-controls').hidden=true;
  for(const slot of castSlots){slot.workRoute=null;slot.working=false;}
- areas.accepted.y=.18;areas.accepted.address='A-01-L0';$('storage-level').value='0';flowStep(0);
+ areas.accepted.y=.18;areas.accepted.address='A-01-L0';$('storage-level').value='0';flowStep(0);updateSceneNeed();
 }
 $('prepare-dock').onclick=()=>{
  if(state.running||dockReady)return;
@@ -755,7 +793,7 @@ $('prepare-dock').onclick=()=>{
 function updateDock(){
  const t=state.t;
  $('dock-checks').textContent=t<2?`1 / 3 · Driver in refuge; delivery note matched to ${order()?.number||'the purchase order'}.`:t<4?'2 / 3 · Trailer secured; deck and pallet condition checked.':'3 / 3 · Bridge plate in position; unloading route clear.';
- if(t>=6){receivingScene.prepare();dockReady=true;state.running=false;state.phase=0;$('prepare-dock').textContent='Dock prepared';$('demo').disabled=false;flowStep(1,'Dock ready. Play delivery or drive the forklift to B-01.');}
+ if(t>=6){receivingScene.prepare();dockReady=true;state.running=false;state.phase=0;$('prepare-dock').hidden=true;$('demo').disabled=false;flowStep(1,'Dock ready. Play delivery or drive the forklift to B-01.');}
 }
 function deployWorker(id,x,z){
  const slot=castSlots.find(s=>s.id===id);if(!slot?.actor)return;
@@ -805,19 +843,14 @@ function updateReview(dt){
  status('Physical check complete (illustrative). Confirm the intact count; a corrected document is still required where indicated.');showOutcomeActions('hold');
 }
 function showRecordedConversation(opts={}){
- const root=$('meeting-chat');
- if(!root.hidden&&!opts.force){if(root._close)root._close();else{root.hidden=true;document.body.classList.remove('conversation-open');}return;}
- const entry=entryNow();if(!entry)return;
+ if(!entryNow())return;
  if(!(guided&&chatLive&&!chatLive.done))meetingRun=null;
- const wantTeam=opts.team===true||(opts.team!==false&&guided);
- openConversation({root,entry,lines:replayLines(entry,followupData?.cases.find(c=>c.id===currentCase)?.signoff),cast:castSlots.map(s=>({id:s.id,name:s.name,job:castJobs[s.index]})),initialView:wantTeam?'team':null,live:!!opts.live,
-  onClose:()=>document.body.classList.remove('conversation-open'),onEvidence:()=>{$('meeting-chat').hidden=true;document.body.classList.remove('conversation-open');renderEvidence();},onLocate:focusCast,
-  onWorkflow:()=>{$('meeting-chat').hidden=true;document.body.classList.remove('conversation-open');document.body.classList.remove('cast-focus');}});
- document.body.classList.add('conversation-open');
- if(guided&&chatLive&&!opts.live)pushChatToUI();
+ openTeamView(!!opts.live);
+ switchTab('team');
+ if(guided&&chatLive&&!chatLive.done)pushChatToUI();
 }
-$('show-meeting').onclick=()=>showRecordedConversation();$('agents-top').onclick=()=>showRecordedConversation();
-function reset(){guided=false;setGateSignal(-1);$('match').hidden=true;receivedQty=null;resetReceiving();resetMeeting();buildLoad();for(const load of completedLoads){scene.remove(load.object);disposeLoadGraphics(load.object);}completedLoads.length=0;automation=null;transferTarget=null;verified=false;reviewResolved=false;forkHeight=0;$('evidence').hidden=true;$('outcome-actions').hidden=true;$('next-delivery').hidden=true;document.querySelector('.playback').hidden=true;state.paused=false;$('pause-demo').textContent='Pause';state.running=false;state.held=false;state.phase=0;state.result=null;state.mode='orbit';state.t=0;delivery.parent?.remove(delivery);scene.add(delivery);delivery.position.set(18.1,.18,-4);delivery.rotation.set(0,Math.PI/2,0);fork.position.set(18.2,.18,-.6);fork.rotation.y=-Math.PI/2;liftTarget=0;barrierTarget=0;signals.forEach(s=>s.material.emissiveIntensity=.06);$('demo').disabled=false;$('case').disabled=false;status('Ready to explore.');setView('hero');}
+$('show-meeting').onclick=()=>{closeMoreMenu();showRecordedConversation();};
+function reset(){guided=false;setGateSignal(-1);$('match').hidden=true;receivedQty=null;resetReceiving();resetMeeting();buildLoad();for(const load of completedLoads){scene.remove(load.object);disposeLoadGraphics(load.object);}completedLoads.length=0;automation=null;transferTarget=null;verified=false;reviewResolved=false;forkHeight=0;$('evidence').hidden=true;$('outcome-actions').hidden=true;$('next-delivery').hidden=true;document.querySelector('.playback').hidden=true;state.paused=false;$('pause-demo').textContent='Pause';state.running=false;state.held=false;state.phase=0;state.result=null;state.mode='orbit';state.t=0;delivery.parent?.remove(delivery);scene.add(delivery);delivery.position.set(18.1,.18,-4);delivery.rotation.set(0,Math.PI/2,0);fork.position.set(18.2,.18,-.6);fork.rotation.y=-Math.PI/2;liftTarget=0;barrierTarget=0;signals.forEach(s=>s.material.emissiveIntensity=.06);$('demo').disabled=false;$('case').disabled=false;status('Ready to explore.');syncDeliveryCards();updateDeliveryTitle();updateInspectorSpeaker(null);switchTab('inspector');setView('hero');}
 function pickup(){
  const pose={x:fork.position.x,z:fork.position.z,angle:fork.rotation.y};
  if(physicalLocation==='hold'&&!handlingDecision&&!state.held){status('Resolve the hold before collecting this load.');return false;}
@@ -847,13 +880,13 @@ function renderEvidence(){
  for(const [name,value] of evidenceRows(entry,order())){const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=name;dd.textContent=value;list.append(dt,dd);}
  $('evidence-note').src='../'+(entry?.images.note||'');$('evidence-camera').src='../'+(entry?.images.camera||'');
  $('evidence-warning').textContent=entry?.note.embedded_instructions?.length?'Untrusted document text — instructions below were NOT executed. '+entry.note.embedded_instructions.join(' | '):entry?.what||'';
- $('evidence').hidden=false;
+ switchTab('evidence');
 }
 function finish(){
  const entry=caseData?.cases.find(c=>c.id===currentCase);state.running=false;automation=null;
  if(!entry){status('Recorded evidence unavailable. Delivery remains on hold.','#bd4931');$('demo').disabled=false;$('case').disabled=false;return;}
  if(chatLive&&!chatLive.done){chatLive.shown=chatLive.lines.length;chatLive.done=true;pushChatToUI();}
- chatLive=null;meetingRun=null;$('speech').hidden=true;
+ const lastSpeaker=meetingRun?.speaker||null;chatLive=null;meetingRun=null;updateInspectorSpeaker(lastSpeaker);
  state.result=entry.gate.action;verified=true;physicalLocation='inspection';barrierTarget=state.result==='post'?-Math.PI*.48:0;
  setGateSignal({block:0,human:1,post:2}[state.result]);
  status(resultCopy[currentCase]+(currentCase==='hasarli'?' Recorded proposal: accept 11 intact cartons; isolate 1 damaged carton.':''));showMatch(entry);setView('gatecheck');
@@ -882,6 +915,7 @@ function showOutcomeActions(location='inspection'){
  $('location-confirm').hidden=!['accepted','returned'].includes(location);if(location==='refused'){$('transfer-load').hidden=true;$('manual-transfer').hidden=true;}
  $('location-prompt').textContent=`P-${String(deliveryNumber).padStart(3,'0')} → ${areas[location]?.address||''}. Enter the destination address to confirm this simulated scan.`;
  if(location==='hold')stageSupervisor();
+ updateSceneNeed();
 }
 function startCommands(commands,onComplete){automation={commands:commands.map(x=>[...x]),index:0,remaining:null,onComplete};state.running=true;state.paused=false;state.phase=4;$('pause-demo').textContent='Pause';document.querySelector('.playback').hidden=false;}
 function stepCommands(dt){
@@ -902,7 +936,12 @@ function stepCommands(dt){
  if(next.hit){state.paused=true;$('pause-demo').textContent='Resume';status('Route obstructed. Movement stopped; reset or clear the route.','#bd4931');return;}
  a.remaining-=delta;if(Math.abs(a.remaining)<.0001){a.index++;a.remaining=null;}
 }
-function runDemo(){if(state.running)return;if(physicalLocation!=='trailer'||Math.hypot(fork.position.x-18.2,fork.position.z+.6)>.1||Math.cos(fork.rotation.y+Math.PI/2)<.999){status('Continue manual handling, or press R and prepare the next exercise before guided playback.');return;}if(!dockReady){status('Complete dock preparation first.');return;}guided=true;setView('dock');$('demo').disabled=true;$('case').disabled=true;flowStep(1,'Unload to B-01; the pallet is not accepted stock yet.');chatLive=null;$('speech').hidden=true;showRecordedConversation({team:true,live:true,force:true});const commands=collectRoute.map(c=>[...c]);commands.splice(7,0,['drop'],['wait',3],['pickup']);startCommands(commands,()=>{state.running=true;state.phase=3;state.t=0;});}
+// Edge buttons slide the columns away so the warehouse has the screen (Sena, 1 Nov).
+function setColumn(side,hidden){document.body.classList.toggle(side+'-hidden',hidden);const b=$('toggle-'+side);if(b){b.textContent=(side==='left')===hidden?'›':'‹';b.setAttribute('aria-label',(hidden?'Show':'Hide')+(side==='left'?' the delivery list':' the side panel'));}}
+$('toggle-left').onclick=()=>setColumn('left',!document.body.classList.contains('left-hidden'));
+$('toggle-right').onclick=()=>setColumn('right',!document.body.classList.contains('right-hidden'));
+const DRIVE_ICON='<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 17V8h6l3 5v4M13 13h3M18 4v13h3"/><circle cx="6.5" cy="17.5" r="1.8"/><circle cx="12" cy="17.5" r="1.8"/></svg>';
+function runDemo(){if(state.running)return;if(physicalLocation!=='trailer'||Math.hypot(fork.position.x-18.2,fork.position.z+.6)>.1||Math.cos(fork.rotation.y+Math.PI/2)<.999){status('Continue manual handling, or press R and prepare the next exercise before guided playback.');return;}if(!dockReady){status('Complete dock preparation first.');return;}guided=true;setColumn('left',true);setView('dock');$('demo').disabled=true;$('case').disabled=true;flowStep(1,'Unload to B-01; the pallet is not accepted stock yet.');chatLive=null;showRecordedConversation({team:true,live:true,force:true});const commands=collectRoute.map(c=>[...c]);commands.splice(7,0,['drop'],['wait',3],['pickup']);startCommands(commands,()=>{state.running=true;state.phase=3;state.t=0;});}
 // The purchase order the delivery is received against (data.json, the Turkish run), in English.
 function order(){const o=caseData?.order;return o&&{...o,product:english(o.product)};}
 // What this delivery leaves on the order line once it is received.
@@ -938,17 +977,21 @@ $('review-approve').onclick=()=>{
  receivedQty=count;reviewResolved=true;handlingDecision='accepted';barrierTarget=-Math.PI*.48;transferTarget='accepted';areas.accepted.y=.18;areas.accepted.address='A-01-L0';
  buildLoad(count);updatePalletTag('A-01-L0',count);
  if(currentCase==='hasarli'){const isolated=group(scene,13,.18,7);pallet(isolated,0,0,0);crate(isolated,0,.36,0,.51,.26,.64);twoSidedLabel(isolated,'Q-01 · 1 DAMAGED',0,1,0,1.5,.3,'#c48223','#ffffff');flush(isolated);completedLoads.push({object:isolated,x:13,z:7,angle:0});}
- $('review-controls').hidden=true;flowStep(5,reviewPolicy(currentCase).document?`Corrected note verified on its own: it now says ${count}, as counted. Not an override of the blocked receipt: a new check, where note, order and count agree. Label and secure the load.`:`Supervisor signs off ${count} (the gate sent this delivery to a person). Label and secure the load.`);
+ $('review-controls').hidden=true;updateSceneNeed();flowStep(5,reviewPolicy(currentCase).document?`Corrected note verified on its own: it now says ${count}, as counted. Not an override of the blocked receipt: a new check, where note, order and count agree. Label and secure the load.`:`Supervisor signs off ${count} (the gate sent this delivery to a person). Label and secure the load.`);
  if(!atRouteStart(forkPose(),'hold')){manualForTarget();return;}
  setView('plan');startCommands(reviewRoute('accepted'),()=>showOutcomeActions('accepted'));
 };
 $('review-return').onclick=()=>{
  if(state.running||physicalLocation!=='hold'||state.held)return;
- transferTarget='returned';updatePalletTag('R-01');handlingDecision='returned';reviewResolved=true;$('review-controls').hidden=true;
+ transferTarget='returned';updatePalletTag('R-01');handlingDecision='returned';reviewResolved=true;$('review-controls').hidden=true;updateSceneNeed();
  status('Supervisor authorized a return. Move to R-01 for collection; this is not a completed outbound shipment.');
  if(!atRouteStart(forkPose(),'hold')){manualForTarget();return;}
  setView('plan');startCommands(reviewRoute('returned'),()=>showOutcomeActions('returned'));
 };
+$('scene-review').onclick=()=>{switchTab('inspector');$('review-inspect').click();};
+$('insp-review').onclick=()=>$('review-inspect').click();
+$('scene-approve').onclick=()=>{switchTab('inspector');$('review-approve').click();};
+$('insp-approve').onclick=()=>$('review-approve').click();
 $('confirm-location').onclick=()=>{
  if(state.running||state.held||!['accepted','returned'].includes(physicalLocation))return;
  const expected=areas[physicalLocation].address;
@@ -958,17 +1001,17 @@ $('confirm-location').onclick=()=>{
  if(guided)setTimeout(()=>{if(guided&&!$('next-delivery').hidden)$('next-delivery').click();},2600);
  flowStep(7,`${expected} confirmed for P-${String(deliveryNumber).padStart(3,'0')}. ${physicalLocation==='returned'?'Awaiting carrier collection.':'Put-away complete.'}${onOrder()} No live inventory update.`);
 };
-$('close-evidence').onclick=()=>$('evidence').hidden=true;$('show-evidence').onclick=renderEvidence;
+$('close-evidence').onclick=()=>switchTab('inspector');$('show-evidence').onclick=()=>{closeMoreMenu();renderEvidence();};
 $('next-delivery').onclick=()=>{
  if(state.running||state.held||!locationConfirmed)return;
  const li=document.createElement('li');li.textContent=`Delivery ${deliveryNumber} · ${currentCase} · ${transferTarget==='refused'?'refused · back on the trailer':areas[transferTarget].address} · ERP ${state.result} (recorded) · handling ${handlingDecision||transferTarget} (simulated)${currentCase==='hasarli'&&handlingDecision==='accepted'?' · 1 carton remains Q-01 quarantined':''}`;$('delivery-history').prepend(li);
  // End this exercise. This clears its scene, not persistent inventory or an outbound shipment.
  receivingScene.release();setDockSignal(true);setView('outside');state.running=true;state.phase=9;state.t=0;$('next-delivery').hidden=true;status('Exercise saved. Receiver releases the dock; driver receives the green signal.');
 };
-$('toggle-panel').onclick=()=>{const collapsed=$('panel').classList.toggle('collapsed');$('panel-controls').hidden=collapsed;$('toggle-panel').textContent=collapsed?'+':'−';$('toggle-panel').setAttribute('aria-expanded',String(!collapsed));$('toggle-panel').setAttribute('aria-label',collapsed?'Expand controls':'Minimize controls');};
+
 $('pause-demo').onclick=()=>{state.paused=!state.paused;$('pause-demo').textContent=state.paused?'Resume':'Pause';};$('play-speed').onchange=()=>{state.speed=Number($('play-speed').value);};
 $('demo').onclick=runDemo;$('case').onchange=()=>{currentCase=$('case').value;reset();buildLoad();};
-$('drive').onclick=()=>{if(state.running)return;if(!dockReady){status('Prepare the dock before driving.');return;}if(state.mode==='drive'){setView('hero');return;}cameraTween=null;state.mode='drive';controls.enabled=false;$('touch').hidden=false;$('drive').innerHTML='Exit driving <span>ESC</span>';status('Use WASD / arrow keys to drive. E picks up or sets down the load.');document.querySelectorAll('[data-view]').forEach(b=>b.classList.remove('active'));};
+$('drive').onclick=()=>{if(state.running)return;if(!dockReady){status('Prepare the dock before driving.');return;}if(state.mode==='drive'){setView('hero');return;}cameraTween=null;state.mode='drive';controls.enabled=false;$('touch').hidden=false;$('drive').innerHTML='Exit driving <span>ESC</span>';$('drive').classList.remove('icon-only');status('Use WASD / arrow keys to drive. E picks up or sets down the load.');document.querySelectorAll('[data-view]').forEach(b=>b.classList.remove('active'));};
 document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>setView(b.dataset.view));
 function focusCast(id){
  const slot=castSlots.find(s=>s.id===id);if(!slot)return;
@@ -985,7 +1028,7 @@ $('close-nav').onclick=()=>{closeNavigation();$('open-nav').focus();};
 document.addEventListener('pointerdown',e=>{if(!$('scene-nav').hidden&&!$('scene-nav').contains(e.target)&&!$('open-nav').contains(e.target))closeNavigation();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('scene-nav').hidden){e.preventDefault();e.stopImmediatePropagation();closeNavigation();$('open-nav').focus();}},true);
 $('office-doors').onclick=()=>{const open=$('office-doors').getAttribute('aria-pressed')!=='true';$('office-doors').setAttribute('aria-pressed',String(open));officeDoors.forEach(d=>d.userData.open=open);};
-$('walk-route').onclick=()=>{walkStarted=performance.now();setView('rooms');status('Pedestrian route: public walkway → near-side stairs → balcony. No entry into controlled storage.');};
+$('walk-route').onclick=()=>{walkStarted=performance.now();walkingGuide.visible=true;setView('rooms');status('Pedestrian route: public walkway → near-side stairs → balcony. No entry into controlled storage.');};
 function adjustLift(delta){if(state.running||state.mode!=='drive')return;forkHeight=T.MathUtils.clamp(forkHeight+delta,0,2.35);liftTarget=forkHeight+(state.held?.3:0);if(state.held)delivery.position.y=.42+forkHeight;status(`Fork height: ${forkHeight.toFixed(2)} · Lower before driving.`);}
 $('lift-up').onclick=()=>adjustLift(.1);$('lift-down').onclick=()=>adjustLift(-.1);
 $('help').onclick=()=>$('instructions').showModal();$('close-help').onclick=()=>$('instructions').close();$('clean').onclick=()=>document.body.classList.toggle('clean');
@@ -1003,7 +1046,7 @@ function animate(){requestAnimationFrame(animate);updateHeadlights(performance.n
  receivingScene.tick(state.paused?0:dt*state.speed);updateWorkActors(state.paused?0:dt*state.speed);state.t+=state.running?(state.paused?0:dt*state.speed):dt;for(const slot of castSlots)slot.mixer?.update(state.paused&&slot.onFloor?0:dt);for(const slot of castSlots)if(!slot.onFloor||slot.seated)slot.legs?.forEach(leg=>leg.rotation.x=-Math.PI/2);
  for(const slot of castSlots){if(slot.seated&&slot.id===meetingRun?.speaker&&!state.paused){const t=clock.elapsedTime;slot.arms?.forEach((arm,i)=>{arm.rotation.x=-.18-.12*Math.sin(t*2.8+i);arm.rotation.z=(i?1:-1)*(.04+.035*Math.sin(t*2));});}}
  for(const door of officeDoors)door.rotation.y=T.MathUtils.damp(door.rotation.y,door.userData.open?-Math.PI*.47:0,4,dt);
- if(walkStarted){const t=(performance.now()-walkStarted)/1000;const points=[[-9.6,.18,3],...stairApproach,...stairAscent.slice(1),[-11.2,4.3,9.4],[-11.2,4.3,3]];let duration=0;for(let i=0;i<points.length-1;i++){const a=new T.Vector3(...points[i]),b=new T.Vector3(...points[i+1]),d=a.distanceTo(b)/1.4;if(t>=duration&&t<duration+d){walkingGuide.position.lerpVectors(a,b,(t-duration)/d);walkingGuide.rotation.y=Math.atan2(b.x-a.x,b.z-a.z);break;}duration+=d;}if(t>duration){walkStarted=0;status('Pedestrian route complete: upper office balcony.');}}
+ if(walkStarted){const t=(performance.now()-walkStarted)/1000;const points=[[-9.6,.18,3],...stairApproach,...stairAscent.slice(1),[-11.2,4.3,9.4],[-11.2,4.3,3]];let duration=0;for(let i=0;i<points.length-1;i++){const a=new T.Vector3(...points[i]),b=new T.Vector3(...points[i+1]),d=a.distanceTo(b)/1.4;if(t>=duration&&t<duration+d){walkingGuide.position.lerpVectors(a,b,(t-duration)/d);walkingGuide.rotation.y=Math.atan2(b.x-a.x,b.z-a.z);break;}duration+=d;}if(t>duration){walkStarted=0;walkingGuide.visible=false;status('Pedestrian route complete: upper office balcony.');}}
  // Guided playback films what is moving: while the forklift runs a route the camera rides beside
  // it at three-quarter view, and rises with the forks when they lift a pallet (Sena, 1 Nov).
  if(guided&&automation&&!state.paused&&!cameraTween){const cmd=automation.commands[automation.index],nextCmd=automation.commands[automation.index+1],lifting=forkHeight>.25||cmd?.[0]==='lift'||(cmd?.[0]==='wait'&&nextCmd?.[0]==='lift');
@@ -1022,12 +1065,123 @@ function animate(){requestAnimationFrame(animate);updateHeadlights(performance.n
  if(next.hit){status('Obstacle ahead. Reverse or change direction.','#d19a31');collisionNotice=true;}else if(collisionNotice&&(speed||turn)){status(state.held?'Load secured. Take it to the yellow zone; press E to set down.':'Use WASD / arrow keys to drive. E picks up or sets down the load.');collisionNotice=false;}
  const follow=new T.Vector3(0,5.5,8).applyAxisAngle(new T.Vector3(0,1,0),fork.rotation.y).add(fork.position);camera.position.lerp(follow,1-Math.exp(-dt*4));controls.target.copy(fork.position).add(new T.Vector3(0,1,0));camera.lookAt(controls.target);}
  if(state.running&&!state.paused){if(automation)stepCommands(dt*state.speed);else if(state.phase===3){beginInspection();}else if(state.phase===6){updateInspection(dt*state.speed);}else if(state.phase===7){updateReview(dt*state.speed);}else if(state.phase===8){updateDock();}else if(state.phase===9&&state.t>=5){deliveryNumber++;reset();status('Exercise saved in session history. Prepare the dock for the next delivery.');}}
- if(meetingRun?.speaker&&!$('speech').hidden){const slot=castSlots.find(s=>s.id===meetingRun.speaker);if(slot?.actor){const v=slot.actor.getWorldPosition(new T.Vector3()).add(new T.Vector3(0,3,0)).project(camera);$('speech').style.left=`${Math.max(document.body.classList.contains('conversation-open')&&innerWidth>550?(innerWidth<=900?420:460):140,Math.min(innerWidth-140,(v.x+1)*innerWidth/2))}px`;$('speech').style.top=`${Math.max(130,Math.min(innerHeight-160,(1-v.y)*innerHeight/2))}px`;}}
+ updateSceneNeedPose();syncTransport();
  barrier.rotation.z=T.MathUtils.damp(barrier.rotation.z,barrierTarget,4,dt);
  if(introActive)updateIntro();else if(state.mode!=='drive')controls.update();ceiling.visible=camera.position.y<10.8&&!(state.running||state.mode==='drive');overhead.visible=camera.position.y<10.8;renderer.render(scene,camera);
  document.body.classList.toggle('handling-active',state.running);document.body.dataset.ready='true';document.body.dataset.cameraMoving=String(!!cameraTween);document.body.dataset.result=state.result||'';document.body.dataset.phase=String(state.phase);document.body.dataset.fork=JSON.stringify([fork.position.x,fork.position.z]);
 }
+let activeTab='inspector';
+function switchTab(name){activeTab=name;applyTab();for(const b of document.querySelectorAll('#side-tabs button')){const on=b.dataset.tab===name;b.classList.toggle('active',on);b.setAttribute('aria-selected',String(on));}}
+function applyTab(){$('tab-inspector').hidden=activeTab!=='inspector';$('meeting-chat').hidden=activeTab!=='team';$('evidence').hidden=activeTab!=='evidence';}
+function closeMoreMenu(){$('more-menu').hidden=true;$('more-btn').setAttribute('aria-expanded','false');}
+const caseIcons={
+ ok:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8.5 12.5 2.5 2.5 4.5-5.5"/></svg>',
+ eksik:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8l9-5 9 5v8l-9 5-9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg>',
+ wrong:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg>',
+ hasarli:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2.5 20h19z"/><path d="M12 9v5M12 17.5v.5"/></svg>',
+ talimat:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9.5 13h5"/></svg>',
+ belirsiz:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 9 5-9 5-9-5z"/><path d="m3 13 9 5 9-5"/></svg>'};
+// Delivery cards mirror the #case options exactly; selecting one does what #case does.
+function buildDeliveryCards(){
+ const list=$('delivery-list'),sel=$('case');list.replaceChildren();
+ for(const opt of [...sel.options]){
+  const b=document.createElement('button');b.type='button';b.className='room';b.dataset.case=opt.value;b.setAttribute('role','option');
+  const icon=document.createElement('span');icon.className='room-icon';icon.innerHTML=caseIcons[opt.value]||'';icon.setAttribute('aria-hidden','true');
+  const copy=document.createElement('span');copy.className='room-copy';
+  const name=document.createElement('strong');name.textContent=opt.text;
+  const sub=document.createElement('small');sub.textContent='Recorded run';
+  copy.append(name,sub);
+  const dot=document.createElement('span');dot.className='room-dot';dot.hidden=true;dot.title='Recorded decision needs Şef';
+  b.append(icon,copy,dot);
+  b.onclick=()=>{if($('case').disabled||currentCase===opt.value)return;$('case').value=opt.value;$('case').dispatchEvent(new Event('change'));$('deliveries').classList.remove('sheet-open');};
+  list.append(b);
+ }
+ syncDeliveryCards();
+}
+function syncDeliveryCards(){for(const b of document.querySelectorAll('#delivery-list .room')){const on=b.dataset.case===currentCase;b.classList.toggle('active',on);b.setAttribute('aria-selected',String(on));}}
+function refreshDeliveryCards(){
+ if(!caseData)return;
+ for(const b of document.querySelectorAll('#delivery-list .room')){
+  const entry=caseData.cases.find(c=>c.id===b.dataset.case);if(!entry)continue;
+  b.querySelector('small').textContent=`${participants(entry.id).length} agents · ${entry.gate.action==='human'?'ASK ŞEF':entry.gate.action.toUpperCase()}`;
+  b.querySelector('.room-dot').hidden=entry.gate.action!=='human';
+ }
+}
+function updateDeliveryTitle(){
+ const opt=$('case').selectedOptions[0],label=opt?opt.textContent:'';
+ const m=label.match(/(\d+)\s*—\s*(.+)/);
+ $('delivery-title').textContent=m?`Delivery ${m[1]} · ${m[2]}`:label;
+ $('delivery-sub').textContent=caseData?`${participants(currentCase).length} agents · recorded run`:'recorded run';
+}
+// Run-language switch. Hook only: the page still plays the single recorded run
+// (data.json); a future data swap can read window.__legoRunLang here.
+function setRunLanguage(lang){
+ for(const b of document.querySelectorAll('#run-lang button'))b.classList.toggle('active',b.dataset.lang===lang);
+ document.documentElement.dataset.runLang=lang;window.__legoRunLang=lang;
+}
+function tickClock(){$('live-time').textContent=new Intl.DateTimeFormat('en-GB',{hour:'2-digit',minute:'2-digit'}).format(new Date());}
+let askAgentId='kapi';
+function crewList(){return castSlots.length?castSlots.map(s=>({id:s.id,name:s.name,job:castJobs[s.index]||''})):Object.keys(names).map(id=>({id,name:names[id],job:''}));}
+function buildAskMenu(){
+ const menu=$('ask-menu');menu.replaceChildren();
+ for(const c of crewList()){
+  const b=document.createElement('button');b.type='button';
+  const img=document.createElement('img');img.src=`../img/av-${c.id}.jpg`;img.alt='';
+  const copy=document.createElement('span');
+  const name=document.createElement('strong');name.textContent=c.name;
+  const job=document.createElement('small');job.textContent=c.job;
+  copy.append(name,job);b.append(img,copy);
+  b.onclick=()=>{askAgentId=c.id;$('ask-avatar').src=img.src;$('ask-avatar').alt=c.name;$('ask-name').textContent=c.name;$('ask-input').placeholder=`Ask ${c.name} about this delivery…`;$('ask-menu').hidden=true;$('ask-agent').setAttribute('aria-expanded','false');$('ask-input').focus();};
+  menu.append(b);
+ }
+}
+function sendAsk(){
+ const input=$('ask-input'),text=input.value.trim();
+ if(!text||!entryNow())return;
+ input.value='';switchTab('team');
+ const root=$('meeting-chat');
+ if(!root._askAgent)openTeamView();
+ root._askAgent?.(askAgentId,text);
+}
+function updateSceneNeed(){
+ const pending=!$('review-controls').hidden&&physicalLocation==='hold';
+ $('scene-need').hidden=!pending;$('inspector-need').hidden=!pending;
+ if(pending){const reason=resultCopy[currentCase]||'';$('scene-need-reason').textContent=reason;$('insp-need-reason').textContent=reason;}
+ updateInspectorSpeaker(updateInspectorSpeaker.current||null);
+}
+function updateSceneNeedPose(){
+ const card=$('scene-need');if(card.hidden)return;
+ const slot=castSlots.find(s=>s.id==='sef');
+ const base=slot?.actor?slot.actor.getWorldPosition(new T.Vector3()):new T.Vector3(10,.18,7);
+ const v=base.add(new T.Vector3(0,3.1,0)).project(camera);
+ const wide=innerWidth>900;
+ card.style.left=`${Math.max(wide?300:90,Math.min(innerWidth-(wide?340:90),(v.x+1)*innerWidth/2))}px`;
+ card.style.top=`${Math.max(120,Math.min(innerHeight-180,(1-v.y)*innerHeight/2))}px`;
+}
+let lastPlaying=null;
+function syncTransport(){
+ const playing=!!(state.running||automation);
+ if(playing===lastPlaying)return;lastPlaying=playing;
+ document.querySelector('.playback').hidden=!playing;
+ $('transport').classList.toggle('is-playing',playing);
+}
+document.querySelectorAll('#side-tabs button').forEach(b=>b.onclick=()=>switchTab(b.dataset.tab));
+document.querySelectorAll('#run-lang button').forEach(b=>b.onclick=()=>setRunLanguage(b.dataset.lang));
+window.__legoRunLang='tr';
+$('ask-agent').onclick=()=>{const m=$('ask-menu'),open=m.hidden;m.hidden=!open;$('ask-agent').setAttribute('aria-expanded',String(open));};
+document.addEventListener('pointerdown',e=>{if(!$('ask-menu').hidden&&!$('ask-bar').contains(e.target)){$('ask-menu').hidden=true;$('ask-agent').setAttribute('aria-expanded','false');}});
+$('ask-send').onclick=sendAsk;
+$('ask-input').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();sendAsk();}});
+$('open-deliveries').onclick=()=>{const open=$('deliveries').classList.toggle('sheet-open');$('open-deliveries').setAttribute('aria-expanded',String(open));$('side').classList.remove('sheet-open');$('open-inspector').setAttribute('aria-expanded','false');};
+$('open-inspector').onclick=()=>{const open=$('side').classList.toggle('sheet-open');$('open-inspector').setAttribute('aria-expanded',String(open));$('deliveries').classList.remove('sheet-open');$('open-deliveries').setAttribute('aria-expanded','false');};
+$('more-btn').onclick=()=>{const m=$('more-menu'),open=m.hidden;m.hidden=!open;$('more-btn').setAttribute('aria-expanded',String(open));};
+document.addEventListener('pointerdown',e=>{if(!$('more-menu').hidden&&!e.target.closest('.menu-wrap'))closeMoreMenu();});
+buildDeliveryCards();refreshDeliveryCards();updateDeliveryTitle();buildAskMenu();tickClock();setInterval(tickClock,5000);updateInspectorSpeaker(null);switchTab('inspector');openTeamView();
 window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
 window.__lego={scene,camera,controls,renderer,state,fork,delivery,zone,reset,pickup,runDemo,setView,blocked,get currentCase(){return currentCase;}};
 if(camera.aspect<1.25)setView('hero');
 resetReceiving();animate();progress(1);await pauseFrame();$('loading').remove();if(!matchMedia('(prefers-reduced-motion: reduce)').matches)startIntro();
+
+// The ⋯ menu also opens the camera views and hides the interface (Sena, 1 Nov).
+$('menu-explore').onclick=()=>{$('more-menu').hidden=true;$('open-nav').click();};
+$('menu-clean').onclick=()=>{$('more-menu').hidden=true;$('clean').click();};

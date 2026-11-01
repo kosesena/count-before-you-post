@@ -113,12 +113,13 @@ export function openConversation({root,entry,lines,cast,onClose,onEvidence,onLoc
  }
  function render(){if(selected==='team')teamView();else if(selected)detail();else inbox();}
  root._teamTotal=messages.length;root._openTeam=openTeam;
- root._getTeamLive=()=>({shown:teamShown,typing:teamTyping,total:messages.length});
+ root._getTeamLive=()=>({shown:teamShown,typing:teamTyping,total:messages.length,active:teamActive});
  root._setTeamLive=(shown,typingId)=>{
   teamShown=Math.max(0,Math.min(messages.length,shown));teamTyping=typingId||null;
   teamActive=teamTyping||(teamShown>0?messages[teamShown-1]?.speaker:null)||null;
   if(selected==='team')render();
   else if(!selected){const hadFocus=root.querySelector('.chat-search')===document.activeElement;render();if(hadFocus){const s=root.querySelector('.chat-search');if(s){s.focus();s.setSelectionRange(s.value.length,s.value.length);}}}
  };
+ root._askAgent=(id,text)=>{if(!crew.some(c=>c.id===id)||!String(text||'').trim())return;selected=id;render();const form=root.querySelector('.chat-composer'),input=root.querySelector('.chat-composer textarea');if(form&&input){input.value=text;form.requestSubmit();}};
  root.hidden=false;render();
 }

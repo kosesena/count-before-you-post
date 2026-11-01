@@ -4,7 +4,7 @@
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#f5f2eb">
   <title>Count Before You Post · Warehouse Simulator</title>
-  <link rel="stylesheet" href="./style.css?v=time-2">
+  <link rel="stylesheet" href="./style.css?v=dock-3">
   <script type="importmap">{"imports":{"three":"./vendor/three.module.js"}}</script>
 </head>
 <body>
@@ -12,35 +12,70 @@
   <header>
     <a class="brand" href="./" aria-label="Return to the warehouse"><span class="brand-icon"><i></i><i></i><i></i><i></i></span><span>COUNT BEFORE YOU POST<small>META GLOBAL AI HACKATHON · PROJECT DEMO</small></span></a>
     <div class="edition"><span></span> WAREHOUSE <b>01</b></div>
-    <button id="agents-top" aria-label="Open the agent panel"><span class="stack"><img src="../img/av-spark.jpg" alt=""><img src="../img/av-kapi.jpg" alt=""><img src="../img/av-sef.jpg" alt=""></span>Agents</button>
-    <button id="help" class="round" aria-label="Show controls" title="Controls">?</button>
+    <div class="top-actions">
+      <div class="menu-wrap"><button id="more-btn" aria-haspopup="true" aria-expanded="false" aria-controls="more-menu" title="More actions">⋯</button>
+        <div id="more-menu" hidden><button id="show-meeting">Team chat</button><button id="show-evidence">Recorded evidence</button><button id="office-doors" aria-pressed="false">Office doors</button><button id="walk-route">Walk upstairs</button><button id="menu-explore">Camera views</button><button id="menu-clean">Hide interface (H)</button></div>
+      </div>
+      <button id="help" class="round" aria-label="Show controls" title="Controls">?</button>
+    </div>
   </header>
-  <aside id="panel">
-    <button id="toggle-panel" aria-label="Minimize controls" aria-expanded="true" aria-controls="panel-controls">−</button>
-    <div class="eyebrow">RECEIVING DESK / 01</div>
-    <h1>Every piece.<br>In its place.</h1>
-    <div id="panel-controls"><p class="intro">Explore. Drive. Verify.</p>
-    <div class="rule"></div>
-    <label for="case">DELIVERY SCENARIO</label>
-    <select id="case">
+  <aside id="deliveries" aria-label="Deliveries">
+    <p class="caption">RUN LANGUAGE</p>
+    <div id="run-lang" role="group" aria-label="Run language"><button type="button" data-lang="tr" class="active">TR</button><button type="button" data-lang="en">EN</button><button type="button" data-lang="de">DE</button><button type="button" data-lang="zh">ZH</button></div>
+    <p class="caption">DELIVERIES</p>
+    <select id="case" class="visually-hidden" aria-label="Delivery scenario">
       <option value="ok">01 — Matching delivery</option><option value="eksik">02 — Missing carton</option>
       <option value="wrong">03 — Wrong product</option><option value="hasarli">04 — Damaged carton</option>
       <option value="talimat">05 — Injected instructions</option><option value="belirsiz">06 — Stacked load</option>
     </select>
-    <div class="receiving-flow"><ol id="receiving-steps" aria-label="Receiving progress"></ol><p id="dock-checks"></p><button id="prepare-dock" class="secondary">Prepare dock &amp; receive documents</button></div>
-    <button id="demo" class="primary">Play delivery <span>↗</span></button>
-    <button id="drive" class="secondary">Drive forklift <span>W A S D</span></button>
-    <div class="playback" hidden><button id="pause-demo">Pause</button><select id="play-speed" aria-label="Playback speed"><option value="0.35">Extra slow</option><option value="0.5" selected>Slow · 0.5×</option><option value="1">Normal · 1×</option><option value="4">Quick walkthrough · 4×</option></select></div>
-    <div id="outcome-actions" hidden>
-<label for="storage-level">PUT-AWAY LOCATION</label><select id="storage-level"><option value="0">A-01-L0 · Ground slot</option><option value="1">A-01-L1 · Upper shelf</option></select>
-<button id="transfer-load" class="primary">Transfer load</button><button id="manual-transfer" class="secondary">Handle manually</button>
-<div id="review-controls" hidden><p id="review-proposal"></p><label for="review-count">MANUALLY CONFIRMED INTACT CARTONS</label><input id="review-count" type="number" min="0" max="12" value="0"><p>Training decision only. The recorded ERP gate result stays unchanged.</p><button id="review-inspect">Perform recount / document check</button><label class="check-row"><input id="review-inspected" type="checkbox" disabled> Physical check completed</label><label id="review-document-row" class="check-row"><input id="review-document" type="checkbox"> Corrected document independently verified (simulation)</label><button id="review-approve">Confirm simulated acceptance</button><button id="review-return">Return entire load</button></div></div>
-<div id="location-confirm" hidden><p id="location-prompt"></p><label for="location-code">DESTINATION SCAN (SIMULATED)</label><input id="location-code" placeholder="e.g. A-01-L0" autocomplete="off"><button id="confirm-location" class="primary">Confirm pallet &amp; location</button></div><button id="next-delivery" hidden>Finish exercise &amp; next delivery</button>
-<div class="operation-tools"><button id="show-meeting">Agents</button><button id="show-evidence">Recorded evidence</button><button id="office-doors" aria-pressed="false">Office doors</button><button id="walk-route">Walk upstairs</button></div>
-<details><summary>Delivery history</summary><ol id="delivery-history"></ol></details>
-</div><div id="status" role="status" aria-live="polite"><i></i><span>Ready to explore.</span></div>
-    <p class="footnote">Recorded verification results.<br>No live ERP writes.<br>This scene was built with OpenAI Codex.</p>
+    <div id="delivery-list" role="listbox" aria-label="Delivery scenario"></div>
+    <p class="footnote">Recorded verification results.<br>No live ERP writes.</p>
   </aside>
+  <div id="stage-meta"><h2 id="delivery-title">Delivery 01 · Matching delivery</h2><p id="delivery-sub">recorded run</p></div>
+  <div id="live-pill"><span class="live-dot" aria-hidden="true"></span> live <time id="live-time">--:--</time></div>
+  <div id="scene-need" hidden><span class="need-tag">NEEDS YOU</span><strong id="scene-need-name">Şef</strong><p id="scene-need-reason"></p><div class="need-actions"><button type="button" id="scene-review">Review first</button><button type="button" id="scene-approve" class="primary">Approve</button></div></div>
+  <aside id="side" aria-label="Inspector panel">
+    <div id="side-tabs" role="tablist" aria-label="Inspector, team chat, evidence">
+      <button type="button" data-tab="inspector" class="active" role="tab" aria-selected="true">Inspector</button><button type="button" data-tab="team" role="tab" aria-selected="false">Team chat</button><button type="button" data-tab="evidence" role="tab" aria-selected="false">Evidence</button>
+    </div>
+    <div id="tab-inspector" role="tabpanel" aria-label="Inspector">
+      <section id="match" hidden aria-label="Gate decision and three-way match" aria-live="polite"><div class="match-head"><span id="match-badge"></span><p id="match-say"></p><button id="match-close" aria-label="Close the decision card">×</button></div><p class="eyebrow">THREE-WAY MATCH · ORDER · NOTE · PALLET</p><ol id="match-rows"></ol></section>
+      <div id="inspector-agent"><img id="insp-avatar" src="../img/av-kapi.jpg" alt=""><div class="insp-copy"><strong id="insp-name">Kapı</strong><small id="insp-role">Guards the receiving gate</small></div><span id="insp-status" class="pill">READY</span></div>
+      <div id="inspector-need" hidden><span class="need-tag">NEEDS YOU</span><p id="insp-need-reason"></p><div class="need-actions"><button type="button" id="insp-review">Review first</button><button type="button" id="insp-approve" class="primary">Approve</button></div></div>
+      <p class="caption">WHAT IT IS ACTUALLY DOING</p>
+      <ol id="receiving-steps" aria-label="Receiving progress"></ol>
+      <p id="dock-checks"></p>
+      <div id="status" role="status" aria-live="polite"><i></i><span>Ready to explore.</span></div>
+      <div id="outcome-actions" hidden>
+        <label for="storage-level">PUT-AWAY LOCATION</label><select id="storage-level"><option value="0">A-01-L0 · Ground slot</option><option value="1">A-01-L1 · Upper shelf</option></select>
+        <button id="transfer-load" class="primary">Transfer load</button><button id="manual-transfer" class="secondary">Handle manually</button>
+        <div id="review-controls" hidden><p id="review-proposal"></p><label for="review-count">MANUALLY CONFIRMED INTACT CARTONS</label><input id="review-count" type="number" min="0" max="12" value="0"><p>Training decision only. The recorded ERP gate result stays unchanged.</p><button id="review-inspect">Perform recount / document check</button><label class="check-row"><input id="review-inspected" type="checkbox" disabled> Physical check completed</label><label id="review-document-row" class="check-row"><input id="review-document" type="checkbox"> Corrected document independently verified (simulation)</label><button id="review-approve">Confirm simulated acceptance</button><button id="review-return">Return entire load</button></div>
+      </div>
+      <div id="location-confirm" hidden><p id="location-prompt"></p><label for="location-code">DESTINATION SCAN (SIMULATED)</label><input id="location-code" placeholder="e.g. A-01-L0" autocomplete="off"><button id="confirm-location" class="primary">Confirm pallet &amp; location</button></div>
+      <button id="next-delivery" hidden>Finish exercise &amp; next delivery</button>
+      <details><summary>Delivery history</summary><ol id="delivery-history"></ol></details>
+      <p class="footnote">Recorded verification results.<br>No live ERP writes.<br>This scene was built with OpenAI Codex.</p>
+    </div>
+    <aside id="meeting-chat" hidden aria-label="Agent conversations" role="tabpanel"></aside>
+    <aside id="evidence" hidden aria-label="Recorded delivery evidence" role="tabpanel"><button id="close-evidence" aria-label="Close evidence">×</button><p class="eyebrow">RECORDED EVIDENCE · NOT A LIVE AI RUN</p><h2>Why this decision?</h2><p id="evidence-warning"></p><dl id="evidence-rows"></dl><details open><summary>Original delivery note</summary><img id="evidence-note" alt="Recorded delivery note"></details><details><summary>Recorded counting-camera image</summary><img id="evidence-camera" alt="Recorded pallet camera evidence"></details><p>Images are from the recorded trial, not the current 3D camera. Document instructions are treated as untrusted data.</p></aside>
+  </aside>
+  <div id="dock">
+    <div id="ask-bar">
+      <button id="ask-agent" aria-haspopup="true" aria-expanded="false" aria-label="Choose who to ask"><img id="ask-avatar" src="../img/av-kapi.jpg" alt=""><span id="ask-name">Kapı</span><span class="caret" aria-hidden="true">▾</span></button>
+      <div id="ask-menu" hidden></div>
+      <input id="ask-input" maxlength="1500" placeholder="Ask Kapı about this delivery…" aria-label="Ask anything — answered from the recorded evidence" autocomplete="off">
+      <button id="ask-send" aria-label="Send message">→</button>
+    </div>
+    <div id="transport">
+      <button id="prepare-dock" class="transport-btn" title="Prepare the dock and receive the documents"><span class="ico" aria-hidden="true">⚓</span>Prepare</button>
+      <button id="demo" class="transport-btn primary" title="Play this delivery"><span class="ico" aria-hidden="true">▶</span>Play</button>
+      <button id="drive" class="transport-btn icon-only" title="Drive forklift · WASD" aria-label="Drive forklift (W A S D)"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 17V8h6l3 5v4M13 13h3M18 4v13h3"/><circle cx="6.5" cy="17.5" r="1.8"/><circle cx="12" cy="17.5" r="1.8"/></svg></button>
+      <div class="playback" hidden><button id="pause-demo">Pause</button><select id="play-speed" aria-label="Playback speed"><option value="0.35">Extra slow</option><option value="0.5" selected>Slow · 0.5×</option><option value="1">Normal · 1×</option><option value="4">Quick walkthrough · 4×</option></select></div>
+    </div>
+  </div>
+  <button id="toggle-left" class="edge-toggle" aria-label="Hide the delivery list">‹</button><button id="toggle-right" class="edge-toggle" aria-label="Hide the side panel">›</button>
+  <button id="open-deliveries" aria-controls="deliveries" aria-expanded="false">Deliveries</button>
+  <button id="open-inspector" aria-controls="side" aria-expanded="false">Panel</button>
   <button id="open-nav" aria-controls="scene-nav" aria-expanded="false">Explore <span>☰</span></button><nav id="scene-nav" aria-label="Explore the warehouse" hidden><div class="nav-heading"><h2>Where to?</h2><button id="close-nav" aria-label="Close navigation">×</button></div>
     <button data-view="hero" class="active"><b class="view-number">01</b><svg class="view-icon" viewBox="0 0 24 26" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>Overview</span></button>
     <button data-view="table"><b class="view-number">02</b><svg class="view-icon" viewBox="0 0 24 26" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="8" rx="9" ry="4"/><path d="M12 12v8M7 21h10"/></svg><span>Meeting table</span></button>
@@ -49,20 +84,17 @@
     <button data-view="plan"><b class="view-number">05</b><svg class="view-icon" viewBox="0 0 24 26" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 3 10 6-10 6L2 9 10 3Zm-10 11 10 6 10-6M2 18l10 6 10-6"/></svg><span>Floor plan</span></button>
     <button data-view="outside"><b class="view-number">06</b><svg class="view-icon" viewBox="0 0 24 26" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 5h12v12H2zM14 9h5l3 4v4h-8"/><circle cx="6" cy="18" r="2"/><circle cx="18" cy="18" r="2"/></svg><span>Loading dock</span></button>
   <button id="replay-intro"><span aria-hidden="true">▷</span><span>Replay introduction</span></button></nav>
-  <aside id="meeting-chat" hidden aria-label="Agent conversations"></aside><div id="speech" hidden><strong id="speech-name"></strong><p id="speech-text"></p></div>
-  <aside id="evidence" hidden aria-label="Recorded delivery evidence"><button id="close-evidence" aria-label="Close evidence">×</button><p class="eyebrow">RECORDED EVIDENCE · NOT A LIVE AI RUN</p><h2>Why this decision?</h2><p id="evidence-warning"></p><dl id="evidence-rows"></dl><details open><summary>Original delivery note</summary><img id="evidence-note" alt="Recorded delivery note"></details><details><summary>Recorded counting-camera image</summary><img id="evidence-camera" alt="Recorded pallet camera evidence"></details><p>Images are from the recorded trial, not the current 3D camera. Document instructions are treated as untrusted data.</p></aside>
   <div id="hint">Drag to look around <b>·</b> Scroll to zoom <b>·</b> Right-drag to pan</div>
   <button id="clean" title="Hide / show interface (H)" aria-label="Hide or show interface">◩</button>
   <div id="touch" hidden><button data-key="w" aria-label="Forward">↑</button><div><button data-key="a" aria-label="Turn left">←</button><button data-key="s" aria-label="Reverse">↓</button><button data-key="d" aria-label="Turn right">→</button></div><button id="lift-up">Lift + (Q)</button><button id="lift-down">Lower − (Z)</button><button id="touch-load">Pick up / set down</button></div>
   <dialog id="instructions"><button id="close-help" aria-label="Close">×</button><div class="eyebrow">WAREHOUSE GUIDE</div><h2>Small pieces.<br>A bigger picture.</h2><p>Drag to orbit the scene, scroll to zoom, and right-drag to pan.</p><p><b>Forklift:</b> Select “Drive forklift”. Use W/S or ↑/↓ to move and A/D or ←/→ to turn. Press E to pick up or set down a pallet. Prepare the dock first. Set the pallet down in B-01 (unverified), then move it to the yellow inspection zone. Q/Z raise and lower the forks.</p><p><b>H</b> hides the interface. <b>R</b> resets the scene. “Play delivery” starts physical handling with recorded evidence. Blocked ERP writes go to H-01 for a separate handling decision. Use Pause and Playback speed to read at your own pace.</p><p class="footnote">A hackathon project demo using recorded decisions. It does not write to a live ERP.</p></dialog>
-  <section id="match" hidden aria-label="Gate decision and three-way match" aria-live="polite"><div class="match-head"><span id="match-badge"></span><p id="match-say"></p><button id="match-close" aria-label="Close the decision card">×</button></div><p class="eyebrow">THREE-WAY MATCH · ORDER · NOTE · PALLET</p><ol id="match-rows"></ol></section>
   <section id="warehouse-intro" aria-label="Warehouse introduction" hidden>
     <div class="intro-copy"><p id="intro-detail"></p><h2 id="intro-title"></h2></div>
     <button id="skip-intro">Enter warehouse <span>↗</span></button><div id="intro-progress"></div>
   </section>
   <div id="loading"><img id="loading-poster" src="loading-poster.jpg" alt="" fetchpriority="high"><div class="loading-card"><p class="loading-pitch">An AI agent may not post a goods receipt until the evidence agrees.</p><strong>Preparing your warehouse…</strong><div id="loading-bar" role="progressbar" aria-label="Loading the warehouse"><i></i></div><small>COUNT BEFORE YOU POST · META GLOBAL AI HACKATHON</small></div></div>
   <script type="module">
-    import('./main.js?v=sentences-2').catch(error => {
+    import('./main.js?v=dock-3').catch(error => {
       console.error(error);
       const loading = document.getElementById('loading');
       if (loading) {
