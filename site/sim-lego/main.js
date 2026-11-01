@@ -413,7 +413,36 @@ cyl(meeting,0,.4,0,1,.27,C.black,48);for(let i=0;i<7;i++)cyl(meeting,0,.57+i*.19
 for(let x=-2.4;x<=2.4;x+=.6){const len=Math.sqrt(2.48**2-x*x)*2;box(meeting,x,2.077,0,.012,.003,len,0xb96c2b);box(meeting,0,2.078,x,len,.003,.012,0xb96c2b);}
 const stools=Array.from({length:5},(_,i)=>{const a=Math.PI+i*Math.PI*2/5;return [Math.cos(a)*3.15,Math.sin(a)*3.15,[C.yellow,C.blue,C.teal,C.orange,0x9853bf][i]];});
 for(const [x,z,c] of stools){cyl(meeting,x,.36,z,.5,.15,c,40);for(let i=0;i<5;i++)cyl(meeting,x,.5+i*.19,z,.105,.18,C.black,20);ring(meeting,x,.58,z,.34,.055,C.black);cyl(meeting,x,1.45,z,.51,.21,c,48);cyl(meeting,x,1.565,z,.46,.035,c,48);for(let i=0;i<4;i++){const a=i*Math.PI/2;cyl(meeting,x+Math.cos(a)*.32,1.6,z+Math.sin(a)*.32,.065,.045,c,12);}}
-sheet(meeting,.6,2.1,.7,.65,.8);sheet(meeting,.25,2.1,-.65,.65,.8);box(meeting,-.85,2.12,-.1,.6,.09,.75,C.black);box(meeting,-.85,2.17,-.1,.48,.012,.6,0xd3e8e6);box(meeting,.95,2.14,-.35,.25,.12,.25,C.black);cyl(meeting,.95,2.34,-.35,.06,.3,0x81888b,16);flush(meeting);
+// Briefing set: a place setting per stool, the delivery model in the middle, note and status in reach.
+const tableTopY=2.08;
+for(const [sx,sz,c] of stools){const L=Math.hypot(sx,sz),dx=sx/L,dz=sz/L,tx=-dz,tz=dx;
+ cyl(meeting,dx*2.0,tableTopY+.07,dz*2.0,.07,.14,c,16);
+ cyl(meeting,dx*2.0,tableTopY+.141,dz*2.0,.055,.012,0x3d2b1f,12);
+ box(meeting,dx*2.0+tx*.085,tableTopY+.07,dz*2.0+tz*.085,.05,.08,.05,c);
+ const g0=group(meeting,dx*1.65,tableTopY,dz*1.65,Math.atan2(dx,dz));
+ for(const s of [-1,1]){const g=group(g0,0,0,0);g.rotation.x=-s*.32;
+  box(g,0,.07,s*.05,.3,.17,.015,C.white);box(g,0,.085,s*.06,.3,.045,.008,c);}}
+for(let i=-1;i<=1;i++)box(meeting,i*.3,tableTopY+.0175,0,.1,.035,.7,0xa97b45);
+box(meeting,0,tableTopY+.0525,0,.9,.035,.7,0xbd965f);
+for(let ix=0;ix<3;ix++)for(let iz=0;iz<4;iz++){const cx=(ix-1)*.28,cz=(iz-1.5)*.165;
+ box(meeting,cx,tableTopY+.15,cz,.26,.16,.15,C.tan);box(meeting,cx,tableTopY+.232,cz,.07,.008,.15,0xc5a06d);}
+const cb=group(meeting,-1.0,tableTopY,.75,.35);
+box(cb,0,.015,0,.5,.03,.65,0x6b4f35);sheet(cb,0,.038,0,.42,.55);box(cb,0,.062,-.26,.16,.028,.08,C.black);
+const tabScr=glowMat(0x24404d,.5);
+box(meeting,.95,tableTopY+.03,.37,.34,.06,.12,C.black);
+const tb=group(meeting,.95,tableTopY,.45);tb.rotation.x=-.3;
+box(tb,0,.15,0,.42,.3,.03,C.black);box(tb,0,.15,.018,.36,.24,.008,tabScr);
+for(let k=0;k<3;k++)box(tb,(k-1)*.11,.21,.024,.07,.05,.006,glowMat([C.green,C.orange,C.red][k],1.1));
+box(tb,0,.1,.024,.24,.03,.006,0x9fb6bf);box(tb,0,.045,.024,.16,.03,.006,0x9fb6bf);
+cyl(meeting,0,tableTopY+.03,-1.0,.26,.06,C.black,3,0,.5,0);
+for(let k=0;k<3;k++){const a=k*Math.PI*2/3+.5;cyl(meeting,Math.cos(a)*.12,tableTopY+.062,-1.0+Math.sin(a)*.12,.022,.012,0x81888b,8);}
+cyl(meeting,0,tableTopY+.062,-1.0,.025,.014,glowMat(C.green,1.2),8);
+cyl(meeting,-.95,tableTopY+.08,-.75,.11,.16,C.blue,16);
+for(let k=0;k<3;k++){const a=k*2.1+.4;cyl(meeting,-.95+Math.cos(a)*.04,tableTopY+.19,-.75+Math.sin(a)*.04,.018,.2,[C.red,C.yellow,C.green][k],8,Math.cos(a)*.18,0,Math.sin(a)*.18);}
+const s1=group(meeting,.05,tableTopY,1.05,-.3);sheet(s1,0,.02,0,.55,.7);
+const s2=group(meeting,.55,tableTopY,-1.55,.5);sheet(s2,0,.02,0,.55,.7);
+for(const [qx,qz,qr,qc] of [[1.35,.1,.3,C.yellow],[-1.35,-.5,-.25,C.pink],[-.35,-.75,.15,C.green]]){const g=group(meeting,qx,tableTopY,qz,qr);box(g,0,.008,0,.14,.016,.14,qc);}
+flush(meeting);
 await stage('Parking the vehicles…');
 function wheel(parent,x,y,z,r=.55){
  cyl(parent,x,y,z,r,.38,0x202226,32,0,0,Math.PI/2);
