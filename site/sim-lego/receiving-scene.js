@@ -37,9 +37,10 @@ export function buildReceivingScene({T,scene,group,box,cyl,label,twoSidedLabel,f
   hangingSign(['RECOUNT · REPACK','H-01'],10,7,3.4,'#174c3b',5.2);
   // Waste stations by the receiving desk, in bricks (written by hand, Claude Code): a wheelie bin
   // for stretch film and a roll cage for flattened cardboard. Each stays inside its old 0.8 m footprint.
+  // Backed against the receiving partition behind the desk, out of the open floor (Sena, 1 Nov).
   const filmMat=new T.MeshStandardMaterial({color:0xf4f8ff,transparent:true,opacity:.55,roughness:.1,side:T.DoubleSide,depthWrite:false});
-  const DARK_BLUE=0x0b3f8a, TAPE=0xb07a3c, KRAFT=0xc9a46a;
-  const wrapBin=group(equipment,-7.1,.18,1.1);
+  const WASTE_Z=-6.75, DARK_BLUE=0x0b3f8a, TAPE=0xb07a3c, KRAFT=0xc9a46a;
+  const wrapBin=group(equipment,-7.1,.18,WASTE_Z);
   box(wrapBin,0,.46,.02,.66,.74,.58,C.blue);                       // body
   box(wrapBin,0,.85,.02,.74,.06,.66,DARK_BLUE);                    // rim
   for(const x of [-.34,.34])box(wrapBin,x,.47,.02,.03,.62,.44,DARK_BLUE);   // side ribs
@@ -56,8 +57,8 @@ export function buildReceivingScene({T,scene,group,box,cyl,label,twoSidedLabel,f
     const puff=new T.Mesh(new T.IcosahedronGeometry(r,1),filmMat);puff.scale.set(1.2,sy,1);puff.position.set(x,y,z);puff.rotation.set(x*3,z*5,y);wrapBin.add(puff);}
   cyl(wrapBin,.2,1.04,.12,.05,.34,KRAFT,14,0,0,1.3);              // an empty film core on top
   flush(wrapBin);
-  label(equipment,'STRETCH FILM',-7.1,.55,1.43,.5,.12,'#ffffff','#0b3f8a');
-  const cardCage=group(equipment,-5.8,.18,1.1);
+  label(equipment,'STRETCH FILM',-7.1,.55,WASTE_Z+.33,.5,.12,'#ffffff','#0b3f8a');
+  const cardCage=group(equipment,-5.8,.18,WASTE_Z);
   box(cardCage,0,.12,0,.74,.06,.7,0x2f8a3a);                       // deck
   for(const x of [-.34,.34])for(const z of [-.32,.32]){box(cardCage,x,.58,z,.05,.92,.05,C.green);
     cyl(cardCage,x*.9,.04,z*.9,.045,.04,C.black,12);box(cardCage,x*.9,.08,z*.9,.06,.04,.06,0x9aa3a8);}
@@ -71,8 +72,8 @@ export function buildReceivingScene({T,scene,group,box,cyl,label,twoSidedLabel,f
   flush(cardCage);
   for(const [x,h,tilt,col] of [[-.22,.95,-.06,C.tan],[-.1,1.05,.05,KRAFT],[.03,.88,-.03,C.tan],[.15,1.0,.07,KRAFT],[.25,.82,-.05,C.tan]]){
     const sheet=group(cardCage,x,.15,0);box(sheet,0,h/2,0,.035,h,.56,col);box(sheet,.02,h*.62,0,.006,.05,.56,TAPE);flush(sheet);sheet.rotation.z=tilt;}
-  const leaning=group(equipment,-6.32,.18,1.1);box(leaning,0,.33,0,.035,.66,.42,KRAFT);box(leaning,.02,.4,0,.006,.04,.42,TAPE);flush(leaning);leaning.rotation.z=.22;
-  label(equipment,'CARDBOARD',-5.8,.8,1.445,.6,.14,'#ffffff','#167443');
+  const leaning=group(equipment,-6.32,.18,WASTE_Z);box(leaning,0,.33,0,.035,.66,.42,KRAFT);box(leaning,.02,.4,0,.006,.04,.42,TAPE);flush(leaning);leaning.rotation.z=.22;
+  label(equipment,'CARDBOARD',-5.8,.8,WASTE_Z+.345,.6,.14,'#ffffff','#167443');
   // Quarantine is physically distinct from authorized returns.
   for(const z of [5.6,8.4])box(equipment,13,.23,z,2.8,.06,.08,C.orange);
   for(const x of [11.6,14.4])box(equipment,x,.23,7,.08,.06,2.8,C.orange);

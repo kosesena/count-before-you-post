@@ -20,7 +20,7 @@ export const stairApproach=[[-9.6,.18,9.4],[-9.6,.18,11.8]];
 export const stairAscent=[[-9.6,.18,11.8],[-9.6,2.24,14.4],[-9.6,2.24,14.8],[-11.2,2.24,14.8],[-11.2,2.24,14.4],[-11.2,4.3,11.8],[-11.2,4.3,10.65]];
 export const solids=[
  // Receiving furniture and waste stations.
- rectangle(4,7,.08,4),rectangle(-5,-4,1.4,.6),rectangle(-7.1,1.1,.4,.4),rectangle(-5.8,1.1,.4,.4),
+ rectangle(4,7,.08,4),rectangle(-5,-4,1.4,.6),rectangle(-7.1,-6.75,.4,.4),rectangle(-5.8,-6.75,.4,.4),
  // Receiving partition: the only vehicle passage is the controlled gate.
  rectangle(-10.775,-7.3,.625,.12),rectangle(-3.325,-7.3,5.625,.12),rectangle(11.65,-7.3,5.35,.12),
  // Dedicated storage rack uprights; the ground slot remains accessible.

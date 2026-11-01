@@ -1,10 +1,10 @@
 import {openConversation} from './conversation.js?v=bilingual-1';
-import {buildReceivingScene} from './receiving-scene.js?v=tidy-1';
+import {buildReceivingScene} from './receiving-scene.js?v=waste-1';
 import {receivingSteps,initialDestination,reviewPolicy,canAccept,locationMatches,atRouteStart,reviewRoute} from './receiving.mjs?v=order-1';
 import {participants,names,replayLines,english} from './replay.mjs?v=chat-3';
 import * as T from 'three';
-import { blockedPose, movePose, rectangle, stairAscent, stairApproach } from './collision.mjs?v=tidy-1';
-import {areas,contained,pickupAligned,placementClear,collectRoute,destinationRoute,refuseRoute,evidenceRows} from './operations.mjs?v=tidy-1';
+import { blockedPose, movePose, rectangle, stairAscent, stairApproach } from './collision.mjs?v=waste-1';
+import {areas,contained,pickupAligned,placementClear,collectRoute,destinationRoute,refuseRoute,evidenceRows} from './operations.mjs?v=waste-1';
 import { GLTFLoader } from './vendor/GLTFLoader.js';
 import { DRACOLoader } from './vendor/DRACOLoader.js';
 import { OrbitControls } from './vendor/OrbitControls.js';
