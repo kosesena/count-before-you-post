@@ -8,8 +8,8 @@ for(const c of original){
  assert.ok(lines.length>c.agent.steps.length);
  assert.equal(lines.filter(x=>x.decision).length,1);
  const results=c.agent.steps.filter(s=>s.tool==='count_cartons').map(s=>JSON.parse(s.result));
- const replies=lines.filter(x=>x.speaker==='sam'&&x.text.includes('sure'));
- assert.deepEqual(replies.map(x=>x.text),results.map(r=>`${r.sure} sure · ${r.doubtful} doubtful`));
+ const replies=lines.filter(x=>x.speaker==='sam'&&x.text.includes("I'm sure of"));
+ assert.deepEqual(replies.map(x=>x.text),results.map(r=>`I'm sure of ${r.sure}, ${r.doubtful} doubtful.`));
  assert.ok(lines.every(x=>!x.text.includes('undefined')));
  for(const s of c.agent.steps.filter(s=>s.kind==='thinking'))assert.ok(!lines.some(x=>x.text===s.text));
  assert.ok(participants(c.id).length<=5);

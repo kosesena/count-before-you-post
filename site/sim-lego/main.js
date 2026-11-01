@@ -1,7 +1,7 @@
-import {openConversation} from './conversation.js?v=panel-2';
+import {openConversation} from './conversation.js?v=sentences-1';
 import {buildReceivingScene} from './receiving-scene.js?v=faces-1';
 import {receivingSteps,initialDestination,reviewPolicy,canAccept,locationMatches,atRouteStart,reviewRoute} from './receiving.mjs?v=order-1';
-import {participants,names,replayLines,english} from './replay.mjs?v=chat-3';
+import {participants,names,replayLines,english} from './replay.mjs?v=sentences-1';
 import * as T from 'three';
 import { blockedPose, movePose, rectangle, stairAscent, stairApproach } from './collision.mjs?v=waste-1';
 import {areas,contained,pickupAligned,placementClear,collectRoute,destinationRoute,refuseRoute,evidenceRows} from './operations.mjs?v=waste-1';
@@ -658,7 +658,7 @@ const flowList=$('receiving-steps');receivingSteps.forEach(text=>{const li=docum
 function flowStep(index,text){[...flowList.children].forEach((li,i)=>{li.dataset.state=i<index?'done':i===index?'active':'pending';if(i===index)li.setAttribute('aria-current','step');else li.removeAttribute('aria-current');});if(text)status(text);}
 function entryNow(){return caseData?.cases.find(c=>c.id===currentCase);}
 
-window.__dbg={camera,fork,controls};const keys=new Set();let cameraTween=null;let barrierTarget=0;
+window.__dbg={camera,fork,controls,get slots(){return castSlots},get rs(){return receivingScene}};const keys=new Set();let cameraTween=null;let barrierTarget=0;
 const views={putaway:{eye:[10,5.2,-4.6],target:[4,2,-12.4]},hero:{eye:[-1,6.5,21],target:[-1,3.5,-4]},gatecheck:{eye:[10.5,6.2,3.2],target:[2.6,1.8,-6.4]},table:{eye:[8,7,18],target:[-1,1.5,7]},rooms:{eye:[4,8,15],target:[-13,3.9,1]},dock:{eye:[18,16,16],target:[8,0,-4]},inspection:{eye:[10,13,17],target:[-2,1,-3]},review:{eye:[10,16,24],target:[10,1,7]},plan:{eye:[31,39,35],target:[6,0,0]},outside:{eye:[33,5.8,10],target:[22,2.7,-4]}};
 // A live cinematic tour of this exact warehouse, with no external video.
 let introActive=false,introStarted=0;
@@ -696,6 +696,41 @@ document.addEventListener('keydown',e=>{if(introActive&&e.key==='Escape'){e.prev
 function status(text,color='#799c70'){$('status').querySelector('span').textContent=text;$('status').querySelector('i').style.background=color;}
 function setView(name){if(introActive)endIntro(false);$('scene-nav').hidden=true;$('open-nav').setAttribute('aria-expanded','false');document.body.classList.remove('cast-focus');state.mode='orbit';$('touch').hidden=true;$('drive').innerHTML='Drive forklift <span>W A S D</span>';const v=views[name];const aim=new T.Vector3(...v.target);const eye=new T.Vector3(...v.eye);if(camera.aspect<1.25)eye.sub(aim).multiplyScalar(Math.min(1.75,1.25/camera.aspect)).add(aim);cameraTween={from:camera.position.clone(),targetFrom:controls.target.clone(),to:eye,targetTo:aim,t:0};document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===name));controls.enabled=true;}
 let meetingRun=null;
+let chatLive=null;
+const CHAT_TYPING=1;
+function chatLinesNow(){const entry=entryNow();return entry?replayLines(entry,followupData?.cases.find(c=>c.id===currentCase)?.signoff):[];}
+function pushChatToUI(){
+ const root=$('meeting-chat');
+ if(!root._setTeamLive||!chatLive)return;
+ root._setTeamLive(chatLive.shown,chatLive.done||chatLive.phase!=='typing'?null:chatLive.lines[chatLive.current]?.speaker||null);
+}
+function sayChatLine(line){
+ const slot=castSlots.find(s=>s.id===line.speaker);
+ if(!slot?.actor)return;
+ meetingRun={speaker:line.speaker};
+ $('speech-name').textContent=slot.name||names[line.speaker]||line.speaker;
+ $('speech-text').textContent=line.text;
+ $('speech').hidden=false;
+}
+// Each message stays long enough to read: about 3 s for a short line, up to 7 s for a long reason (Sena, 1 Nov).
+function readTime(line){return Math.min(7,Math.max(3,1.4+String(line?.text||'').length*.045));}
+function updateChat(dt){
+ if(!chatLive||chatLive.done)return;
+ if(!chatLive.started){chatLive.started=true;pushChatToUI();}
+ chatLive.timer+=dt;
+ if(chatLive.phase==='typing'){
+  if(chatLive.timer<CHAT_TYPING)return;
+  chatLive.timer=0;chatLive.phase='gap';chatLive.shown=chatLive.current+1;
+  const line=chatLive.lines[chatLive.current];
+  pushChatToUI();
+  if(line)sayChatLine(line);
+  if(chatLive.shown>=chatLive.lines.length){chatLive.done=true;pushChatToUI();}
+ }else if(chatLive.timer>=readTime(chatLive.lines[chatLive.current])){
+  chatLive.current++;chatLive.timer=0;chatLive.phase='typing';
+  pushChatToUI();
+ }
+}
+function chatReady(){return !chatLive||chatLive.done;}
 const castHomes=new Map(castSlots.filter(s=>s.actor).map(s=>[s.id,{position:s.actor.position.clone(),rotation:s.actor.rotation.clone()}]));
 let followupData=null;try{const r=await fetch('../data-en.json');if(r.ok)followupData=await r.json();}catch{}
 function resetMeeting(){
@@ -745,15 +780,18 @@ function beginInspection(){
  inspectionRun={elapsed:0,index:-1};state.phase=6;receivingScene.inspect();
  deployWorker('spark',-2,-4.5);deployWorker('sam',-.5,-1.6);deployWorker('kapi',0,-5.5);
  flowStep(3,'Receiver scans the pallet; Spark reads the note, Sam reviews the camera count, Kapı compares the evidence.');
+ if(guided){const lines=chatLinesNow();chatLive={lines,current:0,shown:0,timer:0,phase:'typing',started:false,done:lines.length===0};}
+ else chatLive=null;
 }
 function updateInspection(dt){
  const run=inspectionRun;if(!run)return;
  if(receivingScene.receiver.route.length||castSlots.some(s=>s.workRoute?.length))return;
+ updateChat(dt);
  run.elapsed+=dt;const index=Math.floor(run.elapsed/3);
  const entry=entryNow();if(!entry){inspectionRun=null;finish();return;}
  const rows=evidenceRows(entry,order());
  const steps=[['Delivery note',rows[0][1]],['Camera count · recorded',rows[1][1]],['Visual inspection · recorded',rows[2][1]],['Receiver / Voice','Physical work is illustrative. No independent voice result was recorded in this scenario.'],['Purchase order',rows[6][1]],['Gate · recorded',rows[4][1]]];
- if(index>=steps.length){inspectionRun=null;finish();return;}
+ if(index>=steps.length){if(!chatReady())return;inspectionRun=null;finish();return;}
  if(index!==run.index){run.index=index;flowStep(3,steps[index].join(' — '));}
 }
 function updateReview(dt){
@@ -766,17 +804,19 @@ function updateReview(dt){
  $('review-inspected').checked=true;reviewTask=null;state.running=false;state.phase=0;
  status('Physical check complete (illustrative). Confirm the intact count; a corrected document is still required where indicated.');showOutcomeActions('hold');
 }
-function showRecordedConversation(){
+function showRecordedConversation(opts={}){
  const root=$('meeting-chat');
- if(!root.hidden){if(root._close)root._close();else{root.hidden=true;document.body.classList.remove('conversation-open');}return;}
+ if(!root.hidden&&!opts.force){if(root._close)root._close();else{root.hidden=true;document.body.classList.remove('conversation-open');}return;}
  const entry=entryNow();if(!entry)return;
- meetingRun=null;
- openConversation({root,entry,lines:replayLines(entry,followupData?.cases.find(c=>c.id===currentCase)?.signoff),cast:castSlots.map(s=>({id:s.id,name:s.name,job:castJobs[s.index]})),
+ if(!(guided&&chatLive&&!chatLive.done))meetingRun=null;
+ const wantTeam=opts.team===true||(opts.team!==false&&guided);
+ openConversation({root,entry,lines:replayLines(entry,followupData?.cases.find(c=>c.id===currentCase)?.signoff),cast:castSlots.map(s=>({id:s.id,name:s.name,job:castJobs[s.index]})),initialView:wantTeam?'team':null,live:!!opts.live,
   onClose:()=>document.body.classList.remove('conversation-open'),onEvidence:()=>{$('meeting-chat').hidden=true;document.body.classList.remove('conversation-open');renderEvidence();},onLocate:focusCast,
   onWorkflow:()=>{$('meeting-chat').hidden=true;document.body.classList.remove('conversation-open');document.body.classList.remove('cast-focus');}});
  document.body.classList.add('conversation-open');
+ if(guided&&chatLive&&!opts.live)pushChatToUI();
 }
-$('show-meeting').onclick=showRecordedConversation;$('agents-top').onclick=showRecordedConversation;
+$('show-meeting').onclick=()=>showRecordedConversation();$('agents-top').onclick=()=>showRecordedConversation();
 function reset(){guided=false;setGateSignal(-1);$('match').hidden=true;receivedQty=null;resetReceiving();resetMeeting();buildLoad();for(const load of completedLoads){scene.remove(load.object);disposeLoadGraphics(load.object);}completedLoads.length=0;automation=null;transferTarget=null;verified=false;reviewResolved=false;forkHeight=0;$('evidence').hidden=true;$('outcome-actions').hidden=true;$('next-delivery').hidden=true;document.querySelector('.playback').hidden=true;state.paused=false;$('pause-demo').textContent='Pause';state.running=false;state.held=false;state.phase=0;state.result=null;state.mode='orbit';state.t=0;delivery.parent?.remove(delivery);scene.add(delivery);delivery.position.set(18.1,.18,-4);delivery.rotation.set(0,Math.PI/2,0);fork.position.set(18.2,.18,-.6);fork.rotation.y=-Math.PI/2;liftTarget=0;barrierTarget=0;signals.forEach(s=>s.material.emissiveIntensity=.06);$('demo').disabled=false;$('case').disabled=false;status('Ready to explore.');setView('hero');}
 function pickup(){
  const pose={x:fork.position.x,z:fork.position.z,angle:fork.rotation.y};
@@ -812,6 +852,8 @@ function renderEvidence(){
 function finish(){
  const entry=caseData?.cases.find(c=>c.id===currentCase);state.running=false;automation=null;
  if(!entry){status('Recorded evidence unavailable. Delivery remains on hold.','#bd4931');$('demo').disabled=false;$('case').disabled=false;return;}
+ if(chatLive&&!chatLive.done){chatLive.shown=chatLive.lines.length;chatLive.done=true;pushChatToUI();}
+ chatLive=null;meetingRun=null;$('speech').hidden=true;
  state.result=entry.gate.action;verified=true;physicalLocation='inspection';barrierTarget=state.result==='post'?-Math.PI*.48:0;
  setGateSignal({block:0,human:1,post:2}[state.result]);
  status(resultCopy[currentCase]+(currentCase==='hasarli'?' Recorded proposal: accept 11 intact cartons; isolate 1 damaged carton.':''));showMatch(entry);setView('gatecheck');
@@ -860,7 +902,7 @@ function stepCommands(dt){
  if(next.hit){state.paused=true;$('pause-demo').textContent='Resume';status('Route obstructed. Movement stopped; reset or clear the route.','#bd4931');return;}
  a.remaining-=delta;if(Math.abs(a.remaining)<.0001){a.index++;a.remaining=null;}
 }
-function runDemo(){if(state.running)return;if(physicalLocation!=='trailer'||Math.hypot(fork.position.x-18.2,fork.position.z+.6)>.1||Math.cos(fork.rotation.y+Math.PI/2)<.999){status('Continue manual handling, or press R and prepare the next exercise before guided playback.');return;}if(!dockReady){status('Complete dock preparation first.');return;}guided=true;setView('dock');$('demo').disabled=true;$('case').disabled=true;flowStep(1,'Unload to B-01; the pallet is not accepted stock yet.');const commands=collectRoute.map(c=>[...c]);commands.splice(7,0,['drop'],['wait',3],['pickup']);startCommands(commands,()=>{state.running=true;state.phase=3;state.t=0;});}
+function runDemo(){if(state.running)return;if(physicalLocation!=='trailer'||Math.hypot(fork.position.x-18.2,fork.position.z+.6)>.1||Math.cos(fork.rotation.y+Math.PI/2)<.999){status('Continue manual handling, or press R and prepare the next exercise before guided playback.');return;}if(!dockReady){status('Complete dock preparation first.');return;}guided=true;setView('dock');$('demo').disabled=true;$('case').disabled=true;flowStep(1,'Unload to B-01; the pallet is not accepted stock yet.');chatLive=null;$('speech').hidden=true;showRecordedConversation({team:true,live:true,force:true});const commands=collectRoute.map(c=>[...c]);commands.splice(7,0,['drop'],['wait',3],['pickup']);startCommands(commands,()=>{state.running=true;state.phase=3;state.t=0;});}
 // The purchase order the delivery is received against (data.json, the Turkish run), in English.
 function order(){const o=caseData?.order;return o&&{...o,product:english(o.product)};}
 // What this delivery leaves on the order line once it is received.
