@@ -181,23 +181,22 @@ for(let floor=0;floor<2;floor++)for(let n=0;n<5;n++){
   {const px=1.72,pz=-1.95;plant(room,px,.22,pz);
    for(const [fx,fz,fc] of [[.1,.06,C.pink],[-.09,.08,C.yellow],[.02,-.1,C.white],[-.07,-.05,C.pink],[.11,-.07,C.yellow]]){cyl(room,px+fx,1.02+fx*.4,pz+fz,.065,.05,fc,12);cyl(room,px+fx,1.05+fx*.4,pz+fz,.025,.02,C.orange,8);}}
   // Chair and number label stay in place; the chair takes the room's accent colour.
-  const CH=name==='Spark'?C.orange:name==='Kapı'?C.tan:C.black;
+  const CH=name==='Spark'?C.orange:name==='Şef'?C.blue:name==='Sam'?0x369ce5:name==='Voice'?C.navy:0xb98a52;
   if(name==='Spark'){
-   // Cosy reading office: crowded cork board, wooden desk, anglepoise lamp.
+   // Premium reading office: tidy cork board, solid wood desk, touch lamp.
    roomLight.color.setHex(0xffc98a);roomLight.intensity=10;
+   box(room,-.3,.195,.55,3.0,.035,2.0,0xb5674c);
    box(room,-.2,1.32,-2.335,3.42,1.36,.04,C.orange);
    box(room,-.2,1.32,-2.31,3.3,1.24,.08,C.tan);
-   for(let i=0;i<4;i++){const cx=-1.4+i*.7;
-    box(room,cx,1.3,-2.25,.36,.46,.03,C.white);
-    box(room,cx-.06,1.37,-2.23,.09,.035,.012,C.green);
-    box(room,cx-.06,1.26,-2.23,.09,.035,.012,0x65727d);}
-   const st=[[-1.62,1.72],[-.92,1.74],[-.22,1.72],[.48,1.74],[1.12,1.72],[-1.27,.92],[-.27,.9],[.83,.92]];
-   st.forEach(([sx,sy],i)=>box(room,sx,sy,-2.25,.17,.17,.025,i%2?C.yellow:C.orange));
-   box(room,-.3,1.2,.7,2.5,.14,1.2,C.tan);
-   box(room,-1.4,.62,.7,.12,1.0,1.0,C.tan);
-   box(room,.75,.62,.7,.7,1.0,1.0,C.tan);
-   box(room,.75,.82,.19,.5,.3,.03,C.tan);box(room,.75,.42,.19,.5,.3,.03,C.tan);
-   cyl(room,.75,.82,.22,.035,.05,C.black,8,Math.PI/2);cyl(room,.75,.42,.22,.035,.05,C.black,8,Math.PI/2);
+   for(let i=0;i<3;i++){const cx=-1.0+i*.8;
+    box(room,cx,1.32,-2.25,.42,.52,.03,C.white);
+    box(room,cx,1.48,-2.23,.2,.06,.012,[C.green,C.blue,C.red][i]);}
+   box(room,-.3,1.18,.7,2.5,.18,1.2,C.tan);
+   box(room,-.3,1.06,.7,2.5,.06,1.2,0xb8935a);
+   box(room,-1.4,.62,.7,.12,.95,1.0,C.tan);
+   box(room,.6,.62,.7,.7,.95,1.0,C.tan);
+   box(room,.6,.82,.19,.5,.3,.03,0xc4a06a);box(room,.6,.42,.19,.5,.3,.03,0xc4a06a);
+   cyl(room,.6,.82,.16,.035,.05,C.black,8,Math.PI/2);cyl(room,.6,.42,.16,.035,.05,C.black,8,Math.PI/2);
    // A cordless touch lamp like the ones on restaurant tables, at the desk's left end, clear of
    // Spark's face (by hand, Sena 1 Nov): round base with a touch ring, slim brass stem, an opal
    // mushroom dome that glows softly, and the warm light under its rim.
@@ -207,52 +206,61 @@ for(let floor=0;floor<2;floor++)for(let n=0;n<5;n++){
     cyl(room,lx,top+.405,lz,.03,.03,brass,16);
     piece(room,geom('dome',1,1,1),opal,lx,top+.41,lz);
     cyl(room,lx,top+.405,lz,.15,.006,glowMat(0xffe6bf,1.3),32);}
-   cyl(room,.35,1.31,.98,.03,.3,C.tan,8,Math.PI/2);
-   cyl(room,.35,1.31,.68,.13,.035,C.white,16);
-   box(room,-.55,1.29,.95,.5,.03,.65,C.tan);
-   sheet(room,-.55,1.32,.95,.4,.5);
-   box(room,-.55,1.35,1.2,.16,.04,.06,C.black);
+   box(room,.05,1.30,.35,.44,.06,.32,0x7a4a3a);
+   box(room,.05,1.345,.35,.38,.03,.28,0xf4ead8);
    cyl(room,.7,1.42,.35,.09,.22,C.orange,12);
    cyl(room,.66,1.56,.33,.018,.26,C.black,8,0,0,.12);
    cyl(room,.74,1.56,.37,.018,.26,C.red,8,0,0,-.12);
    cyl(room,.7,1.57,.3,.018,.26,C.blue,8,.12,0,0);
+   box(room,-2.0,1.7,.3,.06,.9,.7,C.black);
+   box(room,-1.96,1.7,.3,.04,.78,.58,0xf4e3c2);
+   box(room,-1.93,1.62,.3,.02,.3,.4,0xc46a4a);
+   box(room,.9,2.15,-2.28,1.1,.06,.32,0xa87f4e);
+   box(room,.6,2.34,-2.28,.09,.32,.22,C.orange);
+   box(room,.72,2.34,-2.28,.09,.32,.22,C.white);
+   cyl(room,1.15,2.28,-2.28,.07,.2,0xe8e0d0,12);
+   cyl(room,.9,2.10,-2.18,.025,1.0,glowMat(0xffd9a0,1.2),12,0,0,Math.PI/2);
   }else if(name==='Şef'){
-   // Tidy supervisor's booth: shift planner, steel counter, stamp, hard hat, hi-vis.
+   // Premium supervisor's booth: shift planner, steel counter, stamp.
    roomLight.color.setHex(0xdfe8ff);roomLight.intensity=9;
+   box(room,-.3,.195,.55,3.0,.035,2.0,0x5f7386);
    box(room,-.2,1.32,-2.335,3.3,1.4,.04,C.blue);
    box(room,-.2,1.32,-2.31,3.14,1.28,.08,C.tan);
    const cols=[C.red,C.yellow,C.green,C.white];
    for(let r=0;r<3;r++)for(let c=0;c<4;c++)box(room,-1.28+c*.68,1.62-r*.42,-2.25,.52,.3,.03,cols[(r+c)%4]);
-   box(room,1.55,1.3,-2.3,.3,.5,.12,C.floor);
-   box(room,1.55,1.42,-2.22,.16,.42,.1,C.black);
-   cyl(room,1.61,1.78,-2.22,.025,.3,C.black,8);
-   box(room,-.3,1.2,.7,2.5,.14,1.2,C.floor);
-   box(room,-.3,.62,.18,2.5,1.0,.1,C.floor);
-   box(room,-.3,1.08,.24,2.5,.07,.02,C.yellow);
-   box(room,-.9,1.33,.5,.34,.1,.34,C.red);
-   cyl(room,-.9,1.45,.5,.07,.15,C.black,12);
-   cyl(room,-.9,1.6,.5,.12,.12,C.black,16);
-   sheet(room,-.15,1.3,1.0,.5,.55);
-   sheet(room,-.1,1.34,1.02,.5,.55);
-   cyl(room,.6,1.47,.4,.09,.36,C.floor,16);
+   box(room,-.3,1.18,.7,2.5,.18,1.2,C.floor);
+   box(room,-.3,1.06,.7,2.5,.06,1.2,0x9aa2a6);
+   box(room,-.3,.62,1.22,2.5,.95,.1,0xb8bfc2);
+   box(room,-.3,.95,1.28,2.5,.07,.02,C.yellow);
+   box(room,.35,1.33,.5,.34,.1,.34,C.red);
+   cyl(room,.35,1.45,.5,.07,.15,C.black,12);
+   cyl(room,.35,1.6,.5,.12,.12,C.black,16);
+   sheet(room,.1,1.30,1.0,.5,.55);
+   cyl(room,.6,1.47,.4,.09,.36,0xb8bfc2,16);
    cyl(room,.6,1.69,.4,.06,.08,C.black,12);
    cyl(room,1.95,1.95,-1.6,.03,.18,C.black,8,0,0,Math.PI/2);
    cyl(room,1.82,2.02,-1.6,.2,.16,C.yellow,16);
    cyl(room,1.82,1.94,-1.6,.28,.05,C.yellow,16);
-   cyl(room,1.95,1.95,-1.0,.03,.18,C.black,8,0,0,Math.PI/2);
-   box(room,1.98,1.5,-1.0,.1,.7,.55,C.orange);
-   box(room,1.92,1.62,-1.0,.03,.1,.5,C.yellow);
-   box(room,1.92,1.38,-1.0,.03,.1,.5,C.yellow);
+   box(room,-2.0,1.7,.3,.06,.9,.7,C.black);
+   box(room,-1.96,1.7,.3,.04,.78,.58,0xd0e0e8);
+   box(room,-1.93,1.62,.3,.02,.3,.4,C.blue);
+   box(room,.9,2.15,-2.28,1.1,.06,.32,0x8a9499);
+   box(room,.6,2.34,-2.28,.09,.32,.22,C.blue);
+   box(room,.72,2.34,-2.28,.09,.32,.22,C.white);
+   box(room,1.12,2.28,-2.28,.22,.2,.22,0x3a4a5a);
+   cyl(room,.9,2.10,-2.18,.025,1.0,glowMat(0xffe2b8,1.1),12,0,0,Math.PI/2);
   }else if(name==='Sam'){
-   // Clean counting studio: carton grid, white desk, tripod camera, mini pallet, flip counter.
+   // Premium counting studio: carton drawings, white desk, tripod, mini pallet.
    roomLight.color.setHex(0xf2f6ff);roomLight.intensity=10;
-   for(let r=0;r<2;r++)for(let c=0;c<5;c++){const gx=-1.56+c*.78,gy=1.02+r*.68;
+   box(room,-.3,.195,.55,3.0,.035,2.0,0x9fb6c9);
+   for(let r=0;r<2;r++)for(let c=0;c<3;c++){const gx=-.78+c*.78,gy=1.02+r*.68;
     box(room,gx,gy,-2.35,.62,.6,.03,C.white);
     box(room,gx,gy-.02,-2.33,.36,.38,.02,C.tan);
     box(room,gx,gy-.02,-2.315,.36,.06,.012,C.white);}
-   box(room,-.3,1.2,.7,2.5,.14,1.2,C.white);
-   box(room,-1.45,.62,.7,.12,1.0,1.0,C.white);
-   box(room,.85,.62,.7,.12,1.0,1.0,C.white);
+   box(room,-.3,1.18,.7,2.5,.18,1.2,C.white);
+   box(room,-.3,1.06,.7,2.5,.06,1.2,0xd0d3d6);
+   box(room,-1.45,.62,.7,.12,.95,1.0,C.white);
+   box(room,.85,.62,.7,.12,.95,1.0,C.white);
    // Tripod in the back-left corner and the mini pallet beside Sam, so nothing stands in front of the face (Sena, 1 Nov).
    cyl(room,-1.72,1.03,-1.2,.035,1.85,C.black,8,0,0,.2);
    cyl(room,-2.05,1.03,-1.08,.035,1.85,C.black,8,-.15,0,-.17);
@@ -268,21 +276,21 @@ for(let floor=0;floor<2;floor++)for(let n=0;n<5;n++){
    box(room,.6,1.56,.35,.6,.45,.14,C.black);
    box(room,.45,1.58,.43,.2,.28,.02,C.white);
    box(room,.75,1.58,.43,.2,.28,.02,C.white);
-   box(room,.45,1.58,.445,.05,.2,.012,C.black);
-   box(room,.75,1.68,.445,.12,.04,.012,C.black);
-   box(room,.75,1.58,.445,.12,.04,.012,C.black);
-   box(room,.75,1.48,.445,.12,.04,.012,C.black);
-   box(room,.79,1.63,.445,.04,.1,.012,C.black);
-   box(room,.71,1.53,.445,.04,.1,.012,C.black);
+   box(room,-2.0,1.7,.5,.06,.9,.7,C.black);
+   box(room,-1.96,1.7,.5,.04,.78,.58,0xd8e6f0);
+   box(room,1.0,2.15,-2.28,.9,.06,.32,0xe8e4da);
+   box(room,.8,2.30,-2.28,.24,.24,.22,C.tan);
+   box(room,1.08,2.34,-2.28,.09,.32,.22,0x369ce5);
+   cyl(room,1.0,2.10,-2.18,.025,.8,glowMat(0xffe8c8,1.1),12,0,0,Math.PI/2);
   }else if(name==='Voice'){
-   // Warm dim listening room: acoustic pads, reel-to-reel, cream-shade lamp, phone.
+   // Premium listening room: acoustic pads, reel-to-reel, speaker, lamp.
    roomLight.color.setHex(0xffb46b);roomLight.intensity=5;
+   box(room,-.3,.195,.55,3.0,.035,2.0,0x7d4a52);
    for(let r=0;r<2;r++)for(let c=0;c<4;c++)box(room,-1.55+c*.8,1.0+r*.68,-2.31,.74,.62,.1,(r+c)%2?C.black:C.navy);
-   const vn=[[1.45,1.6],[1.7,1.35],[1.4,1.08],[1.66,.85],[1.52,1.86]];
-   vn.forEach(([vx,vy],i)=>box(room,vx,vy,-2.33,.17,.17,.025,i%2?C.white:C.yellow));
-   box(room,-.3,1.2,.7,2.5,.14,1.2,0x6b4f35);
-   box(room,-1.45,.62,.7,.12,1.0,1.0,0x6b4f35);
-   box(room,.85,.62,.7,.12,1.0,1.0,0x6b4f35);
+   box(room,-.3,1.18,.7,2.5,.18,1.2,0x6b4f35);
+   box(room,-.3,1.06,.7,2.5,.06,1.2,0x543d28);
+   box(room,-1.45,.62,.7,.12,.95,1.0,0x6b4f35);
+   box(room,.85,.62,.7,.12,.95,1.0,0x6b4f35);
    // The big reel-to-reel stands on the floor at the front of the room, a portable speaker sits
    // on the desk, and the lamp is at the desk's left, so Voice's face stays clear (Sena, 1 Nov).
    {const rx=-1.35,ry=.16,rz=1.95;
@@ -299,14 +307,19 @@ for(let floor=0;floor<2;floor++)for(let n=0;n<5;n++){
    cyl(room,-1.42,1.56,.32,.035,.45,C.black,8);
    cyl(room,-1.42,1.85,.32,.2,.24,C.white,16);
    cyl(room,-1.42,1.76,.32,.06,.08,glowMat(C.white,1),12);
-   box(room,-1.28,1.4,.85,.12,.2,.25,C.black);
-   box(room,-1.0,1.4,.85,.12,.2,.25,C.black);
-   box(room,-1.14,1.52,.85,.4,.06,.25,C.black);
    box(room,.72,1.33,.95,.3,.1,.4,C.black);
    box(room,.72,1.43,.95,.34,.08,.16,C.black);
+   box(room,-2.0,1.7,.3,.06,.9,.7,0x3a2e22);
+   box(room,-1.96,1.7,.3,.04,.78,.58,0xe8d0b0);
+   box(room,.9,2.15,-2.28,1.1,.06,.32,0x4a3a2a);
+   box(room,.6,2.34,-2.28,.09,.32,.22,C.black);
+   box(room,.72,2.34,-2.28,.09,.32,.22,C.orange);
+   cyl(room,1.15,2.28,-2.28,.07,.2,0xd8c8b0,12);
+   cyl(room,.9,2.10,-2.18,.025,1.0,glowMat(0xffb46b,1.2),12,0,0,Math.PI/2);
   }else{
-   // Kapı: everything cardboard, signal panel, rule-book lectern, barrier post.
+   // Kapı premium: cardboard walls, solid desk, signal panel, lectern.
    roomLight.color.setHex(0xffe0b8);roomLight.intensity=8;
+   box(room,-.3,.195,.55,3.0,.035,2.0,0xc2a173);
    for(let i=0;i<3;i++)box(room,-1.36+i*1.36,1.05,-2.335,1.32,1.8,.05,C.tan);
    box(room,-.68,1.05,-2.3,.12,1.8,.02,C.white);
    box(room,.68,1.05,-2.3,.12,1.8,.02,C.white);
@@ -315,10 +328,12 @@ for(let floor=0;floor<2;floor++)for(let n=0;n<5;n++){
    box(room,-1.99,1.05,-.5,.02,1.8,.12,C.white);
    box(room,2.02,1.05,-1.5,.05,1.8,1.4,C.tan);
    box(room,1.99,1.05,-1.5,.02,1.8,.12,C.white);
-   box(room,-.3,.64,.7,2.2,.96,1.0,C.tan);
-   box(room,-.3,1.13,.7,.14,.02,1.0,C.white);
-   cyl(room,.45,1.2,.5,.12,.1,C.tan,16);
-   cyl(room,.45,1.24,.5,.05,.11,C.black,12);
+   box(room,-.3,.63,.7,2.2,.91,1.0,C.tan);
+   box(room,-.3,1.18,.7,2.5,.18,1.2,C.tan);
+   box(room,-.3,1.06,.7,2.5,.06,1.2,0xb8935a);
+   box(room,-.3,.65,1.21,.14,.6,.02,C.white);
+   cyl(room,.45,1.32,.5,.12,.1,C.tan,16);
+   cyl(room,.45,1.40,.5,.05,.11,C.black,12);
    box(room,1.2,2.15,-2.3,.5,1.1,.12,C.black);
    cyl(room,1.2,2.42,-2.22,.13,.07,C.red,16,Math.PI/2);
    cyl(room,1.2,2.15,-2.22,.13,.07,C.yellow,16,Math.PI/2);
@@ -330,8 +345,20 @@ for(let floor=0;floor<2;floor++)for(let n=0;n<5;n++){
    box(room,1.0,1.26,1.6,.06,.06,.6,C.red);
    cyl(room,-1.9,.22,2.2,.16,.12,C.black,12);
    for(let k=0;k<6;k++)cyl(room,-1.9,.37+k*.18,2.2,.09,.17,k%2?C.white:C.red,12);
+   box(room,-2.0,1.7,1.2,.06,.9,.7,0x8a6a45);
+   box(room,-1.96,1.7,1.2,.04,.78,.58,0xf4ead8);
+   box(room,-1.93,1.62,1.2,.02,.24,.34,C.green);
+   box(room,.4,2.10,-2.28,.9,.06,.32,0xa87f4e);
+   box(room,.15,2.23,-2.28,.2,.2,.2,C.tan);
+   box(room,.38,2.21,-2.28,.18,.16,.2,C.white);
+   box(room,.62,2.29,-2.28,.09,.32,.22,C.red);
+   cyl(room,.4,2.04,-2.18,.025,.8,glowMat(0xffe0b8,1.2),12,0,0,Math.PI/2);
   }
-  box(room,-.65,.5,-.85,.85,.13,.85,CH);box(room,-.65,.32,-.85,.12,.35,.12,CH);box(room,-.65,.93,-1.25,.85,.8,.12,CH);
+  box(room,-.65,.55,.05,.6,.1,.55,CH);
+  box(room,-.65,.90,-.28,.55,.6,.1,CH);
+  cyl(room,-.65,.38,.05,.05,.25,C.black,12);
+  for(let i=0;i<5;i++){const a=i*Math.PI*2/5,dx=Math.cos(a),dz=Math.sin(a);
+   cyl(room,-.65+dx*.175,.22,.05+dz*.175,.03,.35,CH,8,Math.PI/2,Math.atan2(dx,dz),0);}
   label(room,String(floor*5+n+1).padStart(2,'0'),-.8,2.45,-2.39,1.4,.85,'#faf4df','#617c87');
  }else{
   box(room,.1,1.2,.7,2.8,.14,1.25,0xc6ac83);for(const xx of [-1.1,1.3])for(const zz of [.22,1.15])box(room,xx,.68,zz,.1,1.05,.1,0x58636c);
