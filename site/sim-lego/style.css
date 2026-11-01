@@ -9,9 +9,6 @@ header{position:fixed;top:0;left:0;right:0;z-index:20;display:flex;align-items:c
 .brand small{display:block;font-size:7px;letter-spacing:1.2px;color:var(--muted);margin-top:2px;font-weight:600}
 .brand-icon{display:grid;grid-template-columns:repeat(2,6px);gap:3px;padding:7px;background:var(--accent);border-radius:7px}
 .brand-icon i{width:6px;height:6px;border-radius:50%;background:#bcd7ff}
-.edition{display:flex;align-items:center;gap:8px;font-size:9px;letter-spacing:1.4px;color:var(--muted);background:var(--paper);padding:9px 13px;border-radius:999px;border:1px solid var(--line);box-shadow:var(--shadow);backdrop-filter:blur(7px) saturate(1.25)}
-.edition span{width:6px;height:6px;background:#2fa36b;border-radius:50%}
-.edition b{border-left:1px solid var(--line);padding-left:9px;color:var(--ink)}
 .top-actions{margin-left:auto;display:flex;align-items:center;gap:8px;pointer-events:auto}
 .menu-wrap{position:relative}
 #more-btn,#help.round{width:34px;height:34px;border:1px solid var(--line);border-radius:50%;background:var(--paper);box-shadow:var(--shadow);backdrop-filter:blur(7px) saturate(1.25);color:var(--ink);font-size:16px;line-height:1}
@@ -302,7 +299,6 @@ body.clean header,body.clean #deliveries,body.clean #side,body.clean #stage-meta
 @media(max-width:900px){
   header{padding:10px 12px}
   .brand{font-size:11px}
-  .edition{display:none}
   #deliveries{left:10px;top:104px;bottom:150px;width:min(280px,84vw);transform:translateX(-115%);transition:transform .25s ease}
   #deliveries.sheet-open{transform:none}
   #side{right:10px;top:104px;bottom:150px;width:min(320px,88vw);transform:translateX(115%);transition:transform .25s ease}
@@ -396,3 +392,7 @@ body.left-hidden #dock{--l:16px}body.right-hidden #dock{--r:16px}
 
 #agent-speech{position:fixed;z-index:13;transform:translate(-50%,-100%);width:230px;padding:11px 14px;background:#fff;color:#243238;border:1px solid #cdd9e8;border-radius:14px;box-shadow:0 6px 22px #10203026;font-size:12px;line-height:1.5;pointer-events:none}#agent-speech[hidden],.intro-playing #agent-speech,body.clean #agent-speech{display:none}
 #agent-speech:after{content:'';position:absolute;bottom:-7px;left:50%;width:12px;height:12px;background:#fff;transform:rotate(45deg);border-right:1px solid #cdd9e8;border-bottom:1px solid #cdd9e8}
+
+#outcome-actions label[hidden]{display:none!important}
+body.awaiting-location .step-bar i{animation:none;width:100%}
+#scan-location{width:100%;margin:8px 0}

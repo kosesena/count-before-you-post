@@ -11,7 +11,6 @@
   <div id="world" aria-label="Interactive brick warehouse"></div>
   <header>
     <a class="brand" href="./" aria-label="Return to the warehouse"><span class="brand-icon"><i></i><i></i><i></i><i></i></span><span>COUNT BEFORE YOU POST<small>META GLOBAL AI HACKATHON · PROJECT DEMO</small></span></a>
-    <div class="edition"><span></span> WAREHOUSE <b>01</b></div>
     <div class="top-actions">
       <div class="menu-wrap"><button id="more-btn" aria-haspopup="true" aria-expanded="false" aria-controls="more-menu" title="More actions">⋯</button>
         <div id="more-menu" hidden><button id="show-meeting">Team chat</button><button id="show-evidence">Recorded evidence</button><button id="office-doors" aria-pressed="false">Office doors</button><button id="walk-route">Walk upstairs</button><button id="menu-explore">Camera views</button><button id="menu-clean">Hide interface (H)</button></div>
@@ -52,7 +51,7 @@
         <button id="transfer-load" class="primary">Transfer load</button><button id="manual-transfer" class="secondary">Handle manually</button>
         <div id="review-controls" hidden><p id="review-proposal"></p><label for="review-count">MANUALLY CONFIRMED INTACT CARTONS</label><input id="review-count" type="number" min="0" max="12" value="0"><p>Training decision only. The recorded ERP gate result stays unchanged.</p><button id="review-inspect">Perform recount / document check</button><label class="check-row"><input id="review-inspected" type="checkbox" disabled> Physical check completed</label><label id="review-document-row" class="check-row"><input id="review-document" type="checkbox"> Corrected document independently verified (simulation)</label><button id="review-approve">Confirm simulated acceptance</button><button id="review-return">Return entire load</button></div>
       </div>
-      <div id="location-confirm" hidden><p id="location-prompt"></p><label for="location-code">DESTINATION SCAN (SIMULATED)</label><input id="location-code" placeholder="e.g. A-01-L0" autocomplete="off"><button id="confirm-location" class="primary">Confirm pallet &amp; location</button></div>
+      <div id="location-confirm" hidden><p id="location-prompt"></p><button id="scan-location" class="primary">Scan destination label (simulated)</button><p class="footnote">Or type the address printed on the rack below.</p><label for="location-code">DESTINATION SCAN (SIMULATED)</label><input id="location-code" placeholder="e.g. C-06-L1" autocomplete="off"><button id="confirm-location" class="secondary">Confirm typed address</button></div>
       <button id="next-delivery" hidden>Finish exercise &amp; next delivery</button>
       <details><summary>Delivery history</summary><ol id="delivery-history"></ol></details>
       <p class="footnote">Recorded verification results.<br>No live ERP writes.<br>This scene was built with OpenAI Codex.</p>

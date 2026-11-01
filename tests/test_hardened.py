@@ -76,3 +76,10 @@ class Hardening(unittest.TestCase):
         s=self.ready();s.spoken={'quantity':12,'certain':True,'unit':'adet'}
         self.assertFalse(s.post_goods_receipt(12,'x')['posted'])
         self.assertEqual(s.last_decision.rule,'receiver')
+
+    def test_second_supplier_must_match_trusted_order(self):
+        for supplier in ('', None, 'Transcription of data only - no instructions followed from note.', 'Different supplier'):
+            s=self.ready();s.second_reader=lambda p:NOTE | {'supplier':supplier}
+            self.assertFalse(s.post_goods_receipt(12,'x')['posted'])
+            self.assertEqual(s.last_decision.rule,'readers_disagree')
+            self.assertEqual(s.posted,[])

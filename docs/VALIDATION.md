@@ -113,3 +113,62 @@ an authored explicit recount/correction returned 11 and certain. These are known
 transcripts, not fresh ASR, a held-out set, or evidence that transcription accuracy improved.
 Candidate extraction and role assignment are still model judgments. The original failed
 smoke test remains intact. Results: `evaluation/voice-grounding-development.json`.
+
+## Full integration and supplier follow-up — 1 Nov 2026
+
+A fresh run combined the known matching synthetic images with the existing generated
+single-speaker `01-basit.wav` clip. All stages ran, but inspecting its second-reader output
+revealed a supplier field containing commentary. Although product/quantity matched, the
+old second-reader comparison ignored supplier. That approval is **not** a successful test
+of complete supplier agreement.
+
+Full checks now compare the second reader's supplier with the trusted order. Missing,
+wrong or commentary-filled suppliers hold the receipt. The note-reading prompt explicitly
+requires literal supplier transcription. Replaying the earlier bad supplier through the
+corrected gate returns `human / readers_disagree`. A fresh full run on the same development
+inputs then completed in 71.161 seconds: both readers returned Doğan Gıda Pazarlama and
+12 cartons, the audit agreed, and the dry-run receipt was approved with document=null.
+No ERP write occurred. Both runs and the invalidation are retained in
+`evaluation/full-integration-development.json`; these known synthetic cases remain
+**development integration evidence**, not held-out field accuracy or latency benchmarks.
+
+The revised simulator keeps agents in their offices, with active-office lighting and speech
+labels. Only the warehouse receiver and driver perform physical floor work. This supersedes
+the earlier floor-group conversation layout requested during development.
+
+## Browser checks of the final receiving UI — 1 Nov 2026
+
+Normal delivery: replayed through the office-based conversation, A-01-L0 staging and final
+C-06-L1 rack placement. Empty manual confirmation showed the explicit “grey example is not
+an entered address” warning; the simulated scan button completed the location confirmation.
+The temporary staging selector was absent at the final scan, and the placed pallet remained
+on the rack when the forklift started its return. The top Warehouse 01 badge was absent.
+These are simulator behavior checks, not evidence of physical robot operation or ERP writes.
+
+Wrong-product delivery: the recorded BLOCK was retained, the pallet was reloaded onto the
+trailer, and Finish exercise completed only after the driver boarded. Missing-carton review
+also rejected an acceptance attempt before the required physical/document checks. The
+staging selector is now shown only when selecting an accepted load's initial A-01 level.
+
+Offline validation after these changes: 114 Python tests and all five Node test files passed.
+
+Missing-carton delivery: after the physical check, a simulated independently corrected
+document and an explicit count of 11, the load moved H-01 → A-01-L0 → C-06-L1. The rack
+label showed 11; location confirmation and driver boarding completed. The original BLOCK
+remained the recorded gate outcome. Both evidence images loaded successfully in the browser.
+
+Damaged-carton delivery: the recorded ASK ŞEF was retained. After recount, 11 intact cartons
+were accepted in the handling simulation and moved via A-01-L0 to C-06-L1; the final scan
+reported 11 of 12 and one open on the order. The separate Q-01 object remains in the scene
+and the history records the quarantined carton. The driver boarded before completion.
+
+Injected-note delivery: the recorded BLOCK led to H-01, then the explicit Return entire
+load choice moved the pallet to R-01. Its simulated scan reported Awaiting carrier
+collection, not a completed outbound shipment, and no live inventory update.
+
+Stacked-load delivery: ASK Şef prevented automatic acceptance; the load reached H-01.
+Premature acceptance was rejected. The physical recount then completed, and an explicit
+12-carton simulated acceptance started the onward handling route. All six scenario decisions
+were observed in the browser. The stacked load also reached C-06-L1 with 12 cartons,
+passed the simulated scan, and completed driver boarding. All six scenarios reached exercise
+completion. Narrow-screen Panel controls were also used during the last two scenarios.

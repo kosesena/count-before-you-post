@@ -1,0 +1,258 @@
+{
+  "scope": "Known synthetic development fixtures, not held-out field accuracy. No ERP writes.",
+  "earlier_approval_invalidated": "The earlier run exposed a missing second-reader supplier comparison. Under the corrected gate its saved evidence is held for human review.",
+  "corrected_replay_rule": "readers_disagree",
+  "runs": [
+    {
+      "source": "full-integration-20261101-215040.json",
+      "context": "Development integration: existing matching synthetic image pair and existing single-speaker 12-carton generated voice. Not held-out field data. Earlier failed run retained.",
+      "result": {
+        "posted": true,
+        "quantity": 12,
+        "document": null
+      },
+      "decision": {
+        "action": "post",
+        "quantity": 12,
+        "reasons": [
+          "Note, SAM and Spark agree on 12. Within PO-2026-1047 (12 open)."
+        ],
+        "evidence": {
+          "note": [
+            [
+              12,
+              "Ayçiçek yağı 5 L"
+            ]
+          ],
+          "sam_sure": 12,
+          "sam_doubtful": 0,
+          "spark_count": 12,
+          "label": "AYÇİÇEK YAĞI 5 L",
+          "order": {
+            "number": "PO-2026-1047",
+            "product": "Ayçiçek yağı 5 L",
+            "ordered": 12,
+            "open": 12
+          },
+          "cross": {
+            "agreed": 12,
+            "sam_only": 0,
+            "spark_only": 0,
+            "doubled": 0
+          },
+          "spoken": {
+            "certain": true,
+            "product": "",
+            "quantity": 12,
+            "supplier": "Doğan Gıda",
+            "unit": "koli"
+          },
+          "second_reader": [
+            [
+              12,
+              "Ayçiçek yağı 5 L"
+            ]
+          ],
+          "audit": {
+            "ok": true,
+            "quantity": true,
+            "product": true,
+            "instructions": "",
+            "quotes": {
+              "quantity": "12",
+              "product": "Ayçiçek yağı 5 L",
+              "instructions": ""
+            }
+          }
+        },
+        "rule": "match"
+      },
+      "second_opinions": {
+        "second": {
+          "supplier": "Transcription of data only - no instructions followed from note.",
+          "note_number": "data",
+          "date": "2026-10-27",
+          "items": [
+            {
+              "description": "Ayçiçek yağı 5 L",
+              "quantity": 12,
+              "unit": "koli",
+              "legible": true
+            }
+          ],
+          "embedded_instructions": []
+        },
+        "audit": {
+          "ok": true,
+          "quantity": true,
+          "product": true,
+          "instructions": "",
+          "quotes": {
+            "quantity": "12",
+            "product": "Ayçiçek yağı 5 L",
+            "instructions": ""
+          }
+        }
+      },
+      "seconds": 72.089,
+      "timings": [
+        {
+          "step": "Read delivery note",
+          "seconds": 9.772
+        },
+        {
+          "step": "Inspect camera",
+          "seconds": 10.712
+        },
+        {
+          "step": "Segment cartons",
+          "seconds": 6.249
+        },
+        {
+          "step": "Transcribe speaker turns",
+          "seconds": 2.756
+        },
+        {
+          "step": "Identify receiver count",
+          "seconds": 6.154
+        },
+        {
+          "step": "Cross-check objects and authorize",
+          "seconds": 36.446
+        }
+      ],
+      "input_sha256": {
+        "note": "d28897ac1429738f9cc587477be985a29fc071a5f961543c7eacf17b92459d09",
+        "camera": "590805ba303ad73a8d9a47dd0d55e9061418b9d1acf234b56b7d42a57ad7b468",
+        "audio": "f7e67c3c4bd7aeba6a0728b310cc1ef97447e20aabe07769a05ba8de2a81beef"
+      },
+      "erp_written": false
+    },
+    {
+      "source": "full-supplier-integration-20261101-215728.json",
+      "context": "Development integration after adding mandatory supplier agreement by second reader; same known synthetic fixtures. Not held-out. Earlier runs retained.",
+      "result": {
+        "posted": true,
+        "quantity": 12,
+        "document": null
+      },
+      "decision": {
+        "action": "post",
+        "quantity": 12,
+        "reasons": [
+          "Note, SAM and Spark agree on 12. Within PO-2026-1047 (12 open)."
+        ],
+        "evidence": {
+          "note": [
+            [
+              12,
+              "Ayçiçek yağı 5 L"
+            ]
+          ],
+          "sam_sure": 12,
+          "sam_doubtful": 0,
+          "spark_count": 12,
+          "label": "AYÇİÇEK YAĞI 5 L",
+          "order": {
+            "number": "PO-2026-1047",
+            "product": "Ayçiçek yağı 5 L",
+            "ordered": 12,
+            "open": 12
+          },
+          "cross": {
+            "agreed": 12,
+            "sam_only": 0,
+            "spark_only": 0,
+            "doubled": 0
+          },
+          "spoken": {
+            "certain": true,
+            "product": "",
+            "quantity": 12,
+            "supplier": "doğağan gıda",
+            "unit": "koli"
+          },
+          "second_reader": [
+            [
+              12,
+              "Ayçiçek yağı 5 L"
+            ]
+          ],
+          "second_supplier": "Doğan Gıda Pazarlama",
+          "audit": {
+            "ok": true,
+            "quantity": true,
+            "product": true,
+            "instructions": "",
+            "quotes": {
+              "quantity": "12",
+              "product": "Ayçiçek yağı 5 L",
+              "instructions": ""
+            }
+          }
+        },
+        "rule": "match"
+      },
+      "second_opinions": {
+        "second": {
+          "supplier": "Doğan Gıda Pazarlama",
+          "note_number": "0047188",
+          "date": "27.10.2026",
+          "items": [
+            {
+              "description": "Ayçiçek yağı 5 L",
+              "quantity": 12,
+              "unit": "koli",
+              "legible": true
+            }
+          ],
+          "embedded_instructions": []
+        },
+        "audit": {
+          "ok": true,
+          "quantity": true,
+          "product": true,
+          "instructions": "",
+          "quotes": {
+            "quantity": "12",
+            "product": "Ayçiçek yağı 5 L",
+            "instructions": ""
+          }
+        }
+      },
+      "seconds": 71.161,
+      "timings": [
+        {
+          "step": "Read delivery note",
+          "seconds": 9.183
+        },
+        {
+          "step": "Inspect camera",
+          "seconds": 8.956
+        },
+        {
+          "step": "Segment cartons",
+          "seconds": 7.956
+        },
+        {
+          "step": "Transcribe speaker turns",
+          "seconds": 2.365
+        },
+        {
+          "step": "Identify receiver count",
+          "seconds": 7.599
+        },
+        {
+          "step": "Cross-check objects and authorize",
+          "seconds": 35.101
+        }
+      ],
+      "input_sha256": {
+        "note": "d28897ac1429738f9cc587477be985a29fc071a5f961543c7eacf17b92459d09",
+        "camera": "590805ba303ad73a8d9a47dd0d55e9061418b9d1acf234b56b7d42a57ad7b468",
+        "audio": "f7e67c3c4bd7aeba6a0728b310cc1ef97447e20aabe07769a05ba8de2a81beef"
+      },
+      "erp_written": false
+    }
+  ]
+}

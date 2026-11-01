@@ -65,4 +65,12 @@ Browser walkthrough on 2026-10-31 completed all six physical exercises through d
 
 Guided playback pauses at the gate result for a put-away choice and at the destination for an explicit address confirmation. Put-away and closing movement run at no more than normal speed; Pause freezes the movement. The pallet settles onto its destination before the forks detach. There is no timed automatic scene reset.
 
-Accepted pallets now require a second physical transfer from temporary A-01 to C-06-L1 in the rear warehouse rack. That bay is empty and collision geometry retains its posts; confirmation is only offered at the final warehouse address. During inspection, Spark, Sam and Kapı form a conversation group, turn toward the speaker/recipient, and gesture after the idle animation update. One scene caption follows the speaking agent using the recorded message text.
+Accepted pallets now require a second physical transfer from temporary A-01 to C-06-L1 in the rear warehouse rack. That bay is empty and collision geometry retains its posts; confirmation is only offered at the final warehouse address. During inspection, agents stay at their office desks; the active office and its recorded message are highlighted.
+
+### Office-based agents (1 Nov follow-up)
+Agents now remain at their own desks, including Şef during exception review. Inspection
+frames the office wing; the active speaker gestures, their office lights up and the recorded
+message appears above it. The warehouse receiver still walks to inspect/recount the pallet.
+No agent deployment route crosses the forklift aisle. Final scans show the actual destination
+address; temporary staging controls disappear once the pallet reaches its final location.
+Recorded model summaries are explicitly labelled as model text, not proof of an ERP write.

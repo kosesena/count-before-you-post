@@ -22,9 +22,9 @@ export function replayLines(entry,followup){
  }
  // Derived summaries and separate follow-up runs have no trace timestamp of their own.
  at=undefined;
- if(entry.agent?.answer)add('spark',null,entry.agent.answer,'data.json · agent.answer');
+ if(entry.agent?.answer)add('spark',null,`Recorded model summary — not proof of an ERP write: ${entry.agent.answer}`,'data.json · agent.answer',{summary:true});
  add('kapi',null,`My decision: ${entry.gate.action==='human'?'ask Şef':entry.gate.action}. ${entry.gate.reason}`,'data.json · gate',{decision:true});
  if(entry.draft)add('wonder','sef',`I drafted a ${String(entry.draft.document).replace(/_/g,' ')} (${entry.draft.status}). ${entry.gate.reason}`,'data.json · draft / gate',{summary:true});
- if(entry.gate.action==='human'&&followup){add('sef','kapi',`${followup.decision.approve?'Approved':'Not approved'} · ${followup.decision.quantity} cartons. ${followup.decision.notes}`,'data-en.json · signoff · follow-up run, on the Turkish note');for(const [qty,doc] of followup.posted||[])add('kapi','sef',`Posted ${qty} cartons · ${doc}`,'data-en.json · signoff.posted · follow-up run, on the Turkish note');}
+ if(entry.gate.action==='human'&&followup){add('sef','kapi',`${followup.decision.approve?'Approved':'Not approved'} · ${followup.decision.quantity} cartons. ${followup.decision.notes}`,'data-en.json · signoff · follow-up run, on the Turkish note');for(const [qty,doc] of followup.posted||[])add('kapi','sef',doc?`Posted ${qty} cartons · ${doc}`:`Dry run: ${qty} cartons approved. No ERP receipt was written.`,'data-en.json · signoff.posted · follow-up run, on the Turkish note');}
  return lines;
 }

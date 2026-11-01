@@ -79,7 +79,7 @@ Purchase Invoice. Reference: [ERPNext Purchase Receipt](https://docs.frappe.io/e
 ```bash
 git clone --depth 1 https://github.com/kosesena/count-before-you-post && cd count-before-you-post
 python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
-.venv/bin/python -m unittest discover tests      # 87 tests, offline
+.venv/bin/python -m unittest discover tests      # offline gate, workflow and API checks
 for l in tr en de zh; do CBYP_LANG=$l .venv/bin/python experiments/run_gate.py | grep -E "checks|matches|receipts"; done
 node --test site/sim-lego/*.test.mjs              # the Brick Dock's logic (Node 20+)
 git status --short experiments/results            # empty: the gate's results came out the same

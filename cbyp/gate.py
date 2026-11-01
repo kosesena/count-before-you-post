@@ -228,6 +228,10 @@ def decide(note: dict, sam_confs: list[float], look: dict, cross=None,
         evidence["second_reader"] = [(i["quantity"], i["description"])
                                      for i in second.get("items") or []]
         diffs = differences(note, second)
+        if order is not None and order.get("require_supplier"):
+            evidence["second_supplier"] = second.get("supplier", "")
+            if not isinstance(second.get("supplier"), str) or not second["supplier"].strip() or normalize(second["supplier"]) != normalize(order.get("supplier", "")):
+                diffs.append("second reader supplier does not match the trusted order")
         if second.get("embedded_instructions"):
             diffs.append("it reports an instruction to software: "
                          + " | ".join(second["embedded_instructions"]))

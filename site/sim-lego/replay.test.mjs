@@ -11,6 +11,7 @@ for(const c of original){
  const replies=lines.filter(x=>x.speaker==='sam'&&x.text.includes("I'm sure of"));
  assert.deepEqual(replies.map(x=>x.text),results.map(r=>`I'm sure of ${r.sure}, ${r.doubtful} doubtful.`));
  assert.ok(lines.every(x=>!x.text.includes('undefined')));
+ if(c.agent?.answer)assert.ok(lines.find(x=>x.source==='data.json · agent.answer').text.startsWith('Recorded model summary — not proof of an ERP write:'));
  for(const s of c.agent.steps.filter(s=>s.kind==='thinking'))assert.ok(!lines.some(x=>x.text===s.text));
  assert.ok(participants(c.id).length<=5);
  const team=participants(c.id,lines);
