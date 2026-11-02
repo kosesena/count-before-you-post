@@ -1,0 +1,77 @@
+{
+  "scope": "Targeted identifier extraction on the previously inspected Deli development photo and unchanged authored note. Not a full workflow run or independent accuracy benchmark.",
+  "input_sha256": {
+    "note": "64a1563aa3d258abc8a073e43137b77dbba35ecc2d0a200e627c43ab15d69793",
+    "camera": "e6ca4f0913c3713b3f183b6773584f9ab17c3fa5774f942ceca36990b5d40c26",
+    "audio": "1853cd474ca88519bd439f9aca2a0d52d2f8bc33b45b0430734da702fe220200"
+  },
+  "readings": {
+    "camera": {
+      "result": {
+        "all_cartons_visible": true,
+        "all_labels_identified": true,
+        "cartons_visible": 1,
+        "damaged_cartons": 0,
+        "product_identity": {
+          "brand": "deli 得力公",
+          "model": "HWCD6238(10)GSML",
+          "product_code": "No.770",
+          "variant": "黑"
+        },
+        "product_on_labels": "固定无线电话机 No.770 TELEPHONE",
+        "stacked": false
+      },
+      "seconds": 11.669
+    },
+    "primary_note": {
+      "result": {
+        "date": "",
+        "embedded_instructions": [],
+        "items": [
+          {
+            "description": "deli No.770 TELEPHONE",
+            "legible": true,
+            "product_identity": {
+              "brand": "deli",
+              "model": "",
+              "product_code": "No.770",
+              "variant": ""
+            },
+            "quantity": 1,
+            "unit": "carton"
+          }
+        ],
+        "note_number": "CLEAN-deli",
+        "supplier": "Controlled Fixture Supplier"
+      },
+      "seconds": 10.694
+    },
+    "second_note": {
+      "result": {
+        "supplier": "Controlled Fixture Supplier",
+        "note_number": "CLEAN-deli",
+        "date": "",
+        "items": [
+          {
+            "description": "deli No.770 TELEPHONE",
+            "product_identity": {
+              "brand": "deli",
+              "product_code": "No.770",
+              "model": "",
+              "variant": ""
+            },
+            "quantity": 1,
+            "unit": "carton",
+            "legible": true
+          }
+        ],
+        "embedded_instructions": [
+          ""
+        ]
+      },
+      "seconds": 12.917
+    }
+  },
+  "erp_written": false,
+  "total_cost_usd": null
+}

@@ -95,7 +95,7 @@ def verify(note, camera, audio, order, language="Turkish", progress=None):
 
 def validate_inputs(note, camera, audio, order):
     if order and "product_identity" in order and not valid_identity(order["product_identity"]):
-        raise ValueError("Trusted product identity requires brand, model and variant strings; brand and model cannot be empty.")
+        raise ValueError("Trusted identity requires brand and at least one product code or technical model; all fields must be strings.")
     if not order or not order.get("supplier") or not order.get("product") or not order.get("number"):
         raise ValueError("A trusted order number, supplier and exact product are required.")
     if any(type(order.get(k)) is not int or order[k] < 0 for k in ("ordered", "received")):

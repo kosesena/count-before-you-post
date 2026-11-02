@@ -1,0 +1,8 @@
+Creators: Jinrong Yang, Shengkai Wu, Lijun Gou, Hangcheng Yu, Chenxi Lin, Jiazhuo Wang, Pan Wang, Minxuan Li, Xiaoping Li.
+Source: SCD / LSCD dataset project, https://github.com/yancie-yjr/scd.github.io
+Dataset license: Creative Commons Attribution-NonCommercial-ShareAlike 4.0
+https://creativecommons.org/licenses/by-nc-sa/4.0/
+scd-822.jpg: validation image ID 822, original filename 1 (87).jpg
+scd-374.jpg: validation image ID 374, original filename 1 (411).jpg
+Original images copied unchanged. No endorsement is implied.
+The dataset image license is distinct from this repository's code license.

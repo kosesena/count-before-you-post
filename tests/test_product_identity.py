@@ -45,3 +45,22 @@ class IdentityTests(unittest.TestCase):
         second = copy.deepcopy(NOTE)
         second['items'][0]['quantity'] = 2
         self.assertEqual(self.decision(second=second).rule, 'readers_disagree')
+
+class IdentifierNamespaceTests(unittest.TestCase):
+    def test_article_code_does_not_require_unknown_technical_model(self):
+        expected = {'brand': 'Deli', 'product_code': 'No.770', 'model': '', 'variant': '黑'}
+        observed = expected | {'model': 'HWCD6238(10)GSML'}
+        self.assertTrue(matches(expected, observed))
+        self.assertFalse(matches(expected, observed | {'product_code': '', 'model': 'No.770'}))
+        self.assertFalse(matches(expected, observed | {'product_code': 'No.771'}))
+        self.assertFalse(matches(expected, observed | {'variant': ''}))
+
+    def test_both_identifiers_required_when_order_specifies_both(self):
+        expected = {'brand': 'Deli', 'product_code': 'No.770', 'model': 'HWCD6238(10)GSML', 'variant': ''}
+        self.assertTrue(matches(expected, expected))
+        self.assertFalse(matches(expected, expected | {'model': 'Other'}))
+        self.assertFalse(matches(expected, expected | {'product_code': ''}))
+
+    def test_legacy_model_never_matches_an_article_code(self):
+        self.assertFalse(matches(ID, ID | {'product_code': 'No.770', 'model': ''}))
+        self.assertFalse(matches(ID | {'model': ''}, ID))

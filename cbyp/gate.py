@@ -189,7 +189,7 @@ def decide(note: dict, sam_confs: list[float], look: dict, cross=None,
         evidence["order"] = {"number": order["number"], "product": order["product"],
                              "ordered": order["ordered"], "open": open_quantity(order)}
         if use_identity and not identity_matches(identity, item.get("product_identity")):
-            return out("not_ordered", BLOCK, "Note brand/model/variant does not verify the trusted order identity. "
+            return out("not_ordered", BLOCK, "Note brand/article code/technical model/variant does not verify the trusted order identity. "
                        "No receipt; compare the identifier evidence before deciding whether to return the load.")
         if not use_identity and not same_product(order["product"], item["description"]):
             return out("not_ordered", BLOCK, f"Not on the order: {order['number']} is for "
@@ -199,7 +199,7 @@ def decide(note: dict, sam_confs: list[float], look: dict, cross=None,
                       and look.get("all_labels_identified") is True) if use_identity else same_product(
                           look["product_on_labels"], item["description"])
     if not camera_matches:
-        detail = ("Every carton must have a readable, matching brand/model/variant."
+        detail = ("Every carton must have a readable, matching brand/article code/technical model/variant."
                   if use_identity else f"Camera read '{look['product_on_labels']}', note says '{item['description']}'.")
         return out("wrong_product", BLOCK, f"Product identity not verified. {detail} "
                    "No receipt; check the exact product and model on the labels before deciding whether to return the load.")
@@ -245,7 +245,7 @@ def decide(note: dict, sam_confs: list[float], look: dict, cross=None,
         diffs = differences(note, second, identity=identity if use_identity else None)
         if use_identity and not all(identity_matches(identity, i.get("product_identity"))
                                     for i in second.get("items") or []):
-            diffs.append("second reader cannot verify trusted brand/model/variant")
+            diffs.append("second reader cannot verify trusted brand/article code/technical model/variant")
         if order is not None and order.get("require_supplier"):
             evidence["second_supplier"] = second.get("supplier", "")
             if not isinstance(second.get("supplier"), str) or not second["supplier"].strip() or normalize(second["supplier"]) != normalize(order.get("supplier", "")):

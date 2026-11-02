@@ -17,7 +17,7 @@ LOOK = {
     "properties": {
         "product_on_labels": {"type": "string"},
         "product_identity": IDENTITY_SCHEMA,
-        "all_labels_identified": {"type": "boolean", "description": "True only if brand, model and any variant can be read on EVERY carton and all agree. False for unreadable, mixed or hidden labels."},
+        "all_labels_identified": {"type": "boolean", "description": "True only if brand, at least one product code or technical model, and any variant can be read on EVERY carton and all agree. False for unreadable, mixed or hidden labels."},
         "cartons_visible": {"type": "integer"},
         "damaged_cartons": {"type": "integer"},
         "stacked": {"type": "boolean", "description": "Cartons stacked in more than one layer."},
