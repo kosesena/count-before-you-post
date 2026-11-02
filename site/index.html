@@ -879,6 +879,7 @@ footer p { margin: 4px 0; }
   </div>
   <p class="dock-msg">Opening the dock&hellip;</p>
 </div>
+<script src="evidence-status.js"></script>
 <script>
 "use strict";
 const $ = id => document.getElementById(id);
@@ -1360,7 +1361,7 @@ function crossReading(c) {
   const total = `${esc(x.agreed)} agreed of ${esc(x.cartons)} cartons \u00b7 ${esc(x.spark_points)} Spark points`;
   const rest = `${esc(x.sam_only)} only SAM \u00b7 ${esc(x.spark_only)} only Spark` +
     (x.doubled ? ` \u00b7 ${esc(x.doubled)} doubled` : "") +
-    (x.count === null || x.count === undefined ? " \u00b7 no single agreed count" : "");
+    (EvidenceStatus.cross(c) ? ` · ${esc(EvidenceStatus.cross(c))}` : "");
   return `<div class="reading"><div class="who">${av("sam")}${av("spark")}Carton by carton \u00b7 SAM \u00d7 Spark</div>` +
     `<div class="val">${total}</div><div class="det">${rest}</div></div>`;
 }
@@ -1384,8 +1385,8 @@ function gateBlock(c) {
   const qty = (g.quantity === null || g.quantity === undefined) ? ""
     : `<span class="qty">Quantity in this decision: <b>${esc(g.quantity)}</b></span>`;
   const rules = (LANG_DATA.rules || []).map((r, i) => {
-    const cls = i < fired ? "passed" : (i === fired ? "fired" : "later");
-    const res = i < fired ? "passed" : (i === fired ? "decided" : "not reached");
+    const res = EvidenceStatus.rule(r, g.rule, LANG_DATA.rules || []);
+    const cls = res === "decided" ? "fired" : "later";
     return `<li class="${cls}"><span>${esc(RULE_LABEL[r] || r)} \u2192 ${esc(RULE_ARROW[r] || g.action)}</span>` +
       `<span class="res">${res}</span></li>`;
   }).join("");
