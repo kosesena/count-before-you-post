@@ -969,5 +969,187 @@
     "Deli literal-category document is a post-hoc variant, not independent evidence.",
     "Synthetic approval proves integration only.",
     "No ERP writer installed; complete provider costs unknown."
-  ]
+  ],
+  "identity_development": {
+    "scope": "Development rerun of the same two previously inspected photographs with literal brand/model evidence. Identities authored from prior visual inspection, not independent catalog or field truth. No ERP writes.",
+    "method": "Fresh full dry runs with structured literal brand/model/variant readings. Expected identities fixed before run. No post-hoc identifier edits.",
+    "cases": [
+      {
+        "id": "clean-haier",
+        "source_image_id": "374",
+        "expected_identity": {
+          "brand": "Haier",
+          "model": "HRO6H22-4",
+          "variant": ""
+        },
+        "input_sha256": {
+          "note": "569452ab4919cc5b6ab6c0142623d80fca8737fd2ff2952d94992997fab02175",
+          "camera": "2ba28cb2a3d2b42d81cf19bbfba2d102cf5f2c6e046f53deeb08dc42e8074d51",
+          "audio": "6b35790298a8e360687c2f6cdecc762b3ac5a4dce8bd44fc3724994df02f350b"
+        },
+        "action": "block",
+        "rule": "wrong_product",
+        "note": {
+          "date": "",
+          "embedded_instructions": [],
+          "items": [
+            {
+              "description": "Haier HRO6H22-4",
+              "legible": true,
+              "product_identity": {
+                "brand": "Haier",
+                "model": "HRO6H22-4",
+                "variant": ""
+              },
+              "quantity": 2,
+              "unit": "carton"
+            }
+          ],
+          "note_number": "CLEAN-haier",
+          "supplier": "Controlled Fixture Supplier"
+        },
+        "camera": {
+          "all_cartons_visible": true,
+          "all_labels_identified": false,
+          "cartons_visible": 2,
+          "damaged_cartons": 1,
+          "product_identity": {
+            "brand": "Haier",
+            "model": "HRO6H22-4",
+            "variant": "Flash Silver"
+          },
+          "product_on_labels": "Haier",
+          "stacked": false
+        },
+        "recorded_decision": {
+          "action": "block",
+          "quantity": null,
+          "reasons": [
+            "Product identity not verified: camera read 'Haier', note says 'Haier HRO6H22-4'. No receipt; check the exact product and model on the labels before deciding whether to return the load."
+          ],
+          "evidence": {
+            "note": [
+              [
+                2,
+                "Haier HRO6H22-4"
+              ]
+            ],
+            "sam_sure": 2,
+            "sam_doubtful": 0,
+            "spark_count": 2,
+            "label": "Haier",
+            "order": {
+              "number": "PO-CLEAN-haier",
+              "product": "Haier HRO6H22-4",
+              "ordered": 2,
+              "open": 2
+            },
+            "product_identity": {
+              "expected": {
+                "brand": "Haier",
+                "model": "HRO6H22-4",
+                "variant": ""
+              },
+              "note": {
+                "brand": "Haier",
+                "model": "HRO6H22-4",
+                "variant": ""
+              },
+              "camera": {
+                "brand": "Haier",
+                "model": "HRO6H22-4",
+                "variant": "Flash Silver"
+              },
+              "all_labels_identified": false
+            }
+          },
+          "rule": "wrong_product"
+        },
+        "seconds": 73.242,
+        "erp_written": false
+      },
+      {
+        "id": "clean-deli",
+        "source_image_id": "822",
+        "expected_identity": {
+          "brand": "Deli",
+          "model": "No.770",
+          "variant": ""
+        },
+        "input_sha256": {
+          "note": "64a1563aa3d258abc8a073e43137b77dbba35ecc2d0a200e627c43ab15d69793",
+          "camera": "e6ca4f0913c3713b3f183b6773584f9ab17c3fa5774f942ceca36990b5d40c26",
+          "audio": "1853cd474ca88519bd439f9aca2a0d52d2f8bc33b45b0430734da702fe220200"
+        },
+        "action": "block",
+        "rule": "not_ordered",
+        "note": {
+          "date": "",
+          "embedded_instructions": [],
+          "items": [
+            {
+              "description": "deli No.770 TELEPHONE",
+              "legible": true,
+              "product_identity": {
+                "brand": "deli",
+                "model": "No.770 TELEPHONE",
+                "variant": ""
+              },
+              "quantity": 1,
+              "unit": "carton"
+            }
+          ],
+          "note_number": "CLEAN-deli",
+          "supplier": "Controlled Fixture Supplier"
+        },
+        "camera": {
+          "all_cartons_visible": true,
+          "all_labels_identified": true,
+          "cartons_visible": 1,
+          "damaged_cartons": 0,
+          "product_identity": {
+            "brand": "deli",
+            "model": "HWCD6238(10)GSML",
+            "variant": "黑"
+          },
+          "product_on_labels": "固定无线电话机 No.770 TELEPHONE",
+          "stacked": false
+        },
+        "recorded_decision": {
+          "action": "block",
+          "quantity": null,
+          "reasons": [
+            "Not on the order: PO-CLEAN-deli is for 'deli No.770 TELEPHONE', the note says 'deli No.770 TELEPHONE'. Refuse it at the dock; the load goes back on the truck."
+          ],
+          "evidence": {
+            "note": [
+              [
+                1,
+                "deli No.770 TELEPHONE"
+              ]
+            ],
+            "sam_sure": 1,
+            "sam_doubtful": 1,
+            "spark_count": 1,
+            "label": "固定无线电话机 No.770 TELEPHONE",
+            "order": {
+              "number": "PO-CLEAN-deli",
+              "product": "deli No.770 TELEPHONE",
+              "ordered": 1,
+              "open": 1
+            }
+          },
+          "rule": "not_ordered"
+        },
+        "seconds": 84.306,
+        "erp_written": false
+      }
+    ],
+    "limitations": [
+      "Two purposively selected, previously inspected photos; not independent accuracy.",
+      "Generated notes/orders and synthetic receiver speech; not real delivery records.",
+      "No real-photo acceptance established. Model-code extraction and variant ambiguity remain.",
+      "No full API billing or field time savings measured."
+    ]
+  }
 }

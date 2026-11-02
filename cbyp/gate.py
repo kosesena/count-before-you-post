@@ -33,6 +33,7 @@ import unicodedata
 from dataclasses import dataclass, field
 
 from .purchase_order import open_quantity
+from .product_identity import matches as identity_matches
 
 POST, BLOCK, HUMAN = "post", "block", "human"
 
@@ -94,7 +95,7 @@ RULES = ("instruction", "invisible_text", "unreadable", "invalid_quantity", "uni
          "mismatch")
 
 
-def differences(first: dict, second: dict) -> list[str]:
+def differences(first: dict, second: dict, identity=None) -> list[str]:
     """Where two readings of one note disagree on anything the gate decides with."""
     a, b = first.get("items") or [], second.get("items") or []
     if len(a) != len(b):
@@ -105,7 +106,8 @@ def differences(first: dict, second: dict) -> list[str]:
             out.append(f"quantity {x['quantity']} against {y['quantity']}")
         if canonical_unit(x.get("unit")) != canonical_unit(y.get("unit")):
             out.append("unit differs between readers")
-        if not same_product(x["description"], y["description"]):
+        if not (identity_matches(identity, y.get("product_identity")) if identity is not None
+                else same_product(x["description"], y["description"])):
             out.append(f"product '{x['description']}' against '{y['description']}'")
         if x.get("legible", False) != y.get("legible", False):
             out.append("one reader found the quantity hard to read")
@@ -177,17 +179,30 @@ def decide(note: dict, sam_confs: list[float], look: dict, cross=None,
     if order is not None and order.get("require_supplier"):
         if not note.get("supplier") or normalize(note["supplier"]) != normalize(order.get("supplier", "")):
             return out("supplier", BLOCK, "Supplier on the note does not exactly match the trusted purchase order.")
+    identity = order.get("product_identity") if order else None
+    use_identity = order is not None and "product_identity" in order
+    if use_identity:
+        evidence["product_identity"] = {"expected": identity, "note": item.get("product_identity"),
+                                        "camera": look.get("product_identity"),
+                                        "all_labels_identified": look.get("all_labels_identified", False)}
     if order is not None:
         evidence["order"] = {"number": order["number"], "product": order["product"],
                              "ordered": order["ordered"], "open": open_quantity(order)}
-        if not same_product(order["product"], item["description"]):
+        if use_identity and not identity_matches(identity, item.get("product_identity")):
+            return out("not_ordered", BLOCK, "Note brand/model/variant does not verify the trusted order identity. "
+                       "No receipt; compare the identifier evidence before deciding whether to return the load.")
+        if not use_identity and not same_product(order["product"], item["description"]):
             return out("not_ordered", BLOCK, f"Not on the order: {order['number']} is for "
                        f"'{order['product']}', the note says '{item['description']}'. Refuse it "
                        "at the dock; the load goes back on the truck.")
-    if not same_product(look["product_on_labels"], item["description"]):
-        return out("wrong_product", BLOCK, f"Product identity not verified: camera read '{look['product_on_labels']}', "
-                   f"note says '{item['description']}'. No receipt; check the exact product "
-                   "and model on the labels before deciding whether to return the load.")
+    camera_matches = (identity_matches(identity, look.get("product_identity"))
+                      and look.get("all_labels_identified") is True) if use_identity else same_product(
+                          look["product_on_labels"], item["description"])
+    if not camera_matches:
+        detail = ("Every carton must have a readable, matching brand/model/variant."
+                  if use_identity else f"Camera read '{look['product_on_labels']}', note says '{item['description']}'.")
+        return out("wrong_product", BLOCK, f"Product identity not verified. {detail} "
+                   "No receipt; check the exact product and model on the labels before deciding whether to return the load.")
     if look["stacked"] or not look["all_cartons_visible"]:
         return out("hidden", HUMAN, "Cartons are stacked or hidden; the count cannot be verified "
                    "from the camera.")
@@ -227,7 +242,10 @@ def decide(note: dict, sam_confs: list[float], look: dict, cross=None,
         # (experiments/results/second_reader.json), so it may stop a receipt, never decide one.
         evidence["second_reader"] = [(i["quantity"], i["description"])
                                      for i in second.get("items") or []]
-        diffs = differences(note, second)
+        diffs = differences(note, second, identity=identity if use_identity else None)
+        if use_identity and not all(identity_matches(identity, i.get("product_identity"))
+                                    for i in second.get("items") or []):
+            diffs.append("second reader cannot verify trusted brand/model/variant")
         if order is not None and order.get("require_supplier"):
             evidence["second_supplier"] = second.get("supplier", "")
             if not isinstance(second.get("supplier"), str) or not second["supplier"].strip() or normalize(second["supplier"]) != normalize(order.get("supplier", "")):

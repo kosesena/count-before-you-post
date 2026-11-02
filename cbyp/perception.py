@@ -5,6 +5,7 @@ import mimetypes
 from pathlib import Path
 
 from .meta import SPARK, client
+from .product_identity import SCHEMA as IDENTITY_SCHEMA, PROMPT as IDENTITY_PROMPT
 from .sam import parse, segment_image
 
 MIN_CONF = 0.7
@@ -12,9 +13,11 @@ MIN_CONF = 0.7
 LOOK = {
     "type": "object", "additionalProperties": False,
     "required": ["product_on_labels", "cartons_visible", "damaged_cartons", "stacked",
-                 "all_cartons_visible"],
+                 "all_cartons_visible", "product_identity", "all_labels_identified"],
     "properties": {
         "product_on_labels": {"type": "string"},
+        "product_identity": IDENTITY_SCHEMA,
+        "all_labels_identified": {"type": "boolean", "description": "True only if brand, model and any variant can be read on EVERY carton and all agree. False for unreadable, mixed or hidden labels."},
         "cartons_visible": {"type": "integer"},
         "damaged_cartons": {"type": "integer"},
         "stacked": {"type": "boolean", "description": "Cartons stacked in more than one layer."},
@@ -106,3 +109,6 @@ def point_cartons(path):
     )
     pts = json.loads(r.choices[0].message.content)["points"]
     return [(min(w - 1, p["x"] * w // 1000), min(h - 1, p["y"] * h // 1000)) for p in pts]
+
+LOOK_PROMPT += IDENTITY_PROMPT
+VIDEO_PROMPT += IDENTITY_PROMPT
