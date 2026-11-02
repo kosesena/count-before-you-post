@@ -185,9 +185,9 @@ def decide(note: dict, sam_confs: list[float], look: dict, cross=None,
                        f"'{order['product']}', the note says '{item['description']}'. Refuse it "
                        "at the dock; the load goes back on the truck.")
     if not same_product(look["product_on_labels"], item["description"]):
-        return out("wrong_product", BLOCK, f"Wrong product: labels say '{look['product_on_labels']}', "
-                   f"note says '{item['description']}'. Refuse it at the dock; the load goes back "
-                   "on the truck.")
+        return out("wrong_product", BLOCK, f"Product identity not verified: camera read '{look['product_on_labels']}', "
+                   f"note says '{item['description']}'. No receipt; check the exact product "
+                   "and model on the labels before deciding whether to return the load.")
     if look["stacked"] or not look["all_cartons_visible"]:
         return out("hidden", HUMAN, "Cartons are stacked or hidden; the count cannot be verified "
                    "from the camera.")

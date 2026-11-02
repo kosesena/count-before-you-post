@@ -1,0 +1,56 @@
+{
+  "source": "https://github.com/yancie-yjr/scd.github.io",
+  "license": "CC BY-NC-SA 4.0",
+  "selection": "First eight validation images sorted SHA256(clean:IMAGE_ID), excluding original 30, with 1-4 annotations and every bbox 2% inside image edges. Visual screening before acceptance calls; not random accuracy sample.",
+  "candidates": [
+    {
+      "id": "177",
+      "count": 4,
+      "sha256": "3aa5b035eb3b93d7c4d2b5d652b47867dddbd88129142e54eb48060d85ed38c6",
+      "disposition": "Not used for clean acceptance: stacked/mixed/unreadable product evidence"
+    },
+    {
+      "id": "580",
+      "count": 3,
+      "sha256": "c9e8bd8014560e5c645005031f4392d4e31445ced7501b8ce056010ea6c03150",
+      "disposition": "Not used for clean acceptance: stacked/mixed/unreadable product evidence"
+    },
+    {
+      "id": "893",
+      "count": 2,
+      "sha256": "8a77f3a7e5a95a8df7c3c2d73b6bc65787d34ccac9550230a4fa6acf34c93cee",
+      "disposition": "Not used for clean acceptance: stacked/mixed/unreadable product evidence"
+    },
+    {
+      "id": "795",
+      "count": 2,
+      "sha256": "384d57135591feead08a8257209ba2dd0c730350e933a27aa6f5a06ef8f6e9e6",
+      "disposition": "Not used for clean acceptance: stacked/mixed/unreadable product evidence"
+    },
+    {
+      "id": "241",
+      "count": 3,
+      "sha256": "3c6fd5c815fe2192aa8c984bd49a4b3ee9ecfb6fffccd9fb9dd603600728246c",
+      "disposition": "Not used for clean acceptance: stacked/mixed/unreadable product evidence"
+    },
+    {
+      "id": "425",
+      "count": 4,
+      "sha256": "19747429bc4bbb2013820b2e42ab02ee52f8afa6b98ad19cb4a8fb665b538858",
+      "disposition": "Not used for clean acceptance: stacked/mixed/unreadable product evidence"
+    },
+    {
+      "id": "984",
+      "count": 3,
+      "sha256": "f370f4db0ec1f787867c7d6733ce7c65a69f698c202bba725a593e8d30ab7a60",
+      "disposition": "Not used for clean acceptance: stacked/mixed/unreadable product evidence"
+    },
+    {
+      "id": "822",
+      "count": 1,
+      "sha256": "e6ca4f0913c3713b3f183b6773584f9ab17c3fa5774f942ceca36990b5d40c26",
+      "disposition": "Selected: visible single Deli carton, model text visible"
+    }
+  ],
+  "additional_candidate": "374 from original 30; both real-photo acceptance candidates blocked."
+}

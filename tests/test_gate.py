@@ -162,7 +162,7 @@ class ThreeWayMatch(unittest.TestCase):
     def test_wrong_labels_are_refused_at_the_dock(self):
         d = decide(NOTE, SURE12, look(product_on_labels="MISIR YAĞI 5 L"), order=order_for("tr"))
         self.assertEqual((d.action, d.rule), (BLOCK, "wrong_product"))
-        self.assertIn("back on the truck", d.reasons[0])
+        self.assertIn("No receipt", d.reasons[0])
 
     def test_more_than_the_order_goes_to_the_supervisor_for_what_is_open(self):
         d = decide(NOTE, SURE12, look(), order=order_for("tr", ordered=10))

@@ -8,12 +8,13 @@ import json
 import secrets
 import tempfile
 import threading
+import time
 import wave
 from concurrent.futures import ThreadPoolExecutor
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from PIL import Image
-from .workflow import verify
+from .workflow import verify, VerificationRun
 
 ROOT=Path(__file__).resolve().parents[1]
 LIMIT=24*1024*1024
@@ -45,6 +46,44 @@ def decode_file(item,kind,directory):
 def make_server(port=8768,runner=verify):
     jobs={};lock=threading.Lock();pool=ThreadPoolExecutor(max_workers=1)
     token=secrets.token_urlsafe(32)
+    pending={}
+
+    def expire():
+        # Called under lock; only idle failed jobs own a retained checkpoint.
+        for ident, item in list(pending.items()):
+            if jobs[ident]['status'] != 'running' and time.monotonic()-item['created'] > 900:
+                item['temp'].cleanup();del pending[ident]
+                jobs[ident]['retryable']=False
+                jobs[ident]['error']='Saved evidence expired. Start a new verification.'
+
+    def work(ident):
+        item=pending[ident]
+        def progress(step):
+            with lock:jobs[ident]['step']=step
+        retain=False
+        try:
+            task=item['task']
+            if task is not None:
+                result=task.run(progress)
+            else:
+                f=item['files'];p=item['payload']
+                result=runner(f['note'],f['camera'],f['audio'],p['order'],p['language'],progress)
+            out=ROOT/'.local-verification';out.mkdir(exist_ok=True)
+            (out/f'{ident}.json').write_text(json.dumps(result,ensure_ascii=False,indent=2))
+            with lock:jobs[ident]={'status':'complete','result':result}
+        except Exception as e:
+            # Never expose provider messages, URLs or file contents.
+            task=item['task'];retain=bool(task and task.retryable)
+            with lock:
+                jobs[ident]={'status':'error','step':task.failed_step if task else jobs[ident].get('step'),
+                    'error':('Audio verification stopped. Retry the failed step with the same evidence; completed checks are kept.' if retain else 'Verification stopped; no ERP write. Check model access and input files.'),
+                    'error_type':type(e).__name__,'retryable':retain}
+                item['created']=time.monotonic()
+        finally:
+            if not retain:
+                with lock:
+                    item['temp'].cleanup();pending.pop(ident,None)
+
 
     class Handler(BaseHTTPRequestHandler):
         def log_message(self,*args):pass
@@ -65,12 +104,25 @@ def make_server(port=8768,runner=verify):
             if self.path=='/api/config':return self.reply(200,{'token':token,'mode':'dry_run'})
             if self.path.startswith('/api/jobs/'):
                 if self.headers.get('X-Verification-Token')!=token:return self.reply(403,{'error':'Invalid session.'})
-                with lock:job=dict(jobs.get(self.path.split('/')[-1],{}))
+                with lock:
+                    expire()
+                    job=dict(jobs.get(self.path.split('/')[-1],{}))
                 return self.reply(200 if job else 404,job or {'error':'Not found.'})
             return self.reply(404,{'error':'Not found.'})
         def do_POST(self):
             if not self.trusted() or self.headers.get('X-Verification-Token')!=token:
                 return self.reply(403,{'error':'Invalid local session.'})
+            if self.path.startswith('/api/retry/'):
+                ident=self.path.split('/')[-1]
+                with lock:
+                    expire()
+                    if any(j['status']=='running' for j in jobs.values()):
+                        return self.reply(409,{'error':'One verification is already running.'})
+                    if ident not in pending or not jobs[ident].get('retryable'):
+                        return self.reply(409,{'error':'No saved audio step to retry. Start a new verification.'})
+                    jobs[ident]={'status':'running','step':'Retrying audio step'}
+                pool.submit(work,ident)
+                return self.reply(202,{'id':ident})
             if self.path!='/api/verify':return self.reply(404,{'error':'Not found.'})
             try:
                 length=int(self.headers.get('Content-Length','0'))
@@ -89,24 +141,30 @@ def make_server(port=8768,runner=verify):
             except (ValueError,KeyError,TypeError, OSError) as e:
                 return self.reply(400,{'error':str(e)[:180]})
             with lock:
+                expire()
                 if any(j['status']=='running' for j in jobs.values()):
                     temp.cleanup();return self.reply(409,{'error':'One verification is already running.'})
-                ident=secrets.token_hex(12);jobs[ident]={'status':'running','step':'Starting'}
-            def work():
-                def progress(step):
-                    with lock:jobs[ident]['step']=step
+                # Starting a new input set discards any old idle retry checkpoints.
+                for old in list(pending):
+                    pending.pop(old)['temp'].cleanup();jobs[old]['retryable']=False
+                ident=secrets.token_hex(12)
                 try:
-                    result=runner(files['note'],files['camera'],files['audio'],order,payload['language'],progress)
-                    out=ROOT/'.local-verification';out.mkdir(exist_ok=True)
-                    (out/f'{ident}.json').write_text(json.dumps(result,ensure_ascii=False,indent=2))
-                    with lock:jobs[ident]={'status':'complete','result':result}
-                except Exception as e:
-                    # Provider errors may include file contents/URLs; never echo them to the page.
-                    with lock:jobs[ident]={'status':'error','error':'Verification stopped; no ERP write. Check model access and input files.','error_type':type(e).__name__}
-                finally:temp.cleanup()
-            pool.submit(work)
+                    task=VerificationRun(files['note'],files['camera'],files['audio'],order,payload['language']) if runner is verify else None
+                except Exception:
+                    temp.cleanup();return self.reply(400,{'error':'Invalid verification inputs.'})
+                pending[ident]={'task':task,'files':files,'payload':payload,'temp':temp,'created':time.monotonic()}
+                jobs[ident]={'status':'running','step':'Starting'}
+            pool.submit(work,ident)
             self.reply(202,{'id':ident})
     server=ThreadingHTTPServer(('127.0.0.1',port),Handler)
+    original_close=server.server_close
+    def close():
+        pool.shutdown(wait=True)
+        with lock:
+            for item in pending.values():item['temp'].cleanup()
+            pending.clear()
+        original_close()
+    server.server_close=close
     server.worker_pool=pool
     return server
 

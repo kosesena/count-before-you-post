@@ -9,7 +9,7 @@ import time
 import unittest
 import wave
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 from PIL import Image
 from cbyp.verify_server import make_server
 from cbyp.workflow import verify
@@ -63,6 +63,33 @@ class VerificationServer(unittest.TestCase):
         self.server.worker_pool.shutdown()
         self.assertTrue(all(not p.exists() for p in self.called[0]))
         self.assertTrue((Path(self.temp.name)/'.local-verification'/f"{job['id']}.json").is_file())
+    def test_retry_keeps_uploads_and_blocks_duplicate_completion(self):
+        self.server.shutdown();self.server.server_close();self.thread.join()
+        task=MagicMock()
+        task.retryable=True;task.failed_step='Transcribe speaker turns'
+        task.run.side_effect=[TimeoutError(),{'mode':'dry_run','erp_written':False,'result':{'posted':False}}]
+        with patch('cbyp.verify_server.VerificationRun',return_value=task) as factory:
+            self.server=make_server(0)
+            self.thread=threading.Thread(target=self.server.serve_forever,daemon=True);self.thread.start()
+            self.token=self.request('GET','/api/config')[1]['token']
+            status,job=self.request('POST','/api/verify',self.payload());self.assertEqual(status,202)
+            def wait():
+                for _ in range(100):
+                    result=self.request('GET','/api/jobs/'+job['id'])[1]
+                    if result['status']!='running':return result
+                    time.sleep(.01)
+                self.fail('Job did not finish')
+            failed=wait();self.assertTrue(failed['retryable'])
+            paths=factory.call_args.args[:3]
+            self.assertTrue(all(p.exists() for p in paths))
+            self.assertEqual(self.request('POST','/api/retry/'+job['id'],headers={'X-Verification-Token':''})[0],403)
+            self.assertEqual(self.request('POST','/api/retry/'+job['id'])[0],202)
+            self.assertEqual(wait()['status'],'complete')
+            self.assertEqual(task.run.call_count,2)
+            self.assertEqual(self.request('POST','/api/retry/'+job['id'])[0],409)
+            self.server.worker_pool.shutdown()
+            self.assertTrue(all(not p.exists() for p in paths))
+
     def test_missing_files_fail_before_models(self):
         with patch('cbyp.workflow.full_session') as factory:
             with self.assertRaises(ValueError):verify('absent','absent','absent',self.payload()['order'])
