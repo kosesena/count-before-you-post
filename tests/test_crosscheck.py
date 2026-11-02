@@ -5,7 +5,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from cbyp.crosscheck import cross_check, iou  # noqa: E402
-from cbyp.sam import Segment  # noqa: E402
+from cbyp.sam import Segment, _source_segment  # noqa: E402
 
 
 def square(obj, x, y, size=10, conf=0.91):
@@ -17,6 +17,21 @@ CENTRES = [(20 * k + 5, 5) for k in range(3)]
 
 
 class CrossCheck(unittest.TestCase):
+    def test_downsampled_mask_maps_to_source_coordinates(self):
+        s = _source_segment("1", .95, (10, 20, 14, 24), 2, 2, bytes([1, 0, 0, 1]))
+        self.assertEqual(len(s.raster), 16)
+        self.assertTrue(s.contains(10, 20))
+        self.assertTrue(s.contains(13, 23))
+        self.assertFalse(s.contains(12, 20))
+        self.assertFalse(s.contains(14, 24))
+        self.assertEqual(iou(s, square(2, 10, 20, size=4)), .5)
+
+    def test_invalid_mask_fails_closed(self):
+        with self.assertRaises(ValueError):
+            _source_segment("1", .95, (0, 0, 4, 4), 2, 2, b"\x01")
+        with self.assertRaises(ValueError):
+            _source_segment("1", .95, (0.5, 0, 4, 4), 2, 2, bytes(4))
+
     def test_iou(self):
         self.assertEqual(iou(square(1, 0, 0), square(2, 0, 0)), 1.0)
         self.assertEqual(iou(square(1, 0, 0), square(2, 50, 0)), 0.0)

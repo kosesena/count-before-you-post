@@ -1,0 +1,157 @@
+{
+  "source": "https://github.com/yancie-yjr/scd.github.io",
+  "license": "CC BY-NC-SA 4.0",
+  "selection": "First 30 validation images sorted by SHA256(cbyp-2026-11-02:IMAGE_ID); no outcome-based filtering",
+  "cases": [
+    {
+      "id": "305",
+      "sha256": "1ee61a9e0350a4c2f2c021681bd080f0f01a1c200f5bac26644cdbfc6ea62fb3",
+      "annotated_visible_count": 12
+    },
+    {
+      "id": "895",
+      "sha256": "ae14a95281de2038a2c427031ae6003a9d500faf83af1918256461fa3270c043",
+      "annotated_visible_count": 10
+    },
+    {
+      "id": "583",
+      "sha256": "6cb3857e4b13bc18e659843496bb80dcad827268d735f81bafc0cea77261bbdd",
+      "annotated_visible_count": 3
+    },
+    {
+      "id": "160",
+      "sha256": "f5f2407023f4cea5ca5f3b0af945bdbdede3a7362a47f1c18e4306340bef3b2b",
+      "annotated_visible_count": 15
+    },
+    {
+      "id": "374",
+      "sha256": "2ba28cb2a3d2b42d81cf19bbfba2d102cf5f2c6e046f53deeb08dc42e8074d51",
+      "annotated_visible_count": 2
+    },
+    {
+      "id": "991",
+      "sha256": "170550db473e0b396d6c0e1ebadd93ee40deb2b3b40af8fb14b9fec76838f68f",
+      "annotated_visible_count": 4
+    },
+    {
+      "id": "892",
+      "sha256": "befd6a185a87d8a148705e1987ae3050df25b186556e11ca3ceb3694156261c6",
+      "annotated_visible_count": 39
+    },
+    {
+      "id": "210",
+      "sha256": "45ed253fb9fbba79eb9ec0c4f0e469e7c83a0ebcc90ebf91275e2fc2a0253329",
+      "annotated_visible_count": 20
+    },
+    {
+      "id": "505",
+      "sha256": "10f285f93b27d317e662585bc14b39b9db421bbf1a07f8eca7217c3b422a9b3f",
+      "annotated_visible_count": 8
+    },
+    {
+      "id": "485",
+      "sha256": "3608f967825b9c2bb9ba7f86b56196de035f9a1bd0ea33d10be4aeee6fbc7f38",
+      "annotated_visible_count": 6
+    },
+    {
+      "id": "648",
+      "sha256": "511be6a1cb6913d44c89f28206646ca73cce19da99978af1893029f54a220b4b",
+      "annotated_visible_count": 8
+    },
+    {
+      "id": "834",
+      "sha256": "975d54fa4a633e61937b7c28259ffefd4eb7aae9410ea3ceda2682832f51d665",
+      "annotated_visible_count": 9
+    },
+    {
+      "id": "570",
+      "sha256": "0ee2ba85f870b4fc7766fb5f75ea25ba7aaf216d221f063717407ba3403d2516",
+      "annotated_visible_count": 13
+    },
+    {
+      "id": "932",
+      "sha256": "7cf7a6bdd5a46240e8e0c57f8628ec02bb42a13f59bc8255a0539269b4803782",
+      "annotated_visible_count": 8
+    },
+    {
+      "id": "494",
+      "sha256": "a460c0875f11ba0308d639963ae8c068bec7c44f7fa875c5c695b4aa51051511",
+      "annotated_visible_count": 9
+    },
+    {
+      "id": "827",
+      "sha256": "47cd4f9c2e9fa308c37a1ed24df4c29a81b86664b8e119b704f1e59e5d35bc78",
+      "annotated_visible_count": 9
+    },
+    {
+      "id": "949",
+      "sha256": "a3b55df5ca430d2aeb4f1f61b57d8adfd8a48800f32549ebbed231ac40b5ab7c",
+      "annotated_visible_count": 36
+    },
+    {
+      "id": "42",
+      "sha256": "64cf98b2643994fd828c48c00da77c2293250ce4219b0d9fd114df784c5550f5",
+      "annotated_visible_count": 8
+    },
+    {
+      "id": "319",
+      "sha256": "5ab87c6b23915ff7cc9588154a0bd864f13f13defd5aa3909921ecf1de23a66d",
+      "annotated_visible_count": 10
+    },
+    {
+      "id": "382",
+      "sha256": "6a56e332a0a56e9a8d5b9fc215197b8433831d2f5e2cbfeae3881a089ff69219",
+      "annotated_visible_count": 18
+    },
+    {
+      "id": "66",
+      "sha256": "9d7c02d9e0adc7cbdc07c53da4bc208d1358a3634361daf6f0fdde98753f8e3c",
+      "annotated_visible_count": 18
+    },
+    {
+      "id": "439",
+      "sha256": "94b933018a3f46334d8e352085cc4b009452b321444a373916dbf711e270ca0d",
+      "annotated_visible_count": 8
+    },
+    {
+      "id": "88",
+      "sha256": "01dd52180b564ca855b85afced064192e538bb23488c6e201ac8848de3110885",
+      "annotated_visible_count": 17
+    },
+    {
+      "id": "800",
+      "sha256": "dc842fc34118ca114f47d12835cb23af0eafabd3d68097e024ae25867fd48628",
+      "annotated_visible_count": 5
+    },
+    {
+      "id": "627",
+      "sha256": "1358233a4a9b72e26d4a067df36fa164bdca469c4371d16631b0e59045a27af9",
+      "annotated_visible_count": 5
+    },
+    {
+      "id": "736",
+      "sha256": "bfe6bc70ea54df95882608849f9e1f328dc9cdbc3fd842bd8c0d0acc3e9e738e",
+      "annotated_visible_count": 8
+    },
+    {
+      "id": "690",
+      "sha256": "db628ed462aec1222b78a813f05782c70323df6fcc4978695b7ec229c8079b23",
+      "annotated_visible_count": 12
+    },
+    {
+      "id": "646",
+      "sha256": "a92e4fd9d621b86c07a22727563dcf809f4772b398e532c540c67f09cf21bc4d",
+      "annotated_visible_count": 22
+    },
+    {
+      "id": "488",
+      "sha256": "c9ac0b6699cf5c3d05599864690bae28cff7a36ca912f0f5371fb6f26ff04838",
+      "annotated_visible_count": 9
+    },
+    {
+      "id": "460",
+      "sha256": "c25efc7377baa97aa17caa7c7d32cae6ada30c7a52eb784018ae022c148603b4",
+      "annotated_visible_count": 12
+    }
+  ]
+}

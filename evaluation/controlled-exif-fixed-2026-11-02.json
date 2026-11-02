@@ -1,0 +1,330 @@
+{
+  "summary": {
+    "cases": 2,
+    "expected_no_post_cases": 1,
+    "unsafe_posts_in_constrained_cases": 0,
+    "completed_nonposts_in_constrained_cases": 1,
+    "technical_failures": 0,
+    "scope": "Controlled integration development cases; real public images + authored notes/orders + synthetic audio. Not held-out delivery accuracy. Baseline expected outcome unknown. EXIF-orientation regression subset selected by metadata, not results.",
+    "total_cost_usd": null,
+    "caveat": "An earlier rule can mask the injected fault. Baseline outcomes have no independent action truth."
+  },
+  "rows": [
+    {
+      "id": "hybrid-07",
+      "scenario": "baseline",
+      "expected_constraint": null,
+      "source_image_id": "892",
+      "total_cost_usd": null,
+      "steps_started": [
+        "Read delivery note",
+        "Inspect camera",
+        "Segment cartons",
+        "Transcribe speaker turns",
+        "Identify receiver count",
+        "Cross-check objects and authorize"
+      ],
+      "evidence": {
+        "mode": "dry_run",
+        "erp_written": false,
+        "result": {
+          "posted": false,
+          "gate": "block",
+          "reason": "Wrong product: labels say '脂肪乳注射液(C14-24)', note says 'Intralipid 20% 250ml 脂肪乳注射液(C14-24) 英脱利匹特'. Refuse it at the dock; the load goes back on the truck."
+        },
+        "decision": {
+          "action": "block",
+          "quantity": null,
+          "reasons": [
+            "Wrong product: labels say '脂肪乳注射液(C14-24)', note says 'Intralipid 20% 250ml 脂肪乳注射液(C14-24) 英脱利匹特'. Refuse it at the dock; the load goes back on the truck."
+          ],
+          "evidence": {
+            "note": [
+              [
+                39,
+                "Intralipid 20% 250ml 脂肪乳注射液(C14-24) 英脱利匹特"
+              ]
+            ],
+            "sam_sure": 33,
+            "sam_doubtful": 6,
+            "spark_count": 24,
+            "label": "脂肪乳注射液(C14-24)",
+            "order": {
+              "number": "PO-hybrid-07",
+              "product": "Intralipid 20% 250ml 脂肪乳注射液(C14-24) 英脱利匹特",
+              "ordered": 39,
+              "open": 39
+            }
+          },
+          "rule": "wrong_product"
+        },
+        "note": {
+          "date": "2026-11-02",
+          "embedded_instructions": [],
+          "items": [
+            {
+              "description": "Intralipid 20% 250ml 脂肪乳注射液(C14-24) 英脱利匹特",
+              "legible": true,
+              "quantity": 39,
+              "unit": "carton"
+            }
+          ],
+          "note_number": "hybrid-07",
+          "supplier": "Controlled Fixture Supplier"
+        },
+        "camera": {
+          "all_cartons_visible": false,
+          "cartons_visible": 24,
+          "damaged_cartons": 0,
+          "product_on_labels": "脂肪乳注射液(C14-24)",
+          "stacked": true
+        },
+        "receiver": {
+          "certain": true,
+          "product": "",
+          "quantity": 39,
+          "supplier": "controlled fixture supplier",
+          "unit": "cartons"
+        },
+        "speaker_turns": [
+          {
+            "speaker": "A",
+            "transcript": "I am the receiving clerk. I counted 39 cartons. The supplier is controlled fixture supplier."
+          }
+        ],
+        "speech_interpretation": {
+          "count_candidates": [
+            39
+          ],
+          "driver_quantity": null,
+          "receiver": {
+            "certain": true,
+            "product": "",
+            "quantity": 39,
+            "supplier": "controlled fixture supplier",
+            "unit": "cartons"
+          },
+          "receiver_speaker": "A",
+          "receiver_turn": "I am the receiving clerk. I counted 39 cartons. The supplier is controlled fixture supplier.",
+          "voice_validation": {
+            "source_turn_matched": true,
+            "single_supported_count": true
+          }
+        },
+        "second_opinions": {},
+        "trace": [
+          {
+            "gate_cross_check": {
+              "agreed": 7,
+              "sam_only": 30,
+              "spark_only": 12,
+              "doubled": 2
+            },
+            "at": "2026-11-02T16:56:12+03:00"
+          }
+        ],
+        "timings": [
+          {
+            "step": "Read delivery note",
+            "seconds": 10.642
+          },
+          {
+            "step": "Inspect camera",
+            "seconds": 32.813
+          },
+          {
+            "step": "Segment cartons",
+            "seconds": 50.298
+          },
+          {
+            "step": "Transcribe speaker turns",
+            "seconds": 2.942
+          },
+          {
+            "step": "Identify receiver count",
+            "seconds": 3.226
+          },
+          {
+            "step": "Cross-check objects and authorize",
+            "seconds": 72.051
+          }
+        ],
+        "seconds": 171.972,
+        "total_cost_usd": null,
+        "cost_status": "Not measured: provider-wide billing required; not agent-token cost.",
+        "input_sha256": {
+          "note": "67b32a6c1e0ddca72af9c80fceca37c7f368f822b2bb4b0d435be4ae33c3e394",
+          "camera": "befd6a185a87d8a148705e1987ae3050df25b186556e11ca3ceb3694156261c6",
+          "audio": "c7eb1f73797abff31294b9e5fcadd808103d7e647d130324aad532bee1a7e0ca"
+        }
+      },
+      "action": "block",
+      "rule": "wrong_product",
+      "seconds": 171.975
+    },
+    {
+      "id": "hybrid-24",
+      "scenario": "receiver_uncertain",
+      "expected_constraint": "not_post",
+      "source_image_id": "800",
+      "total_cost_usd": null,
+      "steps_started": [
+        "Read delivery note",
+        "Inspect camera",
+        "Segment cartons",
+        "Transcribe speaker turns",
+        "Identify receiver count",
+        "Cross-check objects and authorize"
+      ],
+      "evidence": {
+        "mode": "dry_run",
+        "erp_written": false,
+        "result": {
+          "posted": false,
+          "gate": "human",
+          "reason": "SAM and Spark disagree on which objects are cartons: 2 agreed, 10 only SAM, 3 only Spark."
+        },
+        "decision": {
+          "action": "human",
+          "quantity": null,
+          "reasons": [
+            "SAM and Spark disagree on which objects are cartons: 2 agreed, 10 only SAM, 3 only Spark."
+          ],
+          "evidence": {
+            "note": [
+              [
+                5,
+                "STERILE WATER FOR INJECTION"
+              ]
+            ],
+            "sam_sure": 5,
+            "sam_doubtful": 7,
+            "spark_count": 5,
+            "label": "STERILE WATER FOR INJECTION",
+            "order": {
+              "number": "PO-hybrid-24",
+              "product": "STERILE WATER FOR INJECTION",
+              "ordered": 5,
+              "open": 5
+            },
+            "cross": {
+              "agreed": 2,
+              "sam_only": 10,
+              "spark_only": 3,
+              "doubled": 0
+            }
+          },
+          "rule": "disagree"
+        },
+        "note": {
+          "date": "2026-11-02",
+          "embedded_instructions": [],
+          "items": [
+            {
+              "description": "STERILE WATER FOR INJECTION",
+              "legible": true,
+              "quantity": 5,
+              "unit": "carton"
+            }
+          ],
+          "note_number": "hybrid-24",
+          "supplier": "Controlled Fixture Supplier"
+        },
+        "camera": {
+          "all_cartons_visible": true,
+          "cartons_visible": 5,
+          "damaged_cartons": 0,
+          "product_on_labels": "STERILE WATER FOR INJECTION",
+          "stacked": false
+        },
+        "receiver": {
+          "certain": false,
+          "product": "",
+          "quantity": 5,
+          "supplier": "",
+          "unit": "cartons"
+        },
+        "speaker_turns": [
+          {
+            "speaker": "A",
+            "transcript": "I am the receiving receiving clerk. I could not count all the cartons, maybe five cartons, but I am not sure."
+          }
+        ],
+        "speech_interpretation": {
+          "count_candidates": [
+            5
+          ],
+          "driver_quantity": null,
+          "receiver": {
+            "certain": false,
+            "product": "",
+            "quantity": 5,
+            "supplier": "",
+            "unit": "cartons"
+          },
+          "receiver_speaker": "A",
+          "receiver_turn": "I am the receiving receiving clerk. I could not count all the cartons, maybe five cartons, but I am not sure.",
+          "voice_validation": {
+            "source_turn_matched": true,
+            "single_supported_count": true
+          }
+        },
+        "second_opinions": {},
+        "trace": [
+          {
+            "gate_cross_check": {
+              "agreed": 2,
+              "sam_only": 10,
+              "spark_only": 3,
+              "doubled": 0
+            },
+            "at": "2026-11-02T16:55:04+03:00"
+          }
+        ],
+        "timings": [
+          {
+            "step": "Read delivery note",
+            "seconds": 8.991
+          },
+          {
+            "step": "Inspect camera",
+            "seconds": 19.206
+          },
+          {
+            "step": "Segment cartons",
+            "seconds": 19.927
+          },
+          {
+            "step": "Transcribe speaker turns",
+            "seconds": 4.611
+          },
+          {
+            "step": "Identify receiver count",
+            "seconds": 4.522
+          },
+          {
+            "step": "Cross-check objects and authorize",
+            "seconds": 46.776
+          }
+        ],
+        "seconds": 104.032,
+        "total_cost_usd": null,
+        "cost_status": "Not measured: provider-wide billing required; not agent-token cost.",
+        "input_sha256": {
+          "note": "e36a4ab9cc7a2f46c08dd6138d419c632072d8ba27473a07824febfea885d932",
+          "camera": "dc842fc34118ca114f47d12835cb23af0eafabd3d68097e024ae25867fd48628",
+          "audio": "c86c789deab448ffa11a83ea2d84cbbe44de37ba894923e61753b4a1150d523e"
+        }
+      },
+      "action": "human",
+      "rule": "disagree",
+      "seconds": 104.035
+    }
+  ],
+  "provenance": {
+    "date": "2026-11-02",
+    "erp_writer_installed": false,
+    "inputs": "SCD public images, authored notes/orders, macOS synthetic speech",
+    "trial": "hybrid-exif-fixed-2026-11-02"
+  }
+}

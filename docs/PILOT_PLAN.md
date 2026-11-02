@@ -1,6 +1,6 @@
 # Gerçek veri, saha ölçümü ve API maliyeti
 
-Durum: 2 Kasım 2026. Hazırlık tamamlanabilir; gerçek teslimat ölçümü ve fatura mutabakatı henüz yok. Aşağıdaki işletmeler adaydır; anlaşılmış pilot değildir. Kimseye mesaj gönderilmedi.
+Durum: 2 Kasım 2026. Kullanıcının tercihiyle üçüncü taraf pilotuna bağlı kalmadan, açık gerçek fotoğraflarla kontrollü testler yürütülüyor. Sonuçlar: [kontrollü doğrulama raporu](CONTROLLED_VALIDATION.md). Gerçek teslimat ölçümü ve tam fatura mutabakatı henüz yok. Aşağıdaki işletmeler yalnızca gelecekteki adaylardır; kimseye mesaj gönderilmedi.
 
 ## İnternetten bulunan kaynaklar
 
@@ -11,7 +11,7 @@ Durum: 2 Kasım 2026. Hazırlık tamamlanabilir; gerçek teslimat ölçümü ve 
 | SCD araştırmacıları | https://github.com/yancie-yjr/scd.github.io | Gerçek depo ve internet koli görüntüleri, instance etiketleri. Görsel bileşen değerlendirmesi için aday. Veri lisansı CC BY-NC-SA 4.0; repo kod lisansı ile karıştırılmamalı. |
 | Amazon Bin Image Dataset | https://registry.opendata.aws/amazon-bin-imagery/ | Gerçek fulfillment kutu içi ürün görüntüleri ve metadata. Koli teslimatından farklı görev; ana teslimat doğrulama seti olarak kullanılmayacak. CC BY-NC-SA 3.0 US. |
 
-SCD görüntülerine uydurma irsaliye/ses eklemek gerçek uçtan uca saha verisi üretmez. Görsel testte yalnızca görünür etiketli nesneler değerlendirilebilir; gizli koli adedi çıkarılamaz. Aynı yükün farklı açılarını bağımsız teslimat saymayın. Yayımlanmış verinin model eğitiminde görülmediği garanti edilemez. Bu veriler henüz indirilmedi veya değerlendirilmedi; ticari demo içinde yeniden yayımlama izni varsayılmıyor.
+SCD görüntülerine uydurma irsaliye/ses eklemek gerçek uçtan uca saha verisi üretmez. Görsel testte yalnızca görünür etiketli nesneler değerlendirilebilir; gizli koli adedi çıkarılamaz. Aynı yükün farklı açılarını bağımsız teslimat saymayın. Yayımlanmış verinin model eğitiminde görülmediği garanti edilemez. SCD doğrulama kümesinden önceden belirlenmiş 30 görüntü indirildi ve değerlendirildi. Ham fotoğraflar Git ve site dışında tutuluyor; ticari demo içinde yeniden yayımlama izni varsayılmıyor.
 
 ## Gönderime hazır pilot talebi (henüz gönderilmedi)
 
@@ -56,3 +56,9 @@ API anahtarı, kart bilgisi veya giriş şifresi gerekmiyor. İhracatları ignor
 - İşletmeyle iletişim için açık gönderim talimatı ve veri paylaşmayı kabul eden muhatap gerekir. Bu belge tek başına pilot başlatmaz.
 - Fatura dışa aktarımları gelince maliyet hesaplanabilir.
 - Gerçek teslimatlar gelince mühürleme ve API değerlendirmesi yapılabilir; şu anda saha başarısı iddiası yoktur.
+
+## 2 Kasım maliyet incelemesi
+
+Meta 27 Ekim–2 Kasım kullanım CSV’si alındı; gösterilen net harcama 0 TRY. Bu, ücretsiz kredi öncesi tüketimin veya bu projeye ait tüm çağrıların maliyetinin sıfır olduğunu kanıtlamaz. Özel dökümler `evaluation/private/` altında tutulur.
+
+Baseten için ayrı kullanıcı hesabı yok: 28 Ekim hackathon e-postası 100 USD başlangıç kredisi, API anahtarı ve Muse Spark Open erişimi sağlıyor. E-posta kalan bakiyeyi göstermiyor. Mevcut anahtarla resmi salt okunur `GET /v1/billing/model_apis` isteği 403 döndürdü; çıkarım erişimi fatura erişimi anlamına gelmiyor. Hesap açılması veya tek kullanımlık anahtar bağlantısının yeniden açılması gerekmiyor. Tam API maliyeti doğrulanamadı; tahmin gerçek fatura diye sunulmayacak.

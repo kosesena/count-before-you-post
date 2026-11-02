@@ -124,18 +124,42 @@ def segments(text: str) -> list[Segment]:
     for rec in result.records:
         if isinstance(rec, msp.SegmentationMaskRecord):
             b = rec.bounds
-            out.append(Segment(rec.object_id, rec.confidence, b.left, b.top, b.right, b.bottom,
-                               msp.decode_mask_to_raster(rec.mask)))
+            out.append(_source_segment(rec.object_id, rec.confidence,
+                                       (b.left, b.top, b.right, b.bottom),
+                                       rec.mask.width, rec.mask.height,
+                                       msp.decode_mask_to_raster(rec.mask)))
     return out
+
+
+def _source_segment(obj, conf, bounds, width, height, raster) -> Segment:
+    """Map a box-local raster to source pixels before point/overlap comparisons.
+
+    SAM may downsample large masks independently of their source-media bounds.
+    Nearest-neighbour expansion preserves binary membership; it does not invent
+    additional mask detail. Non-pixel-aligned bounds fail closed for now.
+    """
+    from PIL import Image
+
+    if any(not float(v).is_integer() for v in bounds):
+        raise ValueError("SAM bounds must align with source pixels")
+    left, top, right, bottom = map(int, bounds)
+    target = (right - left, bottom - top)
+    if min(width, height, *target) <= 0 or len(raster) != width * height:
+        raise ValueError("Invalid SAM mask dimensions")
+    if (width, height) != target:
+        raster = Image.frombytes("L", (width, height), raster).resize(
+            target, Image.Resampling.NEAREST).tobytes()
+    return Segment(obj, conf, left, top, right, bottom, raster)
 
 
 def segment_points(path: str | Path, points: list[tuple[int, int]]) -> str:
     """Ask SAM what object sits under each point (one object per point, at most 16)."""
     import meta_sam_parser as msp
-    from PIL import Image
+    from PIL import Image, ImageOps
 
     path = Path(path)
-    w, h = Image.open(path).size
+    with Image.open(path) as image:
+        w, h = ImageOps.exif_transpose(image).size
     prompt = msp.build_object_prompt(size=(w, h), objects=[
         msp.PromptObject(id=i + 1, prompts=[msp.FramePrompt(points=[msp.PromptPoint(x, y)])])
         for i, (x, y) in enumerate(points[:16])])

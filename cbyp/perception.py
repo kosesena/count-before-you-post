@@ -89,10 +89,11 @@ POINTS_PROMPT = (
 
 def point_cartons(path):
     """Spark marks each carton with a point; returns pixel coordinates [(x, y), ...]."""
-    from PIL import Image
+    from PIL import Image, ImageOps
 
     path = Path(path)
-    w, h = Image.open(path).size
+    with Image.open(path) as image:
+        w, h = ImageOps.exif_transpose(image).size
     mime = mimetypes.guess_type(path.name)[0] or "image/png"
     url = f"data:{mime};base64," + base64.b64encode(path.read_bytes()).decode()
     r = client().chat.completions.create(

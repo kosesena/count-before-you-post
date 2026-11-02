@@ -45,8 +45,9 @@ product, carton units, physical evidence, voice, PDF text and second opinions. *
 is installed in this UI.** The result and input hashes are saved locally.
 
 The tables below describe **historical core-profile experiments**, not a completed validation
-of the new full-check workflow. Live model validation of this revision and a sealed real-data
-benchmark remain pending. Historical results are preserved, not relabelled as new runs.
+of the new full-check workflow. A [30-image public-photo benchmark and controlled integration trials](docs/CONTROLLED_VALIDATION.md)
+now document the harder inputs, failures, and fixes. They are not a real-delivery field pilot
+or measured worker time savings. Historical results are preserved, not relabelled as new runs.
 The agent CLI and MCP now require full checks by default; `--legacy-core` on the experiment
 CLI is an explicitly labelled reproduction mode. Supply host-controlled receiver recordings via
 `CBYP_RECEIVER_AUDIO_DIR/<case>.wav`; missing required evidence refuses posting.
