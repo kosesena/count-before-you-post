@@ -29,3 +29,6 @@ assets/mascots/3d/**/*.glb
 evaluation/inputs/
 evaluation/sealed*.json
 evaluation/results*.json
+
+# Private field observations and provider billing exports
+evaluation/private/

@@ -1,0 +1,47 @@
+{
+  "status": "template_not_reconciled",
+  "period_start": null,
+  "period_end": null,
+  "timezone": null,
+  "currency": null,
+  "all_providers_accounted_for": false,
+  "providers": [
+    {
+      "provider": "meta",
+      "source_export": null,
+      "gross_usage_charge": null,
+      "discounts": null,
+      "credits_applied": null,
+      "net_usage_charge": null,
+      "tax": null,
+      "other_projects_charge": null,
+      "unallocated_project_charge": null,
+      "reconciled": false
+    },
+    {
+      "provider": "baseten",
+      "source_export": null,
+      "gross_usage_charge": null,
+      "discounts": null,
+      "credits_applied": null,
+      "net_usage_charge": null,
+      "tax": null,
+      "other_projects_charge": null,
+      "unallocated_project_charge": null,
+      "reconciled": false
+    }
+  ],
+  "calls": [],
+  "call_fields": [
+    "provider",
+    "request_id",
+    "attempt_id",
+    "case_id",
+    "stage",
+    "model",
+    "timestamp",
+    "billed_units",
+    "gross_usage_charge",
+    "source_export_row"
+  ]
+}

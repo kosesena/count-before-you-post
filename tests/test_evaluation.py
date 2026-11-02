@@ -28,3 +28,21 @@ class Evaluation(unittest.TestCase):
         r=summarize([{'truth':{'action':'human'},'result':{'action':'error'}}])
         self.assertEqual(r['technical_failures'],1)
         self.assertEqual(r['correct_hold'],0)
+
+    def test_failed_call_cost_is_part_of_total(self):
+        rows = [
+            {'truth': {'action': 'human'}, 'result': {'action': 'error'}, 'total_cost_usd': 0.25},
+            {'truth': {'action': 'post', 'quantity': 12}, 'result': {'action': 'post', 'quantity': 12}, 'total_cost_usd': 0.5},
+        ]
+        result = summarize(rows)
+        self.assertEqual(result['total_cost_usd'], 0.75)
+        self.assertEqual(result['measured_cost_cases'], 2)
+        self.assertEqual(result['technical_failures'], 1)
+        del rows[0]['total_cost_usd']
+        self.assertIsNone(summarize(rows)['total_cost_usd'])
+
+    def test_invalid_cost_does_not_claim_complete_billing(self):
+        for value in (True, -1, float('nan'), float('inf')):
+            with self.subTest(value=value):
+                result = summarize([{'truth': {'action': 'human'}, 'result': {'action': 'human'}, 'total_cost_usd': value}])
+                self.assertIsNone(result['total_cost_usd'])

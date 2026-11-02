@@ -172,3 +172,7 @@ Premature acceptance was rejected. The physical recount then completed, and an e
 were observed in the browser. The stacked load also reached C-06-L1 with 12 cartons,
 passed the simulated scan, and completed driver boarding. All six scenarios reached exercise
 completion. Narrow-screen Panel controls were also used during the last two scenarios.
+
+## Pilot preparation — 2 Nov 2026
+
+See [PILOT_PLAN.md](PILOT_PLAN.md) for verified candidate contacts, public-dataset limitations, an unsent outreach draft, field observation protocol and billing requirements. Blank JSON templates are in evaluation/. No partner, fresh real delivery, field benefit or complete billing result is claimed.

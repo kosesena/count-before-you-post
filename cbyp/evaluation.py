@@ -1,6 +1,7 @@
 """Evaluation utilities: policy compliance is not the same metric as physical accuracy."""
 import hashlib
 import json
+import math
 import statistics
 from pathlib import Path
 
@@ -15,6 +16,10 @@ def summarize(rows):
         if type(truth.get('physical_count')) is int and type(row.get('observed_count')) is int:
             totals['physical_count_assessed']+=1
             totals['physical_count_errors']+=row['observed_count']!=truth['physical_count']
+        # Failed calls can still incur charges; include them in complete billing.
+        cost = row.get('total_cost_usd')
+        if type(cost) in (int, float) and math.isfinite(cost) and cost >= 0:
+            costs.append(cost)
         if result.get('action')=='error':
             totals['technical_failures']+=1
             totals['eligible']+=expected
@@ -29,7 +34,6 @@ def summarize(rows):
             totals['quantity_assessed']+=1
             totals['quantity_errors']+=result.get('quantity')!=truth['quantity']
         if isinstance(row.get('seconds'),(int,float)):times.append(row['seconds'])
-        if isinstance(row.get('total_cost_usd'),(int,float)):costs.append(row['total_cost_usd'])
     return totals | {'median_seconds':statistics.median(times) if times else None,
                      'measured_cost_cases':len(costs),'total_cost_usd':sum(costs) if len(costs)==len(rows) and rows else None,
                      'automatic_correct_accept_rate':totals['correct_accept']/totals['eligible'] if totals['eligible'] else None}

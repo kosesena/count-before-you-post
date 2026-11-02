@@ -27,6 +27,10 @@ def run(sealed, output):
                  'total_cost_usd':evidence['total_cost_usd'],'observed_count':evidence['camera'].get('cartons_visible'),'evidence':evidence}
         except Exception as e:
             row={'id':case['id'],'truth':case['truth'],'result':{'action':'error','quantity':None},'error_type':type(e).__name__}
+        # Preserve independently collected baseline; unknown stays null.
+        row['load_id'] = case.get('load_id', case['id'])
+        row['manual_active_seconds'] = case.get('manual_active_seconds')
+        row['observer'] = case.get('observer')
         rows.append(row)
         Path(output).write_text(json.dumps({'rows':rows,'summary':summarize(rows),'sealed_sha256':hashlib.sha256(Path(sealed).read_bytes()).hexdigest()},ensure_ascii=False,indent=2))
     return summarize(rows)

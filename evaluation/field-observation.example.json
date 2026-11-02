@@ -1,0 +1,29 @@
+{
+  "status": "template_not_measured",
+  "load_id": null,
+  "case_id": null,
+  "truth_recorded_at": null,
+  "truth_observer": null,
+  "manual": {
+    "observer": null,
+    "sequence": null,
+    "active_seconds": null,
+    "interruption_seconds": null,
+    "elapsed_seconds": null,
+    "decision": null,
+    "accepted_quantity": null
+  },
+  "assisted": {
+    "observer": null,
+    "sequence": null,
+    "capture_active_seconds": null,
+    "review_active_seconds": null,
+    "entry_active_seconds": null,
+    "other_active_seconds": null,
+    "elapsed_seconds": null,
+    "human_review_required": null,
+    "decision": null,
+    "accepted_quantity": null
+  },
+  "notes": null
+}
