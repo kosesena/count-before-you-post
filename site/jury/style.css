@@ -15,3 +15,16 @@
 .tour-narration{font-size:14px;font-weight:650;color:#203c6b;margin:16px 0 8px}
 .tour-source{font-size:11px;margin:10px 0 0}
 @media(max-width:640px){.guided-tour{padding:20px}.guided-top{display:block}.tour-duration{display:block;margin-top:10px}.tour-controls{gap:7px}#tour-progress{flex-basis:100%;order:-1;text-align:left}}
+
+/* Accessible tap sizes and overflow protection for narrow jury screens. */
+.guided-tour,.tour-description,.tour-narration{min-width:0;overflow-wrap:anywhere}
+.guided-top h2{overflow-wrap:break-word}
+.tour-controls button{min-height:44px}
+.tour-start{min-height:44px;display:inline-flex;align-items:center}
+@media(max-width:420px){
+  .guided-tour{padding:18px 16px}
+  .tour-controls{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  #tour-progress{grid-column:1/-1;grid-row:1;min-width:0}
+  .tour-controls button{width:100%;min-width:0;font-size:11px;padding:10px}
+  .tour-source{line-height:1.8}
+}
