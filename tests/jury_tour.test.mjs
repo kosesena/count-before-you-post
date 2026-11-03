@@ -1,10 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {resolve} from 'node:path';
+import {resolve, dirname} from 'node:path';
+import {fileURLToPath} from 'node:url';
 import vm from 'node:vm';
 
-const root = resolve(import.meta.dirname, '..');
+const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const js = readFileSync(resolve(root, 'site/jury/main.js'), 'utf8');
 const html = readFileSync(resolve(root, 'site/jury/index.html'), 'utf8');
 const css = readFileSync(resolve(root, 'site/jury/style.css'), 'utf8');
