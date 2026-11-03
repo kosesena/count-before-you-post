@@ -58,6 +58,7 @@ async function load() {
     render();
     $('status').textContent = '';
     document.querySelectorAll('[data-case]').forEach(b => b.disabled = false);
+    if (typeof renderJuryTour === 'function') $('tour-next').disabled = false;
   } catch (error) {
     if (token !== request) return;
     $('case').hidden = true;
@@ -101,6 +102,7 @@ async function loadReal() {
     renderReal();
     $('real-status').textContent = '';
     document.querySelectorAll('[data-real]').forEach(b => b.disabled = false);
+    if (typeof renderJuryTour === 'function') $('tour-next').disabled = false;
   } catch (error) {
     $('real-case').hidden = true;
     $('real-status').textContent = 'Real-photo evidence could not be loaded. Reload or open the full development evidence below.';
@@ -108,3 +110,43 @@ async function loadReal() {
 }
 document.querySelectorAll('[data-real]').forEach(b => b.addEventListener('click', () => {realSelected = b.dataset.real; renderReal();}));
 loadReal();
+
+
+// Optional self-paced jury tour. Navigation changes only already-recorded evidence.
+const juryTour = [
+  {type:'real', id:'correct', label:'Correct delivery',
+   narration:'A claim is not a stock record. In this controlled photo, the document, order and physical evidence agree: dry-run approval, no ERP write.'},
+  {type:'real', id:'quantity-mismatch', label:'Wrong quantity',
+   narration:'Keep the same camera view and change the authored document and test order to two cartons. The physical count remains one, so the gate blocks the receipt.'},
+  {type:'real', id:'wrong-article', label:'Wrong product',
+   narration:'The quantity matches, but the authored document and order have a different article code. The gate blocks; matching quantity alone is insufficient.'},
+  {type:'historical', id:'belirsiz', label:'Ask a person',
+   narration:'This is a separate historical synthetic core-profile recording, not a new real-photo trial. The evidence is uncertain; the gate requires human review.'}
+];
+let juryTourIndex = 0;
+function renderJuryTour() {
+  const step = juryTour[juryTourIndex];
+  const ready = step.type === 'real' ? Boolean(realControls?.rows?.length) : Boolean(data?.cases?.length);
+  $('tour-prev').disabled = juryTourIndex === 0;
+  $('tour-next').disabled = !ready;
+  $('tour-next').textContent = juryTourIndex === juryTour.length - 1 ? 'Restart tour ↺' : 'Next decision →';
+  $('tour-progress').textContent = `Step ${juryTourIndex + 1} of ${juryTour.length} · ${step.label}` + (ready ? '' : ' · Load evidence to continue');
+  $('tour-narration').textContent = step.narration;
+  if (!ready) return;
+  if (step.type === 'real') {
+    realSelected = step.id;
+    renderReal();
+    $('real-title').scrollIntoView({behavior:'auto', block:'start'});
+  } else {
+    selected = step.id;
+    render();
+    $('case-title').scrollIntoView({behavior:'auto', block:'start'});
+  }
+}
+$('tour-prev').addEventListener('click', () => {
+  if (juryTourIndex > 0) {juryTourIndex -= 1; renderJuryTour();}
+});
+$('tour-next').addEventListener('click', () => {
+  juryTourIndex = (juryTourIndex + 1) % juryTour.length;
+  renderJuryTour();
+});
