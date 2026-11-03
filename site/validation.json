@@ -1228,5 +1228,394 @@
     },
     "erp_written": false,
     "total_cost_usd": null
+  },
+  "explicit_identity_controls": {
+    "scope": "Post-hoc development controls on previously inspected SCD image 822. Authored explicit article/colour notes and orders, reused synthetic speech. Black matches visually read label; white is a deliberate negative control. Not unseen-data accuracy, genuine shipment or field validation.",
+    "attempts": [
+      {
+        "trial": "explicit-identity-controls-2026-11-02",
+        "case_id": "explicit-deli-black",
+        "action": "block",
+        "rule": "wrong_product",
+        "note": {
+          "date": "",
+          "embedded_instructions": [],
+          "items": [
+            {
+              "description": "Telephone",
+              "legible": true,
+              "product_identity": {
+                "brand": "deli",
+                "model": "",
+                "product_code": "No.770",
+                "variant": "黑"
+              },
+              "quantity": 1,
+              "unit": "carton"
+            }
+          ],
+          "note_number": "explicit-deli-black",
+          "supplier": "Controlled Fixture Supplier"
+        },
+        "camera": {
+          "all_cartons_visible": true,
+          "all_labels_identified": true,
+          "cartons_visible": 1,
+          "damaged_cartons": 0,
+          "product_identity": {
+            "brand": "deli",
+            "model": "HWCD6238(10)GSML",
+            "product_code": "No.770",
+            "variant": "黑色"
+          },
+          "product_on_labels": "固定无线电话机 No.770 TELEPHONE",
+          "stacked": false
+        },
+        "decision": {
+          "action": "block",
+          "quantity": null,
+          "reasons": [
+            "Product identity not verified. Every carton must have a readable, matching brand/article code/technical model/variant. No receipt; check the exact product and model on the labels before deciding whether to return the load."
+          ],
+          "evidence": {
+            "note": [
+              [
+                1,
+                "Telephone"
+              ]
+            ],
+            "sam_sure": 1,
+            "sam_doubtful": 1,
+            "spark_count": 1,
+            "label": "固定无线电话机 No.770 TELEPHONE",
+            "product_identity": {
+              "expected": {
+                "brand": "deli",
+                "product_code": "No.770",
+                "model": "",
+                "variant": "黑"
+              },
+              "note": {
+                "brand": "deli",
+                "model": "",
+                "product_code": "No.770",
+                "variant": "黑"
+              },
+              "camera": {
+                "brand": "deli",
+                "model": "HWCD6238(10)GSML",
+                "product_code": "No.770",
+                "variant": "黑色"
+              },
+              "all_labels_identified": true
+            },
+            "order": {
+              "number": "PO-explicit-deli-black",
+              "product": "Telephone",
+              "ordered": 1,
+              "open": 1
+            }
+          },
+          "rule": "wrong_product"
+        },
+        "input_sha256": {
+          "note": "0a31fdc6cd901140d9a3679df68ed88eb078ee024f71ebec5f67cfbda4e7fa66",
+          "camera": "e6ca4f0913c3713b3f183b6773584f9ab17c3fa5774f942ceca36990b5d40c26",
+          "audio": "1853cd474ca88519bd439f9aca2a0d52d2f8bc33b45b0430734da702fe220200"
+        },
+        "seconds": 97.764,
+        "erp_written": false
+      },
+      {
+        "trial": "explicit-identity-controls-2026-11-02",
+        "case_id": "explicit-deli-wrong-colour",
+        "action": "block",
+        "rule": "wrong_product",
+        "note": {
+          "date": "",
+          "embedded_instructions": [],
+          "items": [
+            {
+              "description": "Telephone",
+              "legible": true,
+              "product_identity": {
+                "brand": "deli",
+                "model": "",
+                "product_code": "No.770",
+                "variant": "白"
+              },
+              "quantity": 1,
+              "unit": "carton"
+            }
+          ],
+          "note_number": "explicit-deli-wrong-colour",
+          "supplier": "Controlled Fixture Supplier"
+        },
+        "camera": {
+          "all_cartons_visible": true,
+          "all_labels_identified": true,
+          "cartons_visible": 1,
+          "damaged_cartons": 0,
+          "product_identity": {
+            "brand": "deli",
+            "model": "HWCD6238(10)GSML",
+            "product_code": "No.770",
+            "variant": ""
+          },
+          "product_on_labels": "固定无线电话机",
+          "stacked": false
+        },
+        "decision": {
+          "action": "block",
+          "quantity": null,
+          "reasons": [
+            "Product identity not verified. Every carton must have a readable, matching brand/article code/technical model/variant. No receipt; check the exact product and model on the labels before deciding whether to return the load."
+          ],
+          "evidence": {
+            "note": [
+              [
+                1,
+                "Telephone"
+              ]
+            ],
+            "sam_sure": 1,
+            "sam_doubtful": 1,
+            "spark_count": 1,
+            "label": "固定无线电话机",
+            "product_identity": {
+              "expected": {
+                "brand": "deli",
+                "product_code": "No.770",
+                "model": "",
+                "variant": "白"
+              },
+              "note": {
+                "brand": "deli",
+                "model": "",
+                "product_code": "No.770",
+                "variant": "白"
+              },
+              "camera": {
+                "brand": "deli",
+                "model": "HWCD6238(10)GSML",
+                "product_code": "No.770",
+                "variant": ""
+              },
+              "all_labels_identified": true
+            },
+            "order": {
+              "number": "PO-explicit-deli-wrong-colour",
+              "product": "Telephone",
+              "ordered": 1,
+              "open": 1
+            }
+          },
+          "rule": "wrong_product"
+        },
+        "input_sha256": {
+          "note": "dd9dad7da2fd463b498deb77c0198dd185060b3c740b37bd7f86e132a18231a3",
+          "camera": "e6ca4f0913c3713b3f183b6773584f9ab17c3fa5774f942ceca36990b5d40c26",
+          "audio": "1853cd474ca88519bd439f9aca2a0d52d2f8bc33b45b0430734da702fe220200"
+        },
+        "seconds": 98.213,
+        "erp_written": false
+      },
+      {
+        "trial": "explicit-identity-literal-retry-2026-11-02",
+        "case_id": "explicit-deli-black",
+        "action": "human",
+        "rule": "disagree",
+        "note": {
+          "date": "",
+          "embedded_instructions": [],
+          "items": [
+            {
+              "description": "Telephone",
+              "legible": true,
+              "product_identity": {
+                "brand": "deli",
+                "model": "",
+                "product_code": "No.770",
+                "variant": "黑"
+              },
+              "quantity": 1,
+              "unit": "carton"
+            }
+          ],
+          "note_number": "explicit-deli-black",
+          "supplier": "Controlled Fixture Supplier"
+        },
+        "camera": {
+          "all_cartons_visible": true,
+          "all_labels_identified": true,
+          "cartons_visible": 1,
+          "damaged_cartons": 0,
+          "product_identity": {
+            "brand": "deli",
+            "model": "HWCD6238(10)GSML",
+            "product_code": "No.770",
+            "variant": "黑"
+          },
+          "product_on_labels": "固定无线电话机 No.770 TELEPHONE",
+          "stacked": false
+        },
+        "decision": {
+          "action": "human",
+          "quantity": null,
+          "reasons": [
+            "SAM and Spark disagree on which objects are cartons: 2 agreed, 0 only SAM, 1 only Spark."
+          ],
+          "evidence": {
+            "note": [
+              [
+                1,
+                "Telephone"
+              ]
+            ],
+            "sam_sure": 1,
+            "sam_doubtful": 1,
+            "spark_count": 1,
+            "label": "固定无线电话机 No.770 TELEPHONE",
+            "product_identity": {
+              "expected": {
+                "brand": "deli",
+                "product_code": "No.770",
+                "model": "",
+                "variant": "黑"
+              },
+              "note": {
+                "brand": "deli",
+                "model": "",
+                "product_code": "No.770",
+                "variant": "黑"
+              },
+              "camera": {
+                "brand": "deli",
+                "model": "HWCD6238(10)GSML",
+                "product_code": "No.770",
+                "variant": "黑"
+              },
+              "all_labels_identified": true
+            },
+            "order": {
+              "number": "PO-explicit-deli-black",
+              "product": "Telephone",
+              "ordered": 1,
+              "open": 1
+            },
+            "cross": {
+              "agreed": 2,
+              "sam_only": 0,
+              "spark_only": 1,
+              "doubled": 0
+            }
+          },
+          "rule": "disagree"
+        },
+        "input_sha256": {
+          "note": "0a31fdc6cd901140d9a3679df68ed88eb078ee024f71ebec5f67cfbda4e7fa66",
+          "camera": "e6ca4f0913c3713b3f183b6773584f9ab17c3fa5774f942ceca36990b5d40c26",
+          "audio": "1853cd474ca88519bd439f9aca2a0d52d2f8bc33b45b0430734da702fe220200"
+        },
+        "seconds": 114.158,
+        "erp_written": false
+      },
+      {
+        "trial": "explicit-identity-literal-retry-2026-11-02",
+        "case_id": "explicit-deli-wrong-colour",
+        "action": "block",
+        "rule": "wrong_product",
+        "note": {
+          "date": "",
+          "embedded_instructions": [],
+          "items": [
+            {
+              "description": "Telephone",
+              "legible": true,
+              "product_identity": {
+                "brand": "deli",
+                "model": "",
+                "product_code": "No.770",
+                "variant": "白"
+              },
+              "quantity": 1,
+              "unit": "carton"
+            }
+          ],
+          "note_number": "explicit-deli-wrong-colour",
+          "supplier": "Controlled Fixture Supplier"
+        },
+        "camera": {
+          "all_cartons_visible": true,
+          "all_labels_identified": true,
+          "cartons_visible": 1,
+          "damaged_cartons": 0,
+          "product_identity": {
+            "brand": "deli",
+            "model": "",
+            "product_code": "No.770",
+            "variant": "黑"
+          },
+          "product_on_labels": "固定无线电话机",
+          "stacked": false
+        },
+        "decision": {
+          "action": "block",
+          "quantity": null,
+          "reasons": [
+            "Product identity not verified. Every carton must have a readable, matching brand/article code/technical model/variant. No receipt; check the exact product and model on the labels before deciding whether to return the load."
+          ],
+          "evidence": {
+            "note": [
+              [
+                1,
+                "Telephone"
+              ]
+            ],
+            "sam_sure": 1,
+            "sam_doubtful": 1,
+            "spark_count": 1,
+            "label": "固定无线电话机",
+            "product_identity": {
+              "expected": {
+                "brand": "deli",
+                "product_code": "No.770",
+                "model": "",
+                "variant": "白"
+              },
+              "note": {
+                "brand": "deli",
+                "model": "",
+                "product_code": "No.770",
+                "variant": "白"
+              },
+              "camera": {
+                "brand": "deli",
+                "model": "",
+                "product_code": "No.770",
+                "variant": "黑"
+              },
+              "all_labels_identified": true
+            },
+            "order": {
+              "number": "PO-explicit-deli-wrong-colour",
+              "product": "Telephone",
+              "ordered": 1,
+              "open": 1
+            }
+          },
+          "rule": "wrong_product"
+        },
+        "input_sha256": {
+          "note": "dd9dad7da2fd463b498deb77c0198dd185060b3c740b37bd7f86e132a18231a3",
+          "camera": "e6ca4f0913c3713b3f183b6773584f9ab17c3fa5774f942ceca36990b5d40c26",
+          "audio": "1853cd474ca88519bd439f9aca2a0d52d2f8bc33b45b0430734da702fe220200"
+        },
+        "seconds": 100.956,
+        "erp_written": false
+      }
+    ],
+    "conclusion": "Literal extraction retry passed black product identity, then stopped on object disagreement. Wrong-colour control remained blocked. No complete real-photo acceptance established.",
+    "total_cost_usd": null
   }
 }

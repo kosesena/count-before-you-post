@@ -3,5 +3,11 @@
   "framework": null,
   "buildCommand": "",
   "installCommand": "",
-  "outputDirectory": "site"
+  "outputDirectory": "site",
+  "functions": {
+    "api/verify.py": {
+      "maxDuration": 300,
+      "excludeFiles": "{evaluation/**,experiments/**,tests/**,output/**,.env*,.venv/**,site/img/**,site/audio/**,site/media/**,site/sim/**,site/sim-lego/**}"
+    }
+  }
 }
