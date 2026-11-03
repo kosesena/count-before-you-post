@@ -58,7 +58,7 @@ async function load() {
     render();
     $('status').textContent = '';
     document.querySelectorAll('[data-case]').forEach(b => b.disabled = false);
-    if (typeof renderJuryTour === 'function') $('tour-next').disabled = false;
+    refreshJuryTourAvailability();
   } catch (error) {
     if (token !== request) return;
     $('case').hidden = true;
@@ -102,7 +102,7 @@ async function loadReal() {
     renderReal();
     $('real-status').textContent = '';
     document.querySelectorAll('[data-real]').forEach(b => b.disabled = false);
-    if (typeof renderJuryTour === 'function') $('tour-next').disabled = false;
+    refreshJuryTourAvailability();
   } catch (error) {
     $('real-case').hidden = true;
     $('real-status').textContent = 'Real-photo evidence could not be loaded. Reload or open the full development evidence below.';
@@ -112,7 +112,7 @@ document.querySelectorAll('[data-real]').forEach(b => b.addEventListener('click'
 loadReal();
 
 
-// Optional self-paced jury tour. Navigation changes only already-recorded evidence.
+// A self-paced tour of recorded evidence. Tour transitions never call model APIs.
 const juryTour = [
   {type:'real', id:'correct', label:'Correct delivery',
    narration:'A claim is not a stock record. In this controlled photo, the document, order and physical evidence agree: dry-run approval, no ERP write.'},
@@ -124,29 +124,46 @@ const juryTour = [
    narration:'This is a separate historical synthetic core-profile recording, not a new real-photo trial. The evidence is uncertain; the gate requires human review.'}
 ];
 let juryTourIndex = 0;
-function renderJuryTour() {
-  const step = juryTour[juryTourIndex];
-  const ready = step.type === 'real' ? Boolean(realControls?.rows?.length) : Boolean(data?.cases?.length);
+let juryTourStarted = false;
+function tourReady(step) {
+  return step.type === 'real'
+    ? Boolean(realControls?.rows?.some(row => row.id === step.id))
+    : Boolean(data?.cases?.some(c => c.id === step.id));
+}
+function refreshJuryTourAvailability() {
+  // The next button should depend on the *destination*, not whichever fetch finishes first.
+  const next = juryTour[(juryTourIndex + 1) % juryTour.length];
+  $('tour-next').disabled = !tourReady(next);
   $('tour-prev').disabled = juryTourIndex === 0;
-  $('tour-next').disabled = !ready;
   $('tour-next').textContent = juryTourIndex === juryTour.length - 1 ? 'Restart tour ↺' : 'Next decision →';
-  $('tour-progress').textContent = `Step ${juryTourIndex + 1} of ${juryTour.length} · ${step.label}` + (ready ? '' : ' · Load evidence to continue');
-  $('tour-narration').textContent = step.narration;
-  if (!ready) return;
-  if (step.type === 'real') {
-    realSelected = step.id;
-    renderReal();
-    $('real-title').scrollIntoView({behavior:'auto', block:'start'});
-  } else {
-    selected = step.id;
-    render();
-    $('case-title').scrollIntoView({behavior:'auto', block:'start'});
+  if (juryTourStarted && tourReady(juryTour[juryTourIndex])) {
+    // Only update the selection after new asynchronous data arrives; do not scroll unexpectedly.
+    const step = juryTour[juryTourIndex];
+    if (step.type === 'real') { realSelected = step.id; renderReal(); }
+    else { selected = step.id; render(); }
   }
 }
+function renderJuryTour(scroll = true) {
+  const step = juryTour[juryTourIndex];
+  juryTourStarted = true;
+  $('tour-progress').textContent = `Step ${juryTourIndex + 1} of ${juryTour.length} · ${step.label}`;
+  $('tour-narration').textContent = step.narration;
+  refreshJuryTourAvailability();
+  if (!tourReady(step)) {
+    $('tour-progress').textContent += ' · Waiting for recorded evidence';
+    return;
+  }
+  const target = step.type === 'real' ? 'real-title' : 'case-title';
+  if (scroll) $(target).scrollIntoView({behavior:'auto', block:'start'});
+}
 $('tour-prev').addEventListener('click', () => {
-  if (juryTourIndex > 0) {juryTourIndex -= 1; renderJuryTour();}
+  if (juryTourIndex > 0) { juryTourIndex -= 1; renderJuryTour(); }
 });
 $('tour-next').addEventListener('click', () => {
-  juryTourIndex = (juryTourIndex + 1) % juryTour.length;
+  const next = (juryTourIndex + 1) % juryTour.length;
+  if (!tourReady(juryTour[next])) return;
+  juryTourIndex = next;
   renderJuryTour();
 });
+$('tour-start').addEventListener('click', () => renderJuryTour(false));
+refreshJuryTourAvailability();
