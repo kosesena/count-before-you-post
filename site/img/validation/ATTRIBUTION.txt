@@ -6,3 +6,5 @@ scd-822.jpg: validation image ID 822, original filename 1 (87).jpg
 scd-374.jpg: validation image ID 374, original filename 1 (411).jpg
 Original images copied unchanged. No endorsement is implied.
 The dataset image license is distinct from this repository's code license.
+
+scd-822-selected.jpg: cropped derivative of scd-822.jpg, rectangle [820,560,3330,2580] in oriented 3648x2736 original. Crop made by Count Before You Post, 3 November 2026. Same CC BY-NC-SA 4.0 license. area-*-note.png are authored test documents, not real delivery notes.

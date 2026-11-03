@@ -15,6 +15,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from PIL import Image
 from .workflow import verify, VerificationRun
+from .counting_area import select_area, attach_area
 
 ROOT=Path(__file__).resolve().parents[1]
 LIMIT=24*1024*1024
@@ -68,6 +69,7 @@ def make_server(port=8768,runner=verify):
             else:
                 f=item['files'];p=item['payload']
                 result=runner(f['note'],f['camera'],f['audio'],p['order'],p['language'],progress)
+            result=attach_area(result,item['area'])
             out=ROOT/'.local-verification';out.mkdir(exist_ok=True)
             (out/f'{ident}.json').write_text(json.dumps(result,ensure_ascii=False,indent=2))
             with lock:jobs[ident]={'status':'complete','result':result}
@@ -134,7 +136,9 @@ def make_server(port=8768,runner=verify):
                 if not all(isinstance(order.get(k),str) and order[k].strip() for k in ('number','supplier','product')):raise ValueError('Complete the trusted order fields.')
                 if any(type(order.get(k)) is not int or order[k]<0 for k in ('ordered','received')) or order['received']>order['ordered']:raise ValueError('Invalid order quantities.')
                 temp=tempfile.TemporaryDirectory(prefix='cbyp-')
-                try:files={k:decode_file(payload[k],k,temp.name) for k in ('note','camera','audio')}
+                try:
+                    files={k:decode_file(payload[k],k,temp.name) for k in ('note','camera','audio')}
+                    files['camera'], area=select_area(files['camera'],payload.get('counting_area'),temp.name)
                 except Exception as e:
                     temp.cleanup()
                     raise ValueError('Invalid upload: use a readable image/PDF and mono 16 kHz WAV.') from e
@@ -152,7 +156,7 @@ def make_server(port=8768,runner=verify):
                     task=VerificationRun(files['note'],files['camera'],files['audio'],order,payload['language']) if runner is verify else None
                 except Exception:
                     temp.cleanup();return self.reply(400,{'error':'Invalid verification inputs.'})
-                pending[ident]={'task':task,'files':files,'payload':payload,'temp':temp,'created':time.monotonic()}
+                pending[ident]={'area':area,'task':task,'files':files,'payload':payload,'temp':temp,'created':time.monotonic()}
                 jobs[ident]={'status':'running','step':'Starting'}
             pool.submit(work,ident)
             self.reply(202,{'id':ident})

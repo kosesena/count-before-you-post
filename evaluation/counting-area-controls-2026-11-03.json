@@ -1,0 +1,741 @@
+{
+  "date": "2026-11-03",
+  "scope": "Previously inspected SCD 822 real photo, manually selected foreground area, authored notes/orders, synthetic receiver audio. Post-hoc development controls, not unseen deliveries or field validation. All three cases share the same area and audio. No weakening of gate rules.",
+  "selection": {
+    "box": [
+      820,
+      560,
+      3330,
+      2580
+    ],
+    "confirmed": true
+  },
+  "original_image": "img/validation/scd-822.jpg",
+  "selected_image": "img/validation/scd-822-selected.jpg",
+  "original_sha256": "e6ca4f0913c3713b3f183b6773584f9ab17c3fa5774f942ceca36990b5d40c26",
+  "analyzed_sha256": "afb98787d032f2e8ccc1651a63ace944280a969128a3bbc34677fdb340ec9e09",
+  "rows": [
+    {
+      "id": "correct",
+      "expected_constraint": null,
+      "evidence": {
+        "mode": "dry_run",
+        "erp_written": false,
+        "result": {
+          "posted": true,
+          "quantity": 1,
+          "document": null
+        },
+        "decision": {
+          "action": "post",
+          "quantity": 1,
+          "reasons": [
+            "Note, SAM and Spark agree on 1. Within PO-area-correct (1 open)."
+          ],
+          "evidence": {
+            "note": [
+              [
+                1,
+                "Telephone"
+              ]
+            ],
+            "sam_sure": 1,
+            "sam_doubtful": 0,
+            "spark_count": 1,
+            "label": "No.770 TELEPHONE",
+            "product_identity": {
+              "expected": {
+                "brand": "deli",
+                "product_code": "No.770",
+                "model": "",
+                "variant": "黑"
+              },
+              "note": {
+                "brand": "deli",
+                "model": "",
+                "product_code": "No.770",
+                "variant": "黑"
+              },
+              "camera": {
+                "brand": "deli",
+                "model": "HWCD6238(10)GSML",
+                "product_code": "No.770",
+                "variant": "黑"
+              },
+              "all_labels_identified": true
+            },
+            "order": {
+              "number": "PO-area-correct",
+              "product": "Telephone",
+              "ordered": 1,
+              "open": 1
+            },
+            "cross": {
+              "agreed": 1,
+              "sam_only": 0,
+              "spark_only": 0,
+              "doubled": 0
+            },
+            "spoken": {
+              "certain": true,
+              "product": "",
+              "quantity": 1,
+              "supplier": "Controlled fixture supplier",
+              "unit": "cartons"
+            },
+            "second_reader": [
+              [
+                1,
+                "Telephone"
+              ]
+            ],
+            "second_supplier": "Controlled Fixture Supplier",
+            "audit": {
+              "ok": true,
+              "quantity": true,
+              "product": true,
+              "instructions": "",
+              "quotes": {
+                "quantity": "Quantity: 1 carton",
+                "product": "Product: Telephone",
+                "instructions": ""
+              }
+            }
+          },
+          "rule": "match"
+        },
+        "note": {
+          "date": "",
+          "embedded_instructions": [],
+          "items": [
+            {
+              "description": "Telephone",
+              "legible": true,
+              "product_identity": {
+                "brand": "deli",
+                "model": "",
+                "product_code": "No.770",
+                "variant": "黑"
+              },
+              "quantity": 1,
+              "unit": "carton"
+            }
+          ],
+          "note_number": "area-correct",
+          "supplier": "Controlled Fixture Supplier"
+        },
+        "camera": {
+          "all_cartons_visible": true,
+          "all_labels_identified": true,
+          "cartons_visible": 1,
+          "damaged_cartons": 0,
+          "product_identity": {
+            "brand": "deli",
+            "model": "HWCD6238(10)GSML",
+            "product_code": "No.770",
+            "variant": "黑"
+          },
+          "product_on_labels": "No.770 TELEPHONE",
+          "stacked": false
+        },
+        "receiver": {
+          "certain": true,
+          "product": "",
+          "quantity": 1,
+          "supplier": "Controlled fixture supplier",
+          "unit": "cartons"
+        },
+        "speaker_turns": [
+          {
+            "speaker": "A",
+            "transcript": "I am the receiving clerk. I counted one cartons, the supplier is Controlled fixture supplier"
+          }
+        ],
+        "speech_interpretation": {
+          "count_candidates": [
+            1
+          ],
+          "driver_quantity": null,
+          "receiver": {
+            "certain": true,
+            "product": "",
+            "quantity": 1,
+            "supplier": "Controlled fixture supplier",
+            "unit": "cartons"
+          },
+          "receiver_speaker": "A",
+          "receiver_turn": "I am the receiving clerk. I counted one cartons, the supplier is Controlled fixture supplier",
+          "voice_validation": {
+            "source_turn_matched": true,
+            "single_supported_count": true
+          }
+        },
+        "second_opinions": {
+          "second": {
+            "supplier": "Controlled Fixture Supplier",
+            "note_number": "area-correct",
+            "date": "",
+            "items": [
+              {
+                "description": "Telephone",
+                "product_identity": {
+                  "brand": "deli",
+                  "product_code": "No.770",
+                  "model": "",
+                  "variant": "黑"
+                },
+                "quantity": 1,
+                "unit": "carton",
+                "legible": true
+              }
+            ],
+            "embedded_instructions": []
+          },
+          "audit": {
+            "ok": true,
+            "quantity": true,
+            "product": true,
+            "instructions": "",
+            "quotes": {
+              "quantity": "Quantity: 1 carton",
+              "product": "Product: Telephone",
+              "instructions": ""
+            }
+          }
+        },
+        "trace": [
+          {
+            "gate_cross_check": {
+              "agreed": 1,
+              "sam_only": 0,
+              "spark_only": 0,
+              "doubled": 0
+            },
+            "at": "2026-11-03T14:04:00+03:00"
+          },
+          {
+            "second_opinions": {
+              "second": {
+                "supplier": "Controlled Fixture Supplier",
+                "note_number": "area-correct",
+                "date": "",
+                "items": [
+                  {
+                    "description": "Telephone",
+                    "product_identity": {
+                      "brand": "deli",
+                      "product_code": "No.770",
+                      "model": "",
+                      "variant": "黑"
+                    },
+                    "quantity": 1,
+                    "unit": "carton",
+                    "legible": true
+                  }
+                ],
+                "embedded_instructions": []
+              },
+              "audit": {
+                "ok": true,
+                "quantity": true,
+                "product": true,
+                "instructions": "",
+                "quotes": {
+                  "quantity": "Quantity: 1 carton",
+                  "product": "Product: Telephone",
+                  "instructions": ""
+                }
+              }
+            },
+            "at": "2026-11-03T14:04:22+03:00"
+          }
+        ],
+        "timings": [
+          {
+            "step": "Read delivery note",
+            "seconds": 8.534,
+            "status": "complete"
+          },
+          {
+            "step": "Inspect camera",
+            "seconds": 23.327,
+            "status": "complete"
+          },
+          {
+            "step": "Segment cartons",
+            "seconds": 7.466,
+            "status": "complete"
+          },
+          {
+            "step": "Transcribe speaker turns",
+            "seconds": 3.123,
+            "status": "complete"
+          },
+          {
+            "step": "Identify receiver count",
+            "seconds": 4.565,
+            "status": "complete"
+          },
+          {
+            "step": "Cross-check objects and authorize",
+            "seconds": 44.322,
+            "status": "complete"
+          }
+        ],
+        "seconds": 91.337,
+        "total_cost_usd": null,
+        "cost_status": "Not measured: provider-wide billing required; not agent-token cost.",
+        "input_sha256": {
+          "note": "d49b47e2d62914c61cdfa8f3ef92c75b21d83fb3ad6917ec83dbc582484625d8",
+          "camera": "afb98787d032f2e8ccc1651a63ace944280a969128a3bbc34677fdb340ec9e09",
+          "audio": "1853cd474ca88519bd439f9aca2a0d52d2f8bc33b45b0430734da702fe220200"
+        },
+        "counting_area": {
+          "scope": "operator_selected_area",
+          "box": [
+            820,
+            560,
+            3330,
+            2580
+          ],
+          "coordinate_space": "EXIF-oriented original image pixels",
+          "original_size": [
+            3648,
+            2736
+          ],
+          "operator_confirmed_complete_delivery": true,
+          "limitation": "Only the selected area was analyzed. Completeness is the operator’s assertion, not independently verified. Outside-area goods are not checked.",
+          "original": {
+            "sha256": "e6ca4f0913c3713b3f183b6773584f9ab17c3fa5774f942ceca36990b5d40c26"
+          },
+          "analyzed": {
+            "sha256": "afb98787d032f2e8ccc1651a63ace944280a969128a3bbc34677fdb340ec9e09"
+          }
+        }
+      },
+      "seconds": 91.788
+    },
+    {
+      "id": "quantity-mismatch",
+      "expected_constraint": "not_post",
+      "evidence": {
+        "mode": "dry_run",
+        "erp_written": false,
+        "result": {
+          "posted": false,
+          "gate": "block",
+          "reason": "Counted 1, note says 2; draft a discrepancy for the supplier."
+        },
+        "decision": {
+          "action": "block",
+          "quantity": 1,
+          "reasons": [
+            "Counted 1, note says 2; draft a discrepancy for the supplier."
+          ],
+          "evidence": {
+            "note": [
+              [
+                2,
+                "Telephone"
+              ]
+            ],
+            "sam_sure": 1,
+            "sam_doubtful": 0,
+            "spark_count": 1,
+            "label": "No.770 TELEPHONE",
+            "product_identity": {
+              "expected": {
+                "brand": "deli",
+                "product_code": "No.770",
+                "model": "",
+                "variant": "黑"
+              },
+              "note": {
+                "brand": "deli",
+                "model": "",
+                "product_code": "No.770",
+                "variant": "黑"
+              },
+              "camera": {
+                "brand": "deli",
+                "model": "HWCD6238(10)GSML",
+                "product_code": "No.770",
+                "variant": "黑"
+              },
+              "all_labels_identified": true
+            },
+            "order": {
+              "number": "PO-area-quantity-mismatch",
+              "product": "Telephone",
+              "ordered": 2,
+              "open": 2
+            },
+            "cross": {
+              "agreed": 1,
+              "sam_only": 0,
+              "spark_only": 0,
+              "doubled": 0
+            },
+            "spoken": {
+              "certain": true,
+              "product": "",
+              "quantity": 1,
+              "supplier": "controlled controlled fixture supplier",
+              "unit": "cartons"
+            }
+          },
+          "rule": "mismatch"
+        },
+        "note": {
+          "date": "",
+          "embedded_instructions": [],
+          "items": [
+            {
+              "description": "Telephone",
+              "legible": true,
+              "product_identity": {
+                "brand": "deli",
+                "model": "",
+                "product_code": "No.770",
+                "variant": "黑"
+              },
+              "quantity": 2,
+              "unit": "carton"
+            }
+          ],
+          "note_number": "area-quantity-mismatch",
+          "supplier": "Controlled Fixture Supplier"
+        },
+        "camera": {
+          "all_cartons_visible": true,
+          "all_labels_identified": true,
+          "cartons_visible": 1,
+          "damaged_cartons": 0,
+          "product_identity": {
+            "brand": "deli",
+            "model": "HWCD6238(10)GSML",
+            "product_code": "No.770",
+            "variant": "黑"
+          },
+          "product_on_labels": "No.770 TELEPHONE",
+          "stacked": false
+        },
+        "receiver": {
+          "certain": true,
+          "product": "",
+          "quantity": 1,
+          "supplier": "controlled controlled fixture supplier",
+          "unit": "cartons"
+        },
+        "speaker_turns": [
+          {
+            "speaker": "A",
+            "transcript": "I am the receiving clerk. I counted one cartons. The supplier is controlled controlled fixture supplier."
+          }
+        ],
+        "speech_interpretation": {
+          "count_candidates": [
+            1
+          ],
+          "driver_quantity": null,
+          "receiver": {
+            "certain": true,
+            "product": "",
+            "quantity": 1,
+            "supplier": "controlled controlled fixture supplier",
+            "unit": "cartons"
+          },
+          "receiver_speaker": "A",
+          "receiver_turn": "I am the receiving clerk. I counted one cartons. The supplier is controlled controlled fixture supplier.",
+          "voice_validation": {
+            "source_turn_matched": true,
+            "single_supported_count": true
+          }
+        },
+        "second_opinions": {},
+        "trace": [
+          {
+            "gate_cross_check": {
+              "agreed": 1,
+              "sam_only": 0,
+              "spark_only": 0,
+              "doubled": 0
+            },
+            "at": "2026-11-03T14:05:21+03:00"
+          }
+        ],
+        "timings": [
+          {
+            "step": "Read delivery note",
+            "seconds": 6.324,
+            "status": "complete"
+          },
+          {
+            "step": "Inspect camera",
+            "seconds": 18.53,
+            "status": "complete"
+          },
+          {
+            "step": "Segment cartons",
+            "seconds": 8.357,
+            "status": "complete"
+          },
+          {
+            "step": "Transcribe speaker turns",
+            "seconds": 2.763,
+            "status": "complete"
+          },
+          {
+            "step": "Identify receiver count",
+            "seconds": 6.13,
+            "status": "complete"
+          },
+          {
+            "step": "Cross-check objects and authorize",
+            "seconds": 16.501,
+            "status": "complete"
+          }
+        ],
+        "seconds": 58.605,
+        "total_cost_usd": null,
+        "cost_status": "Not measured: provider-wide billing required; not agent-token cost.",
+        "input_sha256": {
+          "note": "397cbc7814efe583b9256f9d3d67175e7b5b010aaf3216eecfe067fe0c7d5e29",
+          "camera": "afb98787d032f2e8ccc1651a63ace944280a969128a3bbc34677fdb340ec9e09",
+          "audio": "1853cd474ca88519bd439f9aca2a0d52d2f8bc33b45b0430734da702fe220200"
+        },
+        "counting_area": {
+          "scope": "operator_selected_area",
+          "box": [
+            820,
+            560,
+            3330,
+            2580
+          ],
+          "coordinate_space": "EXIF-oriented original image pixels",
+          "original_size": [
+            3648,
+            2736
+          ],
+          "operator_confirmed_complete_delivery": true,
+          "limitation": "Only the selected area was analyzed. Completeness is the operator’s assertion, not independently verified. Outside-area goods are not checked.",
+          "original": {
+            "sha256": "e6ca4f0913c3713b3f183b6773584f9ab17c3fa5774f942ceca36990b5d40c26"
+          },
+          "analyzed": {
+            "sha256": "afb98787d032f2e8ccc1651a63ace944280a969128a3bbc34677fdb340ec9e09"
+          }
+        }
+      },
+      "seconds": 58.691
+    },
+    {
+      "id": "wrong-article",
+      "expected_constraint": "not_post",
+      "evidence": {
+        "mode": "dry_run",
+        "erp_written": false,
+        "result": {
+          "posted": false,
+          "gate": "block",
+          "reason": "Product identity not verified. Every carton must have a readable, matching brand/article code/technical model/variant. No receipt; check the exact product and model on the labels before deciding whether to return the load."
+        },
+        "decision": {
+          "action": "block",
+          "quantity": null,
+          "reasons": [
+            "Product identity not verified. Every carton must have a readable, matching brand/article code/technical model/variant. No receipt; check the exact product and model on the labels before deciding whether to return the load."
+          ],
+          "evidence": {
+            "note": [
+              [
+                1,
+                "Telephone"
+              ]
+            ],
+            "sam_sure": 1,
+            "sam_doubtful": 0,
+            "spark_count": 1,
+            "label": "No.770 TELEPHONE",
+            "product_identity": {
+              "expected": {
+                "brand": "deli",
+                "product_code": "No.999",
+                "model": "",
+                "variant": "黑"
+              },
+              "note": {
+                "brand": "deli",
+                "model": "",
+                "product_code": "No.999",
+                "variant": "黑"
+              },
+              "camera": {
+                "brand": "deli",
+                "model": "HWCD6238(10)GSML",
+                "product_code": "No.770",
+                "variant": "黑"
+              },
+              "all_labels_identified": true
+            },
+            "order": {
+              "number": "PO-area-wrong-article",
+              "product": "Telephone",
+              "ordered": 1,
+              "open": 1
+            }
+          },
+          "rule": "wrong_product"
+        },
+        "note": {
+          "date": "",
+          "embedded_instructions": [],
+          "items": [
+            {
+              "description": "Telephone",
+              "legible": true,
+              "product_identity": {
+                "brand": "deli",
+                "model": "",
+                "product_code": "No.999",
+                "variant": "黑"
+              },
+              "quantity": 1,
+              "unit": "carton"
+            }
+          ],
+          "note_number": "area-wrong-article",
+          "supplier": "Controlled Fixture Supplier"
+        },
+        "camera": {
+          "all_cartons_visible": true,
+          "all_labels_identified": true,
+          "cartons_visible": 1,
+          "damaged_cartons": 0,
+          "product_identity": {
+            "brand": "deli",
+            "model": "HWCD6238(10)GSML",
+            "product_code": "No.770",
+            "variant": "黑"
+          },
+          "product_on_labels": "No.770 TELEPHONE",
+          "stacked": false
+        },
+        "receiver": {
+          "certain": true,
+          "product": "",
+          "quantity": 1,
+          "supplier": "controlled controlled fixture supplier",
+          "unit": "cartons"
+        },
+        "speaker_turns": [
+          {
+            "speaker": "A",
+            "transcript": "I am the receiving clerk, I counted one cartons, the supplier is controlled controlled fixture supplier"
+          }
+        ],
+        "speech_interpretation": {
+          "count_candidates": [
+            1
+          ],
+          "driver_quantity": null,
+          "receiver": {
+            "certain": true,
+            "product": "",
+            "quantity": 1,
+            "supplier": "controlled controlled fixture supplier",
+            "unit": "cartons"
+          },
+          "receiver_speaker": "A",
+          "receiver_turn": "I am the receiving clerk, I counted one cartons, the supplier is controlled controlled fixture supplier",
+          "voice_validation": {
+            "source_turn_matched": true,
+            "single_supported_count": true
+          }
+        },
+        "second_opinions": {},
+        "trace": [
+          {
+            "gate_cross_check": {
+              "agreed": 1,
+              "sam_only": 0,
+              "spark_only": 0,
+              "doubled": 0
+            },
+            "at": "2026-11-03T14:06:17+03:00"
+          }
+        ],
+        "timings": [
+          {
+            "step": "Read delivery note",
+            "seconds": 8.789,
+            "status": "complete"
+          },
+          {
+            "step": "Inspect camera",
+            "seconds": 15.216,
+            "status": "complete"
+          },
+          {
+            "step": "Segment cartons",
+            "seconds": 6.816,
+            "status": "complete"
+          },
+          {
+            "step": "Transcribe speaker turns",
+            "seconds": 2.194,
+            "status": "complete"
+          },
+          {
+            "step": "Identify receiver count",
+            "seconds": 3.989,
+            "status": "complete"
+          },
+          {
+            "step": "Cross-check objects and authorize",
+            "seconds": 19.241,
+            "status": "complete"
+          }
+        ],
+        "seconds": 56.245,
+        "total_cost_usd": null,
+        "cost_status": "Not measured: provider-wide billing required; not agent-token cost.",
+        "input_sha256": {
+          "note": "d97fedf0326c8998556cc3d427455a821bb8e9109c2bba94002682069d10470b",
+          "camera": "afb98787d032f2e8ccc1651a63ace944280a969128a3bbc34677fdb340ec9e09",
+          "audio": "1853cd474ca88519bd439f9aca2a0d52d2f8bc33b45b0430734da702fe220200"
+        },
+        "counting_area": {
+          "scope": "operator_selected_area",
+          "box": [
+            820,
+            560,
+            3330,
+            2580
+          ],
+          "coordinate_space": "EXIF-oriented original image pixels",
+          "original_size": [
+            3648,
+            2736
+          ],
+          "operator_confirmed_complete_delivery": true,
+          "limitation": "Only the selected area was analyzed. Completeness is the operator’s assertion, not independently verified. Outside-area goods are not checked.",
+          "original": {
+            "sha256": "e6ca4f0913c3713b3f183b6773584f9ab17c3fa5774f942ceca36990b5d40c26"
+          },
+          "analyzed": {
+            "sha256": "afb98787d032f2e8ccc1651a63ace944280a969128a3bbc34677fdb340ec9e09"
+          }
+        }
+      },
+      "seconds": 56.317
+    }
+  ],
+  "limitations": [
+    "One previously inspected public photo, not three independent shipments.",
+    "Selection chosen manually before these three calls; operator asserts delivery completeness.",
+    "Authored purchase orders and notes, synthetic receiver voice; no field pilot or measured savings.",
+    "Earlier whole-image failures remain published.",
+    "No ERP writes; total API cost is not measured."
+  ]
+}

@@ -13,3 +13,9 @@ References: https://vercel.com/docs/functions/runtimes/python and https://vercel
 ## Production verification — 3 November 2026
 
 Deployment `4dab8c9` completed successfully. Production GET reported configured; a POST without a code returned 403. An authenticated request with the existing synthetic oil fixture completed in 63.4 seconds: `post`, quantity 12, rule `match`, `erp_written: false`. All 12 objects matched; the second reader and audit completed. Public evidence: `evaluation/hosted-smoke-2026-11-03.json`, also included in `site/validation.json`. This is a connectivity/full-pipeline smoke test, not a new independent accuracy test. The browser showed the hosted access-code form. Four HTTP tests passed.
+
+## Optional counting area
+
+The verification form previews the original photo and accepts a dragged rectangle or exact pixel coordinates. An explicit operator completeness confirmation is required. Both hosted and local servers crop the EXIF-oriented original, use that same crop for all camera models, and attach both original and analyzed image data, hashes, dimensions and coordinates to the downloadable report. Whole-image processing remains the default. Approval of a selected area does not establish delivery completeness or inspect excluded goods. Selection changes invalidate the UI confirmation. The local retry checkpoint retains the immutable cropped file and original provenance. Hosted original-plus-crop report assets over 4 MB are rejected before provider calls; use the local service for larger images.
+
+Three development calls on the same previously inspected SCD 822 image and fixed area returned post/match, block/mismatch and block/wrong_product. The correct case included second reading and audit. Records: `evaluation/counting-area-controls-2026-11-03.json`. Authored notes/orders and synthetic speech; no ERP writes, no independent shipment or field claim.

@@ -8,16 +8,20 @@ MAX_BODY=4_000_000
 def process(payload, runner=None):
     from cbyp.verify_server import decode_file
     from cbyp.workflow import verify
+    from cbyp.counting_area import select_area, attach_area
     if not isinstance(payload,dict) or payload.get('consent') is not True:
         raise ValueError('Confirm model processing first.')
     if payload.get('language') not in ('Turkish','English','German','Chinese'):
         raise ValueError('Choose a supported audio language.')
     with tempfile.TemporaryDirectory(prefix='cbyp-hosted-') as tmp:
         files={k:decode_file(payload[k],k,tmp) for k in ('note','camera','audio')}
+        files['camera'], area = select_area(files['camera'], payload.get('counting_area'), tmp)
+        if area is not None and len(json.dumps(area).encode()) > 4_000_000:
+            raise ValueError('Original and selected area exceed hosted evidence size; use the local service.')
         order=payload['order']
         if not isinstance(order,dict):raise ValueError('Invalid trusted order.')
         order=dict(order,require_supplier=True)
-        return (runner or verify)(*(files[k] for k in ('note','camera','audio')),order,payload['language'])
+        return attach_area((runner or verify)(*(files[k] for k in ('note','camera','audio')),order,payload['language']), area)
 
 class handler(BaseHTTPRequestHandler):
     def log_message(self,*args):pass
