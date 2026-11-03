@@ -155,16 +155,45 @@ class Session:
             self.refused.append((quantity, why))
             return {"posted": False, "gate": "human", "reason": why}
         trusted_order = (self.order | {"require_supplier": True}) if self.full_checks and self.order else self.order
-        cross = self.cross()
-        d = decide(self.note, self.sam, self.look, cross, order=trusted_order, spoken=self.spoken, invisible=hidden)
-        if d.action == POST and (self.second_reader or self.auditor):
+        frame = None
+        if self.full_checks:
+            from .frame_completeness import inspect_frame
             try:
-                d = decide(self.note, self.sam, self.look, cross, order=trusted_order, spoken=self.spoken, invisible=hidden,
-                           **self._opinions())
+                frame = inspect_frame(self.camera_path, self.concept)
             except Exception:
-                why = "Required second opinion failed; no receipt permitted."
-                self.refused.append((quantity, why))
-                return {"posted": False, "gate": "human", "reason": why}
+                frame = {"requires_review": True, "error": "Frame completeness could not be verified."}
+            self.log({"frame_completeness": frame})
+        cross = self.cross()
+        d = decide(self.note, self.sam, self.look, cross, order=trusted_order, spoken=self.spoken, invisible=hidden, frame=frame)
+        # A first-reader mismatch is not yet proof that the physical delivery is wrong.
+        verify_rejection = self.full_checks and d.rule == "not_ordered"
+        if (d.action == POST or verify_rejection) and (self.second_reader or self.auditor):
+            try:
+                opinions = self._opinions()
+                if verify_rejection:
+                    from .gate import differences, normalize
+                    from .product_identity import literal
+                    second = opinions.get("second") or {}
+                    diffs = differences(self.note, second)
+                    for first_item, second_item in zip(self.note.get("items", []), second.get("items", [])):
+                        a, b = first_item.get("product_identity") or {}, second_item.get("product_identity") or {}
+                        if any(literal(a.get(k)) != literal(b.get(k)) for k in ("brand", "product_code", "model", "variant")):
+                            diffs.append("product identifier readings differ")
+                    if normalize(self.note.get("supplier", "")) != normalize(second.get("supplier", "")):
+                        diffs.append("supplier readings differ")
+                    audit = opinions.get("audit") or {}
+                    if diffs or second.get("embedded_instructions") or not audit.get("ok"):
+                        d = Decision(HUMAN, None,
+                            ["Product mismatch is not confirmed by independent note readings; "
+                             "review the original document. No automatic correction or receipt."],
+                            {**d.evidence, "first_reader_rule": d.rule, "reading_differences": diffs,
+                             "second_reader": second, "audit": audit}, "readers_disagree")
+                else:
+                    d = decide(self.note, self.sam, self.look, cross, order=trusted_order,
+                               spoken=self.spoken, invisible=hidden, frame=frame, **opinions)
+            except Exception:
+                d = Decision(HUMAN, None, ["Required second opinion failed; no receipt permitted."],
+                             {**d.evidence, "required_check_failed": True}, "readers_disagree")
         self.last_decision = d
         if d.action == HUMAN and self.signoff is not None:
             d = self._signed_off(d, quantity)
@@ -195,6 +224,8 @@ class Session:
         a post decision for exactly the quantity they approved, their notes on the receipt.
         Rejected, or another quantity: the refusal, as a tool result for the agent."""
         s = self.signoff
+        if d.evidence.get("required_check_failed") or d.evidence.get("frame_completeness", {}).get("error"):
+            return {"posted": False, "gate": HUMAN, "reason": "Retry the failed required check before signing off."}
         if d.rule in {"unit", "invalid_quantity", "unreadable", "invisible_text"}:
             return {"posted": False, "gate": HUMAN, "reason": "Correct and re-read this evidence before signing off."}
         if not s.get("approve"):

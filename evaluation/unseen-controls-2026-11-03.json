@@ -1,0 +1,3551 @@
+{
+  "summary": {
+    "photos": 5,
+    "controls": 15,
+    "actions": {
+      "human": 9,
+      "block": 4,
+      "post": 2
+    },
+    "exact_targets_met": 11,
+    "acceptable_actions_met": 13,
+    "acceptance_targets": 1,
+    "accepted_positive_targets": 1,
+    "nonpost_targets": 14,
+    "posts_on_nonpost_targets": 1,
+    "human_targets": 13,
+    "human_targets_routed_to_human": 9,
+    "technical_failures": 0,
+    "median_seconds_all_attempts": 73.9,
+    "total_cost_usd": null,
+    "erp_writes": 0
+  },
+  "manifest": {
+    "frozen_at": "2026-11-03T19:22:26.972111+03:00",
+    "source_selection": {
+      "frozen_at": "2026-11-03T19:20:43.856341+03:00",
+      "selection": "ALL SCD validation images with exactly one carton annotation, excluding all 38 prior benchmark/screening IDs and any already downloaded filename. No replacement or outcome filtering.",
+      "excluded_ids": [
+        "42",
+        "66",
+        "88",
+        "160",
+        "177",
+        "210",
+        "241",
+        "305",
+        "319",
+        "374",
+        "382",
+        "425",
+        "439",
+        "460",
+        "485",
+        "488",
+        "494",
+        "505",
+        "570",
+        "580",
+        "583",
+        "627",
+        "646",
+        "648",
+        "690",
+        "736",
+        "795",
+        "800",
+        "822",
+        "827",
+        "834",
+        "892",
+        "893",
+        "895",
+        "932",
+        "949",
+        "984",
+        "991"
+      ],
+      "scope": "Previously unused in this repository, not necessarily unseen in model training. Single-annotation convenience stratum, not warehouse accuracy. All selected images will be reported even if unsuitable for acceptance.",
+      "source": "https://github.com/yancie-yjr/scd.github.io",
+      "license": "CC BY-NC-SA 4.0",
+      "images": [
+        {
+          "height": 1940,
+          "width": 2488,
+          "id": 37,
+          "file_name": "3548.jpg"
+        },
+        {
+          "height": 3000,
+          "width": 4000,
+          "id": 93,
+          "file_name": "l (64).jpg"
+        },
+        {
+          "height": 3264,
+          "width": 2448,
+          "id": 111,
+          "file_name": "3388.jpg"
+        },
+        {
+          "height": 4000,
+          "width": 3000,
+          "id": 278,
+          "file_name": "2 (76).jpg"
+        },
+        {
+          "height": 850,
+          "width": 1357,
+          "id": 711,
+          "file_name": "2409.jpg"
+        }
+      ]
+    },
+    "scope": "5 previously unused public SCD photos, 15 authored controls. Original images, no selected area. Synthetic audio and notes/orders. Existing full_checks workflow with exact product-description matching, supplier, object cross-check, receiver, second reader and audit. No structured brand/article/model identity in orders: this is NOT strict SKU validation. No ERP writer. Not independent shipments, model-training holdout or field accuracy.",
+    "protocol": "Single first application run per case, no outcome-based changes or retries; existing provider SDK transport retries remain enabled. Every selected image and case retained, including errors. Quantity mismatch changes note and open order to 2; speech remains 1. Receiver uncertainty changes only speech. Earlier gate rules can mask injected faults. No measured worker baseline or total billing cost.",
+    "code_sha256": {
+      "cbyp/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "cbyp/agent.py": "79da59efb1a22210fd4d99072ad607187044e97009500b3f83288687ecb9fb33",
+      "cbyp/counting_area.py": "2632f8db801ed7005ecfc8c9bae84640f8ea204722455652ee1b1ab15ffc8d5b",
+      "cbyp/crosscheck.py": "723fcac2c79fa48adbbe8bf51579f96c08bda8874fb14a84aca4def9abb6ac4a",
+      "cbyp/delivery_note.py": "72af8c4fe54179f7358b8db39eab2a3955ea056649faacf7d72fb572224e6833",
+      "cbyp/erpnext.py": "98aacec65b434333d1fcfe4757cd730e8165db3946ec6afcb845907a9beafb9d",
+      "cbyp/evaluation.py": "079b3cfda5cf8f5a2e3d98bff61bb62e0071bb0dccb546a9136673c9140fbe30",
+      "cbyp/gate.py": "9eadd753be7a473a9686c2f74fe54d4de9d219fb91f034bb3d06a4954af6415b",
+      "cbyp/mcp_server.py": "b4c4a75978f1e325a97fc7318516cda80282ff991b5ab552eb1d0bbccc66b1ad",
+      "cbyp/meta.py": "c39a4e70d4deab5028371bfbf9090a9defb263307de9330f4d486bdc6b1a7e55",
+      "cbyp/pdf_text.py": "29a400ead46f440e356a2efee7107792a6581eddecf5dd011eb88de186e88fd5",
+      "cbyp/perception.py": "a82455d0fcf0cb866b7939697a1c5a6213822c8cba1f30c41986bc0397d49c1d",
+      "cbyp/product_identity.py": "6eef769968a7c54fa035668c90369b6790c58f16f5ed3fb34e4d1b8dee3b8830",
+      "cbyp/purchase_order.py": "972525dd08726af31ac8ca3c5bbefcee79f35ba52602f20e5e820f4d06964914",
+      "cbyp/sam.py": "997f0f309aeda89105629bbd6634eb5c5026bc4a4468d77ba826f41e741895b4",
+      "cbyp/second_reader.py": "0823bbc9bdb07e57d0687620eba3054546e9e7dba853a001fe2331fbd7dc4cc6",
+      "cbyp/verify_server.py": "588137e3cd3f58a5bd317fe37a5e80d45ec2580830bcc7b437a08ff20b2b4347",
+      "cbyp/voice.py": "8a6170425b990d9a1d3b5ddbf981e77ccccc4c7b31dd4c0d5da2469e8311f029",
+      "cbyp/wonder.py": "d43d6aaa8f0c1cc72a690ea82aec20724d50694fafb5c3d2eb57cd211281c0d6",
+      "cbyp/workflow.py": "f31dcd75c6cfbfa0ea03e9ff5db0bc562f6006eb5c18282f27725e2534a9322e"
+    },
+    "git_head": "7bd65476168f4cf27bd583b53939fea52d7bd3ea",
+    "cases": [
+      {
+        "id": "scd-37-baseline",
+        "source_image_id": 37,
+        "scenario": "baseline",
+        "expected_action": "human",
+        "acceptable_actions": [
+          "human"
+        ],
+        "reference_visible_count": 1,
+        "reference_rationale": "Carton fills frame with clipped edges; complete extent cannot confidently be established.",
+        "reference_author": "Assistant visual inspection before verification; not independent human annotation of acceptance",
+        "spoken_script": "I am the receiving clerk. I counted one carton. The supplier is Controlled Fixture Supplier.",
+        "order": {
+          "number": "PO-scd-37-baseline",
+          "supplier": "Controlled Fixture Supplier",
+          "require_supplier": true,
+          "product": "关节止痛膏",
+          "unit": "carton",
+          "ordered": 1,
+          "received": 0
+        },
+        "files": {
+          "note": {
+            "sha256": "9d9c5a63b8482496f03486ddb8eda54bf8f148dcc8f73abb0b204768d2700e7c",
+            "filename": "note.png"
+          },
+          "camera": {
+            "sha256": "491bb96ba3075588de24513eb2f3bfa149610c7c2697fc97a48105401985e869",
+            "filename": "3548.jpg"
+          },
+          "audio": {
+            "sha256": "67f7e5d7944cdd6c16b6287483bcfb725f03fcd016551d4e4b5bf5b75870c65e",
+            "filename": "receiver.wav"
+          }
+        }
+      },
+      {
+        "id": "scd-37-quantity_mismatch",
+        "source_image_id": 37,
+        "scenario": "quantity_mismatch",
+        "expected_action": "human",
+        "acceptable_actions": [
+          "block",
+          "human"
+        ],
+        "reference_visible_count": 1,
+        "reference_rationale": "Carton fills frame with clipped edges; complete extent cannot confidently be established.",
+        "reference_author": "Assistant visual inspection before verification; not independent human annotation of acceptance",
+        "spoken_script": "I am the receiving clerk. I counted one carton. The supplier is Controlled Fixture Supplier.",
+        "order": {
+          "number": "PO-scd-37-quantity_mismatch",
+          "supplier": "Controlled Fixture Supplier",
+          "require_supplier": true,
+          "product": "关节止痛膏",
+          "unit": "carton",
+          "ordered": 2,
+          "received": 0
+        },
+        "files": {
+          "note": {
+            "sha256": "611e19ab097570bf5cf18b44b8a85d3d828f39e05ecc502fa43fbedcb1c0899d",
+            "filename": "note.png"
+          },
+          "camera": {
+            "sha256": "491bb96ba3075588de24513eb2f3bfa149610c7c2697fc97a48105401985e869",
+            "filename": "3548.jpg"
+          },
+          "audio": {
+            "sha256": "67f7e5d7944cdd6c16b6287483bcfb725f03fcd016551d4e4b5bf5b75870c65e",
+            "filename": "receiver.wav"
+          }
+        }
+      },
+      {
+        "id": "scd-37-receiver_uncertain",
+        "source_image_id": 37,
+        "scenario": "receiver_uncertain",
+        "expected_action": "human",
+        "acceptable_actions": [
+          "human"
+        ],
+        "reference_visible_count": 1,
+        "reference_rationale": "Carton fills frame with clipped edges; complete extent cannot confidently be established.",
+        "reference_author": "Assistant visual inspection before verification; not independent human annotation of acceptance",
+        "spoken_script": "I am the receiving clerk. I am not sure how many cartons arrived. I could not complete the count. The supplier is Controlled Fixture Supplier.",
+        "order": {
+          "number": "PO-scd-37-receiver_uncertain",
+          "supplier": "Controlled Fixture Supplier",
+          "require_supplier": true,
+          "product": "关节止痛膏",
+          "unit": "carton",
+          "ordered": 1,
+          "received": 0
+        },
+        "files": {
+          "note": {
+            "sha256": "2bc7c33197d406daccd405557d60f757791c328ea64e55668c9ba2047f7e93d7",
+            "filename": "note.png"
+          },
+          "camera": {
+            "sha256": "491bb96ba3075588de24513eb2f3bfa149610c7c2697fc97a48105401985e869",
+            "filename": "3548.jpg"
+          },
+          "audio": {
+            "sha256": "9fece24dc92650a0664ca84b80ff0274ea7c502d430c7d840ff499e682de5f59",
+            "filename": "receiver.wav"
+          }
+        }
+      },
+      {
+        "id": "scd-93-baseline",
+        "source_image_id": 93,
+        "scenario": "baseline",
+        "expected_action": "human",
+        "acceptable_actions": [
+          "human"
+        ],
+        "reference_visible_count": 1,
+        "reference_rationale": "Open/torn top and partly obscured markings; no verified contents or SKU.",
+        "reference_author": "Assistant visual inspection before verification; not independent human annotation of acceptance",
+        "spoken_script": "I am the receiving clerk. I counted one carton. The supplier is Controlled Fixture Supplier.",
+        "order": {
+          "number": "PO-scd-93-baseline",
+          "supplier": "Controlled Fixture Supplier",
+          "require_supplier": true,
+          "product": "V88",
+          "unit": "carton",
+          "ordered": 1,
+          "received": 0
+        },
+        "files": {
+          "note": {
+            "sha256": "92527c31252d40486c0091d69e80cc5ca868113354933609385c32a02d1191bc",
+            "filename": "note.png"
+          },
+          "camera": {
+            "sha256": "a7d85e11979bbed09ea85f138726c9e2bbdc4f8d6d7f48e5af18fc75fac38a84",
+            "filename": "l (64).jpg"
+          },
+          "audio": {
+            "sha256": "67f7e5d7944cdd6c16b6287483bcfb725f03fcd016551d4e4b5bf5b75870c65e",
+            "filename": "receiver.wav"
+          }
+        }
+      },
+      {
+        "id": "scd-93-quantity_mismatch",
+        "source_image_id": 93,
+        "scenario": "quantity_mismatch",
+        "expected_action": "human",
+        "acceptable_actions": [
+          "block",
+          "human"
+        ],
+        "reference_visible_count": 1,
+        "reference_rationale": "Open/torn top and partly obscured markings; no verified contents or SKU.",
+        "reference_author": "Assistant visual inspection before verification; not independent human annotation of acceptance",
+        "spoken_script": "I am the receiving clerk. I counted one carton. The supplier is Controlled Fixture Supplier.",
+        "order": {
+          "number": "PO-scd-93-quantity_mismatch",
+          "supplier": "Controlled Fixture Supplier",
+          "require_supplier": true,
+          "product": "V88",
+          "unit": "carton",
+          "ordered": 2,
+          "received": 0
+        },
+        "files": {
+          "note": {
+            "sha256": "0132208fc15ccf9b291c4d26b4060fbfdb9dbe44f160b9d79e30602b278e90dd",
+            "filename": "note.png"
+          },
+          "camera": {
+            "sha256": "a7d85e11979bbed09ea85f138726c9e2bbdc4f8d6d7f48e5af18fc75fac38a84",
+            "filename": "l (64).jpg"
+          },
+          "audio": {
+            "sha256": "67f7e5d7944cdd6c16b6287483bcfb725f03fcd016551d4e4b5bf5b75870c65e",
+            "filename": "receiver.wav"
+          }
+        }
+      },
+      {
+        "id": "scd-93-receiver_uncertain",
+        "source_image_id": 93,
+        "scenario": "receiver_uncertain",
+        "expected_action": "human",
+        "acceptable_actions": [
+          "human"
+        ],
+        "reference_visible_count": 1,
+        "reference_rationale": "Open/torn top and partly obscured markings; no verified contents or SKU.",
+        "reference_author": "Assistant visual inspection before verification; not independent human annotation of acceptance",
+        "spoken_script": "I am the receiving clerk. I am not sure how many cartons arrived. I could not complete the count. The supplier is Controlled Fixture Supplier.",
+        "order": {
+          "number": "PO-scd-93-receiver_uncertain",
+          "supplier": "Controlled Fixture Supplier",
+          "require_supplier": true,
+          "product": "V88",
+          "unit": "carton",
+          "ordered": 1,
+          "received": 0
+        },
+        "files": {
+          "note": {
+            "sha256": "f7e9b7734d53b4719374d33a64306fba512e34197b92787c7b1fe8a15f1419b7",
+            "filename": "note.png"
+          },
+          "camera": {
+            "sha256": "a7d85e11979bbed09ea85f138726c9e2bbdc4f8d6d7f48e5af18fc75fac38a84",
+            "filename": "l (64).jpg"
+          },
+          "audio": {
+            "sha256": "9fece24dc92650a0664ca84b80ff0274ea7c502d430c7d840ff499e682de5f59",
+            "filename": "receiver.wav"
+          }
+        }
+      },
+      {
+        "id": "scd-111-baseline",
+        "source_image_id": 111,
+        "scenario": "baseline",
+        "expected_action": "post",
+        "acceptable_actions": [
+          "post"
+        ],
+        "reference_visible_count": 1,
+        "reference_rationale": "One visibly intact carton on pallet, legible product name. Candidate for description-level acceptance only.",
+        "reference_author": "Assistant visual inspection before verification; not independent human annotation of acceptance",
+        "spoken_script": "I am the receiving clerk. I counted one carton. The supplier is Controlled Fixture Supplier.",
+        "order": {
+          "number": "PO-scd-111-baseline",
+          "supplier": "Controlled Fixture Supplier",
+          "require_supplier": true,
+          "product": "川贝清肺糖浆",
+          "unit": "carton",
+          "ordered": 1,
+          "received": 0
+        },
+        "files": {
+          "note": {
+            "sha256": "01164d31b5f42e2ca967aba4c32b1f4edaf495c0bb484dee9dae78f64b74ad14",
+            "filename": "note.png"
+          },
+          "camera": {
+            "sha256": "2f2b931920cc000fe9e184662b1067a2cefbb7d848e3b2c2c8def89e9104028d",
+            "filename": "3388.jpg"
+          },
+          "audio": {
+            "sha256": "67f7e5d7944cdd6c16b6287483bcfb725f03fcd016551d4e4b5bf5b75870c65e",
+            "filename": "receiver.wav"
+          }
+        }
+      },
+      {
+        "id": "scd-111-quantity_mismatch",
+        "source_image_id": 111,
+        "scenario": "quantity_mismatch",
+        "expected_action": "block",
+        "acceptable_actions": [
+          "block",
+          "human"
+        ],
+        "reference_visible_count": 1,
+        "reference_rationale": "One visibly intact carton on pallet, legible product name. Candidate for description-level acceptance only.",
+        "reference_author": "Assistant visual inspection before verification; not independent human annotation of acceptance",
+        "spoken_script": "I am the receiving clerk. I counted one carton. The supplier is Controlled Fixture Supplier.",
+        "order": {
+          "number": "PO-scd-111-quantity_mismatch",
+          "supplier": "Controlled Fixture Supplier",
+          "require_supplier": true,
+          "product": "川贝清肺糖浆",
+          "unit": "carton",
+          "ordered": 2,
+          "received": 0
+        },
+        "files": {
+          "note": {
+            "sha256": "0a25b16624999f962a083a84f1dc2c675a81c77a27ebe76a2e4e82ff2cfbfdad",
+            "filename": "note.png"
+          },
+          "camera": {
+            "sha256": "2f2b931920cc000fe9e184662b1067a2cefbb7d848e3b2c2c8def89e9104028d",
+            "filename": "3388.jpg"
+          },
+          "audio": {
+            "sha256": "67f7e5d7944cdd6c16b6287483bcfb725f03fcd016551d4e4b5bf5b75870c65e",
+            "filename": "receiver.wav"
+          }
+        }
+      },
+      {
+        "id": "scd-111-receiver_uncertain",
+        "source_image_id": 111,
+        "scenario": "receiver_uncertain",
+        "expected_action": "human",
+        "acceptable_actions": [
+          "human"
+        ],
+        "reference_visible_count": 1,
+        "reference_rationale": "One visibly intact carton on pallet, legible product name. Candidate for description-level acceptance only.",
+        "reference_author": "Assistant visual inspection before verification; not independent human annotation of acceptance",
+        "spoken_script": "I am the receiving clerk. I am not sure how many cartons arrived. I could not complete the count. The supplier is Controlled Fixture Supplier.",
+        "order": {
+          "number": "PO-scd-111-receiver_uncertain",
+          "supplier": "Controlled Fixture Supplier",
+          "require_supplier": true,
+          "product": "川贝清肺糖浆",
+          "unit": "carton",
+          "ordered": 1,
+          "received": 0
+        },
+        "files": {
+          "note": {
+            "sha256": "e9227ce0197e47e66cc3e781be946867630c6ef14528ff987c533995bbe1408e",
+            "filename": "note.png"
+          },
+          "camera": {
+            "sha256": "2f2b931920cc000fe9e184662b1067a2cefbb7d848e3b2c2c8def89e9104028d",
+            "filename": "3388.jpg"
+          },
+          "audio": {
+            "sha256": "9fece24dc92650a0664ca84b80ff0274ea7c502d430c7d840ff499e682de5f59",
+            "filename": "receiver.wav"
+          }
+        }
+      },
+      {
+        "id": "scd-278-baseline",
+        "source_image_id": 278,
+        "scenario": "baseline",
+        "expected_action": "human",
+        "acceptable_actions": [
+          "human"
+        ],
+        "reference_visible_count": 1,
+        "reference_rationale": "Torn/crushed upper rim; damage calls for review.",
+        "reference_author": "Assistant visual inspection before verification; not independent human annotation of acceptance",
+        "spoken_script": "I am the receiving clerk. I counted one carton. The supplier is Controlled Fixture Supplier.",
+        "order": {
+          "number": "PO-scd-278-baseline",
+          "supplier": "Controlled Fixture Supplier",
+          "require_supplier": true,
+          "product": "WATER FILTER FOR RO Plus",
+          "unit": "carton",
+          "ordered": 1,
+          "received": 0
+        },
+        "files": {
+          "note": {
+            "sha256": "aaa5e8839f8c463ceba144db9bc4d70ae88c035ce086d02c773ce8413e750c19",
+            "filename": "note.png"
+          },
+          "camera": {
+            "sha256": "7244b6dfc016e752c597546d62c40c4c83dd6e6927ec702c2e6869168fbc98ab",
+            "filename": "2 (76).jpg"
+          },
+          "audio": {
+            "sha256": "67f7e5d7944cdd6c16b6287483bcfb725f03fcd016551d4e4b5bf5b75870c65e",
+            "filename": "receiver.wav"
+          }
+        }
+      },
+      {
+        "id": "scd-278-quantity_mismatch",
+        "source_image_id": 278,
+        "scenario": "quantity_mismatch",
+        "expected_action": "human",
+        "acceptable_actions": [
+          "block",
+          "human"
+        ],
+        "reference_visible_count": 1,
+        "reference_rationale": "Torn/crushed upper rim; damage calls for review.",
+        "reference_author": "Assistant visual inspection before verification; not independent human annotation of acceptance",
+        "spoken_script": "I am the receiving clerk. I counted one carton. The supplier is Controlled Fixture Supplier.",
+        "order": {
+          "number": "PO-scd-278-quantity_mismatch",
+          "supplier": "Controlled Fixture Supplier",
+          "require_supplier": true,
+          "product": "WATER FILTER FOR RO Plus",
+          "unit": "carton",
+          "ordered": 2,
+          "received": 0
+        },
+        "files": {
+          "note": {
+            "sha256": "7a2249d1a465c5fc18bf7a1647daa4d8bc2480e2d1618788ccca4767492edf4c",
+            "filename": "note.png"
+          },
+          "camera": {
+            "sha256": "7244b6dfc016e752c597546d62c40c4c83dd6e6927ec702c2e6869168fbc98ab",
+            "filename": "2 (76).jpg"
+          },
+          "audio": {
+            "sha256": "67f7e5d7944cdd6c16b6287483bcfb725f03fcd016551d4e4b5bf5b75870c65e",
+            "filename": "receiver.wav"
+          }
+        }
+      },
+      {
+        "id": "scd-278-receiver_uncertain",
+        "source_image_id": 278,
+        "scenario": "receiver_uncertain",
+        "expected_action": "human",
+        "acceptable_actions": [
+          "human"
+        ],
+        "reference_visible_count": 1,
+        "reference_rationale": "Torn/crushed upper rim; damage calls for review.",
+        "reference_author": "Assistant visual inspection before verification; not independent human annotation of acceptance",
+        "spoken_script": "I am the receiving clerk. I am not sure how many cartons arrived. I could not complete the count. The supplier is Controlled Fixture Supplier.",
+        "order": {
+          "number": "PO-scd-278-receiver_uncertain",
+          "supplier": "Controlled Fixture Supplier",
+          "require_supplier": true,
+          "product": "WATER FILTER FOR RO Plus",
+          "unit": "carton",
+          "ordered": 1,
+          "received": 0
+        },
+        "files": {
+          "note": {
+            "sha256": "0a99554acb5fc43a48718d135ae119cf9eaf1a7bac30694fc380a137b55de835",
+            "filename": "note.png"
+          },
+          "camera": {
+            "sha256": "7244b6dfc016e752c597546d62c40c4c83dd6e6927ec702c2e6869168fbc98ab",
+            "filename": "2 (76).jpg"
+          },
+          "audio": {
+            "sha256": "9fece24dc92650a0664ca84b80ff0274ea7c502d430c7d840ff499e682de5f59",
+            "filename": "receiver.wav"
+          }
+        }
+      },
+      {
+        "id": "scd-711-baseline",
+        "source_image_id": 711,
+        "scenario": "baseline",
+        "expected_action": "human",
+        "acceptable_actions": [
+          "human"
+        ],
+        "reference_visible_count": 1,
+        "reference_rationale": "Carton partly obscured by shelf and extends beyond upper/left frame; full extent uncertain.",
+        "reference_author": "Assistant visual inspection before verification; not independent human annotation of acceptance",
+        "spoken_script": "I am the receiving clerk. I counted one carton. The supplier is Controlled Fixture Supplier.",
+        "order": {
+          "number": "PO-scd-711-baseline",
+          "supplier": "Controlled Fixture Supplier",
+          "require_supplier": true,
+          "product": "苦参素葡萄糖注射液",
+          "unit": "carton",
+          "ordered": 1,
+          "received": 0
+        },
+        "files": {
+          "note": {
+            "sha256": "ded15e4d3cf78d231e438194a3496f9e60290970b7f64c8c35e0507b04c6b54c",
+            "filename": "note.png"
+          },
+          "camera": {
+            "sha256": "e9b6841e22ac05543c0a4e1063395b0a8d086c0416b01e93392c0a9d0801a575",
+            "filename": "2409.jpg"
+          },
+          "audio": {
+            "sha256": "67f7e5d7944cdd6c16b6287483bcfb725f03fcd016551d4e4b5bf5b75870c65e",
+            "filename": "receiver.wav"
+          }
+        }
+      },
+      {
+        "id": "scd-711-quantity_mismatch",
+        "source_image_id": 711,
+        "scenario": "quantity_mismatch",
+        "expected_action": "human",
+        "acceptable_actions": [
+          "block",
+          "human"
+        ],
+        "reference_visible_count": 1,
+        "reference_rationale": "Carton partly obscured by shelf and extends beyond upper/left frame; full extent uncertain.",
+        "reference_author": "Assistant visual inspection before verification; not independent human annotation of acceptance",
+        "spoken_script": "I am the receiving clerk. I counted one carton. The supplier is Controlled Fixture Supplier.",
+        "order": {
+          "number": "PO-scd-711-quantity_mismatch",
+          "supplier": "Controlled Fixture Supplier",
+          "require_supplier": true,
+          "product": "苦参素葡萄糖注射液",
+          "unit": "carton",
+          "ordered": 2,
+          "received": 0
+        },
+        "files": {
+          "note": {
+            "sha256": "25d7ecaa1f5a328beef46aabf94ae98210bb497fdcefb10fc212a8a06bf1ece9",
+            "filename": "note.png"
+          },
+          "camera": {
+            "sha256": "e9b6841e22ac05543c0a4e1063395b0a8d086c0416b01e93392c0a9d0801a575",
+            "filename": "2409.jpg"
+          },
+          "audio": {
+            "sha256": "67f7e5d7944cdd6c16b6287483bcfb725f03fcd016551d4e4b5bf5b75870c65e",
+            "filename": "receiver.wav"
+          }
+        }
+      },
+      {
+        "id": "scd-711-receiver_uncertain",
+        "source_image_id": 711,
+        "scenario": "receiver_uncertain",
+        "expected_action": "human",
+        "acceptable_actions": [
+          "human"
+        ],
+        "reference_visible_count": 1,
+        "reference_rationale": "Carton partly obscured by shelf and extends beyond upper/left frame; full extent uncertain.",
+        "reference_author": "Assistant visual inspection before verification; not independent human annotation of acceptance",
+        "spoken_script": "I am the receiving clerk. I am not sure how many cartons arrived. I could not complete the count. The supplier is Controlled Fixture Supplier.",
+        "order": {
+          "number": "PO-scd-711-receiver_uncertain",
+          "supplier": "Controlled Fixture Supplier",
+          "require_supplier": true,
+          "product": "苦参素葡萄糖注射液",
+          "unit": "carton",
+          "ordered": 1,
+          "received": 0
+        },
+        "files": {
+          "note": {
+            "sha256": "26a7b59b9cf70f390240db29fde013a1a3f6bcdcf2224e078a8edd43617da11f",
+            "filename": "note.png"
+          },
+          "camera": {
+            "sha256": "e9b6841e22ac05543c0a4e1063395b0a8d086c0416b01e93392c0a9d0801a575",
+            "filename": "2409.jpg"
+          },
+          "audio": {
+            "sha256": "9fece24dc92650a0664ca84b80ff0274ea7c502d430c7d840ff499e682de5f59",
+            "filename": "receiver.wav"
+          }
+        }
+      }
+    ]
+  },
+  "manifest_sha256": "87207c2b1f5375bcfdd20d792f2d588c92dba516eee74cf9b00e3d4ba528f876",
+  "rows": [
+    {
+      "id": "scd-37-baseline",
+      "source_image_id": 37,
+      "scenario": "baseline",
+      "expected_action": "human",
+      "acceptable_actions": [
+        "human"
+      ],
+      "started_at": "2026-11-03T19:22:40.671286+03:00",
+      "evidence": {
+        "mode": "dry_run",
+        "erp_written": false,
+        "result": {
+          "posted": false,
+          "gate": "human",
+          "reason": "Before posting, the second reader of the note disagrees with Spark: it reports an instruction to software:  | CONTROLLED TEST DOCUMENT - NOT A REAL DELIVERY."
+        },
+        "decision": {
+          "action": "human",
+          "quantity": 1,
+          "reasons": [
+            "Before posting, the second reader of the note disagrees with Spark: it reports an instruction to software:  | CONTROLLED TEST DOCUMENT - NOT A REAL DELIVERY."
+          ],
+          "evidence": {
+            "note": [
+              [
+                1,
+                "关节止痛膏"
+              ]
+            ],
+            "sam_sure": 1,
+            "sam_doubtful": 0,
+            "spark_count": 1,
+            "label": "关节止痛膏",
+            "order": {
+              "number": "PO-scd-37-baseline",
+              "product": "关节止痛膏",
+              "ordered": 1,
+              "open": 1
+            },
+            "cross": {
+              "agreed": 1,
+              "sam_only": 0,
+              "spark_only": 0,
+              "doubled": 0
+            },
+            "spoken": {
+              "certain": true,
+              "product": "",
+              "quantity": 1,
+              "supplier": "controlled fixture supplier",
+              "unit": "carton"
+            },
+            "second_reader": [
+              [
+                1,
+                "关节止痛膏"
+              ]
+            ],
+            "second_supplier": "Controlled Fixture Supplier"
+          },
+          "rule": "readers_disagree"
+        },
+        "note": {
+          "date": "",
+          "embedded_instructions": [],
+          "items": [
+            {
+              "description": "关节止痛膏",
+              "legible": true,
+              "product_identity": {
+                "brand": "",
+                "model": "",
+                "product_code": "",
+                "variant": ""
+              },
+              "quantity": 1,
+              "unit": "carton"
+            }
+          ],
+          "note_number": "scd-37-baseline",
+          "supplier": "Controlled Fixture Supplier"
+        },
+        "camera": {
+          "all_cartons_visible": true,
+          "all_labels_identified": false,
+          "cartons_visible": 1,
+          "damaged_cartons": 0,
+          "product_identity": {
+            "brand": "",
+            "model": "",
+            "product_code": "",
+            "variant": "7厘米 x 10厘米"
+          },
+          "product_on_labels": "关节止痛膏",
+          "stacked": false
+        },
+        "receiver": {
+          "certain": true,
+          "product": "",
+          "quantity": 1,
+          "supplier": "controlled fixture supplier",
+          "unit": "carton"
+        },
+        "speaker_turns": [
+          {
+            "speaker": "A",
+            "transcript": "I am the receiving clerk. I counted one carton. The supplier is controlled fixture supplier."
+          }
+        ],
+        "speech_interpretation": {
+          "count_candidates": [
+            1
+          ],
+          "driver_quantity": null,
+          "receiver": {
+            "certain": true,
+            "product": "",
+            "quantity": 1,
+            "supplier": "controlled fixture supplier",
+            "unit": "carton"
+          },
+          "receiver_speaker": "A",
+          "receiver_turn": "I am the receiving clerk. I counted one carton. The supplier is controlled fixture supplier.",
+          "voice_validation": {
+            "source_turn_matched": true,
+            "single_supported_count": true
+          }
+        },
+        "second_opinions": {
+          "second": {
+            "supplier": "Controlled Fixture Supplier",
+            "note_number": "scd-37-baseline",
+            "date": "",
+            "items": [
+              {
+                "description": "关节止痛膏",
+                "product_identity": {
+                  "brand": "",
+                  "product_code": "",
+                  "model": "",
+                  "variant": ""
+                },
+                "quantity": 1,
+                "unit": "carton",
+                "legible": true
+              }
+            ],
+            "embedded_instructions": [
+              "",
+              "CONTROLLED TEST DOCUMENT - NOT A REAL DELIVERY"
+            ]
+          },
+          "audit": {
+            "ok": true,
+            "quantity": true,
+            "product": true,
+            "instructions": "",
+            "quotes": {
+              "quantity": "Quantity: 1 carton",
+              "product": "Product: 关节止痛膏",
+              "instructions": ""
+            }
+          }
+        },
+        "trace": [
+          {
+            "gate_cross_check": {
+              "agreed": 1,
+              "sam_only": 0,
+              "spark_only": 0,
+              "doubled": 0
+            },
+            "at": "2026-11-03T19:23:36+03:00"
+          },
+          {
+            "second_opinions": {
+              "second": {
+                "supplier": "Controlled Fixture Supplier",
+                "note_number": "scd-37-baseline",
+                "date": "",
+                "items": [
+                  {
+                    "description": "关节止痛膏",
+                    "product_identity": {
+                      "brand": "",
+                      "product_code": "",
+                      "model": "",
+                      "variant": ""
+                    },
+                    "quantity": 1,
+                    "unit": "carton",
+                    "legible": true
+                  }
+                ],
+                "embedded_instructions": [
+                  "",
+                  "CONTROLLED TEST DOCUMENT - NOT A REAL DELIVERY"
+                ]
+              },
+              "audit": {
+                "ok": true,
+                "quantity": true,
+                "product": true,
+                "instructions": "",
+                "quotes": {
+                  "quantity": "Quantity: 1 carton",
+                  "product": "Product: 关节止痛膏",
+                  "instructions": ""
+                }
+              }
+            },
+            "at": "2026-11-03T19:23:56+03:00"
+          }
+        ],
+        "timings": [
+          {
+            "step": "Read delivery note",
+            "seconds": 7.023,
+            "status": "complete"
+          },
+          {
+            "step": "Inspect camera",
+            "seconds": 16.992,
+            "status": "complete"
+          },
+          {
+            "step": "Segment cartons",
+            "seconds": 8.229,
+            "status": "complete"
+          },
+          {
+            "step": "Transcribe speaker turns",
+            "seconds": 2.614,
+            "status": "complete"
+          },
+          {
+            "step": "Identify receiver count",
+            "seconds": 5.962,
+            "status": "complete"
+          },
+          {
+            "step": "Cross-check objects and authorize",
+            "seconds": 34.819,
+            "status": "complete"
+          }
+        ],
+        "seconds": 75.639,
+        "total_cost_usd": null,
+        "cost_status": "Not measured: provider-wide billing required; not agent-token cost.",
+        "input_sha256": {
+          "note": "9d9c5a63b8482496f03486ddb8eda54bf8f148dcc8f73abb0b204768d2700e7c",
+          "camera": "491bb96ba3075588de24513eb2f3bfa149610c7c2697fc97a48105401985e869",
+          "audio": "67f7e5d7944cdd6c16b6287483bcfb725f03fcd016551d4e4b5bf5b75870c65e"
+        }
+      },
+      "action": "human",
+      "rule": "readers_disagree",
+      "seconds": 75.749,
+      "exact_target_met": true,
+      "acceptable_action_met": true
+    },
+    {
+      "id": "scd-37-quantity_mismatch",
+      "source_image_id": 37,
+      "scenario": "quantity_mismatch",
+      "expected_action": "human",
+      "acceptable_actions": [
+        "block",
+        "human"
+      ],
+      "started_at": "2026-11-03T19:22:40.671383+03:00",
+      "evidence": {
+        "mode": "dry_run",
+        "erp_written": false,
+        "result": {
+          "posted": false,
+          "gate": "block",
+          "reason": "Counted 1, note says 2; draft a discrepancy for the supplier."
+        },
+        "decision": {
+          "action": "block",
+          "quantity": 1,
+          "reasons": [
+            "Counted 1, note says 2; draft a discrepancy for the supplier."
+          ],
+          "evidence": {
+            "note": [
+              [
+                2,
+                "关节止痛膏"
+              ]
+            ],
+            "sam_sure": 1,
+            "sam_doubtful": 0,
+            "spark_count": 1,
+            "label": "关节止痛膏",
+            "order": {
+              "number": "PO-scd-37-quantity_mismatch",
+              "product": "关节止痛膏",
+              "ordered": 2,
+              "open": 2
+            },
+            "cross": {
+              "agreed": 1,
+              "sam_only": 0,
+              "spark_only": 0,
+              "doubled": 0
+            },
+            "spoken": {
+              "certain": true,
+              "product": "",
+              "quantity": 1,
+              "supplier": "controlled fixture supplier",
+              "unit": "carton"
+            }
+          },
+          "rule": "mismatch"
+        },
+        "note": {
+          "date": "",
+          "embedded_instructions": [],
+          "items": [
+            {
+              "description": "关节止痛膏",
+              "legible": true,
+              "product_identity": {
+                "brand": "",
+                "model": "",
+                "product_code": "",
+                "variant": ""
+              },
+              "quantity": 2,
+              "unit": "carton"
+            }
+          ],
+          "note_number": "scd-37-quantity_mismatch",
+          "supplier": "Controlled Fixture Supplier"
+        },
+        "camera": {
+          "all_cartons_visible": true,
+          "all_labels_identified": false,
+          "cartons_visible": 1,
+          "damaged_cartons": 0,
+          "product_identity": {
+            "brand": "",
+            "model": "",
+            "product_code": "",
+            "variant": "7厘米 x 10厘米"
+          },
+          "product_on_labels": "关节止痛膏",
+          "stacked": false
+        },
+        "receiver": {
+          "certain": true,
+          "product": "",
+          "quantity": 1,
+          "supplier": "controlled fixture supplier",
+          "unit": "carton"
+        },
+        "speaker_turns": [
+          {
+            "speaker": "A",
+            "transcript": "I am the receiving clerk. I counted one carton. The supplier is controlled fixture supplier."
+          }
+        ],
+        "speech_interpretation": {
+          "count_candidates": [
+            1
+          ],
+          "driver_quantity": null,
+          "receiver": {
+            "certain": true,
+            "product": "",
+            "quantity": 1,
+            "supplier": "controlled fixture supplier",
+            "unit": "carton"
+          },
+          "receiver_speaker": "A",
+          "receiver_turn": "I am the receiving clerk. I counted one carton. The supplier is controlled fixture supplier.",
+          "voice_validation": {
+            "source_turn_matched": true,
+            "single_supported_count": true
+          }
+        },
+        "second_opinions": {},
+        "trace": [
+          {
+            "gate_cross_check": {
+              "agreed": 1,
+              "sam_only": 0,
+              "spark_only": 0,
+              "doubled": 0
+            },
+            "at": "2026-11-03T19:23:34+03:00"
+          }
+        ],
+        "timings": [
+          {
+            "step": "Read delivery note",
+            "seconds": 6.17,
+            "status": "complete"
+          },
+          {
+            "step": "Inspect camera",
+            "seconds": 11.237,
+            "status": "complete"
+          },
+          {
+            "step": "Segment cartons",
+            "seconds": 7.687,
+            "status": "complete"
+          },
+          {
+            "step": "Transcribe speaker turns",
+            "seconds": 3.534,
+            "status": "complete"
+          },
+          {
+            "step": "Identify receiver count",
+            "seconds": 4.523,
+            "status": "complete"
+          },
+          {
+            "step": "Cross-check objects and authorize",
+            "seconds": 20.714,
+            "status": "complete"
+          }
+        ],
+        "seconds": 53.865,
+        "total_cost_usd": null,
+        "cost_status": "Not measured: provider-wide billing required; not agent-token cost.",
+        "input_sha256": {
+          "note": "611e19ab097570bf5cf18b44b8a85d3d828f39e05ecc502fa43fbedcb1c0899d",
+          "camera": "491bb96ba3075588de24513eb2f3bfa149610c7c2697fc97a48105401985e869",
+          "audio": "67f7e5d7944cdd6c16b6287483bcfb725f03fcd016551d4e4b5bf5b75870c65e"
+        }
+      },
+      "action": "block",
+      "rule": "mismatch",
+      "seconds": 53.92,
+      "exact_target_met": false,
+      "acceptable_action_met": true
+    },
+    {
+      "id": "scd-37-receiver_uncertain",
+      "source_image_id": 37,
+      "scenario": "receiver_uncertain",
+      "expected_action": "human",
+      "acceptable_actions": [
+        "human"
+      ],
+      "started_at": "2026-11-03T19:22:40.671525+03:00",
+      "evidence": {
+        "mode": "dry_run",
+        "erp_written": false,
+        "result": {
+          "posted": false,
+          "gate": "human",
+          "reason": "The receiver was not sure of the count."
+        },
+        "decision": {
+          "action": "human",
+          "quantity": 1,
+          "reasons": [
+            "The receiver was not sure of the count."
+          ],
+          "evidence": {
+            "note": [
+              [
+                1,
+                "关节止痛膏"
+              ]
+            ],
+            "sam_sure": 1,
+            "sam_doubtful": 0,
+            "spark_count": 1,
+            "label": "关节止痛膏",
+            "order": {
+              "number": "PO-scd-37-receiver_uncertain",
+              "product": "关节止痛膏",
+              "ordered": 1,
+              "open": 1
+            },
+            "cross": {
+              "agreed": 1,
+              "sam_only": 0,
+              "spark_only": 0,
+              "doubled": 0
+            },
+            "spoken": {
+              "certain": false,
+              "product": "",
+              "quantity": null,
+              "supplier": "controlled fixture supplier",
+              "unit": "cartons"
+            }
+          },
+          "rule": "receiver"
+        },
+        "note": {
+          "date": "",
+          "embedded_instructions": [],
+          "items": [
+            {
+              "description": "关节止痛膏",
+              "legible": true,
+              "product_identity": {
+                "brand": "",
+                "model": "",
+                "product_code": "",
+                "variant": ""
+              },
+              "quantity": 1,
+              "unit": "carton"
+            }
+          ],
+          "note_number": "scd-37-receiver_uncertain",
+          "supplier": "Controlled Fixture Supplier"
+        },
+        "camera": {
+          "all_cartons_visible": true,
+          "all_labels_identified": false,
+          "cartons_visible": 1,
+          "damaged_cartons": 0,
+          "product_identity": {
+            "brand": "",
+            "model": "",
+            "product_code": "",
+            "variant": "7厘米 x 10厘米"
+          },
+          "product_on_labels": "关节止痛膏",
+          "stacked": false
+        },
+        "receiver": {
+          "certain": false,
+          "product": "",
+          "quantity": null,
+          "supplier": "controlled fixture supplier",
+          "unit": "cartons"
+        },
+        "speaker_turns": [
+          {
+            "speaker": "A",
+            "transcript": "I am the receiving receiving clerk. I am not sure how many cartons arrived. I could not could not complete the count. The supplier is controlled fixture supplier."
+          }
+        ],
+        "speech_interpretation": {
+          "count_candidates": [],
+          "driver_quantity": null,
+          "receiver": {
+            "certain": false,
+            "product": "",
+            "quantity": null,
+            "supplier": "controlled fixture supplier",
+            "unit": "cartons"
+          },
+          "receiver_speaker": "A",
+          "receiver_turn": "I am the receiving receiving clerk. I am not sure how many cartons arrived. I could not could not complete the count. The supplier is controlled fixture supplier.",
+          "voice_validation": {
+            "source_turn_matched": true,
+            "single_supported_count": false
+          }
+        },
+        "second_opinions": {},
+        "trace": [
+          {
+            "gate_cross_check": {
+              "agreed": 1,
+              "sam_only": 0,
+              "spark_only": 0,
+              "doubled": 0
+            },
+            "at": "2026-11-03T19:23:40+03:00"
+          }
+        ],
+        "timings": [
+          {
+            "step": "Read delivery note",
+            "seconds": 7.451,
+            "status": "complete"
+          },
+          {
+            "step": "Inspect camera",
+            "seconds": 15.655,
+            "status": "complete"
+          },
+          {
+            "step": "Segment cartons",
+            "seconds": 12.073,
+            "status": "complete"
+          },
+          {
+            "step": "Transcribe speaker turns",
+            "seconds": 3.067,
+            "status": "complete"
+          },
+          {
+            "step": "Identify receiver count",
+            "seconds": 5.829,
+            "status": "complete"
+          },
+          {
+            "step": "Cross-check objects and authorize",
+            "seconds": 16.174,
+            "status": "complete"
+          }
+        ],
+        "seconds": 60.249,
+        "total_cost_usd": null,
+        "cost_status": "Not measured: provider-wide billing required; not agent-token cost.",
+        "input_sha256": {
+          "note": "2bc7c33197d406daccd405557d60f757791c328ea64e55668c9ba2047f7e93d7",
+          "camera": "491bb96ba3075588de24513eb2f3bfa149610c7c2697fc97a48105401985e869",
+          "audio": "9fece24dc92650a0664ca84b80ff0274ea7c502d430c7d840ff499e682de5f59"
+        }
+      },
+      "action": "human",
+      "rule": "receiver",
+      "seconds": 60.28,
+      "exact_target_met": true,
+      "acceptable_action_met": true
+    },
+    {
+      "id": "scd-93-baseline",
+      "source_image_id": 93,
+      "scenario": "baseline",
+      "expected_action": "human",
+      "acceptable_actions": [
+        "human"
+      ],
+      "started_at": "2026-11-03T19:23:34.592617+03:00",
+      "evidence": {
+        "mode": "dry_run",
+        "erp_written": false,
+        "result": {
+          "posted": false,
+          "gate": "human",
+          "reason": "SAM and Spark disagree on which objects are cartons: 0 agreed, 0 only SAM, 2 only Spark."
+        },
+        "decision": {
+          "action": "human",
+          "quantity": null,
+          "reasons": [
+            "SAM and Spark disagree on which objects are cartons: 0 agreed, 0 only SAM, 2 only Spark."
+          ],
+          "evidence": {
+            "note": [
+              [
+                1,
+                "V88"
+              ]
+            ],
+            "sam_sure": 0,
+            "sam_doubtful": 0,
+            "spark_count": 2,
+            "label": "V88",
+            "order": {
+              "number": "PO-scd-93-baseline",
+              "product": "V88",
+              "ordered": 1,
+              "open": 1
+            },
+            "cross": {
+              "agreed": 0,
+              "sam_only": 0,
+              "spark_only": 2,
+              "doubled": 0
+            }
+          },
+          "rule": "disagree"
+        },
+        "note": {
+          "date": "",
+          "embedded_instructions": [],
+          "items": [
+            {
+              "description": "V88",
+              "legible": true,
+              "product_identity": {
+                "brand": "",
+                "model": "",
+                "product_code": "",
+                "variant": ""
+              },
+              "quantity": 1,
+              "unit": "carton"
+            }
+          ],
+          "note_number": "scd-93-baseline",
+          "supplier": "Controlled Fixture Supplier"
+        },
+        "camera": {
+          "all_cartons_visible": true,
+          "all_labels_identified": false,
+          "cartons_visible": 2,
+          "damaged_cartons": 0,
+          "product_identity": {
+            "brand": "",
+            "model": "",
+            "product_code": "",
+            "variant": ""
+          },
+          "product_on_labels": "V88",
+          "stacked": false
+        },
+        "receiver": {
+          "certain": true,
+          "product": "",
+          "quantity": 1,
+          "supplier": "controlled fixture fixture supplier",
+          "unit": "carton"
+        },
+        "speaker_turns": [
+          {
+            "speaker": "A",
+            "transcript": "I am the receiving clerk. I counted one carton. The supplier is controlled fixture fixture supplier"
+          }
+        ],
+        "speech_interpretation": {
+          "count_candidates": [
+            1
+          ],
+          "driver_quantity": null,
+          "receiver": {
+            "certain": true,
+            "product": "",
+            "quantity": 1,
+            "supplier": "controlled fixture fixture supplier",
+            "unit": "carton"
+          },
+          "receiver_speaker": "A",
+          "receiver_turn": "I am the receiving clerk. I counted one carton. The supplier is controlled fixture fixture supplier",
+          "voice_validation": {
+            "source_turn_matched": true,
+            "single_supported_count": true
+          }
+        },
+        "second_opinions": {},
+        "trace": [
+          {
+            "gate_cross_check": {
+              "agreed": 0,
+              "sam_only": 0,
+              "spark_only": 2,
+              "doubled": 0
+            },
+            "at": "2026-11-03T19:24:54+03:00"
+          }
+        ],
+        "timings": [
+          {
+            "step": "Read delivery note",
+            "seconds": 6.056,
+            "status": "complete"
+          },
+          {
+            "step": "Inspect camera",
+            "seconds": 27.612,
+            "status": "complete"
+          },
+          {
+            "step": "Segment cartons",
+            "seconds": 10.154,
+            "status": "complete"
+          },
+          {
+            "step": "Transcribe speaker turns",
+            "seconds": 3.253,
+            "status": "complete"
+          },
+          {
+            "step": "Identify receiver count",
+            "seconds": 5.757,
+            "status": "complete"
+          },
+          {
+            "step": "Cross-check objects and authorize",
+            "seconds": 27.203,
+            "status": "complete"
+          }
+        ],
+        "seconds": 80.035,
+        "total_cost_usd": null,
+        "cost_status": "Not measured: provider-wide billing required; not agent-token cost.",
+        "input_sha256": {
+          "note": "92527c31252d40486c0091d69e80cc5ca868113354933609385c32a02d1191bc",
+          "camera": "a7d85e11979bbed09ea85f138726c9e2bbdc4f8d6d7f48e5af18fc75fac38a84",
+          "audio": "67f7e5d7944cdd6c16b6287483bcfb725f03fcd016551d4e4b5bf5b75870c65e"
+        }
+      },
+      "action": "human",
+      "rule": "disagree",
+      "seconds": 80.072,
+      "exact_target_met": true,
+      "acceptable_action_met": true
+    },
+    {
+      "id": "scd-93-quantity_mismatch",
+      "source_image_id": 93,
+      "scenario": "quantity_mismatch",
+      "expected_action": "human",
+      "acceptable_actions": [
+        "block",
+        "human"
+      ],
+      "started_at": "2026-11-03T19:23:40.952948+03:00",
+      "evidence": {
+        "mode": "dry_run",
+        "erp_written": false,
+        "result": {
+          "posted": false,
+          "gate": "human",
+          "reason": "Cartons are stacked or hidden; the count cannot be verified from the camera."
+        },
+        "decision": {
+          "action": "human",
+          "quantity": null,
+          "reasons": [
+            "Cartons are stacked or hidden; the count cannot be verified from the camera."
+          ],
+          "evidence": {
+            "note": [
+              [
+                2,
+                "V88"
+              ]
+            ],
+            "sam_sure": 0,
+            "sam_doubtful": 0,
+            "spark_count": 2,
+            "label": "V88",
+            "order": {
+              "number": "PO-scd-93-quantity_mismatch",
+              "product": "V88",
+              "ordered": 2,
+              "open": 2
+            }
+          },
+          "rule": "hidden"
+        },
+        "note": {
+          "date": "",
+          "embedded_instructions": [],
+          "items": [
+            {
+              "description": "V88",
+              "legible": true,
+              "product_identity": {
+                "brand": "",
+                "model": "",
+                "product_code": "",
+                "variant": ""
+              },
+              "quantity": 2,
+              "unit": "carton"
+            }
+          ],
+          "note_number": "scd-93-quantity_mismatch",
+          "supplier": "Controlled Fixture Supplier"
+        },
+        "camera": {
+          "all_cartons_visible": false,
+          "all_labels_identified": false,
+          "cartons_visible": 2,
+          "damaged_cartons": 0,
+          "product_identity": {
+            "brand": "V88",
+            "model": "",
+            "product_code": "",
+            "variant": ""
+          },
+          "product_on_labels": "V88",
+          "stacked": true
+        },
+        "receiver": {
+          "certain": true,
+          "product": "",
+          "quantity": 1,
+          "supplier": "controlled fixture supplier",
+          "unit": "carton"
+        },
+        "speaker_turns": [
+          {
+            "speaker": "A",
+            "transcript": "I am the receiving clerk. I counted one carton, the supplier is controlled fixture supplier"
+          }
+        ],
+        "speech_interpretation": {
+          "count_candidates": [
+            1
+          ],
+          "driver_quantity": null,
+          "receiver": {
+            "certain": true,
+            "product": "",
+            "quantity": 1,
+            "supplier": "controlled fixture supplier",
+            "unit": "carton"
+          },
+          "receiver_speaker": "A",
+          "receiver_turn": "I am the receiving clerk. I counted one carton, the supplier is controlled fixture supplier",
+          "voice_validation": {
+            "source_turn_matched": true,
+            "single_supported_count": true
+          }
+        },
+        "second_opinions": {},
+        "trace": [
+          {
+            "gate_cross_check": {
+              "agreed": 0,
+              "sam_only": 0,
+              "spark_only": 2,
+              "doubled": 0
+            },
+            "at": "2026-11-03T19:25:30+03:00"
+          }
+        ],
+        "timings": [
+          {
+            "step": "Read delivery note",
+            "seconds": 5.894,
+            "status": "complete"
+          },
+          {
+            "step": "Inspect camera",
+            "seconds": 42.148,
+            "status": "complete"
+          },
+          {
+            "step": "Segment cartons",
+            "seconds": 20.507,
+            "status": "complete"
+          },
+          {
+            "step": "Transcribe speaker turns",
+            "seconds": 2.029,
+            "status": "complete"
+          },
+          {
+            "step": "Identify receiver count",
+            "seconds": 5.946,
+            "status": "complete"
+          },
+          {
+            "step": "Cross-check objects and authorize",
+            "seconds": 32.88,
+            "status": "complete"
+          }
+        ],
+        "seconds": 109.404,
+        "total_cost_usd": null,
+        "cost_status": "Not measured: provider-wide billing required; not agent-token cost.",
+        "input_sha256": {
+          "note": "0132208fc15ccf9b291c4d26b4060fbfdb9dbe44f160b9d79e30602b278e90dd",
+          "camera": "a7d85e11979bbed09ea85f138726c9e2bbdc4f8d6d7f48e5af18fc75fac38a84",
+          "audio": "67f7e5d7944cdd6c16b6287483bcfb725f03fcd016551d4e4b5bf5b75870c65e"
+        }
+      },
+      "action": "human",
+      "rule": "hidden",
+      "seconds": 109.44,
+      "exact_target_met": true,
+      "acceptable_action_met": true
+    },
+    {
+      "id": "scd-93-receiver_uncertain",
+      "source_image_id": 93,
+      "scenario": "receiver_uncertain",
+      "expected_action": "human",
+      "acceptable_actions": [
+        "human"
+      ],
+      "started_at": "2026-11-03T19:23:56.421717+03:00",
+      "evidence": {
+        "mode": "dry_run",
+        "erp_written": false,
+        "result": {
+          "posted": false,
+          "gate": "human",
+          "reason": "SAM and Spark disagree on which objects are cartons: 0 agreed, 0 only SAM, 2 only Spark."
+        },
+        "decision": {
+          "action": "human",
+          "quantity": null,
+          "reasons": [
+            "SAM and Spark disagree on which objects are cartons: 0 agreed, 0 only SAM, 2 only Spark."
+          ],
+          "evidence": {
+            "note": [
+              [
+                1,
+                "V88"
+              ]
+            ],
+            "sam_sure": 0,
+            "sam_doubtful": 0,
+            "spark_count": 2,
+            "label": "V88",
+            "order": {
+              "number": "PO-scd-93-receiver_uncertain",
+              "product": "V88",
+              "ordered": 1,
+              "open": 1
+            },
+            "cross": {
+              "agreed": 0,
+              "sam_only": 0,
+              "spark_only": 2,
+              "doubled": 0
+            }
+          },
+          "rule": "disagree"
+        },
+        "note": {
+          "date": "",
+          "embedded_instructions": [],
+          "items": [
+            {
+              "description": "V88",
+              "legible": true,
+              "product_identity": {
+                "brand": "",
+                "model": "",
+                "product_code": "",
+                "variant": ""
+              },
+              "quantity": 1,
+              "unit": "carton"
+            }
+          ],
+          "note_number": "scd-93-receiver_uncertain",
+          "supplier": "Controlled Fixture Supplier"
+        },
+        "camera": {
+          "all_cartons_visible": true,
+          "all_labels_identified": false,
+          "cartons_visible": 2,
+          "damaged_cartons": 0,
+          "product_identity": {
+            "brand": "",
+            "model": "",
+            "product_code": "",
+            "variant": ""
+          },
+          "product_on_labels": "V88",
+          "stacked": false
+        },
+        "receiver": {
+          "certain": false,
+          "product": "",
+          "quantity": null,
+          "supplier": "controlled fixture supplier",
+          "unit": "cartons"
+        },
+        "speaker_turns": [
+          {
+            "speaker": "A",
+            "transcript": "I am the receiving clerk. I am not sure how many cartons arrived. I could not complete the count. The supplier is controlled fixture supplier."
+          }
+        ],
+        "speech_interpretation": {
+          "count_candidates": [],
+          "driver_quantity": null,
+          "receiver": {
+            "certain": false,
+            "product": "",
+            "quantity": null,
+            "supplier": "controlled fixture supplier",
+            "unit": "cartons"
+          },
+          "receiver_speaker": "A",
+          "receiver_turn": "I am the receiving clerk. I am not sure how many cartons arrived. I could not complete the count. The supplier is controlled fixture supplier.",
+          "voice_validation": {
+            "source_turn_matched": true,
+            "single_supported_count": false
+          }
+        },
+        "second_opinions": {},
+        "trace": [
+          {
+            "gate_cross_check": {
+              "agreed": 0,
+              "sam_only": 0,
+              "spark_only": 2,
+              "doubled": 0
+            },
+            "at": "2026-11-03T19:25:33+03:00"
+          }
+        ],
+        "timings": [
+          {
+            "step": "Read delivery note",
+            "seconds": 8.292,
+            "status": "complete"
+          },
+          {
+            "step": "Inspect camera",
+            "seconds": 28.303,
+            "status": "complete"
+          },
+          {
+            "step": "Segment cartons",
+            "seconds": 15.356,
+            "status": "complete"
+          },
+          {
+            "step": "Transcribe speaker turns",
+            "seconds": 2.78,
+            "status": "complete"
+          },
+          {
+            "step": "Identify receiver count",
+            "seconds": 8.08,
+            "status": "complete"
+          },
+          {
+            "step": "Cross-check objects and authorize",
+            "seconds": 33.729,
+            "status": "complete"
+          }
+        ],
+        "seconds": 96.54,
+        "total_cost_usd": null,
+        "cost_status": "Not measured: provider-wide billing required; not agent-token cost.",
+        "input_sha256": {
+          "note": "f7e9b7734d53b4719374d33a64306fba512e34197b92787c7b1fe8a15f1419b7",
+          "camera": "a7d85e11979bbed09ea85f138726c9e2bbdc4f8d6d7f48e5af18fc75fac38a84",
+          "audio": "9fece24dc92650a0664ca84b80ff0274ea7c502d430c7d840ff499e682de5f59"
+        }
+      },
+      "action": "human",
+      "rule": "disagree",
+      "seconds": 96.606,
+      "exact_target_met": true,
+      "acceptable_action_met": true
+    },
+    {
+      "id": "scd-111-baseline",
+      "source_image_id": 111,
+      "scenario": "baseline",
+      "expected_action": "post",
+      "acceptable_actions": [
+        "post"
+      ],
+      "started_at": "2026-11-03T19:24:54.666696+03:00",
+      "evidence": {
+        "mode": "dry_run",
+        "erp_written": false,
+        "result": {
+          "posted": true,
+          "quantity": 1,
+          "document": null
+        },
+        "decision": {
+          "action": "post",
+          "quantity": 1,
+          "reasons": [
+            "Note, SAM and Spark agree on 1. Within PO-scd-111-baseline (1 open)."
+          ],
+          "evidence": {
+            "note": [
+              [
+                1,
+                "川贝清肺糖浆"
+              ]
+            ],
+            "sam_sure": 1,
+            "sam_doubtful": 0,
+            "spark_count": 1,
+            "label": "川贝清肺糖浆",
+            "order": {
+              "number": "PO-scd-111-baseline",
+              "product": "川贝清肺糖浆",
+              "ordered": 1,
+              "open": 1
+            },
+            "cross": {
+              "agreed": 1,
+              "sam_only": 0,
+              "spark_only": 0,
+              "doubled": 0
+            },
+            "spoken": {
+              "certain": true,
+              "product": "",
+              "quantity": 1,
+              "supplier": "controlled fixture fixture supplier",
+              "unit": "carton"
+            },
+            "second_reader": [
+              [
+                1,
+                "川贝清肺糖浆"
+              ]
+            ],
+            "second_supplier": "Controlled Fixture Supplier",
+            "audit": {
+              "ok": true,
+              "quantity": true,
+              "product": true,
+              "instructions": "",
+              "quotes": {
+                "quantity": "Quantity: 1 carton",
+                "product": "Product: 川贝清肺糖浆",
+                "instructions": ""
+              }
+            }
+          },
+          "rule": "match"
+        },
+        "note": {
+          "date": "",
+          "embedded_instructions": [],
+          "items": [
+            {
+              "description": "川贝清肺糖浆",
+              "legible": true,
+              "product_identity": {
+                "brand": "",
+                "model": "",
+                "product_code": "",
+                "variant": ""
+              },
+              "quantity": 1,
+              "unit": "carton"
+            }
+          ],
+          "note_number": "scd-111-baseline",
+          "supplier": "Controlled Fixture Supplier"
+        },
+        "camera": {
+          "all_cartons_visible": true,
+          "all_labels_identified": false,
+          "cartons_visible": 1,
+          "damaged_cartons": 0,
+          "product_identity": {
+            "brand": "",
+            "model": "",
+            "product_code": "",
+            "variant": ""
+          },
+          "product_on_labels": "川贝清肺糖浆",
+          "stacked": false
+        },
+        "receiver": {
+          "certain": true,
+          "product": "",
+          "quantity": 1,
+          "supplier": "controlled fixture fixture supplier",
+          "unit": "carton"
+        },
+        "speaker_turns": [
+          {
+            "speaker": "A",
+            "transcript": "I am the receiving clerk. I counted one carton, the supplier is controlled fixture fixture supplier."
+          }
+        ],
+        "speech_interpretation": {
+          "count_candidates": [
+            1
+          ],
+          "driver_quantity": null,
+          "receiver": {
+            "certain": true,
+            "product": "",
+            "quantity": 1,
+            "supplier": "controlled fixture fixture supplier",
+            "unit": "carton"
+          },
+          "receiver_speaker": "A",
+          "receiver_turn": "I am the receiving clerk. I counted one carton, the supplier is controlled fixture fixture supplier.",
+          "voice_validation": {
+            "source_turn_matched": true,
+            "single_supported_count": true
+          }
+        },
+        "second_opinions": {
+          "second": {
+            "supplier": "Controlled Fixture Supplier",
+            "note_number": "scd-111-baseline",
+            "date": "",
+            "items": [
+              {
+                "description": "川贝清肺糖浆",
+                "product_identity": {
+                  "brand": "",
+                  "product_code": "",
+                  "model": "",
+                  "variant": ""
+                },
+                "quantity": 1,
+                "unit": "carton",
+                "legible": true
+              }
+            ],
+            "embedded_instructions": []
+          },
+          "audit": {
+            "ok": true,
+            "quantity": true,
+            "product": true,
+            "instructions": "",
+            "quotes": {
+              "quantity": "Quantity: 1 carton",
+              "product": "Product: 川贝清肺糖浆",
+              "instructions": ""
+            }
+          }
+        },
+        "trace": [
+          {
+            "gate_cross_check": {
+              "agreed": 1,
+              "sam_only": 0,
+              "spark_only": 0,
+              "doubled": 0
+            },
+            "at": "2026-11-03T19:25:48+03:00"
+          },
+          {
+            "second_opinions": {
+              "second": {
+                "supplier": "Controlled Fixture Supplier",
+                "note_number": "scd-111-baseline",
+                "date": "",
+                "items": [
+                  {
+                    "description": "川贝清肺糖浆",
+                    "product_identity": {
+                      "brand": "",
+                      "product_code": "",
+                      "model": "",
+                      "variant": ""
+                    },
+                    "quantity": 1,
+                    "unit": "carton",
+                    "legible": true
+                  }
+                ],
+                "embedded_instructions": []
+              },
+              "audit": {
+                "ok": true,
+                "quantity": true,
+                "product": true,
+                "instructions": "",
+                "quotes": {
+                  "quantity": "Quantity: 1 carton",
+                  "product": "Product: 川贝清肺糖浆",
+                  "instructions": ""
+                }
+              }
+            },
+            "at": "2026-11-03T19:26:06+03:00"
+          }
+        ],
+        "timings": [
+          {
+            "step": "Read delivery note",
+            "seconds": 7.706,
+            "status": "complete"
+          },
+          {
+            "step": "Inspect camera",
+            "seconds": 13.96,
+            "status": "complete"
+          },
+          {
+            "step": "Segment cartons",
+            "seconds": 11.168,
+            "status": "complete"
+          },
+          {
+            "step": "Transcribe speaker turns",
+            "seconds": 3.028,
+            "status": "complete"
+          },
+          {
+            "step": "Identify receiver count",
+            "seconds": 5.709,
+            "status": "complete"
+          },
+          {
+            "step": "Cross-check objects and authorize",
+            "seconds": 29.784,
+            "status": "complete"
+          }
+        ],
+        "seconds": 71.355,
+        "total_cost_usd": null,
+        "cost_status": "Not measured: provider-wide billing required; not agent-token cost.",
+        "input_sha256": {
+          "note": "01164d31b5f42e2ca967aba4c32b1f4edaf495c0bb484dee9dae78f64b74ad14",
+          "camera": "2f2b931920cc000fe9e184662b1067a2cefbb7d848e3b2c2c8def89e9104028d",
+          "audio": "67f7e5d7944cdd6c16b6287483bcfb725f03fcd016551d4e4b5bf5b75870c65e"
+        }
+      },
+      "action": "post",
+      "rule": "match",
+      "seconds": 71.449,
+      "exact_target_met": true,
+      "acceptable_action_met": true
+    },
+    {
+      "id": "scd-111-quantity_mismatch",
+      "source_image_id": 111,
+      "scenario": "quantity_mismatch",
+      "expected_action": "block",
+      "acceptable_actions": [
+        "block",
+        "human"
+      ],
+      "started_at": "2026-11-03T19:25:30.425639+03:00",
+      "evidence": {
+        "mode": "dry_run",
+        "erp_written": false,
+        "result": {
+          "posted": false,
+          "gate": "block",
+          "reason": "Counted 1, note says 2; draft a discrepancy for the supplier."
+        },
+        "decision": {
+          "action": "block",
+          "quantity": 1,
+          "reasons": [
+            "Counted 1, note says 2; draft a discrepancy for the supplier."
+          ],
+          "evidence": {
+            "note": [
+              [
+                2,
+                "川贝清肺糖浆"
+              ]
+            ],
+            "sam_sure": 1,
+            "sam_doubtful": 0,
+            "spark_count": 1,
+            "label": "川贝清肺糖浆",
+            "order": {
+              "number": "PO-scd-111-quantity_mismatch",
+              "product": "川贝清肺糖浆",
+              "ordered": 2,
+              "open": 2
+            },
+            "cross": {
+              "agreed": 1,
+              "sam_only": 0,
+              "spark_only": 0,
+              "doubled": 0
+            },
+            "spoken": {
+              "certain": true,
+              "product": "",
+              "quantity": 1,
+              "supplier": "controlled fixture supplier",
+              "unit": "carton"
+            }
+          },
+          "rule": "mismatch"
+        },
+        "note": {
+          "date": "",
+          "embedded_instructions": [],
+          "items": [
+            {
+              "description": "川贝清肺糖浆",
+              "legible": true,
+              "product_identity": {
+                "brand": "",
+                "model": "",
+                "product_code": "",
+                "variant": ""
+              },
+              "quantity": 2,
+              "unit": "carton"
+            }
+          ],
+          "note_number": "scd-111-quantity_mismatch",
+          "supplier": "Controlled Fixture Supplier"
+        },
+        "camera": {
+          "all_cartons_visible": true,
+          "all_labels_identified": false,
+          "cartons_visible": 1,
+          "damaged_cartons": 0,
+          "product_identity": {
+            "brand": "",
+            "model": "",
+            "product_code": "",
+            "variant": ""
+          },
+          "product_on_labels": "川贝清肺糖浆",
+          "stacked": false
+        },
+        "receiver": {
+          "certain": true,
+          "product": "",
+          "quantity": 1,
+          "supplier": "controlled fixture supplier",
+          "unit": "carton"
+        },
+        "speaker_turns": [
+          {
+            "speaker": "A",
+            "transcript": "I am the receiving clerk. I counted one carton. The supplier is controlled fixture supplier."
+          }
+        ],
+        "speech_interpretation": {
+          "count_candidates": [
+            1
+          ],
+          "driver_quantity": null,
+          "receiver": {
+            "certain": true,
+            "product": "",
+            "quantity": 1,
+            "supplier": "controlled fixture supplier",
+            "unit": "carton"
+          },
+          "receiver_speaker": "A",
+          "receiver_turn": "I am the receiving clerk. I counted one carton. The supplier is controlled fixture supplier.",
+          "voice_validation": {
+            "source_turn_matched": true,
+            "single_supported_count": true
+          }
+        },
+        "second_opinions": {},
+        "trace": [
+          {
+            "gate_cross_check": {
+              "agreed": 1,
+              "sam_only": 0,
+              "spark_only": 0,
+              "doubled": 0
+            },
+            "at": "2026-11-03T19:26:11+03:00"
+          }
+        ],
+        "timings": [
+          {
+            "step": "Read delivery note",
+            "seconds": 5.486,
+            "status": "complete"
+          },
+          {
+            "step": "Inspect camera",
+            "seconds": 10.818,
+            "status": "complete"
+          },
+          {
+            "step": "Segment cartons",
+            "seconds": 6.545,
+            "status": "complete"
+          },
+          {
+            "step": "Transcribe speaker turns",
+            "seconds": 2.791,
+            "status": "complete"
+          },
+          {
+            "step": "Identify receiver count",
+            "seconds": 5.015,
+            "status": "complete"
+          },
+          {
+            "step": "Cross-check objects and authorize",
+            "seconds": 9.687,
+            "status": "complete"
+          }
+        ],
+        "seconds": 40.342,
+        "total_cost_usd": null,
+        "cost_status": "Not measured: provider-wide billing required; not agent-token cost.",
+        "input_sha256": {
+          "note": "0a25b16624999f962a083a84f1dc2c675a81c77a27ebe76a2e4e82ff2cfbfdad",
+          "camera": "2f2b931920cc000fe9e184662b1067a2cefbb7d848e3b2c2c8def89e9104028d",
+          "audio": "67f7e5d7944cdd6c16b6287483bcfb725f03fcd016551d4e4b5bf5b75870c65e"
+        }
+      },
+      "action": "block",
+      "rule": "mismatch",
+      "seconds": 41.052,
+      "exact_target_met": true,
+      "acceptable_action_met": true
+    },
+    {
+      "id": "scd-111-receiver_uncertain",
+      "source_image_id": 111,
+      "scenario": "receiver_uncertain",
+      "expected_action": "human",
+      "acceptable_actions": [
+        "human"
+      ],
+      "started_at": "2026-11-03T19:25:33.029161+03:00",
+      "evidence": {
+        "mode": "dry_run",
+        "erp_written": false,
+        "result": {
+          "posted": false,
+          "gate": "human",
+          "reason": "The receiver was not sure of the count."
+        },
+        "decision": {
+          "action": "human",
+          "quantity": 1,
+          "reasons": [
+            "The receiver was not sure of the count."
+          ],
+          "evidence": {
+            "note": [
+              [
+                1,
+                "川贝清肺糖浆"
+              ]
+            ],
+            "sam_sure": 1,
+            "sam_doubtful": 0,
+            "spark_count": 1,
+            "label": "川贝清肺糖浆",
+            "order": {
+              "number": "PO-scd-111-receiver_uncertain",
+              "product": "川贝清肺糖浆",
+              "ordered": 1,
+              "open": 1
+            },
+            "cross": {
+              "agreed": 1,
+              "sam_only": 0,
+              "spark_only": 0,
+              "doubled": 0
+            },
+            "spoken": {
+              "certain": false,
+              "product": "",
+              "quantity": null,
+              "supplier": "controlled fixture supplier",
+              "unit": "cartons"
+            }
+          },
+          "rule": "receiver"
+        },
+        "note": {
+          "date": "",
+          "embedded_instructions": [],
+          "items": [
+            {
+              "description": "川贝清肺糖浆",
+              "legible": true,
+              "product_identity": {
+                "brand": "",
+                "model": "",
+                "product_code": "",
+                "variant": ""
+              },
+              "quantity": 1,
+              "unit": "carton"
+            }
+          ],
+          "note_number": "scd-111-receiver_uncertain",
+          "supplier": "Controlled Fixture Supplier"
+        },
+        "camera": {
+          "all_cartons_visible": true,
+          "all_labels_identified": false,
+          "cartons_visible": 1,
+          "damaged_cartons": 0,
+          "product_identity": {
+            "brand": "",
+            "model": "",
+            "product_code": "",
+            "variant": ""
+          },
+          "product_on_labels": "川贝清肺糖浆",
+          "stacked": false
+        },
+        "receiver": {
+          "certain": false,
+          "product": "",
+          "quantity": null,
+          "supplier": "controlled fixture supplier",
+          "unit": "cartons"
+        },
+        "speaker_turns": [
+          {
+            "speaker": "A",
+            "transcript": "I am the receiving clerk. I am not sure how many cartons arrived. I could not complete the count. The supplier supplier is controlled fixture supplier."
+          }
+        ],
+        "speech_interpretation": {
+          "count_candidates": [],
+          "driver_quantity": null,
+          "receiver": {
+            "certain": false,
+            "product": "",
+            "quantity": null,
+            "supplier": "controlled fixture supplier",
+            "unit": "cartons"
+          },
+          "receiver_speaker": "A",
+          "receiver_turn": "I am the receiving clerk. I am not sure how many cartons arrived. I could not complete the count. The supplier supplier is controlled fixture supplier.",
+          "voice_validation": {
+            "source_turn_matched": true,
+            "single_supported_count": false
+          }
+        },
+        "second_opinions": {},
+        "trace": [
+          {
+            "gate_cross_check": {
+              "agreed": 1,
+              "sam_only": 0,
+              "spark_only": 0,
+              "doubled": 0
+            },
+            "at": "2026-11-03T19:26:24+03:00"
+          }
+        ],
+        "timings": [
+          {
+            "step": "Read delivery note",
+            "seconds": 6.975,
+            "status": "complete"
+          },
+          {
+            "step": "Inspect camera",
+            "seconds": 9.904,
+            "status": "complete"
+          },
+          {
+            "step": "Segment cartons",
+            "seconds": 6.437,
+            "status": "complete"
+          },
+          {
+            "step": "Transcribe speaker turns",
+            "seconds": 2.942,
+            "status": "complete"
+          },
+          {
+            "step": "Identify receiver count",
+            "seconds": 14.021,
+            "status": "complete"
+          },
+          {
+            "step": "Cross-check objects and authorize",
+            "seconds": 11.572,
+            "status": "complete"
+          }
+        ],
+        "seconds": 51.851,
+        "total_cost_usd": null,
+        "cost_status": "Not measured: provider-wide billing required; not agent-token cost.",
+        "input_sha256": {
+          "note": "e9227ce0197e47e66cc3e781be946867630c6ef14528ff987c533995bbe1408e",
+          "camera": "2f2b931920cc000fe9e184662b1067a2cefbb7d848e3b2c2c8def89e9104028d",
+          "audio": "9fece24dc92650a0664ca84b80ff0274ea7c502d430c7d840ff499e682de5f59"
+        }
+      },
+      "action": "human",
+      "rule": "receiver",
+      "seconds": 51.86,
+      "exact_target_met": true,
+      "acceptable_action_met": true
+    },
+    {
+      "id": "scd-278-baseline",
+      "source_image_id": 278,
+      "scenario": "baseline",
+      "expected_action": "human",
+      "acceptable_actions": [
+        "human"
+      ],
+      "started_at": "2026-11-03T19:26:06.117814+03:00",
+      "evidence": {
+        "mode": "dry_run",
+        "erp_written": false,
+        "result": {
+          "posted": false,
+          "gate": "human",
+          "reason": "Cartons are stacked or hidden; the count cannot be verified from the camera."
+        },
+        "decision": {
+          "action": "human",
+          "quantity": null,
+          "reasons": [
+            "Cartons are stacked or hidden; the count cannot be verified from the camera."
+          ],
+          "evidence": {
+            "note": [
+              [
+                1,
+                "WATER FILTER FOR RO Plus"
+              ]
+            ],
+            "sam_sure": 1,
+            "sam_doubtful": 1,
+            "spark_count": 2,
+            "label": "WATER FILTER FOR RO Plus",
+            "order": {
+              "number": "PO-scd-278-baseline",
+              "product": "WATER FILTER FOR RO Plus",
+              "ordered": 1,
+              "open": 1
+            }
+          },
+          "rule": "hidden"
+        },
+        "note": {
+          "date": "",
+          "embedded_instructions": [],
+          "items": [
+            {
+              "description": "WATER FILTER FOR RO Plus",
+              "legible": true,
+              "product_identity": {
+                "brand": "",
+                "model": "",
+                "product_code": "",
+                "variant": ""
+              },
+              "quantity": 1,
+              "unit": "carton"
+            }
+          ],
+          "note_number": "scd-278-baseline",
+          "supplier": "Controlled Fixture Supplier"
+        },
+        "camera": {
+          "all_cartons_visible": false,
+          "all_labels_identified": false,
+          "cartons_visible": 2,
+          "damaged_cartons": 1,
+          "product_identity": {
+            "brand": "QINYUAN",
+            "model": "",
+            "product_code": "",
+            "variant": ""
+          },
+          "product_on_labels": "WATER FILTER FOR RO Plus",
+          "stacked": false
+        },
+        "receiver": {
+          "certain": true,
+          "product": "",
+          "quantity": 1,
+          "supplier": "controlled fixture supplier",
+          "unit": "carton"
+        },
+        "speaker_turns": [
+          {
+            "speaker": "A",
+            "transcript": "I am the receiving clerk. I counted one carton. The supplier is controlled fixture supplier"
+          }
+        ],
+        "speech_interpretation": {
+          "count_candidates": [
+            1
+          ],
+          "driver_quantity": null,
+          "receiver": {
+            "certain": true,
+            "product": "",
+            "quantity": 1,
+            "supplier": "controlled fixture supplier",
+            "unit": "carton"
+          },
+          "receiver_speaker": "A",
+          "receiver_turn": "I am the receiving clerk. I counted one carton. The supplier is controlled fixture supplier",
+          "voice_validation": {
+            "source_turn_matched": true,
+            "single_supported_count": true
+          }
+        },
+        "second_opinions": {},
+        "trace": [
+          {
+            "gate_cross_check": {
+              "agreed": 1,
+              "sam_only": 1,
+              "spark_only": 0,
+              "doubled": 0
+            },
+            "at": "2026-11-03T19:27:27+03:00"
+          }
+        ],
+        "timings": [
+          {
+            "step": "Read delivery note",
+            "seconds": 6.569,
+            "status": "complete"
+          },
+          {
+            "step": "Inspect camera",
+            "seconds": 23.989,
+            "status": "complete"
+          },
+          {
+            "step": "Segment cartons",
+            "seconds": 8.523,
+            "status": "complete"
+          },
+          {
+            "step": "Transcribe speaker turns",
+            "seconds": 2.453,
+            "status": "complete"
+          },
+          {
+            "step": "Identify receiver count",
+            "seconds": 5.047,
+            "status": "complete"
+          },
+          {
+            "step": "Cross-check objects and authorize",
+            "seconds": 34.429,
+            "status": "complete"
+          }
+        ],
+        "seconds": 81.01,
+        "total_cost_usd": null,
+        "cost_status": "Not measured: provider-wide billing required; not agent-token cost.",
+        "input_sha256": {
+          "note": "aaa5e8839f8c463ceba144db9bc4d70ae88c035ce086d02c773ce8413e750c19",
+          "camera": "7244b6dfc016e752c597546d62c40c4c83dd6e6927ec702c2e6869168fbc98ab",
+          "audio": "67f7e5d7944cdd6c16b6287483bcfb725f03fcd016551d4e4b5bf5b75870c65e"
+        }
+      },
+      "action": "human",
+      "rule": "hidden",
+      "seconds": 81.084,
+      "exact_target_met": true,
+      "acceptable_action_met": true
+    },
+    {
+      "id": "scd-278-quantity_mismatch",
+      "source_image_id": 278,
+      "scenario": "quantity_mismatch",
+      "expected_action": "human",
+      "acceptable_actions": [
+        "block",
+        "human"
+      ],
+      "started_at": "2026-11-03T19:26:11.479265+03:00",
+      "evidence": {
+        "mode": "dry_run",
+        "erp_written": false,
+        "result": {
+          "posted": false,
+          "gate": "human",
+          "reason": "1 damaged carton(s); propose partial receipt of 0."
+        },
+        "decision": {
+          "action": "human",
+          "quantity": 0,
+          "reasons": [
+            "1 damaged carton(s); propose partial receipt of 0."
+          ],
+          "evidence": {
+            "note": [
+              [
+                2,
+                "WATER FILTER FOR RO Plus"
+              ]
+            ],
+            "sam_sure": 1,
+            "sam_doubtful": 1,
+            "spark_count": 1,
+            "label": "WATER FILTER FOR RO Plus",
+            "order": {
+              "number": "PO-scd-278-quantity_mismatch",
+              "product": "WATER FILTER FOR RO Plus",
+              "ordered": 2,
+              "open": 2
+            }
+          },
+          "rule": "damaged"
+        },
+        "note": {
+          "date": "",
+          "embedded_instructions": [],
+          "items": [
+            {
+              "description": "WATER FILTER FOR RO Plus",
+              "legible": true,
+              "product_identity": {
+                "brand": "",
+                "model": "",
+                "product_code": "",
+                "variant": ""
+              },
+              "quantity": 2,
+              "unit": "carton"
+            }
+          ],
+          "note_number": "scd-278-quantity_mismatch",
+          "supplier": "Controlled Fixture Supplier"
+        },
+        "camera": {
+          "all_cartons_visible": true,
+          "all_labels_identified": false,
+          "cartons_visible": 1,
+          "damaged_cartons": 1,
+          "product_identity": {
+            "brand": "QINYUAN",
+            "model": "",
+            "product_code": "",
+            "variant": ""
+          },
+          "product_on_labels": "WATER FILTER FOR RO Plus",
+          "stacked": false
+        },
+        "receiver": {
+          "certain": true,
+          "product": "",
+          "quantity": 1,
+          "supplier": "controlled fixture supplier",
+          "unit": "carton"
+        },
+        "speaker_turns": [
+          {
+            "speaker": "A",
+            "transcript": "I am the receiving clerk. I counted one carton, the supplier is controlled fixture supplier."
+          }
+        ],
+        "speech_interpretation": {
+          "count_candidates": [
+            1
+          ],
+          "driver_quantity": null,
+          "receiver": {
+            "certain": true,
+            "product": "",
+            "quantity": 1,
+            "supplier": "controlled fixture supplier",
+            "unit": "carton"
+          },
+          "receiver_speaker": "A",
+          "receiver_turn": "I am the receiving clerk. I counted one carton, the supplier is controlled fixture supplier.",
+          "voice_validation": {
+            "source_turn_matched": true,
+            "single_supported_count": true
+          }
+        },
+        "second_opinions": {},
+        "trace": [
+          {
+            "gate_cross_check": {
+              "agreed": 1,
+              "sam_only": 1,
+              "spark_only": 0,
+              "doubled": 0
+            },
+            "at": "2026-11-03T19:27:25+03:00"
+          }
+        ],
+        "timings": [
+          {
+            "step": "Read delivery note",
+            "seconds": 5.711,
+            "status": "complete"
+          },
+          {
+            "step": "Inspect camera",
+            "seconds": 24.353,
+            "status": "complete"
+          },
+          {
+            "step": "Segment cartons",
+            "seconds": 8.937,
+            "status": "complete"
+          },
+          {
+            "step": "Transcribe speaker turns",
+            "seconds": 2.303,
+            "status": "complete"
+          },
+          {
+            "step": "Identify receiver count",
+            "seconds": 3.454,
+            "status": "complete"
+          },
+          {
+            "step": "Cross-check objects and authorize",
+            "seconds": 29.124,
+            "status": "complete"
+          }
+        ],
+        "seconds": 73.882,
+        "total_cost_usd": null,
+        "cost_status": "Not measured: provider-wide billing required; not agent-token cost.",
+        "input_sha256": {
+          "note": "7a2249d1a465c5fc18bf7a1647daa4d8bc2480e2d1618788ccca4767492edf4c",
+          "camera": "7244b6dfc016e752c597546d62c40c4c83dd6e6927ec702c2e6869168fbc98ab",
+          "audio": "67f7e5d7944cdd6c16b6287483bcfb725f03fcd016551d4e4b5bf5b75870c65e"
+        }
+      },
+      "action": "human",
+      "rule": "damaged",
+      "seconds": 73.914,
+      "exact_target_met": true,
+      "acceptable_action_met": true
+    },
+    {
+      "id": "scd-278-receiver_uncertain",
+      "source_image_id": 278,
+      "scenario": "receiver_uncertain",
+      "expected_action": "human",
+      "acceptable_actions": [
+        "human"
+      ],
+      "started_at": "2026-11-03T19:26:24.890487+03:00",
+      "evidence": {
+        "mode": "dry_run",
+        "erp_written": false,
+        "result": {
+          "posted": false,
+          "gate": "human",
+          "reason": "Cartons are stacked or hidden; the count cannot be verified from the camera."
+        },
+        "decision": {
+          "action": "human",
+          "quantity": null,
+          "reasons": [
+            "Cartons are stacked or hidden; the count cannot be verified from the camera."
+          ],
+          "evidence": {
+            "note": [
+              [
+                1,
+                "WATER FILTER FOR RO Plus"
+              ]
+            ],
+            "sam_sure": 1,
+            "sam_doubtful": 1,
+            "spark_count": 2,
+            "label": "WATER FILTER FOR RO Plus",
+            "order": {
+              "number": "PO-scd-278-receiver_uncertain",
+              "product": "WATER FILTER FOR RO Plus",
+              "ordered": 1,
+              "open": 1
+            }
+          },
+          "rule": "hidden"
+        },
+        "note": {
+          "date": "",
+          "embedded_instructions": [],
+          "items": [
+            {
+              "description": "WATER FILTER FOR RO Plus",
+              "legible": true,
+              "product_identity": {
+                "brand": "",
+                "model": "",
+                "product_code": "",
+                "variant": ""
+              },
+              "quantity": 1,
+              "unit": "carton"
+            }
+          ],
+          "note_number": "scd-278-receiver_uncertain",
+          "supplier": "Controlled Fixture Supplier"
+        },
+        "camera": {
+          "all_cartons_visible": false,
+          "all_labels_identified": false,
+          "cartons_visible": 2,
+          "damaged_cartons": 1,
+          "product_identity": {
+            "brand": "QINYUAN",
+            "model": "",
+            "product_code": "",
+            "variant": ""
+          },
+          "product_on_labels": "WATER FILTER FOR RO Plus",
+          "stacked": false
+        },
+        "receiver": {
+          "certain": false,
+          "product": "",
+          "quantity": null,
+          "supplier": "controlled fixture supplier",
+          "unit": "cartons"
+        },
+        "speaker_turns": [
+          {
+            "speaker": "A",
+            "transcript": "I am the receiving clerk. I am not sure how many cartons arrived. I could not complete the count. The supplier is controlled fixture supplier."
+          }
+        ],
+        "speech_interpretation": {
+          "count_candidates": [],
+          "driver_quantity": null,
+          "receiver": {
+            "certain": false,
+            "product": "",
+            "quantity": null,
+            "supplier": "controlled fixture supplier",
+            "unit": "cartons"
+          },
+          "receiver_speaker": "A",
+          "receiver_turn": "I am the receiving clerk. I am not sure how many cartons arrived. I could not complete the count. The supplier is controlled fixture supplier.",
+          "voice_validation": {
+            "source_turn_matched": true,
+            "single_supported_count": false
+          }
+        },
+        "second_opinions": {},
+        "trace": [
+          {
+            "gate_cross_check": {
+              "agreed": 1,
+              "sam_only": 1,
+              "spark_only": 0,
+              "doubled": 0
+            },
+            "at": "2026-11-03T19:27:43+03:00"
+          }
+        ],
+        "timings": [
+          {
+            "step": "Read delivery note",
+            "seconds": 5.006,
+            "status": "complete"
+          },
+          {
+            "step": "Inspect camera",
+            "seconds": 24.839,
+            "status": "complete"
+          },
+          {
+            "step": "Segment cartons",
+            "seconds": 8.896,
+            "status": "complete"
+          },
+          {
+            "step": "Transcribe speaker turns",
+            "seconds": 3.344,
+            "status": "complete"
+          },
+          {
+            "step": "Identify receiver count",
+            "seconds": 6.189,
+            "status": "complete"
+          },
+          {
+            "step": "Cross-check objects and authorize",
+            "seconds": 29.854,
+            "status": "complete"
+          }
+        ],
+        "seconds": 78.128,
+        "total_cost_usd": null,
+        "cost_status": "Not measured: provider-wide billing required; not agent-token cost.",
+        "input_sha256": {
+          "note": "0a99554acb5fc43a48718d135ae119cf9eaf1a7bac30694fc380a137b55de835",
+          "camera": "7244b6dfc016e752c597546d62c40c4c83dd6e6927ec702c2e6869168fbc98ab",
+          "audio": "9fece24dc92650a0664ca84b80ff0274ea7c502d430c7d840ff499e682de5f59"
+        }
+      },
+      "action": "human",
+      "rule": "hidden",
+      "seconds": 78.141,
+      "exact_target_met": true,
+      "acceptable_action_met": true
+    },
+    {
+      "id": "scd-711-baseline",
+      "source_image_id": 711,
+      "scenario": "baseline",
+      "expected_action": "human",
+      "acceptable_actions": [
+        "human"
+      ],
+      "started_at": "2026-11-03T19:27:25.395132+03:00",
+      "evidence": {
+        "mode": "dry_run",
+        "erp_written": false,
+        "result": {
+          "posted": true,
+          "quantity": 1,
+          "document": null
+        },
+        "decision": {
+          "action": "post",
+          "quantity": 1,
+          "reasons": [
+            "Note, SAM and Spark agree on 1. Within PO-scd-711-baseline (1 open)."
+          ],
+          "evidence": {
+            "note": [
+              [
+                1,
+                "苦参素葡萄糖注射液"
+              ]
+            ],
+            "sam_sure": 1,
+            "sam_doubtful": 1,
+            "spark_count": 1,
+            "label": "苦参素葡萄糖注射液",
+            "order": {
+              "number": "PO-scd-711-baseline",
+              "product": "苦参素葡萄糖注射液",
+              "ordered": 1,
+              "open": 1
+            },
+            "cross": {
+              "agreed": 1,
+              "sam_only": 1,
+              "spark_only": 0,
+              "doubled": 0
+            },
+            "spoken": {
+              "certain": true,
+              "product": "",
+              "quantity": 1,
+              "supplier": "controlled fixture supplier",
+              "unit": "carton"
+            },
+            "second_reader": [
+              [
+                1,
+                "苦参素葡萄糖注射液"
+              ]
+            ],
+            "second_supplier": "Controlled Fixture Supplier",
+            "audit": {
+              "ok": true,
+              "quantity": true,
+              "product": true,
+              "instructions": "",
+              "quotes": {
+                "quantity": "Quantity: 1 carton",
+                "product": "Product: 苦参素葡萄糖注射液",
+                "instructions": ""
+              }
+            }
+          },
+          "rule": "match"
+        },
+        "note": {
+          "date": "",
+          "embedded_instructions": [],
+          "items": [
+            {
+              "description": "苦参素葡萄糖注射液",
+              "legible": true,
+              "product_identity": {
+                "brand": "",
+                "model": "",
+                "product_code": "",
+                "variant": ""
+              },
+              "quantity": 1,
+              "unit": "carton"
+            }
+          ],
+          "note_number": "scd-711-baseline",
+          "supplier": "Controlled Fixture Supplier"
+        },
+        "camera": {
+          "all_cartons_visible": true,
+          "all_labels_identified": false,
+          "cartons_visible": 1,
+          "damaged_cartons": 0,
+          "product_identity": {
+            "brand": "功克",
+            "model": "",
+            "product_code": "",
+            "variant": "100ml 软袋"
+          },
+          "product_on_labels": "苦参素葡萄糖注射液",
+          "stacked": false
+        },
+        "receiver": {
+          "certain": true,
+          "product": "",
+          "quantity": 1,
+          "supplier": "controlled fixture supplier",
+          "unit": "carton"
+        },
+        "speaker_turns": [
+          {
+            "speaker": "A",
+            "transcript": "I am the receiving clerk. I counted one carton. The supplier is controlled fixture supplier."
+          }
+        ],
+        "speech_interpretation": {
+          "count_candidates": [
+            1
+          ],
+          "driver_quantity": null,
+          "receiver": {
+            "certain": true,
+            "product": "",
+            "quantity": 1,
+            "supplier": "controlled fixture supplier",
+            "unit": "carton"
+          },
+          "receiver_speaker": "A",
+          "receiver_turn": "I am the receiving clerk. I counted one carton. The supplier is controlled fixture supplier.",
+          "voice_validation": {
+            "source_turn_matched": true,
+            "single_supported_count": true
+          }
+        },
+        "second_opinions": {
+          "second": {
+            "supplier": "Controlled Fixture Supplier",
+            "note_number": "scd-711-baseline",
+            "date": "",
+            "items": [
+              {
+                "description": "苦参素葡萄糖注射液",
+                "product_identity": {
+                  "brand": "",
+                  "product_code": "",
+                  "model": "",
+                  "variant": ""
+                },
+                "quantity": 1,
+                "unit": "carton",
+                "legible": true
+              }
+            ],
+            "embedded_instructions": []
+          },
+          "audit": {
+            "ok": true,
+            "quantity": true,
+            "product": true,
+            "instructions": "",
+            "quotes": {
+              "quantity": "Quantity: 1 carton",
+              "product": "Product: 苦参素葡萄糖注射液",
+              "instructions": ""
+            }
+          }
+        },
+        "trace": [
+          {
+            "gate_cross_check": {
+              "agreed": 1,
+              "sam_only": 1,
+              "spark_only": 0,
+              "doubled": 0
+            },
+            "at": "2026-11-03T19:28:30+03:00"
+          },
+          {
+            "second_opinions": {
+              "second": {
+                "supplier": "Controlled Fixture Supplier",
+                "note_number": "scd-711-baseline",
+                "date": "",
+                "items": [
+                  {
+                    "description": "苦参素葡萄糖注射液",
+                    "product_identity": {
+                      "brand": "",
+                      "product_code": "",
+                      "model": "",
+                      "variant": ""
+                    },
+                    "quantity": 1,
+                    "unit": "carton",
+                    "legible": true
+                  }
+                ],
+                "embedded_instructions": []
+              },
+              "audit": {
+                "ok": true,
+                "quantity": true,
+                "product": true,
+                "instructions": "",
+                "quotes": {
+                  "quantity": "Quantity: 1 carton",
+                  "product": "Product: 苦参素葡萄糖注射液",
+                  "instructions": ""
+                }
+              }
+            },
+            "at": "2026-11-03T19:28:47+03:00"
+          }
+        ],
+        "timings": [
+          {
+            "step": "Read delivery note",
+            "seconds": 5.967,
+            "status": "complete"
+          },
+          {
+            "step": "Inspect camera",
+            "seconds": 17.831,
+            "status": "complete"
+          },
+          {
+            "step": "Segment cartons",
+            "seconds": 4.579,
+            "status": "complete"
+          },
+          {
+            "step": "Transcribe speaker turns",
+            "seconds": 2.067,
+            "status": "complete"
+          },
+          {
+            "step": "Identify receiver count",
+            "seconds": 3.914,
+            "status": "complete"
+          },
+          {
+            "step": "Cross-check objects and authorize",
+            "seconds": 47.844,
+            "status": "complete"
+          }
+        ],
+        "seconds": 82.202,
+        "total_cost_usd": null,
+        "cost_status": "Not measured: provider-wide billing required; not agent-token cost.",
+        "input_sha256": {
+          "note": "ded15e4d3cf78d231e438194a3496f9e60290970b7f64c8c35e0507b04c6b54c",
+          "camera": "e9b6841e22ac05543c0a4e1063395b0a8d086c0416b01e93392c0a9d0801a575",
+          "audio": "67f7e5d7944cdd6c16b6287483bcfb725f03fcd016551d4e4b5bf5b75870c65e"
+        }
+      },
+      "action": "post",
+      "rule": "match",
+      "seconds": 82.215,
+      "exact_target_met": false,
+      "acceptable_action_met": false
+    },
+    {
+      "id": "scd-711-quantity_mismatch",
+      "source_image_id": 711,
+      "scenario": "quantity_mismatch",
+      "expected_action": "human",
+      "acceptable_actions": [
+        "block",
+        "human"
+      ],
+      "started_at": "2026-11-03T19:27:27.203127+03:00",
+      "evidence": {
+        "mode": "dry_run",
+        "erp_written": false,
+        "result": {
+          "posted": false,
+          "gate": "block",
+          "reason": "Not on the order: PO-scd-711-quantity_mismatch is for '苦参素葡萄糖注射液', the note says '苫参素葡萄糖注射液'. Refuse it at the dock; the load goes back on the truck."
+        },
+        "decision": {
+          "action": "block",
+          "quantity": null,
+          "reasons": [
+            "Not on the order: PO-scd-711-quantity_mismatch is for '苦参素葡萄糖注射液', the note says '苫参素葡萄糖注射液'. Refuse it at the dock; the load goes back on the truck."
+          ],
+          "evidence": {
+            "note": [
+              [
+                2,
+                "苫参素葡萄糖注射液"
+              ]
+            ],
+            "sam_sure": 1,
+            "sam_doubtful": 1,
+            "spark_count": 1,
+            "label": "苦参素葡萄糖注射液",
+            "order": {
+              "number": "PO-scd-711-quantity_mismatch",
+              "product": "苦参素葡萄糖注射液",
+              "ordered": 2,
+              "open": 2
+            }
+          },
+          "rule": "not_ordered"
+        },
+        "note": {
+          "date": "",
+          "embedded_instructions": [],
+          "items": [
+            {
+              "description": "苫参素葡萄糖注射液",
+              "legible": true,
+              "product_identity": {
+                "brand": "",
+                "model": "",
+                "product_code": "",
+                "variant": ""
+              },
+              "quantity": 2,
+              "unit": "carton"
+            }
+          ],
+          "note_number": "scd-711-quantity_mismatch",
+          "supplier": "Controlled Fixture Supplier"
+        },
+        "camera": {
+          "all_cartons_visible": true,
+          "all_labels_identified": false,
+          "cartons_visible": 1,
+          "damaged_cartons": 0,
+          "product_identity": {
+            "brand": "功克",
+            "model": "",
+            "product_code": "",
+            "variant": "100ml 软袋"
+          },
+          "product_on_labels": "苦参素葡萄糖注射液",
+          "stacked": false
+        },
+        "receiver": {
+          "certain": true,
+          "product": "",
+          "quantity": 1,
+          "supplier": "Controlled Fixture Supplier",
+          "unit": "carton"
+        },
+        "speaker_turns": [
+          {
+            "speaker": "A",
+            "transcript": "I am the receiving clerk. I counted one carton. The supplier is Controlled Fixture Supplier."
+          }
+        ],
+        "speech_interpretation": {
+          "count_candidates": [
+            1
+          ],
+          "driver_quantity": null,
+          "receiver": {
+            "certain": true,
+            "product": "",
+            "quantity": 1,
+            "supplier": "Controlled Fixture Supplier",
+            "unit": "carton"
+          },
+          "receiver_speaker": "A",
+          "receiver_turn": "I am the receiving clerk. I counted one carton. The supplier is Controlled Fixture Supplier.",
+          "voice_validation": {
+            "source_turn_matched": true,
+            "single_supported_count": true
+          }
+        },
+        "second_opinions": {},
+        "trace": [
+          {
+            "gate_cross_check": {
+              "agreed": 1,
+              "sam_only": 1,
+              "spark_only": 0,
+              "doubled": 0
+            },
+            "at": "2026-11-03T19:28:25+03:00"
+          }
+        ],
+        "timings": [
+          {
+            "step": "Read delivery note",
+            "seconds": 5.801,
+            "status": "complete"
+          },
+          {
+            "step": "Inspect camera",
+            "seconds": 9.426,
+            "status": "complete"
+          },
+          {
+            "step": "Segment cartons",
+            "seconds": 4.145,
+            "status": "complete"
+          },
+          {
+            "step": "Transcribe speaker turns",
+            "seconds": 3.292,
+            "status": "complete"
+          },
+          {
+            "step": "Identify receiver count",
+            "seconds": 6.027,
+            "status": "complete"
+          },
+          {
+            "step": "Cross-check objects and authorize",
+            "seconds": 29.598,
+            "status": "complete"
+          }
+        ],
+        "seconds": 58.289,
+        "total_cost_usd": null,
+        "cost_status": "Not measured: provider-wide billing required; not agent-token cost.",
+        "input_sha256": {
+          "note": "25d7ecaa1f5a328beef46aabf94ae98210bb497fdcefb10fc212a8a06bf1ece9",
+          "camera": "e9b6841e22ac05543c0a4e1063395b0a8d086c0416b01e93392c0a9d0801a575",
+          "audio": "67f7e5d7944cdd6c16b6287483bcfb725f03fcd016551d4e4b5bf5b75870c65e"
+        }
+      },
+      "action": "block",
+      "rule": "not_ordered",
+      "seconds": 58.324,
+      "exact_target_met": false,
+      "acceptable_action_met": true
+    },
+    {
+      "id": "scd-711-receiver_uncertain",
+      "source_image_id": 711,
+      "scenario": "receiver_uncertain",
+      "expected_action": "human",
+      "acceptable_actions": [
+        "human"
+      ],
+      "started_at": "2026-11-03T19:27:43.032693+03:00",
+      "evidence": {
+        "mode": "dry_run",
+        "erp_written": false,
+        "result": {
+          "posted": false,
+          "gate": "block",
+          "reason": "Not on the order: PO-scd-711-receiver_uncertain is for '苦参素葡萄糖注射液', the note says '苔参素葡萄糖注射液'. Refuse it at the dock; the load goes back on the truck."
+        },
+        "decision": {
+          "action": "block",
+          "quantity": null,
+          "reasons": [
+            "Not on the order: PO-scd-711-receiver_uncertain is for '苦参素葡萄糖注射液', the note says '苔参素葡萄糖注射液'. Refuse it at the dock; the load goes back on the truck."
+          ],
+          "evidence": {
+            "note": [
+              [
+                1,
+                "苔参素葡萄糖注射液"
+              ]
+            ],
+            "sam_sure": 1,
+            "sam_doubtful": 1,
+            "spark_count": 1,
+            "label": "苦参素葡萄糖注射液",
+            "order": {
+              "number": "PO-scd-711-receiver_uncertain",
+              "product": "苦参素葡萄糖注射液",
+              "ordered": 1,
+              "open": 1
+            }
+          },
+          "rule": "not_ordered"
+        },
+        "note": {
+          "date": "",
+          "embedded_instructions": [],
+          "items": [
+            {
+              "description": "苔参素葡萄糖注射液",
+              "legible": true,
+              "product_identity": {
+                "brand": "",
+                "model": "",
+                "product_code": "",
+                "variant": ""
+              },
+              "quantity": 1,
+              "unit": "carton"
+            }
+          ],
+          "note_number": "scd-711-receiver_uncertain",
+          "supplier": "Controlled Fixture Supplier"
+        },
+        "camera": {
+          "all_cartons_visible": true,
+          "all_labels_identified": false,
+          "cartons_visible": 1,
+          "damaged_cartons": 0,
+          "product_identity": {
+            "brand": "功克",
+            "model": "",
+            "product_code": "",
+            "variant": "100ml 软袋"
+          },
+          "product_on_labels": "苦参素葡萄糖注射液",
+          "stacked": false
+        },
+        "receiver": {
+          "certain": false,
+          "product": "",
+          "quantity": null,
+          "supplier": "controlled fixture supplier",
+          "unit": "cartons"
+        },
+        "speaker_turns": [
+          {
+            "speaker": "A",
+            "transcript": "I am the receiving clerk. I am not sure how many many cartons arrived. I could not not complete the count, the supplier is controlled fixture supplier"
+          }
+        ],
+        "speech_interpretation": {
+          "count_candidates": [],
+          "driver_quantity": null,
+          "receiver": {
+            "certain": false,
+            "product": "",
+            "quantity": null,
+            "supplier": "controlled fixture supplier",
+            "unit": "cartons"
+          },
+          "receiver_speaker": "A",
+          "receiver_turn": "I am the receiving clerk. I am not sure how many many cartons arrived. I could not not complete the count, the supplier is controlled fixture supplier",
+          "voice_validation": {
+            "source_turn_matched": true,
+            "single_supported_count": false
+          }
+        },
+        "second_opinions": {},
+        "trace": [
+          {
+            "gate_cross_check": {
+              "agreed": 1,
+              "sam_only": 1,
+              "spark_only": 0,
+              "doubled": 0
+            },
+            "at": "2026-11-03T19:28:35+03:00"
+          }
+        ],
+        "timings": [
+          {
+            "step": "Read delivery note",
+            "seconds": 7.88,
+            "status": "complete"
+          },
+          {
+            "step": "Inspect camera",
+            "seconds": 11.566,
+            "status": "complete"
+          },
+          {
+            "step": "Segment cartons",
+            "seconds": 4.445,
+            "status": "complete"
+          },
+          {
+            "step": "Transcribe speaker turns",
+            "seconds": 2.768,
+            "status": "complete"
+          },
+          {
+            "step": "Identify receiver count",
+            "seconds": 6.014,
+            "status": "complete"
+          },
+          {
+            "step": "Cross-check objects and authorize",
+            "seconds": 19.846,
+            "status": "complete"
+          }
+        ],
+        "seconds": 52.519,
+        "total_cost_usd": null,
+        "cost_status": "Not measured: provider-wide billing required; not agent-token cost.",
+        "input_sha256": {
+          "note": "26a7b59b9cf70f390240db29fde013a1a3f6bcdcf2224e078a8edd43617da11f",
+          "camera": "e9b6841e22ac05543c0a4e1063395b0a8d086c0416b01e93392c0a9d0801a575",
+          "audio": "9fece24dc92650a0664ca84b80ff0274ea7c502d430c7d840ff499e682de5f59"
+        }
+      },
+      "action": "block",
+      "rule": "not_ordered",
+      "seconds": 52.527,
+      "exact_target_met": false,
+      "acceptable_action_met": false
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Three decisions · Count Before You Post</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="../evidence-status.js" defer></script>
+  <script src="main.js" defer></script>
+</head>
+<body>
+<header><a class="brand" href="../">COUNT BEFORE YOU POST<span>Built with Muse · Jury walkthrough</span></a><nav aria-label="Explore"><a href="../review/">All evidence</a><a href="../sim-lego/">Explore the warehouse ↗</a></nav></header>
+<main>
+  <section class="intro"><p class="eyebrow">ONE REAL PHOTO. THREE CONTROLLED CHECKS.</p><h1>Same cartons.<br><span>A different claim changes the decision.</span></h1><p class="lede">A correct document passes. An extra carton or a different article code stops the receipt.</p><p class="notice">Recorded dry runs · 3 November 2026. Real public photograph; authored notes and orders; synthetic receiver speech. No ERP writes. This page replays results without calling models.</p></section>
+  <section aria-labelledby="real-title">
+    <h2 id="real-title">Start with the real-photo comparison</h2>
+    <div class="toolbar"><nav aria-label="Real-photo controls"><button data-real="correct" aria-pressed="true" disabled>01 · Correct note</button><button data-real="quantity-mismatch" aria-pressed="false" disabled>02 · Wrong quantity</button><button data-real="wrong-article" aria-pressed="false" disabled>03 · Wrong article code</button></nav></div>
+    <p id="real-status" role="status">Loading real-photo evidence…</p>
+    <div id="real-case" hidden>
+      <section id="real-decision" class="decision" aria-labelledby="real-verdict" aria-live="polite"><div><p class="eyebrow">RECORDED GATE DECISION</p><h2 id="real-verdict"></h2><p id="real-reason"></p></div><div class="transaction"><p class="eyebrow">RECORDED RESULT</p><p id="real-result"></p><p id="real-checks" class="small"></p></div></section>
+      <div class="evidence-grid">
+        <article><p class="eyebrow">AUTHORED DOCUMENT + PURCHASE ORDER</p><h3 id="real-claim"></h3><a id="real-note-link" target="_blank" rel="noopener"><img id="real-note" alt="Authored test delivery note"></a><p id="real-order"></p></article>
+        <article><p class="eyebrow">SAME OPERATOR-SELECTED AREA IN EVERY CHECK</p><h3 id="real-count"></h3><a id="real-camera-link" target="_blank" rel="noopener"><img id="real-camera" alt="Selected foreground Deli carton area from SCD photo 822"></a><p><a id="real-original" target="_blank" rel="noopener">Inspect the original uncropped photo ↗</a></p><p class="small">Only this area was analyzed. The operator asserts that it contains the complete delivery; goods outside it were not checked.</p></article>
+      </div>
+      <details><summary>Inspect this control’s result, model evidence and hashes</summary><pre id="real-trace"></pre></details>
+    </div>
+    <p class="small">One previously inspected photograph with three authored controls, not three independent deliveries or an unseen-input benchmark. Notes and purchase orders change together. These controls show acceptance and rejection; the historical example below shows human escalation.</p>
+    <p class="small">Photo: Jinrong Yang et al., <a href="https://github.com/yancie-yjr/scd.github.io">SCD / LSCD</a>, image 822. Original and crop: <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>. <a href="../validation.json">Full development evidence, including earlier failures</a>.</p>
+  </section>
+  <p><a href="../unseen-validation/">New-photo follow-up: all 15 results, including an unexpected approval →</a></p>
+  <section class="historical-intro"><p class="eyebrow">CONTINUE THE WALKTHROUGH</p><h2>Accept, block or ask a person</h2><p>Historical core recordings on synthetic scenes. These are separate examples with a narrower check profile.</p></section>
+  <div class="toolbar"><nav id="scenarios" aria-label="Delivery examples"><button data-case="ok" aria-pressed="true" disabled>01 · Accept</button><button data-case="eksik" aria-pressed="false" disabled>02 · Block</button><button data-case="belirsiz" aria-pressed="false" disabled>03 · Ask a person</button></nav><label>Recorded evidence language<select id="language"><option value="en">English</option><option value="tr">Türkçe</option><option value="de">Deutsch</option><option value="zh">中文</option></select></label></div>
+  <p class="small">Language changes the original recording and its evidence. Interface text remains English.</p>
+  <p id="status" role="status">Loading recorded evidence…</p>
+  <section id="case" hidden aria-labelledby="case-title">
+    <div class="case-heading"><div><p class="eyebrow" id="step"></p><h2 id="case-title"></h2></div><button id="next">Next decision →</button></div>
+    <div class="evidence-grid">
+      <article><p class="eyebrow">01 / SPARK READS THE DOCUMENT</p><h3 id="claim"></h3><a id="note-link" target="_blank" rel="noopener"><img id="note" alt="Original recorded delivery note"></a><p id="product"></p></article>
+      <article><p class="eyebrow">02 / SAM + SPARK CHECK THE CARTONS</p><h3 id="count"></h3><div class="views" role="group" aria-label="Camera evidence"><button data-view="camera" aria-pressed="true">Camera</button><button data-view="masks" aria-pressed="false">SAM masks</button><button data-view="cross" aria-pressed="false">Object match</button></div><a id="camera-link" target="_blank" rel="noopener"><img id="camera" alt="Recorded camera evidence"></a><p id="cross"></p><p id="cross-detail" class="small"></p></article>
+    </div>
+    <section id="decision" class="decision" aria-labelledby="verdict"><div><p class="eyebrow">03 / KAPI ENFORCES THE WRITE POLICY</p><h2 id="verdict"></h2><p id="reason"></p></div><div class="transaction"><p class="eyebrow">ACTUAL RECORDED TOOL OUTCOME</p><p id="transaction"></p><p id="recorded-at" class="small"></p></div></section>
+    <details><summary>Inspect the write attempt and original tool trace</summary><p class="small">The tool result is authoritative. An agent's closing message is not proof of a receipt.</p><pre id="trace"></pre></details>
+    <div class="scope"><h3>What ran in these examples?</h3><p>Spark read the document and inspected the pallet. SAM segmented cartons, and the gate used object-level matching and the trusted purchase order to decide.</p><p><strong>Voice, the second note reader and Wonder's pre-write audit are not established by these historical core recordings.</strong> Their separate experiments and the newer full-workflow trials are available in the <a href="../review/#validation">development evidence</a>.</p><details><summary>Where the other Meta models contribute</summary><ul><li><strong>Voice:</strong> transcribes speaker turns so the receiver's count can be distinguished from the driver's claim.</li><li><strong>Spark Open:</strong> independently rereads the note before a full-workflow approval.</li><li><strong>Wonder:</strong> audits the note reading; separately drafts discrepancy and supervisor paperwork.</li><li><strong>Muse Code:</strong> built parts of the project and attempted writes as an external agent through the same MCP gate.</li><li><strong>Muse Image:</strong> created the character artwork used to explain these roles.</li></ul><p>These roles describe the wider project, not additional checks silently credited to the three recordings above.</p></details></div>
+  </section>
+  <footer><strong>Try the next layer.</strong><p><a href="../verify/">Verify new evidence</a> <span class="small">— owner-supplied demo access code required.</span></p><p><a href="../review/#validation">Inspect real-photo development trials and failures</a> · <a href="../sim-lego/">Drive the dock</a></p></footer>
+</main>
+</body></html>

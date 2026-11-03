@@ -90,7 +90,7 @@ class Decision:
 
 
 # The rules in the order they run; Decision.rule names the one that fired.
-RULES = ("instruction", "invisible_text", "unreadable", "invalid_quantity", "unit", "supplier", "not_ordered", "wrong_product", "hidden",
+RULES = ("instruction", "invisible_text", "unreadable", "invalid_quantity", "unit", "frame_boundary", "supplier", "not_ordered", "wrong_product", "hidden",
          "damaged", "disagree", "receiver", "over_order", "readers_disagree", "audit", "match",
          "mismatch")
 
@@ -144,7 +144,7 @@ def cross_count(cross) -> int | None:
 def decide(note: dict, sam_confs: list[float], look: dict, cross=None,
            spoken: dict | None = None, invisible: list[str] | None = None,
            second: dict | None = None, audit: dict | None = None,
-           order: dict | None = None) -> Decision:
+           order: dict | None = None, frame: dict | None = None) -> Decision:
     """cross: an optional crosscheck.CrossCheck; when given it replaces the count bands.
     spoken: an optional voice.understand() result, the receiver's own count.
     invisible: pdf_text.invisible_lines() of a PDF note, found in code, not by Spark.
@@ -176,6 +176,15 @@ def decide(note: dict, sam_confs: list[float], look: dict, cross=None,
     expected_unit = canonical_unit(order.get("unit", "carton")) if order else "carton"
     if expected_unit != "carton" or canonical_unit(item.get("unit")) != expected_unit:
         return out("unit", HUMAN, "Camera counts cartons. Note and order must explicitly use cartons; no pack conversion is inferred.")
+    if frame is not None:
+        evidence["frame_completeness"] = frame
+        if frame.get("requires_review"):
+            if frame.get("error"):
+                return out("frame_boundary", HUMAN,
+                           "Frame completeness could not be verified; retry the check before receiving.")
+            return out("frame_boundary", HUMAN,
+                       "A detected carton touches the image boundary guard band; complete carton extent "
+                       "is not verified. Supply a wider view or request human review.")
     if order is not None and order.get("require_supplier"):
         if not note.get("supplier") or normalize(note["supplier"]) != normalize(order.get("supplier", "")):
             return out("supplier", BLOCK, "Supplier on the note does not exactly match the trusted purchase order.")

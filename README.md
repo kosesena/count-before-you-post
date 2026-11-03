@@ -36,7 +36,16 @@ Your World*. Everything in this repository was written during the event.
 
 ## Current verification workflow (1 Nov hardening)
 
-[Read the evidence first](site/review/index.html) · [New-input verification](site/verify/index.html) · [Validation protocol](docs/VALIDATION.md)
+[Three-decision jury walkthrough](site/jury/index.html) · [Read the evidence first](site/review/index.html) · [New-input verification](site/verify/index.html) · [Validation protocol](docs/VALIDATION.md)
+
+**3 November update:** [Five previously unused photos, all 15 first-run controls](site/unseen-validation/)
+include one expected clean approval and **one unexpected dry-run approval** where the
+predeclared target was human review. No ERP writes occurred. These authored controls use
+product-description matching, not strict SKU validation; their targets come from pre-run
+assistant inspection, not independent field labels. The historical zero-wrong-receipt results
+below do not establish zero incorrect approvals on these new inputs. The current code adds
+a frame-boundary guard and independent confirmation of document/product mismatches.
+The original results remain unchanged; offline regression tests are not new live-model evidence.
 
 Run `.venv/bin/python -m cbyp.verify_server` and open http://127.0.0.1:8768. Supply your own
 trusted order, note, current carton photo and receiver WAV. Pressing **Verify delivery** sends

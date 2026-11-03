@@ -34,8 +34,13 @@ class Hardening(unittest.TestCase):
         self.assertEqual(decide(NOTE,[.95]*12,LOOK,second=other).rule,'readers_disagree')
 
     def ready(self):
-        s=full_session('note.png','cam.png',order_for(),{'quantity':12,'certain':True})
-        s.note=NOTE;s.look=LOOK;s.sam=[.95]*12;s.concept=[object()]
+        import tempfile
+        from PIL import Image
+        from cbyp.sam import Segment
+        tmp=tempfile.TemporaryDirectory();self.addCleanup(tmp.cleanup)
+        camera=Path(tmp.name)/'cam.png';Image.new('RGB',(100,100)).save(camera)
+        s=full_session('note.png',camera,order_for(),{'quantity':12,'certain':True})
+        s.note=NOTE;s.look=LOOK;s.sam=[.95]*12;s.concept=[Segment('1',.95,10,10,90,90,b'\x01'*6400)]
         s.cross=lambda: CrossCheck(agreed=[(k,(k,0)) for k in range(12)])
         s.second_reader=lambda p:NOTE;s.auditor=lambda p,n:AUDIT
         return s

@@ -22,11 +22,11 @@ LOOK = {
         "damaged_cartons": {"type": "integer"},
         "stacked": {"type": "boolean", "description": "Cartons stacked in more than one layer."},
         "all_cartons_visible": {"type": "boolean",
-                                "description": "False if some cartons may be hidden from view."},
+                                "description": "False if any carton is clipped by the image boundary, obscured by shelving/objects, or may be hidden. Counting a visible carton does not establish its complete extent."},
     },
 }
 LOOK_PROMPT = (
-    "Ceiling camera view of a pallet at a warehouse receiving dock. Read the product name "
+    "Warehouse receiving photo from an unknown camera position. Do not assume an overhead view. Read the product name "
     "printed on the carton labels exactly as written, count the cartons, count cartons that "
     "look crushed, wet or torn, and say whether cartons are stacked so some may be hidden."
 )
