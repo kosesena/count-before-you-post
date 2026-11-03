@@ -1,0 +1,39 @@
+{
+  "One real photograph. Three controlled checks.": {
+    "tr": "Bir gerçek fotoğraf. Üç kontrollü deneme."
+  },
+  "Choose the recorded run independently of the interface language.": {
+    "en": "Choose the recorded run independently of the interface language.",
+    "tr": "Kayıtlı denemenin dilini arayüz dilinden bağımsız seçin.",
+    "de": "Wählen Sie den aufgezeichneten Durchlauf unabhängig von der Sprache der Oberfläche.",
+    "zh": "独立于界面语言选择要回放的记录。"
+  },
+  "{{0}} recorded run loaded. The original evidence language is unchanged by interface translation.": {
+    "en": "{{0}} recorded run loaded. The original evidence language is unchanged by interface translation.",
+    "tr": "{{0}} kayıtlı denemesi yüklendi. Arayüz çevirisi kanıtın özgün dilini değiştirmez.",
+    "de": "Aufgezeichneter Durchlauf {{0}} geladen. Die Übersetzung der Oberfläche ändert die Originalsprache der Nachweise nicht.",
+    "zh": "已加载{{0}}记录。界面翻译不会改变证据的原始语言。"
+  },
+  "Three decisions · Count Before You Post": {
+    "tr": "Üç karar · Count Before You Post",
+    "de": "Drei Entscheidungen · Count Before You Post",
+    "zh": "三种决策 · Count Before You Post"
+  },
+  "Built with Muse · Jury walkthrough": {
+    "tr": "Muse ile geliştirildi · Jüri demosu",
+    "de": "Mit Muse entwickelt · Jury-Rundgang",
+    "zh": "使用 Muse 构建 · 评审导览"
+  },
+  "camera": {
+    "en": "camera",
+    "tr": "kamera",
+    "de": "Kamera",
+    "zh": "相机"
+  },
+  "masks": {
+    "en": "masks",
+    "tr": "maskeler",
+    "de": "Masken",
+    "zh": "掩膜"
+  }
+}

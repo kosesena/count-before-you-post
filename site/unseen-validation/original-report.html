@@ -1,0 +1,2857 @@
+<!doctype html><html lang="tr"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Yeni fotoğraf testleri · Count Before You Post</title><style>body{font:16px/1.6 system-ui;background:#f5f4ee;color:#17313e;margin:0}main{max-width:1150px;margin:auto;padding:36px 22px}h1{font-size:clamp(28px,4vw,44px);line-height:1.15}a{color:#175bdb}.notice{background:#e7eef9;padding:20px;border-left:4px solid #175bdb}.photos{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px}figure{margin:0;background:white;padding:12px;border-radius:10px}img{width:100%;height:190px;object-fit:contain}figcaption{font-size:13px}table{width:100%;border-collapse:collapse;background:white;font-size:14px}th,td{padding:12px;text-align:left;border-bottom:1px solid #d6dfdf}.scroll{overflow:auto}.post{color:#17673f;font-weight:bold}.block,.error{color:#b42b38;font-weight:bold}.human{color:#8c5a00;font-weight:bold}details{border-top:1px solid #ccd6da;padding:16px 0}summary{cursor:pointer;font-weight:700}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:12px/1.5 monospace;background:#e9eef0;padding:16px;max-height:430px;overflow:auto}.small{font-size:13px}</style><main><a href="../jury/">← Jüri demosu</a><h1>5 yeni fotoğraf.<br>15 önceden sabitlenmiş kontrol.</h1><p>3 Kasım 2026 · İlk uygulama koşularının tamamı</p><div class='notice'><strong>2 kabul · 4 ret · 9 insan incelemesi · 0 teknik hata.</strong><p>Kesin karar hedefi: 11/15. Kabul hedefi: 1/1. Otomatik kayıt yapılmaması gereken 14 kontrolde 1 kabul.</p><p>ERP yazımı: 0. Tüm denemelerde medyan süre: 73.9 sn. Maliyet ölçülmedi.</p></div><h2>Başarı kadar önemli iki bulgu</h2><p><strong>111 numaralı yeni fotoğrafta üç karar doğru:</strong> temel belge kabul, miktar uyuşmazlığı ret, kararsız ses insan incelemesi. Kabulde ikinci okuyucu ve denetim tamamlandı. Bu, tek yeni fotoğrafta ürün-adı profili için entegrasyon kanıtıdır; genellenebilir başarı oranı değildir.</p><p><strong>711 numaralı fotoğrafta beklenmeyen kabul:</strong> kadraj/örtülme nedeniyle önceden insan incelemesi hedeflediğimiz temel kontrol kabul edildi. Kamera “tüm koliler görünür” dedi; bu görsel varsayım ile önceden belirlenmiş hedef uyuşmuyor. Etiketlerin tamamının tanımlanmadığı da kayıtta mevcut; ürün-adı profili bunu kesin kimlik profili gibi engellemiyor. Gerçek yanlış stok kaydı kanıtı yok, fakat bu hedefe göre incelemeye gitmesi gereken bir otomatik onay var.</p><p><strong>711 üzerinde iki OCR kaynaklı ret:</strong> miktar kontrolünde 苦 karakteri 苫, kararsız ses kontrolünde 苔 olarak okundu. “not_ordered” kuralı diğer kontrollere ulaşmadan ret verdi. Bu retleri miktar veya ses kusurunu doğru yakalama olarak saymıyoruz. 37 numaralı miktar kontrolü ise insan incelemesi hedefi yerine miktar uyuşmazlığı nedeniyle ret verdi; güvenli bir duruş, ancak aynı karar değil.</p><p><strong>Yorum:</strong> 2 kabulün yalnızca 1’i önceden temiz kabul hedefidir. 13/15 geniş kabul edilebilir karar ölçütü, 11/15 kesin hedef eşleşmesinden farklıdır ve %87 saha doğruluğu anlamına gelmez. 14 otomatik onay verilmemesi gereken kontrolden 1’inde onay çıktı. Sonuçlar yeni denemeyle düzeltilmedi veya elenmedi.</p><h2>Kapsam ve yorumlama</h2><p>Bu test, mevcut <strong>ürün adı eşleştirme</strong> akışını kullanır; güvenilir referans kodları bulunmadığından siparişlerde marka/model/SKU kimliği yoktur. Önceki Deli ürün kodu kontrolüne eşdeğer değildir. Model istemleri, karar kuralları ve eşikleri değiştirilmedi. Tedarikçi, görsel eşleştirme, teslim alan sesi, kabul öncesi ikinci okuyucu ve denetim akışı açık kaldı.</p><p>Eski 30 test fotoğrafı ve sekiz görsel eleme adayı dışlandı. Kalan tek koli anotasyonlu beş fotoğrafın tamamı, model sonuçları görülmeden seçildi. Çalışma zamanı görsel ön taramasıyla fotoğraf elenmedi. Ancak tek koli seçimi kolaylık sağlayan dar bir alt kümedir; fotoğrafların model eğitiminde bulunmadığı bilinmiyor.</p><p>111 numaralı fotoğraf temiz kabul adayıdır. 37, 93, 278 ve 711 görüntülerinde kadraj/örtülme veya hasar nedeniyle önceden insan incelemesi hedeflendi. Bu hedefler asistanın çağrı öncesi görsel incelemesidir; bağımsız saha doğrusu değildir. Dolayısıyla bu deneyde yalnızca <strong>bir temiz kabul hedefi</strong> vardır.</p><p>Her fotoğraf için temel belge, miktarı 2 koliye çıkarılmış belge/sipariş ve kararsız teslim alan sesi üretildi. Gerçek teslimat belgeleri veya çalışan kayıtları değildir. Miktar kusurunda güvenli sonuç hem ret hem insan incelemesi olabilir; tabloda daha dar kesin hedef de gösterilir. Daha erken bir kural, miktar veya ses kusurunun değerlendirilmesini engelleyebilir. Yalnızca “kayıt yapılmadı” sonucu, ilgili kusurun yakalandığını kanıtlamaz.</p><p>Her kontrol tek uygulama koşusu: sonuç sonrası düzeltme veya yeniden deneme yok. Mevcut SDK aktarım tekrarları etkin kaldı. Teknik hatalar başarı sayılmadı. Fotoğraflar kırpılmadan modele gönderildi; aşağıdakiler yalnızca küçültülmüş önizlemeler. İnsan süresi, iş yükü tasarrufu ve gerçek ERP entegrasyonu ölçülmedi.</p><h2>Seçilen fotoğrafların tamamı</h2><div class="photos"><figure><a href='img/scd-37.jpg'><img src='img/scd-37.jpg' alt='SCD 37 seçilmiş kaynak fotoğrafının küçültülmüş önizlemesi' loading='lazy'></a><figcaption>SCD 37 · 关节止痛膏</figcaption></figure><figure><a href='img/scd-93.jpg'><img src='img/scd-93.jpg' alt='SCD 93 seçilmiş kaynak fotoğrafının küçültülmüş önizlemesi' loading='lazy'></a><figcaption>SCD 93 · V88</figcaption></figure><figure><a href='img/scd-111.jpg'><img src='img/scd-111.jpg' alt='SCD 111 seçilmiş kaynak fotoğrafının küçültülmüş önizlemesi' loading='lazy'></a><figcaption>SCD 111 · 川贝清肺糖浆</figcaption></figure><figure><a href='img/scd-278.jpg'><img src='img/scd-278.jpg' alt='SCD 278 seçilmiş kaynak fotoğrafının küçültülmüş önizlemesi' loading='lazy'></a><figcaption>SCD 278 · WATER FILTER FOR RO Plus</figcaption></figure><figure><a href='img/scd-711.jpg'><img src='img/scd-711.jpg' alt='SCD 711 seçilmiş kaynak fotoğrafının küçültülmüş önizlemesi' loading='lazy'></a><figcaption>SCD 711 · 苦参素葡萄糖注射液</figcaption></figure></div><p class="small">Fotoğraflar: Jinrong Yang ve diğerleri, <a href="https://github.com/yancie-yjr/scd.github.io">SCD / LSCD</a>. Kaynaklar ve yeniden boyutlandırılmış önizlemeler <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a>.</p><h2>Sentetik ses girdileri</h2><p>Aynı iki ses dosyası tüm fotoğraflarda kullanıldı; bunlar bağımsız çalışan kayıtları değildir.</p><p>Kesin sayım:</p><audio controls preload="none" src="baseline.wav"></audio><p>Kararsız sayım:</p><audio controls preload="none" src="receiver_uncertain.wav"></audio><h2>15 sonucun tamamı</h2><div class="scroll"><table><thead><tr><th>Fotoğraf</th><th>Kontrol</th><th>Önceden hedef</th><th>Gerçek karar</th><th>Karar kuralı / hata adımı</th><th>Süre</th><th>Kesin hedef</th></tr></thead><tbody><tr><td>37</td><td>baseline</td><td>İnsan incelemesi</td><td class='human'>İnsan incelemesi</td><td>readers_disagree</td><td>75.7 sn</td><td>✓</td></tr><tr><td>37</td><td>quantity_mismatch</td><td>İnsan incelemesi</td><td class='block'>Ret</td><td>mismatch</td><td>53.9 sn</td><td>✗</td></tr><tr><td>37</td><td>receiver_uncertain</td><td>İnsan incelemesi</td><td class='human'>İnsan incelemesi</td><td>receiver</td><td>60.3 sn</td><td>✓</td></tr><tr><td>93</td><td>baseline</td><td>İnsan incelemesi</td><td class='human'>İnsan incelemesi</td><td>disagree</td><td>80.1 sn</td><td>✓</td></tr><tr><td>93</td><td>quantity_mismatch</td><td>İnsan incelemesi</td><td class='human'>İnsan incelemesi</td><td>hidden</td><td>109.4 sn</td><td>✓</td></tr><tr><td>93</td><td>receiver_uncertain</td><td>İnsan incelemesi</td><td class='human'>İnsan incelemesi</td><td>disagree</td><td>96.6 sn</td><td>✓</td></tr><tr><td>111</td><td>baseline</td><td>Kabul</td><td class='post'>Kabul</td><td>match</td><td>71.4 sn</td><td>✓</td></tr><tr><td>111</td><td>quantity_mismatch</td><td>Ret</td><td class='block'>Ret</td><td>mismatch</td><td>41.1 sn</td><td>✓</td></tr><tr><td>111</td><td>receiver_uncertain</td><td>İnsan incelemesi</td><td class='human'>İnsan incelemesi</td><td>receiver</td><td>51.9 sn</td><td>✓</td></tr><tr><td>278</td><td>baseline</td><td>İnsan incelemesi</td><td class='human'>İnsan incelemesi</td><td>hidden</td><td>81.1 sn</td><td>✓</td></tr><tr><td>278</td><td>quantity_mismatch</td><td>İnsan incelemesi</td><td class='human'>İnsan incelemesi</td><td>damaged</td><td>73.9 sn</td><td>✓</td></tr><tr><td>278</td><td>receiver_uncertain</td><td>İnsan incelemesi</td><td class='human'>İnsan incelemesi</td><td>hidden</td><td>78.1 sn</td><td>✓</td></tr><tr><td>711</td><td>baseline</td><td>İnsan incelemesi</td><td class='post'>Kabul</td><td>match</td><td>82.2 sn</td><td>✗</td></tr><tr><td>711</td><td>quantity_mismatch</td><td>İnsan incelemesi</td><td class='block'>Ret</td><td>not_ordered</td><td>58.3 sn</td><td>✗</td></tr><tr><td>711</td><td>receiver_uncertain</td><td>İnsan incelemesi</td><td class='block'>Ret</td><td>not_ordered</td><td>52.5 sn</td><td>✗</td></tr></tbody></table></div><h2>Kanıt ve hata kayıtları</h2><p><a href="results.json" download>Tüm sonuçları, seçim protokolünü ve girdi özetlerini indir (JSON)</a></p><p class="small">Donmuş manifest SHA-256: 87207c2b1f5375bcfdd20d792f2d588c92dba516eee74cf9b00e3d4ba528f876</p><details><summary>scd-37-baseline — İnsan incelemesi</summary><p><strong>Önceden belirlenen gerekçe:</strong> Carton fills frame with clipped edges; complete extent cannot confidently be established.</p><p><strong>Kayıtlı karar:</strong> Before posting, the second reader of the note disagrees with Spark: it reports an instruction to software:  | CONTROLLED TEST DOCUMENT - NOT A REAL DELIVERY.</p><p>İkinci okuyucu ve denetim: kayıtta mevcut.</p><p><a href='img/scd-37-baseline-note.png'>Hazırlanmış belgeyi aç</a></p><pre>{
+  &quot;id&quot;: &quot;scd-37-baseline&quot;,
+  &quot;source_image_id&quot;: 37,
+  &quot;scenario&quot;: &quot;baseline&quot;,
+  &quot;expected_action&quot;: &quot;human&quot;,
+  &quot;acceptable_actions&quot;: [
+    &quot;human&quot;
+  ],
+  &quot;started_at&quot;: &quot;2026-11-03T19:22:40.671286+03:00&quot;,
+  &quot;evidence&quot;: {
+    &quot;mode&quot;: &quot;dry_run&quot;,
+    &quot;erp_written&quot;: false,
+    &quot;result&quot;: {
+      &quot;posted&quot;: false,
+      &quot;gate&quot;: &quot;human&quot;,
+      &quot;reason&quot;: &quot;Before posting, the second reader of the note disagrees with Spark: it reports an instruction to software:  | CONTROLLED TEST DOCUMENT - NOT A REAL DELIVERY.&quot;
+    },
+    &quot;decision&quot;: {
+      &quot;action&quot;: &quot;human&quot;,
+      &quot;quantity&quot;: 1,
+      &quot;reasons&quot;: [
+        &quot;Before posting, the second reader of the note disagrees with Spark: it reports an instruction to software:  | CONTROLLED TEST DOCUMENT - NOT A REAL DELIVERY.&quot;
+      ],
+      &quot;evidence&quot;: {
+        &quot;note&quot;: [
+          [
+            1,
+            &quot;关节止痛膏&quot;
+          ]
+        ],
+        &quot;sam_sure&quot;: 1,
+        &quot;sam_doubtful&quot;: 0,
+        &quot;spark_count&quot;: 1,
+        &quot;label&quot;: &quot;关节止痛膏&quot;,
+        &quot;order&quot;: {
+          &quot;number&quot;: &quot;PO-scd-37-baseline&quot;,
+          &quot;product&quot;: &quot;关节止痛膏&quot;,
+          &quot;ordered&quot;: 1,
+          &quot;open&quot;: 1
+        },
+        &quot;cross&quot;: {
+          &quot;agreed&quot;: 1,
+          &quot;sam_only&quot;: 0,
+          &quot;spark_only&quot;: 0,
+          &quot;doubled&quot;: 0
+        },
+        &quot;spoken&quot;: {
+          &quot;certain&quot;: true,
+          &quot;product&quot;: &quot;&quot;,
+          &quot;quantity&quot;: 1,
+          &quot;supplier&quot;: &quot;controlled fixture supplier&quot;,
+          &quot;unit&quot;: &quot;carton&quot;
+        },
+        &quot;second_reader&quot;: [
+          [
+            1,
+            &quot;关节止痛膏&quot;
+          ]
+        ],
+        &quot;second_supplier&quot;: &quot;Controlled Fixture Supplier&quot;
+      },
+      &quot;rule&quot;: &quot;readers_disagree&quot;
+    },
+    &quot;note&quot;: {
+      &quot;date&quot;: &quot;&quot;,
+      &quot;embedded_instructions&quot;: [],
+      &quot;items&quot;: [
+        {
+          &quot;description&quot;: &quot;关节止痛膏&quot;,
+          &quot;legible&quot;: true,
+          &quot;product_identity&quot;: {
+            &quot;brand&quot;: &quot;&quot;,
+            &quot;model&quot;: &quot;&quot;,
+            &quot;product_code&quot;: &quot;&quot;,
+            &quot;variant&quot;: &quot;&quot;
+          },
+          &quot;quantity&quot;: 1,
+          &quot;unit&quot;: &quot;carton&quot;
+        }
+      ],
+      &quot;note_number&quot;: &quot;scd-37-baseline&quot;,
+      &quot;supplier&quot;: &quot;Controlled Fixture Supplier&quot;
+    },
+    &quot;camera&quot;: {
+      &quot;all_cartons_visible&quot;: true,
+      &quot;all_labels_identified&quot;: false,
+      &quot;cartons_visible&quot;: 1,
+      &quot;damaged_cartons&quot;: 0,
+      &quot;product_identity&quot;: {
+        &quot;brand&quot;: &quot;&quot;,
+        &quot;model&quot;: &quot;&quot;,
+        &quot;product_code&quot;: &quot;&quot;,
+        &quot;variant&quot;: &quot;7厘米 x 10厘米&quot;
+      },
+      &quot;product_on_labels&quot;: &quot;关节止痛膏&quot;,
+      &quot;stacked&quot;: false
+    },
+    &quot;receiver&quot;: {
+      &quot;certain&quot;: true,
+      &quot;product&quot;: &quot;&quot;,
+      &quot;quantity&quot;: 1,
+      &quot;supplier&quot;: &quot;controlled fixture supplier&quot;,
+      &quot;unit&quot;: &quot;carton&quot;
+    },
+    &quot;speaker_turns&quot;: [
+      {
+        &quot;speaker&quot;: &quot;A&quot;,
+        &quot;transcript&quot;: &quot;I am the receiving clerk. I counted one carton. The supplier is controlled fixture supplier.&quot;
+      }
+    ],
+    &quot;speech_interpretation&quot;: {
+      &quot;count_candidates&quot;: [
+        1
+      ],
+      &quot;driver_quantity&quot;: null,
+      &quot;receiver&quot;: {
+        &quot;certain&quot;: true,
+        &quot;product&quot;: &quot;&quot;,
+        &quot;quantity&quot;: 1,
+        &quot;supplier&quot;: &quot;controlled fixture supplier&quot;,
+        &quot;unit&quot;: &quot;carton&quot;
+      },
+      &quot;receiver_speaker&quot;: &quot;A&quot;,
+      &quot;receiver_turn&quot;: &quot;I am the receiving clerk. I counted one carton. The supplier is controlled fixture supplier.&quot;,
+      &quot;voice_validation&quot;: {
+        &quot;source_turn_matched&quot;: true,
+        &quot;single_supported_count&quot;: true
+      }
+    },
+    &quot;second_opinions&quot;: {
+      &quot;second&quot;: {
+        &quot;supplier&quot;: &quot;Controlled Fixture Supplier&quot;,
+        &quot;note_number&quot;: &quot;scd-37-baseline&quot;,
+        &quot;date&quot;: &quot;&quot;,
+        &quot;items&quot;: [
+          {
+            &quot;description&quot;: &quot;关节止痛膏&quot;,
+            &quot;product_identity&quot;: {
+              &quot;brand&quot;: &quot;&quot;,
+              &quot;product_code&quot;: &quot;&quot;,
+              &quot;model&quot;: &quot;&quot;,
+              &quot;variant&quot;: &quot;&quot;
+            },
+            &quot;quantity&quot;: 1,
+            &quot;unit&quot;: &quot;carton&quot;,
+            &quot;legible&quot;: true
+          }
+        ],
+        &quot;embedded_instructions&quot;: [
+          &quot;&quot;,
+          &quot;CONTROLLED TEST DOCUMENT - NOT A REAL DELIVERY&quot;
+        ]
+      },
+      &quot;audit&quot;: {
+        &quot;ok&quot;: true,
+        &quot;quantity&quot;: true,
+        &quot;product&quot;: true,
+        &quot;instructions&quot;: &quot;&quot;,
+        &quot;quotes&quot;: {
+          &quot;quantity&quot;: &quot;Quantity: 1 carton&quot;,
+          &quot;product&quot;: &quot;Product: 关节止痛膏&quot;,
+          &quot;instructions&quot;: &quot;&quot;
+        }
+      }
+    },
+    &quot;trace&quot;: [
+      {
+        &quot;gate_cross_check&quot;: {
+          &quot;agreed&quot;: 1,
+          &quot;sam_only&quot;: 0,
+          &quot;spark_only&quot;: 0,
+          &quot;doubled&quot;: 0
+        },
+        &quot;at&quot;: &quot;2026-11-03T19:23:36+03:00&quot;
+      },
+      {
+        &quot;second_opinions&quot;: {
+          &quot;second&quot;: {
+            &quot;supplier&quot;: &quot;Controlled Fixture Supplier&quot;,
+            &quot;note_number&quot;: &quot;scd-37-baseline&quot;,
+            &quot;date&quot;: &quot;&quot;,
+            &quot;items&quot;: [
+              {
+                &quot;description&quot;: &quot;关节止痛膏&quot;,
+                &quot;product_identity&quot;: {
+                  &quot;brand&quot;: &quot;&quot;,
+                  &quot;product_code&quot;: &quot;&quot;,
+                  &quot;model&quot;: &quot;&quot;,
+                  &quot;variant&quot;: &quot;&quot;
+                },
+                &quot;quantity&quot;: 1,
+                &quot;unit&quot;: &quot;carton&quot;,
+                &quot;legible&quot;: true
+              }
+            ],
+            &quot;embedded_instructions&quot;: [
+              &quot;&quot;,
+              &quot;CONTROLLED TEST DOCUMENT - NOT A REAL DELIVERY&quot;
+            ]
+          },
+          &quot;audit&quot;: {
+            &quot;ok&quot;: true,
+            &quot;quantity&quot;: true,
+            &quot;product&quot;: true,
+            &quot;instructions&quot;: &quot;&quot;,
+            &quot;quotes&quot;: {
+              &quot;quantity&quot;: &quot;Quantity: 1 carton&quot;,
+              &quot;product&quot;: &quot;Product: 关节止痛膏&quot;,
+              &quot;instructions&quot;: &quot;&quot;
+            }
+          }
+        },
+        &quot;at&quot;: &quot;2026-11-03T19:23:56+03:00&quot;
+      }
+    ],
+    &quot;timings&quot;: [
+      {
+        &quot;step&quot;: &quot;Read delivery note&quot;,
+        &quot;seconds&quot;: 7.023,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Inspect camera&quot;,
+        &quot;seconds&quot;: 16.992,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Segment cartons&quot;,
+        &quot;seconds&quot;: 8.229,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Transcribe speaker turns&quot;,
+        &quot;seconds&quot;: 2.614,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Identify receiver count&quot;,
+        &quot;seconds&quot;: 5.962,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Cross-check objects and authorize&quot;,
+        &quot;seconds&quot;: 34.819,
+        &quot;status&quot;: &quot;complete&quot;
+      }
+    ],
+    &quot;seconds&quot;: 75.639,
+    &quot;total_cost_usd&quot;: null,
+    &quot;cost_status&quot;: &quot;Not measured: provider-wide billing required; not agent-token cost.&quot;,
+    &quot;input_sha256&quot;: {
+      &quot;note&quot;: &quot;9d9c5a63b8482496f03486ddb8eda54bf8f148dcc8f73abb0b204768d2700e7c&quot;,
+      &quot;camera&quot;: &quot;491bb96ba3075588de24513eb2f3bfa149610c7c2697fc97a48105401985e869&quot;,
+      &quot;audio&quot;: &quot;67f7e5d7944cdd6c16b6287483bcfb725f03fcd016551d4e4b5bf5b75870c65e&quot;
+    }
+  },
+  &quot;action&quot;: &quot;human&quot;,
+  &quot;rule&quot;: &quot;readers_disagree&quot;,
+  &quot;seconds&quot;: 75.749,
+  &quot;exact_target_met&quot;: true,
+  &quot;acceptable_action_met&quot;: true
+}</pre></details><details><summary>scd-37-quantity_mismatch — Ret</summary><p><strong>Önceden belirlenen gerekçe:</strong> Carton fills frame with clipped edges; complete extent cannot confidently be established.</p><p><strong>Kayıtlı karar:</strong> Counted 1, note says 2; draft a discrepancy for the supplier.</p><p>İkinci okuyucu ve denetim: bu sonuçta tamamlandığı gösterilmedi.</p><p><a href='img/scd-37-quantity_mismatch-note.png'>Hazırlanmış belgeyi aç</a></p><pre>{
+  &quot;id&quot;: &quot;scd-37-quantity_mismatch&quot;,
+  &quot;source_image_id&quot;: 37,
+  &quot;scenario&quot;: &quot;quantity_mismatch&quot;,
+  &quot;expected_action&quot;: &quot;human&quot;,
+  &quot;acceptable_actions&quot;: [
+    &quot;block&quot;,
+    &quot;human&quot;
+  ],
+  &quot;started_at&quot;: &quot;2026-11-03T19:22:40.671383+03:00&quot;,
+  &quot;evidence&quot;: {
+    &quot;mode&quot;: &quot;dry_run&quot;,
+    &quot;erp_written&quot;: false,
+    &quot;result&quot;: {
+      &quot;posted&quot;: false,
+      &quot;gate&quot;: &quot;block&quot;,
+      &quot;reason&quot;: &quot;Counted 1, note says 2; draft a discrepancy for the supplier.&quot;
+    },
+    &quot;decision&quot;: {
+      &quot;action&quot;: &quot;block&quot;,
+      &quot;quantity&quot;: 1,
+      &quot;reasons&quot;: [
+        &quot;Counted 1, note says 2; draft a discrepancy for the supplier.&quot;
+      ],
+      &quot;evidence&quot;: {
+        &quot;note&quot;: [
+          [
+            2,
+            &quot;关节止痛膏&quot;
+          ]
+        ],
+        &quot;sam_sure&quot;: 1,
+        &quot;sam_doubtful&quot;: 0,
+        &quot;spark_count&quot;: 1,
+        &quot;label&quot;: &quot;关节止痛膏&quot;,
+        &quot;order&quot;: {
+          &quot;number&quot;: &quot;PO-scd-37-quantity_mismatch&quot;,
+          &quot;product&quot;: &quot;关节止痛膏&quot;,
+          &quot;ordered&quot;: 2,
+          &quot;open&quot;: 2
+        },
+        &quot;cross&quot;: {
+          &quot;agreed&quot;: 1,
+          &quot;sam_only&quot;: 0,
+          &quot;spark_only&quot;: 0,
+          &quot;doubled&quot;: 0
+        },
+        &quot;spoken&quot;: {
+          &quot;certain&quot;: true,
+          &quot;product&quot;: &quot;&quot;,
+          &quot;quantity&quot;: 1,
+          &quot;supplier&quot;: &quot;controlled fixture supplier&quot;,
+          &quot;unit&quot;: &quot;carton&quot;
+        }
+      },
+      &quot;rule&quot;: &quot;mismatch&quot;
+    },
+    &quot;note&quot;: {
+      &quot;date&quot;: &quot;&quot;,
+      &quot;embedded_instructions&quot;: [],
+      &quot;items&quot;: [
+        {
+          &quot;description&quot;: &quot;关节止痛膏&quot;,
+          &quot;legible&quot;: true,
+          &quot;product_identity&quot;: {
+            &quot;brand&quot;: &quot;&quot;,
+            &quot;model&quot;: &quot;&quot;,
+            &quot;product_code&quot;: &quot;&quot;,
+            &quot;variant&quot;: &quot;&quot;
+          },
+          &quot;quantity&quot;: 2,
+          &quot;unit&quot;: &quot;carton&quot;
+        }
+      ],
+      &quot;note_number&quot;: &quot;scd-37-quantity_mismatch&quot;,
+      &quot;supplier&quot;: &quot;Controlled Fixture Supplier&quot;
+    },
+    &quot;camera&quot;: {
+      &quot;all_cartons_visible&quot;: true,
+      &quot;all_labels_identified&quot;: false,
+      &quot;cartons_visible&quot;: 1,
+      &quot;damaged_cartons&quot;: 0,
+      &quot;product_identity&quot;: {
+        &quot;brand&quot;: &quot;&quot;,
+        &quot;model&quot;: &quot;&quot;,
+        &quot;product_code&quot;: &quot;&quot;,
+        &quot;variant&quot;: &quot;7厘米 x 10厘米&quot;
+      },
+      &quot;product_on_labels&quot;: &quot;关节止痛膏&quot;,
+      &quot;stacked&quot;: false
+    },
+    &quot;receiver&quot;: {
+      &quot;certain&quot;: true,
+      &quot;product&quot;: &quot;&quot;,
+      &quot;quantity&quot;: 1,
+      &quot;supplier&quot;: &quot;controlled fixture supplier&quot;,
+      &quot;unit&quot;: &quot;carton&quot;
+    },
+    &quot;speaker_turns&quot;: [
+      {
+        &quot;speaker&quot;: &quot;A&quot;,
+        &quot;transcript&quot;: &quot;I am the receiving clerk. I counted one carton. The supplier is controlled fixture supplier.&quot;
+      }
+    ],
+    &quot;speech_interpretation&quot;: {
+      &quot;count_candidates&quot;: [
+        1
+      ],
+      &quot;driver_quantity&quot;: null,
+      &quot;receiver&quot;: {
+        &quot;certain&quot;: true,
+        &quot;product&quot;: &quot;&quot;,
+        &quot;quantity&quot;: 1,
+        &quot;supplier&quot;: &quot;controlled fixture supplier&quot;,
+        &quot;unit&quot;: &quot;carton&quot;
+      },
+      &quot;receiver_speaker&quot;: &quot;A&quot;,
+      &quot;receiver_turn&quot;: &quot;I am the receiving clerk. I counted one carton. The supplier is controlled fixture supplier.&quot;,
+      &quot;voice_validation&quot;: {
+        &quot;source_turn_matched&quot;: true,
+        &quot;single_supported_count&quot;: true
+      }
+    },
+    &quot;second_opinions&quot;: {},
+    &quot;trace&quot;: [
+      {
+        &quot;gate_cross_check&quot;: {
+          &quot;agreed&quot;: 1,
+          &quot;sam_only&quot;: 0,
+          &quot;spark_only&quot;: 0,
+          &quot;doubled&quot;: 0
+        },
+        &quot;at&quot;: &quot;2026-11-03T19:23:34+03:00&quot;
+      }
+    ],
+    &quot;timings&quot;: [
+      {
+        &quot;step&quot;: &quot;Read delivery note&quot;,
+        &quot;seconds&quot;: 6.17,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Inspect camera&quot;,
+        &quot;seconds&quot;: 11.237,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Segment cartons&quot;,
+        &quot;seconds&quot;: 7.687,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Transcribe speaker turns&quot;,
+        &quot;seconds&quot;: 3.534,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Identify receiver count&quot;,
+        &quot;seconds&quot;: 4.523,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Cross-check objects and authorize&quot;,
+        &quot;seconds&quot;: 20.714,
+        &quot;status&quot;: &quot;complete&quot;
+      }
+    ],
+    &quot;seconds&quot;: 53.865,
+    &quot;total_cost_usd&quot;: null,
+    &quot;cost_status&quot;: &quot;Not measured: provider-wide billing required; not agent-token cost.&quot;,
+    &quot;input_sha256&quot;: {
+      &quot;note&quot;: &quot;611e19ab097570bf5cf18b44b8a85d3d828f39e05ecc502fa43fbedcb1c0899d&quot;,
+      &quot;camera&quot;: &quot;491bb96ba3075588de24513eb2f3bfa149610c7c2697fc97a48105401985e869&quot;,
+      &quot;audio&quot;: &quot;67f7e5d7944cdd6c16b6287483bcfb725f03fcd016551d4e4b5bf5b75870c65e&quot;
+    }
+  },
+  &quot;action&quot;: &quot;block&quot;,
+  &quot;rule&quot;: &quot;mismatch&quot;,
+  &quot;seconds&quot;: 53.92,
+  &quot;exact_target_met&quot;: false,
+  &quot;acceptable_action_met&quot;: true
+}</pre></details><details><summary>scd-37-receiver_uncertain — İnsan incelemesi</summary><p><strong>Önceden belirlenen gerekçe:</strong> Carton fills frame with clipped edges; complete extent cannot confidently be established.</p><p><strong>Kayıtlı karar:</strong> The receiver was not sure of the count.</p><p>İkinci okuyucu ve denetim: bu sonuçta tamamlandığı gösterilmedi.</p><p><a href='img/scd-37-receiver_uncertain-note.png'>Hazırlanmış belgeyi aç</a></p><pre>{
+  &quot;id&quot;: &quot;scd-37-receiver_uncertain&quot;,
+  &quot;source_image_id&quot;: 37,
+  &quot;scenario&quot;: &quot;receiver_uncertain&quot;,
+  &quot;expected_action&quot;: &quot;human&quot;,
+  &quot;acceptable_actions&quot;: [
+    &quot;human&quot;
+  ],
+  &quot;started_at&quot;: &quot;2026-11-03T19:22:40.671525+03:00&quot;,
+  &quot;evidence&quot;: {
+    &quot;mode&quot;: &quot;dry_run&quot;,
+    &quot;erp_written&quot;: false,
+    &quot;result&quot;: {
+      &quot;posted&quot;: false,
+      &quot;gate&quot;: &quot;human&quot;,
+      &quot;reason&quot;: &quot;The receiver was not sure of the count.&quot;
+    },
+    &quot;decision&quot;: {
+      &quot;action&quot;: &quot;human&quot;,
+      &quot;quantity&quot;: 1,
+      &quot;reasons&quot;: [
+        &quot;The receiver was not sure of the count.&quot;
+      ],
+      &quot;evidence&quot;: {
+        &quot;note&quot;: [
+          [
+            1,
+            &quot;关节止痛膏&quot;
+          ]
+        ],
+        &quot;sam_sure&quot;: 1,
+        &quot;sam_doubtful&quot;: 0,
+        &quot;spark_count&quot;: 1,
+        &quot;label&quot;: &quot;关节止痛膏&quot;,
+        &quot;order&quot;: {
+          &quot;number&quot;: &quot;PO-scd-37-receiver_uncertain&quot;,
+          &quot;product&quot;: &quot;关节止痛膏&quot;,
+          &quot;ordered&quot;: 1,
+          &quot;open&quot;: 1
+        },
+        &quot;cross&quot;: {
+          &quot;agreed&quot;: 1,
+          &quot;sam_only&quot;: 0,
+          &quot;spark_only&quot;: 0,
+          &quot;doubled&quot;: 0
+        },
+        &quot;spoken&quot;: {
+          &quot;certain&quot;: false,
+          &quot;product&quot;: &quot;&quot;,
+          &quot;quantity&quot;: null,
+          &quot;supplier&quot;: &quot;controlled fixture supplier&quot;,
+          &quot;unit&quot;: &quot;cartons&quot;
+        }
+      },
+      &quot;rule&quot;: &quot;receiver&quot;
+    },
+    &quot;note&quot;: {
+      &quot;date&quot;: &quot;&quot;,
+      &quot;embedded_instructions&quot;: [],
+      &quot;items&quot;: [
+        {
+          &quot;description&quot;: &quot;关节止痛膏&quot;,
+          &quot;legible&quot;: true,
+          &quot;product_identity&quot;: {
+            &quot;brand&quot;: &quot;&quot;,
+            &quot;model&quot;: &quot;&quot;,
+            &quot;product_code&quot;: &quot;&quot;,
+            &quot;variant&quot;: &quot;&quot;
+          },
+          &quot;quantity&quot;: 1,
+          &quot;unit&quot;: &quot;carton&quot;
+        }
+      ],
+      &quot;note_number&quot;: &quot;scd-37-receiver_uncertain&quot;,
+      &quot;supplier&quot;: &quot;Controlled Fixture Supplier&quot;
+    },
+    &quot;camera&quot;: {
+      &quot;all_cartons_visible&quot;: true,
+      &quot;all_labels_identified&quot;: false,
+      &quot;cartons_visible&quot;: 1,
+      &quot;damaged_cartons&quot;: 0,
+      &quot;product_identity&quot;: {
+        &quot;brand&quot;: &quot;&quot;,
+        &quot;model&quot;: &quot;&quot;,
+        &quot;product_code&quot;: &quot;&quot;,
+        &quot;variant&quot;: &quot;7厘米 x 10厘米&quot;
+      },
+      &quot;product_on_labels&quot;: &quot;关节止痛膏&quot;,
+      &quot;stacked&quot;: false
+    },
+    &quot;receiver&quot;: {
+      &quot;certain&quot;: false,
+      &quot;product&quot;: &quot;&quot;,
+      &quot;quantity&quot;: null,
+      &quot;supplier&quot;: &quot;controlled fixture supplier&quot;,
+      &quot;unit&quot;: &quot;cartons&quot;
+    },
+    &quot;speaker_turns&quot;: [
+      {
+        &quot;speaker&quot;: &quot;A&quot;,
+        &quot;transcript&quot;: &quot;I am the receiving receiving clerk. I am not sure how many cartons arrived. I could not could not complete the count. The supplier is controlled fixture supplier.&quot;
+      }
+    ],
+    &quot;speech_interpretation&quot;: {
+      &quot;count_candidates&quot;: [],
+      &quot;driver_quantity&quot;: null,
+      &quot;receiver&quot;: {
+        &quot;certain&quot;: false,
+        &quot;product&quot;: &quot;&quot;,
+        &quot;quantity&quot;: null,
+        &quot;supplier&quot;: &quot;controlled fixture supplier&quot;,
+        &quot;unit&quot;: &quot;cartons&quot;
+      },
+      &quot;receiver_speaker&quot;: &quot;A&quot;,
+      &quot;receiver_turn&quot;: &quot;I am the receiving receiving clerk. I am not sure how many cartons arrived. I could not could not complete the count. The supplier is controlled fixture supplier.&quot;,
+      &quot;voice_validation&quot;: {
+        &quot;source_turn_matched&quot;: true,
+        &quot;single_supported_count&quot;: false
+      }
+    },
+    &quot;second_opinions&quot;: {},
+    &quot;trace&quot;: [
+      {
+        &quot;gate_cross_check&quot;: {
+          &quot;agreed&quot;: 1,
+          &quot;sam_only&quot;: 0,
+          &quot;spark_only&quot;: 0,
+          &quot;doubled&quot;: 0
+        },
+        &quot;at&quot;: &quot;2026-11-03T19:23:40+03:00&quot;
+      }
+    ],
+    &quot;timings&quot;: [
+      {
+        &quot;step&quot;: &quot;Read delivery note&quot;,
+        &quot;seconds&quot;: 7.451,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Inspect camera&quot;,
+        &quot;seconds&quot;: 15.655,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Segment cartons&quot;,
+        &quot;seconds&quot;: 12.073,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Transcribe speaker turns&quot;,
+        &quot;seconds&quot;: 3.067,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Identify receiver count&quot;,
+        &quot;seconds&quot;: 5.829,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Cross-check objects and authorize&quot;,
+        &quot;seconds&quot;: 16.174,
+        &quot;status&quot;: &quot;complete&quot;
+      }
+    ],
+    &quot;seconds&quot;: 60.249,
+    &quot;total_cost_usd&quot;: null,
+    &quot;cost_status&quot;: &quot;Not measured: provider-wide billing required; not agent-token cost.&quot;,
+    &quot;input_sha256&quot;: {
+      &quot;note&quot;: &quot;2bc7c33197d406daccd405557d60f757791c328ea64e55668c9ba2047f7e93d7&quot;,
+      &quot;camera&quot;: &quot;491bb96ba3075588de24513eb2f3bfa149610c7c2697fc97a48105401985e869&quot;,
+      &quot;audio&quot;: &quot;9fece24dc92650a0664ca84b80ff0274ea7c502d430c7d840ff499e682de5f59&quot;
+    }
+  },
+  &quot;action&quot;: &quot;human&quot;,
+  &quot;rule&quot;: &quot;receiver&quot;,
+  &quot;seconds&quot;: 60.28,
+  &quot;exact_target_met&quot;: true,
+  &quot;acceptable_action_met&quot;: true
+}</pre></details><details><summary>scd-93-baseline — İnsan incelemesi</summary><p><strong>Önceden belirlenen gerekçe:</strong> Open/torn top and partly obscured markings; no verified contents or SKU.</p><p><strong>Kayıtlı karar:</strong> SAM and Spark disagree on which objects are cartons: 0 agreed, 0 only SAM, 2 only Spark.</p><p>İkinci okuyucu ve denetim: bu sonuçta tamamlandığı gösterilmedi.</p><p><a href='img/scd-93-baseline-note.png'>Hazırlanmış belgeyi aç</a></p><pre>{
+  &quot;id&quot;: &quot;scd-93-baseline&quot;,
+  &quot;source_image_id&quot;: 93,
+  &quot;scenario&quot;: &quot;baseline&quot;,
+  &quot;expected_action&quot;: &quot;human&quot;,
+  &quot;acceptable_actions&quot;: [
+    &quot;human&quot;
+  ],
+  &quot;started_at&quot;: &quot;2026-11-03T19:23:34.592617+03:00&quot;,
+  &quot;evidence&quot;: {
+    &quot;mode&quot;: &quot;dry_run&quot;,
+    &quot;erp_written&quot;: false,
+    &quot;result&quot;: {
+      &quot;posted&quot;: false,
+      &quot;gate&quot;: &quot;human&quot;,
+      &quot;reason&quot;: &quot;SAM and Spark disagree on which objects are cartons: 0 agreed, 0 only SAM, 2 only Spark.&quot;
+    },
+    &quot;decision&quot;: {
+      &quot;action&quot;: &quot;human&quot;,
+      &quot;quantity&quot;: null,
+      &quot;reasons&quot;: [
+        &quot;SAM and Spark disagree on which objects are cartons: 0 agreed, 0 only SAM, 2 only Spark.&quot;
+      ],
+      &quot;evidence&quot;: {
+        &quot;note&quot;: [
+          [
+            1,
+            &quot;V88&quot;
+          ]
+        ],
+        &quot;sam_sure&quot;: 0,
+        &quot;sam_doubtful&quot;: 0,
+        &quot;spark_count&quot;: 2,
+        &quot;label&quot;: &quot;V88&quot;,
+        &quot;order&quot;: {
+          &quot;number&quot;: &quot;PO-scd-93-baseline&quot;,
+          &quot;product&quot;: &quot;V88&quot;,
+          &quot;ordered&quot;: 1,
+          &quot;open&quot;: 1
+        },
+        &quot;cross&quot;: {
+          &quot;agreed&quot;: 0,
+          &quot;sam_only&quot;: 0,
+          &quot;spark_only&quot;: 2,
+          &quot;doubled&quot;: 0
+        }
+      },
+      &quot;rule&quot;: &quot;disagree&quot;
+    },
+    &quot;note&quot;: {
+      &quot;date&quot;: &quot;&quot;,
+      &quot;embedded_instructions&quot;: [],
+      &quot;items&quot;: [
+        {
+          &quot;description&quot;: &quot;V88&quot;,
+          &quot;legible&quot;: true,
+          &quot;product_identity&quot;: {
+            &quot;brand&quot;: &quot;&quot;,
+            &quot;model&quot;: &quot;&quot;,
+            &quot;product_code&quot;: &quot;&quot;,
+            &quot;variant&quot;: &quot;&quot;
+          },
+          &quot;quantity&quot;: 1,
+          &quot;unit&quot;: &quot;carton&quot;
+        }
+      ],
+      &quot;note_number&quot;: &quot;scd-93-baseline&quot;,
+      &quot;supplier&quot;: &quot;Controlled Fixture Supplier&quot;
+    },
+    &quot;camera&quot;: {
+      &quot;all_cartons_visible&quot;: true,
+      &quot;all_labels_identified&quot;: false,
+      &quot;cartons_visible&quot;: 2,
+      &quot;damaged_cartons&quot;: 0,
+      &quot;product_identity&quot;: {
+        &quot;brand&quot;: &quot;&quot;,
+        &quot;model&quot;: &quot;&quot;,
+        &quot;product_code&quot;: &quot;&quot;,
+        &quot;variant&quot;: &quot;&quot;
+      },
+      &quot;product_on_labels&quot;: &quot;V88&quot;,
+      &quot;stacked&quot;: false
+    },
+    &quot;receiver&quot;: {
+      &quot;certain&quot;: true,
+      &quot;product&quot;: &quot;&quot;,
+      &quot;quantity&quot;: 1,
+      &quot;supplier&quot;: &quot;controlled fixture fixture supplier&quot;,
+      &quot;unit&quot;: &quot;carton&quot;
+    },
+    &quot;speaker_turns&quot;: [
+      {
+        &quot;speaker&quot;: &quot;A&quot;,
+        &quot;transcript&quot;: &quot;I am the receiving clerk. I counted one carton. The supplier is controlled fixture fixture supplier&quot;
+      }
+    ],
+    &quot;speech_interpretation&quot;: {
+      &quot;count_candidates&quot;: [
+        1
+      ],
+      &quot;driver_quantity&quot;: null,
+      &quot;receiver&quot;: {
+        &quot;certain&quot;: true,
+        &quot;product&quot;: &quot;&quot;,
+        &quot;quantity&quot;: 1,
+        &quot;supplier&quot;: &quot;controlled fixture fixture supplier&quot;,
+        &quot;unit&quot;: &quot;carton&quot;
+      },
+      &quot;receiver_speaker&quot;: &quot;A&quot;,
+      &quot;receiver_turn&quot;: &quot;I am the receiving clerk. I counted one carton. The supplier is controlled fixture fixture supplier&quot;,
+      &quot;voice_validation&quot;: {
+        &quot;source_turn_matched&quot;: true,
+        &quot;single_supported_count&quot;: true
+      }
+    },
+    &quot;second_opinions&quot;: {},
+    &quot;trace&quot;: [
+      {
+        &quot;gate_cross_check&quot;: {
+          &quot;agreed&quot;: 0,
+          &quot;sam_only&quot;: 0,
+          &quot;spark_only&quot;: 2,
+          &quot;doubled&quot;: 0
+        },
+        &quot;at&quot;: &quot;2026-11-03T19:24:54+03:00&quot;
+      }
+    ],
+    &quot;timings&quot;: [
+      {
+        &quot;step&quot;: &quot;Read delivery note&quot;,
+        &quot;seconds&quot;: 6.056,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Inspect camera&quot;,
+        &quot;seconds&quot;: 27.612,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Segment cartons&quot;,
+        &quot;seconds&quot;: 10.154,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Transcribe speaker turns&quot;,
+        &quot;seconds&quot;: 3.253,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Identify receiver count&quot;,
+        &quot;seconds&quot;: 5.757,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Cross-check objects and authorize&quot;,
+        &quot;seconds&quot;: 27.203,
+        &quot;status&quot;: &quot;complete&quot;
+      }
+    ],
+    &quot;seconds&quot;: 80.035,
+    &quot;total_cost_usd&quot;: null,
+    &quot;cost_status&quot;: &quot;Not measured: provider-wide billing required; not agent-token cost.&quot;,
+    &quot;input_sha256&quot;: {
+      &quot;note&quot;: &quot;92527c31252d40486c0091d69e80cc5ca868113354933609385c32a02d1191bc&quot;,
+      &quot;camera&quot;: &quot;a7d85e11979bbed09ea85f138726c9e2bbdc4f8d6d7f48e5af18fc75fac38a84&quot;,
+      &quot;audio&quot;: &quot;67f7e5d7944cdd6c16b6287483bcfb725f03fcd016551d4e4b5bf5b75870c65e&quot;
+    }
+  },
+  &quot;action&quot;: &quot;human&quot;,
+  &quot;rule&quot;: &quot;disagree&quot;,
+  &quot;seconds&quot;: 80.072,
+  &quot;exact_target_met&quot;: true,
+  &quot;acceptable_action_met&quot;: true
+}</pre></details><details><summary>scd-93-quantity_mismatch — İnsan incelemesi</summary><p><strong>Önceden belirlenen gerekçe:</strong> Open/torn top and partly obscured markings; no verified contents or SKU.</p><p><strong>Kayıtlı karar:</strong> Cartons are stacked or hidden; the count cannot be verified from the camera.</p><p>İkinci okuyucu ve denetim: bu sonuçta tamamlandığı gösterilmedi.</p><p><a href='img/scd-93-quantity_mismatch-note.png'>Hazırlanmış belgeyi aç</a></p><pre>{
+  &quot;id&quot;: &quot;scd-93-quantity_mismatch&quot;,
+  &quot;source_image_id&quot;: 93,
+  &quot;scenario&quot;: &quot;quantity_mismatch&quot;,
+  &quot;expected_action&quot;: &quot;human&quot;,
+  &quot;acceptable_actions&quot;: [
+    &quot;block&quot;,
+    &quot;human&quot;
+  ],
+  &quot;started_at&quot;: &quot;2026-11-03T19:23:40.952948+03:00&quot;,
+  &quot;evidence&quot;: {
+    &quot;mode&quot;: &quot;dry_run&quot;,
+    &quot;erp_written&quot;: false,
+    &quot;result&quot;: {
+      &quot;posted&quot;: false,
+      &quot;gate&quot;: &quot;human&quot;,
+      &quot;reason&quot;: &quot;Cartons are stacked or hidden; the count cannot be verified from the camera.&quot;
+    },
+    &quot;decision&quot;: {
+      &quot;action&quot;: &quot;human&quot;,
+      &quot;quantity&quot;: null,
+      &quot;reasons&quot;: [
+        &quot;Cartons are stacked or hidden; the count cannot be verified from the camera.&quot;
+      ],
+      &quot;evidence&quot;: {
+        &quot;note&quot;: [
+          [
+            2,
+            &quot;V88&quot;
+          ]
+        ],
+        &quot;sam_sure&quot;: 0,
+        &quot;sam_doubtful&quot;: 0,
+        &quot;spark_count&quot;: 2,
+        &quot;label&quot;: &quot;V88&quot;,
+        &quot;order&quot;: {
+          &quot;number&quot;: &quot;PO-scd-93-quantity_mismatch&quot;,
+          &quot;product&quot;: &quot;V88&quot;,
+          &quot;ordered&quot;: 2,
+          &quot;open&quot;: 2
+        }
+      },
+      &quot;rule&quot;: &quot;hidden&quot;
+    },
+    &quot;note&quot;: {
+      &quot;date&quot;: &quot;&quot;,
+      &quot;embedded_instructions&quot;: [],
+      &quot;items&quot;: [
+        {
+          &quot;description&quot;: &quot;V88&quot;,
+          &quot;legible&quot;: true,
+          &quot;product_identity&quot;: {
+            &quot;brand&quot;: &quot;&quot;,
+            &quot;model&quot;: &quot;&quot;,
+            &quot;product_code&quot;: &quot;&quot;,
+            &quot;variant&quot;: &quot;&quot;
+          },
+          &quot;quantity&quot;: 2,
+          &quot;unit&quot;: &quot;carton&quot;
+        }
+      ],
+      &quot;note_number&quot;: &quot;scd-93-quantity_mismatch&quot;,
+      &quot;supplier&quot;: &quot;Controlled Fixture Supplier&quot;
+    },
+    &quot;camera&quot;: {
+      &quot;all_cartons_visible&quot;: false,
+      &quot;all_labels_identified&quot;: false,
+      &quot;cartons_visible&quot;: 2,
+      &quot;damaged_cartons&quot;: 0,
+      &quot;product_identity&quot;: {
+        &quot;brand&quot;: &quot;V88&quot;,
+        &quot;model&quot;: &quot;&quot;,
+        &quot;product_code&quot;: &quot;&quot;,
+        &quot;variant&quot;: &quot;&quot;
+      },
+      &quot;product_on_labels&quot;: &quot;V88&quot;,
+      &quot;stacked&quot;: true
+    },
+    &quot;receiver&quot;: {
+      &quot;certain&quot;: true,
+      &quot;product&quot;: &quot;&quot;,
+      &quot;quantity&quot;: 1,
+      &quot;supplier&quot;: &quot;controlled fixture supplier&quot;,
+      &quot;unit&quot;: &quot;carton&quot;
+    },
+    &quot;speaker_turns&quot;: [
+      {
+        &quot;speaker&quot;: &quot;A&quot;,
+        &quot;transcript&quot;: &quot;I am the receiving clerk. I counted one carton, the supplier is controlled fixture supplier&quot;
+      }
+    ],
+    &quot;speech_interpretation&quot;: {
+      &quot;count_candidates&quot;: [
+        1
+      ],
+      &quot;driver_quantity&quot;: null,
+      &quot;receiver&quot;: {
+        &quot;certain&quot;: true,
+        &quot;product&quot;: &quot;&quot;,
+        &quot;quantity&quot;: 1,
+        &quot;supplier&quot;: &quot;controlled fixture supplier&quot;,
+        &quot;unit&quot;: &quot;carton&quot;
+      },
+      &quot;receiver_speaker&quot;: &quot;A&quot;,
+      &quot;receiver_turn&quot;: &quot;I am the receiving clerk. I counted one carton, the supplier is controlled fixture supplier&quot;,
+      &quot;voice_validation&quot;: {
+        &quot;source_turn_matched&quot;: true,
+        &quot;single_supported_count&quot;: true
+      }
+    },
+    &quot;second_opinions&quot;: {},
+    &quot;trace&quot;: [
+      {
+        &quot;gate_cross_check&quot;: {
+          &quot;agreed&quot;: 0,
+          &quot;sam_only&quot;: 0,
+          &quot;spark_only&quot;: 2,
+          &quot;doubled&quot;: 0
+        },
+        &quot;at&quot;: &quot;2026-11-03T19:25:30+03:00&quot;
+      }
+    ],
+    &quot;timings&quot;: [
+      {
+        &quot;step&quot;: &quot;Read delivery note&quot;,
+        &quot;seconds&quot;: 5.894,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Inspect camera&quot;,
+        &quot;seconds&quot;: 42.148,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Segment cartons&quot;,
+        &quot;seconds&quot;: 20.507,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Transcribe speaker turns&quot;,
+        &quot;seconds&quot;: 2.029,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Identify receiver count&quot;,
+        &quot;seconds&quot;: 5.946,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Cross-check objects and authorize&quot;,
+        &quot;seconds&quot;: 32.88,
+        &quot;status&quot;: &quot;complete&quot;
+      }
+    ],
+    &quot;seconds&quot;: 109.404,
+    &quot;total_cost_usd&quot;: null,
+    &quot;cost_status&quot;: &quot;Not measured: provider-wide billing required; not agent-token cost.&quot;,
+    &quot;input_sha256&quot;: {
+      &quot;note&quot;: &quot;0132208fc15ccf9b291c4d26b4060fbfdb9dbe44f160b9d79e30602b278e90dd&quot;,
+      &quot;camera&quot;: &quot;a7d85e11979bbed09ea85f138726c9e2bbdc4f8d6d7f48e5af18fc75fac38a84&quot;,
+      &quot;audio&quot;: &quot;67f7e5d7944cdd6c16b6287483bcfb725f03fcd016551d4e4b5bf5b75870c65e&quot;
+    }
+  },
+  &quot;action&quot;: &quot;human&quot;,
+  &quot;rule&quot;: &quot;hidden&quot;,
+  &quot;seconds&quot;: 109.44,
+  &quot;exact_target_met&quot;: true,
+  &quot;acceptable_action_met&quot;: true
+}</pre></details><details><summary>scd-93-receiver_uncertain — İnsan incelemesi</summary><p><strong>Önceden belirlenen gerekçe:</strong> Open/torn top and partly obscured markings; no verified contents or SKU.</p><p><strong>Kayıtlı karar:</strong> SAM and Spark disagree on which objects are cartons: 0 agreed, 0 only SAM, 2 only Spark.</p><p>İkinci okuyucu ve denetim: bu sonuçta tamamlandığı gösterilmedi.</p><p><a href='img/scd-93-receiver_uncertain-note.png'>Hazırlanmış belgeyi aç</a></p><pre>{
+  &quot;id&quot;: &quot;scd-93-receiver_uncertain&quot;,
+  &quot;source_image_id&quot;: 93,
+  &quot;scenario&quot;: &quot;receiver_uncertain&quot;,
+  &quot;expected_action&quot;: &quot;human&quot;,
+  &quot;acceptable_actions&quot;: [
+    &quot;human&quot;
+  ],
+  &quot;started_at&quot;: &quot;2026-11-03T19:23:56.421717+03:00&quot;,
+  &quot;evidence&quot;: {
+    &quot;mode&quot;: &quot;dry_run&quot;,
+    &quot;erp_written&quot;: false,
+    &quot;result&quot;: {
+      &quot;posted&quot;: false,
+      &quot;gate&quot;: &quot;human&quot;,
+      &quot;reason&quot;: &quot;SAM and Spark disagree on which objects are cartons: 0 agreed, 0 only SAM, 2 only Spark.&quot;
+    },
+    &quot;decision&quot;: {
+      &quot;action&quot;: &quot;human&quot;,
+      &quot;quantity&quot;: null,
+      &quot;reasons&quot;: [
+        &quot;SAM and Spark disagree on which objects are cartons: 0 agreed, 0 only SAM, 2 only Spark.&quot;
+      ],
+      &quot;evidence&quot;: {
+        &quot;note&quot;: [
+          [
+            1,
+            &quot;V88&quot;
+          ]
+        ],
+        &quot;sam_sure&quot;: 0,
+        &quot;sam_doubtful&quot;: 0,
+        &quot;spark_count&quot;: 2,
+        &quot;label&quot;: &quot;V88&quot;,
+        &quot;order&quot;: {
+          &quot;number&quot;: &quot;PO-scd-93-receiver_uncertain&quot;,
+          &quot;product&quot;: &quot;V88&quot;,
+          &quot;ordered&quot;: 1,
+          &quot;open&quot;: 1
+        },
+        &quot;cross&quot;: {
+          &quot;agreed&quot;: 0,
+          &quot;sam_only&quot;: 0,
+          &quot;spark_only&quot;: 2,
+          &quot;doubled&quot;: 0
+        }
+      },
+      &quot;rule&quot;: &quot;disagree&quot;
+    },
+    &quot;note&quot;: {
+      &quot;date&quot;: &quot;&quot;,
+      &quot;embedded_instructions&quot;: [],
+      &quot;items&quot;: [
+        {
+          &quot;description&quot;: &quot;V88&quot;,
+          &quot;legible&quot;: true,
+          &quot;product_identity&quot;: {
+            &quot;brand&quot;: &quot;&quot;,
+            &quot;model&quot;: &quot;&quot;,
+            &quot;product_code&quot;: &quot;&quot;,
+            &quot;variant&quot;: &quot;&quot;
+          },
+          &quot;quantity&quot;: 1,
+          &quot;unit&quot;: &quot;carton&quot;
+        }
+      ],
+      &quot;note_number&quot;: &quot;scd-93-receiver_uncertain&quot;,
+      &quot;supplier&quot;: &quot;Controlled Fixture Supplier&quot;
+    },
+    &quot;camera&quot;: {
+      &quot;all_cartons_visible&quot;: true,
+      &quot;all_labels_identified&quot;: false,
+      &quot;cartons_visible&quot;: 2,
+      &quot;damaged_cartons&quot;: 0,
+      &quot;product_identity&quot;: {
+        &quot;brand&quot;: &quot;&quot;,
+        &quot;model&quot;: &quot;&quot;,
+        &quot;product_code&quot;: &quot;&quot;,
+        &quot;variant&quot;: &quot;&quot;
+      },
+      &quot;product_on_labels&quot;: &quot;V88&quot;,
+      &quot;stacked&quot;: false
+    },
+    &quot;receiver&quot;: {
+      &quot;certain&quot;: false,
+      &quot;product&quot;: &quot;&quot;,
+      &quot;quantity&quot;: null,
+      &quot;supplier&quot;: &quot;controlled fixture supplier&quot;,
+      &quot;unit&quot;: &quot;cartons&quot;
+    },
+    &quot;speaker_turns&quot;: [
+      {
+        &quot;speaker&quot;: &quot;A&quot;,
+        &quot;transcript&quot;: &quot;I am the receiving clerk. I am not sure how many cartons arrived. I could not complete the count. The supplier is controlled fixture supplier.&quot;
+      }
+    ],
+    &quot;speech_interpretation&quot;: {
+      &quot;count_candidates&quot;: [],
+      &quot;driver_quantity&quot;: null,
+      &quot;receiver&quot;: {
+        &quot;certain&quot;: false,
+        &quot;product&quot;: &quot;&quot;,
+        &quot;quantity&quot;: null,
+        &quot;supplier&quot;: &quot;controlled fixture supplier&quot;,
+        &quot;unit&quot;: &quot;cartons&quot;
+      },
+      &quot;receiver_speaker&quot;: &quot;A&quot;,
+      &quot;receiver_turn&quot;: &quot;I am the receiving clerk. I am not sure how many cartons arrived. I could not complete the count. The supplier is controlled fixture supplier.&quot;,
+      &quot;voice_validation&quot;: {
+        &quot;source_turn_matched&quot;: true,
+        &quot;single_supported_count&quot;: false
+      }
+    },
+    &quot;second_opinions&quot;: {},
+    &quot;trace&quot;: [
+      {
+        &quot;gate_cross_check&quot;: {
+          &quot;agreed&quot;: 0,
+          &quot;sam_only&quot;: 0,
+          &quot;spark_only&quot;: 2,
+          &quot;doubled&quot;: 0
+        },
+        &quot;at&quot;: &quot;2026-11-03T19:25:33+03:00&quot;
+      }
+    ],
+    &quot;timings&quot;: [
+      {
+        &quot;step&quot;: &quot;Read delivery note&quot;,
+        &quot;seconds&quot;: 8.292,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Inspect camera&quot;,
+        &quot;seconds&quot;: 28.303,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Segment cartons&quot;,
+        &quot;seconds&quot;: 15.356,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Transcribe speaker turns&quot;,
+        &quot;seconds&quot;: 2.78,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Identify receiver count&quot;,
+        &quot;seconds&quot;: 8.08,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Cross-check objects and authorize&quot;,
+        &quot;seconds&quot;: 33.729,
+        &quot;status&quot;: &quot;complete&quot;
+      }
+    ],
+    &quot;seconds&quot;: 96.54,
+    &quot;total_cost_usd&quot;: null,
+    &quot;cost_status&quot;: &quot;Not measured: provider-wide billing required; not agent-token cost.&quot;,
+    &quot;input_sha256&quot;: {
+      &quot;note&quot;: &quot;f7e9b7734d53b4719374d33a64306fba512e34197b92787c7b1fe8a15f1419b7&quot;,
+      &quot;camera&quot;: &quot;a7d85e11979bbed09ea85f138726c9e2bbdc4f8d6d7f48e5af18fc75fac38a84&quot;,
+      &quot;audio&quot;: &quot;9fece24dc92650a0664ca84b80ff0274ea7c502d430c7d840ff499e682de5f59&quot;
+    }
+  },
+  &quot;action&quot;: &quot;human&quot;,
+  &quot;rule&quot;: &quot;disagree&quot;,
+  &quot;seconds&quot;: 96.606,
+  &quot;exact_target_met&quot;: true,
+  &quot;acceptable_action_met&quot;: true
+}</pre></details><details><summary>scd-111-baseline — Kabul</summary><p><strong>Önceden belirlenen gerekçe:</strong> One visibly intact carton on pallet, legible product name. Candidate for description-level acceptance only.</p><p><strong>Kayıtlı karar:</strong> Note, SAM and Spark agree on 1. Within PO-scd-111-baseline (1 open).</p><p>İkinci okuyucu ve denetim: kayıtta mevcut.</p><p><a href='img/scd-111-baseline-note.png'>Hazırlanmış belgeyi aç</a></p><pre>{
+  &quot;id&quot;: &quot;scd-111-baseline&quot;,
+  &quot;source_image_id&quot;: 111,
+  &quot;scenario&quot;: &quot;baseline&quot;,
+  &quot;expected_action&quot;: &quot;post&quot;,
+  &quot;acceptable_actions&quot;: [
+    &quot;post&quot;
+  ],
+  &quot;started_at&quot;: &quot;2026-11-03T19:24:54.666696+03:00&quot;,
+  &quot;evidence&quot;: {
+    &quot;mode&quot;: &quot;dry_run&quot;,
+    &quot;erp_written&quot;: false,
+    &quot;result&quot;: {
+      &quot;posted&quot;: true,
+      &quot;quantity&quot;: 1,
+      &quot;document&quot;: null
+    },
+    &quot;decision&quot;: {
+      &quot;action&quot;: &quot;post&quot;,
+      &quot;quantity&quot;: 1,
+      &quot;reasons&quot;: [
+        &quot;Note, SAM and Spark agree on 1. Within PO-scd-111-baseline (1 open).&quot;
+      ],
+      &quot;evidence&quot;: {
+        &quot;note&quot;: [
+          [
+            1,
+            &quot;川贝清肺糖浆&quot;
+          ]
+        ],
+        &quot;sam_sure&quot;: 1,
+        &quot;sam_doubtful&quot;: 0,
+        &quot;spark_count&quot;: 1,
+        &quot;label&quot;: &quot;川贝清肺糖浆&quot;,
+        &quot;order&quot;: {
+          &quot;number&quot;: &quot;PO-scd-111-baseline&quot;,
+          &quot;product&quot;: &quot;川贝清肺糖浆&quot;,
+          &quot;ordered&quot;: 1,
+          &quot;open&quot;: 1
+        },
+        &quot;cross&quot;: {
+          &quot;agreed&quot;: 1,
+          &quot;sam_only&quot;: 0,
+          &quot;spark_only&quot;: 0,
+          &quot;doubled&quot;: 0
+        },
+        &quot;spoken&quot;: {
+          &quot;certain&quot;: true,
+          &quot;product&quot;: &quot;&quot;,
+          &quot;quantity&quot;: 1,
+          &quot;supplier&quot;: &quot;controlled fixture fixture supplier&quot;,
+          &quot;unit&quot;: &quot;carton&quot;
+        },
+        &quot;second_reader&quot;: [
+          [
+            1,
+            &quot;川贝清肺糖浆&quot;
+          ]
+        ],
+        &quot;second_supplier&quot;: &quot;Controlled Fixture Supplier&quot;,
+        &quot;audit&quot;: {
+          &quot;ok&quot;: true,
+          &quot;quantity&quot;: true,
+          &quot;product&quot;: true,
+          &quot;instructions&quot;: &quot;&quot;,
+          &quot;quotes&quot;: {
+            &quot;quantity&quot;: &quot;Quantity: 1 carton&quot;,
+            &quot;product&quot;: &quot;Product: 川贝清肺糖浆&quot;,
+            &quot;instructions&quot;: &quot;&quot;
+          }
+        }
+      },
+      &quot;rule&quot;: &quot;match&quot;
+    },
+    &quot;note&quot;: {
+      &quot;date&quot;: &quot;&quot;,
+      &quot;embedded_instructions&quot;: [],
+      &quot;items&quot;: [
+        {
+          &quot;description&quot;: &quot;川贝清肺糖浆&quot;,
+          &quot;legible&quot;: true,
+          &quot;product_identity&quot;: {
+            &quot;brand&quot;: &quot;&quot;,
+            &quot;model&quot;: &quot;&quot;,
+            &quot;product_code&quot;: &quot;&quot;,
+            &quot;variant&quot;: &quot;&quot;
+          },
+          &quot;quantity&quot;: 1,
+          &quot;unit&quot;: &quot;carton&quot;
+        }
+      ],
+      &quot;note_number&quot;: &quot;scd-111-baseline&quot;,
+      &quot;supplier&quot;: &quot;Controlled Fixture Supplier&quot;
+    },
+    &quot;camera&quot;: {
+      &quot;all_cartons_visible&quot;: true,
+      &quot;all_labels_identified&quot;: false,
+      &quot;cartons_visible&quot;: 1,
+      &quot;damaged_cartons&quot;: 0,
+      &quot;product_identity&quot;: {
+        &quot;brand&quot;: &quot;&quot;,
+        &quot;model&quot;: &quot;&quot;,
+        &quot;product_code&quot;: &quot;&quot;,
+        &quot;variant&quot;: &quot;&quot;
+      },
+      &quot;product_on_labels&quot;: &quot;川贝清肺糖浆&quot;,
+      &quot;stacked&quot;: false
+    },
+    &quot;receiver&quot;: {
+      &quot;certain&quot;: true,
+      &quot;product&quot;: &quot;&quot;,
+      &quot;quantity&quot;: 1,
+      &quot;supplier&quot;: &quot;controlled fixture fixture supplier&quot;,
+      &quot;unit&quot;: &quot;carton&quot;
+    },
+    &quot;speaker_turns&quot;: [
+      {
+        &quot;speaker&quot;: &quot;A&quot;,
+        &quot;transcript&quot;: &quot;I am the receiving clerk. I counted one carton, the supplier is controlled fixture fixture supplier.&quot;
+      }
+    ],
+    &quot;speech_interpretation&quot;: {
+      &quot;count_candidates&quot;: [
+        1
+      ],
+      &quot;driver_quantity&quot;: null,
+      &quot;receiver&quot;: {
+        &quot;certain&quot;: true,
+        &quot;product&quot;: &quot;&quot;,
+        &quot;quantity&quot;: 1,
+        &quot;supplier&quot;: &quot;controlled fixture fixture supplier&quot;,
+        &quot;unit&quot;: &quot;carton&quot;
+      },
+      &quot;receiver_speaker&quot;: &quot;A&quot;,
+      &quot;receiver_turn&quot;: &quot;I am the receiving clerk. I counted one carton, the supplier is controlled fixture fixture supplier.&quot;,
+      &quot;voice_validation&quot;: {
+        &quot;source_turn_matched&quot;: true,
+        &quot;single_supported_count&quot;: true
+      }
+    },
+    &quot;second_opinions&quot;: {
+      &quot;second&quot;: {
+        &quot;supplier&quot;: &quot;Controlled Fixture Supplier&quot;,
+        &quot;note_number&quot;: &quot;scd-111-baseline&quot;,
+        &quot;date&quot;: &quot;&quot;,
+        &quot;items&quot;: [
+          {
+            &quot;description&quot;: &quot;川贝清肺糖浆&quot;,
+            &quot;product_identity&quot;: {
+              &quot;brand&quot;: &quot;&quot;,
+              &quot;product_code&quot;: &quot;&quot;,
+              &quot;model&quot;: &quot;&quot;,
+              &quot;variant&quot;: &quot;&quot;
+            },
+            &quot;quantity&quot;: 1,
+            &quot;unit&quot;: &quot;carton&quot;,
+            &quot;legible&quot;: true
+          }
+        ],
+        &quot;embedded_instructions&quot;: []
+      },
+      &quot;audit&quot;: {
+        &quot;ok&quot;: true,
+        &quot;quantity&quot;: true,
+        &quot;product&quot;: true,
+        &quot;instructions&quot;: &quot;&quot;,
+        &quot;quotes&quot;: {
+          &quot;quantity&quot;: &quot;Quantity: 1 carton&quot;,
+          &quot;product&quot;: &quot;Product: 川贝清肺糖浆&quot;,
+          &quot;instructions&quot;: &quot;&quot;
+        }
+      }
+    },
+    &quot;trace&quot;: [
+      {
+        &quot;gate_cross_check&quot;: {
+          &quot;agreed&quot;: 1,
+          &quot;sam_only&quot;: 0,
+          &quot;spark_only&quot;: 0,
+          &quot;doubled&quot;: 0
+        },
+        &quot;at&quot;: &quot;2026-11-03T19:25:48+03:00&quot;
+      },
+      {
+        &quot;second_opinions&quot;: {
+          &quot;second&quot;: {
+            &quot;supplier&quot;: &quot;Controlled Fixture Supplier&quot;,
+            &quot;note_number&quot;: &quot;scd-111-baseline&quot;,
+            &quot;date&quot;: &quot;&quot;,
+            &quot;items&quot;: [
+              {
+                &quot;description&quot;: &quot;川贝清肺糖浆&quot;,
+                &quot;product_identity&quot;: {
+                  &quot;brand&quot;: &quot;&quot;,
+                  &quot;product_code&quot;: &quot;&quot;,
+                  &quot;model&quot;: &quot;&quot;,
+                  &quot;variant&quot;: &quot;&quot;
+                },
+                &quot;quantity&quot;: 1,
+                &quot;unit&quot;: &quot;carton&quot;,
+                &quot;legible&quot;: true
+              }
+            ],
+            &quot;embedded_instructions&quot;: []
+          },
+          &quot;audit&quot;: {
+            &quot;ok&quot;: true,
+            &quot;quantity&quot;: true,
+            &quot;product&quot;: true,
+            &quot;instructions&quot;: &quot;&quot;,
+            &quot;quotes&quot;: {
+              &quot;quantity&quot;: &quot;Quantity: 1 carton&quot;,
+              &quot;product&quot;: &quot;Product: 川贝清肺糖浆&quot;,
+              &quot;instructions&quot;: &quot;&quot;
+            }
+          }
+        },
+        &quot;at&quot;: &quot;2026-11-03T19:26:06+03:00&quot;
+      }
+    ],
+    &quot;timings&quot;: [
+      {
+        &quot;step&quot;: &quot;Read delivery note&quot;,
+        &quot;seconds&quot;: 7.706,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Inspect camera&quot;,
+        &quot;seconds&quot;: 13.96,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Segment cartons&quot;,
+        &quot;seconds&quot;: 11.168,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Transcribe speaker turns&quot;,
+        &quot;seconds&quot;: 3.028,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Identify receiver count&quot;,
+        &quot;seconds&quot;: 5.709,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Cross-check objects and authorize&quot;,
+        &quot;seconds&quot;: 29.784,
+        &quot;status&quot;: &quot;complete&quot;
+      }
+    ],
+    &quot;seconds&quot;: 71.355,
+    &quot;total_cost_usd&quot;: null,
+    &quot;cost_status&quot;: &quot;Not measured: provider-wide billing required; not agent-token cost.&quot;,
+    &quot;input_sha256&quot;: {
+      &quot;note&quot;: &quot;01164d31b5f42e2ca967aba4c32b1f4edaf495c0bb484dee9dae78f64b74ad14&quot;,
+      &quot;camera&quot;: &quot;2f2b931920cc000fe9e184662b1067a2cefbb7d848e3b2c2c8def89e9104028d&quot;,
+      &quot;audio&quot;: &quot;67f7e5d7944cdd6c16b6287483bcfb725f03fcd016551d4e4b5bf5b75870c65e&quot;
+    }
+  },
+  &quot;action&quot;: &quot;post&quot;,
+  &quot;rule&quot;: &quot;match&quot;,
+  &quot;seconds&quot;: 71.449,
+  &quot;exact_target_met&quot;: true,
+  &quot;acceptable_action_met&quot;: true
+}</pre></details><details><summary>scd-111-quantity_mismatch — Ret</summary><p><strong>Önceden belirlenen gerekçe:</strong> One visibly intact carton on pallet, legible product name. Candidate for description-level acceptance only.</p><p><strong>Kayıtlı karar:</strong> Counted 1, note says 2; draft a discrepancy for the supplier.</p><p>İkinci okuyucu ve denetim: bu sonuçta tamamlandığı gösterilmedi.</p><p><a href='img/scd-111-quantity_mismatch-note.png'>Hazırlanmış belgeyi aç</a></p><pre>{
+  &quot;id&quot;: &quot;scd-111-quantity_mismatch&quot;,
+  &quot;source_image_id&quot;: 111,
+  &quot;scenario&quot;: &quot;quantity_mismatch&quot;,
+  &quot;expected_action&quot;: &quot;block&quot;,
+  &quot;acceptable_actions&quot;: [
+    &quot;block&quot;,
+    &quot;human&quot;
+  ],
+  &quot;started_at&quot;: &quot;2026-11-03T19:25:30.425639+03:00&quot;,
+  &quot;evidence&quot;: {
+    &quot;mode&quot;: &quot;dry_run&quot;,
+    &quot;erp_written&quot;: false,
+    &quot;result&quot;: {
+      &quot;posted&quot;: false,
+      &quot;gate&quot;: &quot;block&quot;,
+      &quot;reason&quot;: &quot;Counted 1, note says 2; draft a discrepancy for the supplier.&quot;
+    },
+    &quot;decision&quot;: {
+      &quot;action&quot;: &quot;block&quot;,
+      &quot;quantity&quot;: 1,
+      &quot;reasons&quot;: [
+        &quot;Counted 1, note says 2; draft a discrepancy for the supplier.&quot;
+      ],
+      &quot;evidence&quot;: {
+        &quot;note&quot;: [
+          [
+            2,
+            &quot;川贝清肺糖浆&quot;
+          ]
+        ],
+        &quot;sam_sure&quot;: 1,
+        &quot;sam_doubtful&quot;: 0,
+        &quot;spark_count&quot;: 1,
+        &quot;label&quot;: &quot;川贝清肺糖浆&quot;,
+        &quot;order&quot;: {
+          &quot;number&quot;: &quot;PO-scd-111-quantity_mismatch&quot;,
+          &quot;product&quot;: &quot;川贝清肺糖浆&quot;,
+          &quot;ordered&quot;: 2,
+          &quot;open&quot;: 2
+        },
+        &quot;cross&quot;: {
+          &quot;agreed&quot;: 1,
+          &quot;sam_only&quot;: 0,
+          &quot;spark_only&quot;: 0,
+          &quot;doubled&quot;: 0
+        },
+        &quot;spoken&quot;: {
+          &quot;certain&quot;: true,
+          &quot;product&quot;: &quot;&quot;,
+          &quot;quantity&quot;: 1,
+          &quot;supplier&quot;: &quot;controlled fixture supplier&quot;,
+          &quot;unit&quot;: &quot;carton&quot;
+        }
+      },
+      &quot;rule&quot;: &quot;mismatch&quot;
+    },
+    &quot;note&quot;: {
+      &quot;date&quot;: &quot;&quot;,
+      &quot;embedded_instructions&quot;: [],
+      &quot;items&quot;: [
+        {
+          &quot;description&quot;: &quot;川贝清肺糖浆&quot;,
+          &quot;legible&quot;: true,
+          &quot;product_identity&quot;: {
+            &quot;brand&quot;: &quot;&quot;,
+            &quot;model&quot;: &quot;&quot;,
+            &quot;product_code&quot;: &quot;&quot;,
+            &quot;variant&quot;: &quot;&quot;
+          },
+          &quot;quantity&quot;: 2,
+          &quot;unit&quot;: &quot;carton&quot;
+        }
+      ],
+      &quot;note_number&quot;: &quot;scd-111-quantity_mismatch&quot;,
+      &quot;supplier&quot;: &quot;Controlled Fixture Supplier&quot;
+    },
+    &quot;camera&quot;: {
+      &quot;all_cartons_visible&quot;: true,
+      &quot;all_labels_identified&quot;: false,
+      &quot;cartons_visible&quot;: 1,
+      &quot;damaged_cartons&quot;: 0,
+      &quot;product_identity&quot;: {
+        &quot;brand&quot;: &quot;&quot;,
+        &quot;model&quot;: &quot;&quot;,
+        &quot;product_code&quot;: &quot;&quot;,
+        &quot;variant&quot;: &quot;&quot;
+      },
+      &quot;product_on_labels&quot;: &quot;川贝清肺糖浆&quot;,
+      &quot;stacked&quot;: false
+    },
+    &quot;receiver&quot;: {
+      &quot;certain&quot;: true,
+      &quot;product&quot;: &quot;&quot;,
+      &quot;quantity&quot;: 1,
+      &quot;supplier&quot;: &quot;controlled fixture supplier&quot;,
+      &quot;unit&quot;: &quot;carton&quot;
+    },
+    &quot;speaker_turns&quot;: [
+      {
+        &quot;speaker&quot;: &quot;A&quot;,
+        &quot;transcript&quot;: &quot;I am the receiving clerk. I counted one carton. The supplier is controlled fixture supplier.&quot;
+      }
+    ],
+    &quot;speech_interpretation&quot;: {
+      &quot;count_candidates&quot;: [
+        1
+      ],
+      &quot;driver_quantity&quot;: null,
+      &quot;receiver&quot;: {
+        &quot;certain&quot;: true,
+        &quot;product&quot;: &quot;&quot;,
+        &quot;quantity&quot;: 1,
+        &quot;supplier&quot;: &quot;controlled fixture supplier&quot;,
+        &quot;unit&quot;: &quot;carton&quot;
+      },
+      &quot;receiver_speaker&quot;: &quot;A&quot;,
+      &quot;receiver_turn&quot;: &quot;I am the receiving clerk. I counted one carton. The supplier is controlled fixture supplier.&quot;,
+      &quot;voice_validation&quot;: {
+        &quot;source_turn_matched&quot;: true,
+        &quot;single_supported_count&quot;: true
+      }
+    },
+    &quot;second_opinions&quot;: {},
+    &quot;trace&quot;: [
+      {
+        &quot;gate_cross_check&quot;: {
+          &quot;agreed&quot;: 1,
+          &quot;sam_only&quot;: 0,
+          &quot;spark_only&quot;: 0,
+          &quot;doubled&quot;: 0
+        },
+        &quot;at&quot;: &quot;2026-11-03T19:26:11+03:00&quot;
+      }
+    ],
+    &quot;timings&quot;: [
+      {
+        &quot;step&quot;: &quot;Read delivery note&quot;,
+        &quot;seconds&quot;: 5.486,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Inspect camera&quot;,
+        &quot;seconds&quot;: 10.818,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Segment cartons&quot;,
+        &quot;seconds&quot;: 6.545,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Transcribe speaker turns&quot;,
+        &quot;seconds&quot;: 2.791,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Identify receiver count&quot;,
+        &quot;seconds&quot;: 5.015,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Cross-check objects and authorize&quot;,
+        &quot;seconds&quot;: 9.687,
+        &quot;status&quot;: &quot;complete&quot;
+      }
+    ],
+    &quot;seconds&quot;: 40.342,
+    &quot;total_cost_usd&quot;: null,
+    &quot;cost_status&quot;: &quot;Not measured: provider-wide billing required; not agent-token cost.&quot;,
+    &quot;input_sha256&quot;: {
+      &quot;note&quot;: &quot;0a25b16624999f962a083a84f1dc2c675a81c77a27ebe76a2e4e82ff2cfbfdad&quot;,
+      &quot;camera&quot;: &quot;2f2b931920cc000fe9e184662b1067a2cefbb7d848e3b2c2c8def89e9104028d&quot;,
+      &quot;audio&quot;: &quot;67f7e5d7944cdd6c16b6287483bcfb725f03fcd016551d4e4b5bf5b75870c65e&quot;
+    }
+  },
+  &quot;action&quot;: &quot;block&quot;,
+  &quot;rule&quot;: &quot;mismatch&quot;,
+  &quot;seconds&quot;: 41.052,
+  &quot;exact_target_met&quot;: true,
+  &quot;acceptable_action_met&quot;: true
+}</pre></details><details><summary>scd-111-receiver_uncertain — İnsan incelemesi</summary><p><strong>Önceden belirlenen gerekçe:</strong> One visibly intact carton on pallet, legible product name. Candidate for description-level acceptance only.</p><p><strong>Kayıtlı karar:</strong> The receiver was not sure of the count.</p><p>İkinci okuyucu ve denetim: bu sonuçta tamamlandığı gösterilmedi.</p><p><a href='img/scd-111-receiver_uncertain-note.png'>Hazırlanmış belgeyi aç</a></p><pre>{
+  &quot;id&quot;: &quot;scd-111-receiver_uncertain&quot;,
+  &quot;source_image_id&quot;: 111,
+  &quot;scenario&quot;: &quot;receiver_uncertain&quot;,
+  &quot;expected_action&quot;: &quot;human&quot;,
+  &quot;acceptable_actions&quot;: [
+    &quot;human&quot;
+  ],
+  &quot;started_at&quot;: &quot;2026-11-03T19:25:33.029161+03:00&quot;,
+  &quot;evidence&quot;: {
+    &quot;mode&quot;: &quot;dry_run&quot;,
+    &quot;erp_written&quot;: false,
+    &quot;result&quot;: {
+      &quot;posted&quot;: false,
+      &quot;gate&quot;: &quot;human&quot;,
+      &quot;reason&quot;: &quot;The receiver was not sure of the count.&quot;
+    },
+    &quot;decision&quot;: {
+      &quot;action&quot;: &quot;human&quot;,
+      &quot;quantity&quot;: 1,
+      &quot;reasons&quot;: [
+        &quot;The receiver was not sure of the count.&quot;
+      ],
+      &quot;evidence&quot;: {
+        &quot;note&quot;: [
+          [
+            1,
+            &quot;川贝清肺糖浆&quot;
+          ]
+        ],
+        &quot;sam_sure&quot;: 1,
+        &quot;sam_doubtful&quot;: 0,
+        &quot;spark_count&quot;: 1,
+        &quot;label&quot;: &quot;川贝清肺糖浆&quot;,
+        &quot;order&quot;: {
+          &quot;number&quot;: &quot;PO-scd-111-receiver_uncertain&quot;,
+          &quot;product&quot;: &quot;川贝清肺糖浆&quot;,
+          &quot;ordered&quot;: 1,
+          &quot;open&quot;: 1
+        },
+        &quot;cross&quot;: {
+          &quot;agreed&quot;: 1,
+          &quot;sam_only&quot;: 0,
+          &quot;spark_only&quot;: 0,
+          &quot;doubled&quot;: 0
+        },
+        &quot;spoken&quot;: {
+          &quot;certain&quot;: false,
+          &quot;product&quot;: &quot;&quot;,
+          &quot;quantity&quot;: null,
+          &quot;supplier&quot;: &quot;controlled fixture supplier&quot;,
+          &quot;unit&quot;: &quot;cartons&quot;
+        }
+      },
+      &quot;rule&quot;: &quot;receiver&quot;
+    },
+    &quot;note&quot;: {
+      &quot;date&quot;: &quot;&quot;,
+      &quot;embedded_instructions&quot;: [],
+      &quot;items&quot;: [
+        {
+          &quot;description&quot;: &quot;川贝清肺糖浆&quot;,
+          &quot;legible&quot;: true,
+          &quot;product_identity&quot;: {
+            &quot;brand&quot;: &quot;&quot;,
+            &quot;model&quot;: &quot;&quot;,
+            &quot;product_code&quot;: &quot;&quot;,
+            &quot;variant&quot;: &quot;&quot;
+          },
+          &quot;quantity&quot;: 1,
+          &quot;unit&quot;: &quot;carton&quot;
+        }
+      ],
+      &quot;note_number&quot;: &quot;scd-111-receiver_uncertain&quot;,
+      &quot;supplier&quot;: &quot;Controlled Fixture Supplier&quot;
+    },
+    &quot;camera&quot;: {
+      &quot;all_cartons_visible&quot;: true,
+      &quot;all_labels_identified&quot;: false,
+      &quot;cartons_visible&quot;: 1,
+      &quot;damaged_cartons&quot;: 0,
+      &quot;product_identity&quot;: {
+        &quot;brand&quot;: &quot;&quot;,
+        &quot;model&quot;: &quot;&quot;,
+        &quot;product_code&quot;: &quot;&quot;,
+        &quot;variant&quot;: &quot;&quot;
+      },
+      &quot;product_on_labels&quot;: &quot;川贝清肺糖浆&quot;,
+      &quot;stacked&quot;: false
+    },
+    &quot;receiver&quot;: {
+      &quot;certain&quot;: false,
+      &quot;product&quot;: &quot;&quot;,
+      &quot;quantity&quot;: null,
+      &quot;supplier&quot;: &quot;controlled fixture supplier&quot;,
+      &quot;unit&quot;: &quot;cartons&quot;
+    },
+    &quot;speaker_turns&quot;: [
+      {
+        &quot;speaker&quot;: &quot;A&quot;,
+        &quot;transcript&quot;: &quot;I am the receiving clerk. I am not sure how many cartons arrived. I could not complete the count. The supplier supplier is controlled fixture supplier.&quot;
+      }
+    ],
+    &quot;speech_interpretation&quot;: {
+      &quot;count_candidates&quot;: [],
+      &quot;driver_quantity&quot;: null,
+      &quot;receiver&quot;: {
+        &quot;certain&quot;: false,
+        &quot;product&quot;: &quot;&quot;,
+        &quot;quantity&quot;: null,
+        &quot;supplier&quot;: &quot;controlled fixture supplier&quot;,
+        &quot;unit&quot;: &quot;cartons&quot;
+      },
+      &quot;receiver_speaker&quot;: &quot;A&quot;,
+      &quot;receiver_turn&quot;: &quot;I am the receiving clerk. I am not sure how many cartons arrived. I could not complete the count. The supplier supplier is controlled fixture supplier.&quot;,
+      &quot;voice_validation&quot;: {
+        &quot;source_turn_matched&quot;: true,
+        &quot;single_supported_count&quot;: false
+      }
+    },
+    &quot;second_opinions&quot;: {},
+    &quot;trace&quot;: [
+      {
+        &quot;gate_cross_check&quot;: {
+          &quot;agreed&quot;: 1,
+          &quot;sam_only&quot;: 0,
+          &quot;spark_only&quot;: 0,
+          &quot;doubled&quot;: 0
+        },
+        &quot;at&quot;: &quot;2026-11-03T19:26:24+03:00&quot;
+      }
+    ],
+    &quot;timings&quot;: [
+      {
+        &quot;step&quot;: &quot;Read delivery note&quot;,
+        &quot;seconds&quot;: 6.975,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Inspect camera&quot;,
+        &quot;seconds&quot;: 9.904,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Segment cartons&quot;,
+        &quot;seconds&quot;: 6.437,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Transcribe speaker turns&quot;,
+        &quot;seconds&quot;: 2.942,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Identify receiver count&quot;,
+        &quot;seconds&quot;: 14.021,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Cross-check objects and authorize&quot;,
+        &quot;seconds&quot;: 11.572,
+        &quot;status&quot;: &quot;complete&quot;
+      }
+    ],
+    &quot;seconds&quot;: 51.851,
+    &quot;total_cost_usd&quot;: null,
+    &quot;cost_status&quot;: &quot;Not measured: provider-wide billing required; not agent-token cost.&quot;,
+    &quot;input_sha256&quot;: {
+      &quot;note&quot;: &quot;e9227ce0197e47e66cc3e781be946867630c6ef14528ff987c533995bbe1408e&quot;,
+      &quot;camera&quot;: &quot;2f2b931920cc000fe9e184662b1067a2cefbb7d848e3b2c2c8def89e9104028d&quot;,
+      &quot;audio&quot;: &quot;9fece24dc92650a0664ca84b80ff0274ea7c502d430c7d840ff499e682de5f59&quot;
+    }
+  },
+  &quot;action&quot;: &quot;human&quot;,
+  &quot;rule&quot;: &quot;receiver&quot;,
+  &quot;seconds&quot;: 51.86,
+  &quot;exact_target_met&quot;: true,
+  &quot;acceptable_action_met&quot;: true
+}</pre></details><details><summary>scd-278-baseline — İnsan incelemesi</summary><p><strong>Önceden belirlenen gerekçe:</strong> Torn/crushed upper rim; damage calls for review.</p><p><strong>Kayıtlı karar:</strong> Cartons are stacked or hidden; the count cannot be verified from the camera.</p><p>İkinci okuyucu ve denetim: bu sonuçta tamamlandığı gösterilmedi.</p><p><a href='img/scd-278-baseline-note.png'>Hazırlanmış belgeyi aç</a></p><pre>{
+  &quot;id&quot;: &quot;scd-278-baseline&quot;,
+  &quot;source_image_id&quot;: 278,
+  &quot;scenario&quot;: &quot;baseline&quot;,
+  &quot;expected_action&quot;: &quot;human&quot;,
+  &quot;acceptable_actions&quot;: [
+    &quot;human&quot;
+  ],
+  &quot;started_at&quot;: &quot;2026-11-03T19:26:06.117814+03:00&quot;,
+  &quot;evidence&quot;: {
+    &quot;mode&quot;: &quot;dry_run&quot;,
+    &quot;erp_written&quot;: false,
+    &quot;result&quot;: {
+      &quot;posted&quot;: false,
+      &quot;gate&quot;: &quot;human&quot;,
+      &quot;reason&quot;: &quot;Cartons are stacked or hidden; the count cannot be verified from the camera.&quot;
+    },
+    &quot;decision&quot;: {
+      &quot;action&quot;: &quot;human&quot;,
+      &quot;quantity&quot;: null,
+      &quot;reasons&quot;: [
+        &quot;Cartons are stacked or hidden; the count cannot be verified from the camera.&quot;
+      ],
+      &quot;evidence&quot;: {
+        &quot;note&quot;: [
+          [
+            1,
+            &quot;WATER FILTER FOR RO Plus&quot;
+          ]
+        ],
+        &quot;sam_sure&quot;: 1,
+        &quot;sam_doubtful&quot;: 1,
+        &quot;spark_count&quot;: 2,
+        &quot;label&quot;: &quot;WATER FILTER FOR RO Plus&quot;,
+        &quot;order&quot;: {
+          &quot;number&quot;: &quot;PO-scd-278-baseline&quot;,
+          &quot;product&quot;: &quot;WATER FILTER FOR RO Plus&quot;,
+          &quot;ordered&quot;: 1,
+          &quot;open&quot;: 1
+        }
+      },
+      &quot;rule&quot;: &quot;hidden&quot;
+    },
+    &quot;note&quot;: {
+      &quot;date&quot;: &quot;&quot;,
+      &quot;embedded_instructions&quot;: [],
+      &quot;items&quot;: [
+        {
+          &quot;description&quot;: &quot;WATER FILTER FOR RO Plus&quot;,
+          &quot;legible&quot;: true,
+          &quot;product_identity&quot;: {
+            &quot;brand&quot;: &quot;&quot;,
+            &quot;model&quot;: &quot;&quot;,
+            &quot;product_code&quot;: &quot;&quot;,
+            &quot;variant&quot;: &quot;&quot;
+          },
+          &quot;quantity&quot;: 1,
+          &quot;unit&quot;: &quot;carton&quot;
+        }
+      ],
+      &quot;note_number&quot;: &quot;scd-278-baseline&quot;,
+      &quot;supplier&quot;: &quot;Controlled Fixture Supplier&quot;
+    },
+    &quot;camera&quot;: {
+      &quot;all_cartons_visible&quot;: false,
+      &quot;all_labels_identified&quot;: false,
+      &quot;cartons_visible&quot;: 2,
+      &quot;damaged_cartons&quot;: 1,
+      &quot;product_identity&quot;: {
+        &quot;brand&quot;: &quot;QINYUAN&quot;,
+        &quot;model&quot;: &quot;&quot;,
+        &quot;product_code&quot;: &quot;&quot;,
+        &quot;variant&quot;: &quot;&quot;
+      },
+      &quot;product_on_labels&quot;: &quot;WATER FILTER FOR RO Plus&quot;,
+      &quot;stacked&quot;: false
+    },
+    &quot;receiver&quot;: {
+      &quot;certain&quot;: true,
+      &quot;product&quot;: &quot;&quot;,
+      &quot;quantity&quot;: 1,
+      &quot;supplier&quot;: &quot;controlled fixture supplier&quot;,
+      &quot;unit&quot;: &quot;carton&quot;
+    },
+    &quot;speaker_turns&quot;: [
+      {
+        &quot;speaker&quot;: &quot;A&quot;,
+        &quot;transcript&quot;: &quot;I am the receiving clerk. I counted one carton. The supplier is controlled fixture supplier&quot;
+      }
+    ],
+    &quot;speech_interpretation&quot;: {
+      &quot;count_candidates&quot;: [
+        1
+      ],
+      &quot;driver_quantity&quot;: null,
+      &quot;receiver&quot;: {
+        &quot;certain&quot;: true,
+        &quot;product&quot;: &quot;&quot;,
+        &quot;quantity&quot;: 1,
+        &quot;supplier&quot;: &quot;controlled fixture supplier&quot;,
+        &quot;unit&quot;: &quot;carton&quot;
+      },
+      &quot;receiver_speaker&quot;: &quot;A&quot;,
+      &quot;receiver_turn&quot;: &quot;I am the receiving clerk. I counted one carton. The supplier is controlled fixture supplier&quot;,
+      &quot;voice_validation&quot;: {
+        &quot;source_turn_matched&quot;: true,
+        &quot;single_supported_count&quot;: true
+      }
+    },
+    &quot;second_opinions&quot;: {},
+    &quot;trace&quot;: [
+      {
+        &quot;gate_cross_check&quot;: {
+          &quot;agreed&quot;: 1,
+          &quot;sam_only&quot;: 1,
+          &quot;spark_only&quot;: 0,
+          &quot;doubled&quot;: 0
+        },
+        &quot;at&quot;: &quot;2026-11-03T19:27:27+03:00&quot;
+      }
+    ],
+    &quot;timings&quot;: [
+      {
+        &quot;step&quot;: &quot;Read delivery note&quot;,
+        &quot;seconds&quot;: 6.569,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Inspect camera&quot;,
+        &quot;seconds&quot;: 23.989,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Segment cartons&quot;,
+        &quot;seconds&quot;: 8.523,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Transcribe speaker turns&quot;,
+        &quot;seconds&quot;: 2.453,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Identify receiver count&quot;,
+        &quot;seconds&quot;: 5.047,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Cross-check objects and authorize&quot;,
+        &quot;seconds&quot;: 34.429,
+        &quot;status&quot;: &quot;complete&quot;
+      }
+    ],
+    &quot;seconds&quot;: 81.01,
+    &quot;total_cost_usd&quot;: null,
+    &quot;cost_status&quot;: &quot;Not measured: provider-wide billing required; not agent-token cost.&quot;,
+    &quot;input_sha256&quot;: {
+      &quot;note&quot;: &quot;aaa5e8839f8c463ceba144db9bc4d70ae88c035ce086d02c773ce8413e750c19&quot;,
+      &quot;camera&quot;: &quot;7244b6dfc016e752c597546d62c40c4c83dd6e6927ec702c2e6869168fbc98ab&quot;,
+      &quot;audio&quot;: &quot;67f7e5d7944cdd6c16b6287483bcfb725f03fcd016551d4e4b5bf5b75870c65e&quot;
+    }
+  },
+  &quot;action&quot;: &quot;human&quot;,
+  &quot;rule&quot;: &quot;hidden&quot;,
+  &quot;seconds&quot;: 81.084,
+  &quot;exact_target_met&quot;: true,
+  &quot;acceptable_action_met&quot;: true
+}</pre></details><details><summary>scd-278-quantity_mismatch — İnsan incelemesi</summary><p><strong>Önceden belirlenen gerekçe:</strong> Torn/crushed upper rim; damage calls for review.</p><p><strong>Kayıtlı karar:</strong> 1 damaged carton(s); propose partial receipt of 0.</p><p>İkinci okuyucu ve denetim: bu sonuçta tamamlandığı gösterilmedi.</p><p><a href='img/scd-278-quantity_mismatch-note.png'>Hazırlanmış belgeyi aç</a></p><pre>{
+  &quot;id&quot;: &quot;scd-278-quantity_mismatch&quot;,
+  &quot;source_image_id&quot;: 278,
+  &quot;scenario&quot;: &quot;quantity_mismatch&quot;,
+  &quot;expected_action&quot;: &quot;human&quot;,
+  &quot;acceptable_actions&quot;: [
+    &quot;block&quot;,
+    &quot;human&quot;
+  ],
+  &quot;started_at&quot;: &quot;2026-11-03T19:26:11.479265+03:00&quot;,
+  &quot;evidence&quot;: {
+    &quot;mode&quot;: &quot;dry_run&quot;,
+    &quot;erp_written&quot;: false,
+    &quot;result&quot;: {
+      &quot;posted&quot;: false,
+      &quot;gate&quot;: &quot;human&quot;,
+      &quot;reason&quot;: &quot;1 damaged carton(s); propose partial receipt of 0.&quot;
+    },
+    &quot;decision&quot;: {
+      &quot;action&quot;: &quot;human&quot;,
+      &quot;quantity&quot;: 0,
+      &quot;reasons&quot;: [
+        &quot;1 damaged carton(s); propose partial receipt of 0.&quot;
+      ],
+      &quot;evidence&quot;: {
+        &quot;note&quot;: [
+          [
+            2,
+            &quot;WATER FILTER FOR RO Plus&quot;
+          ]
+        ],
+        &quot;sam_sure&quot;: 1,
+        &quot;sam_doubtful&quot;: 1,
+        &quot;spark_count&quot;: 1,
+        &quot;label&quot;: &quot;WATER FILTER FOR RO Plus&quot;,
+        &quot;order&quot;: {
+          &quot;number&quot;: &quot;PO-scd-278-quantity_mismatch&quot;,
+          &quot;product&quot;: &quot;WATER FILTER FOR RO Plus&quot;,
+          &quot;ordered&quot;: 2,
+          &quot;open&quot;: 2
+        }
+      },
+      &quot;rule&quot;: &quot;damaged&quot;
+    },
+    &quot;note&quot;: {
+      &quot;date&quot;: &quot;&quot;,
+      &quot;embedded_instructions&quot;: [],
+      &quot;items&quot;: [
+        {
+          &quot;description&quot;: &quot;WATER FILTER FOR RO Plus&quot;,
+          &quot;legible&quot;: true,
+          &quot;product_identity&quot;: {
+            &quot;brand&quot;: &quot;&quot;,
+            &quot;model&quot;: &quot;&quot;,
+            &quot;product_code&quot;: &quot;&quot;,
+            &quot;variant&quot;: &quot;&quot;
+          },
+          &quot;quantity&quot;: 2,
+          &quot;unit&quot;: &quot;carton&quot;
+        }
+      ],
+      &quot;note_number&quot;: &quot;scd-278-quantity_mismatch&quot;,
+      &quot;supplier&quot;: &quot;Controlled Fixture Supplier&quot;
+    },
+    &quot;camera&quot;: {
+      &quot;all_cartons_visible&quot;: true,
+      &quot;all_labels_identified&quot;: false,
+      &quot;cartons_visible&quot;: 1,
+      &quot;damaged_cartons&quot;: 1,
+      &quot;product_identity&quot;: {
+        &quot;brand&quot;: &quot;QINYUAN&quot;,
+        &quot;model&quot;: &quot;&quot;,
+        &quot;product_code&quot;: &quot;&quot;,
+        &quot;variant&quot;: &quot;&quot;
+      },
+      &quot;product_on_labels&quot;: &quot;WATER FILTER FOR RO Plus&quot;,
+      &quot;stacked&quot;: false
+    },
+    &quot;receiver&quot;: {
+      &quot;certain&quot;: true,
+      &quot;product&quot;: &quot;&quot;,
+      &quot;quantity&quot;: 1,
+      &quot;supplier&quot;: &quot;controlled fixture supplier&quot;,
+      &quot;unit&quot;: &quot;carton&quot;
+    },
+    &quot;speaker_turns&quot;: [
+      {
+        &quot;speaker&quot;: &quot;A&quot;,
+        &quot;transcript&quot;: &quot;I am the receiving clerk. I counted one carton, the supplier is controlled fixture supplier.&quot;
+      }
+    ],
+    &quot;speech_interpretation&quot;: {
+      &quot;count_candidates&quot;: [
+        1
+      ],
+      &quot;driver_quantity&quot;: null,
+      &quot;receiver&quot;: {
+        &quot;certain&quot;: true,
+        &quot;product&quot;: &quot;&quot;,
+        &quot;quantity&quot;: 1,
+        &quot;supplier&quot;: &quot;controlled fixture supplier&quot;,
+        &quot;unit&quot;: &quot;carton&quot;
+      },
+      &quot;receiver_speaker&quot;: &quot;A&quot;,
+      &quot;receiver_turn&quot;: &quot;I am the receiving clerk. I counted one carton, the supplier is controlled fixture supplier.&quot;,
+      &quot;voice_validation&quot;: {
+        &quot;source_turn_matched&quot;: true,
+        &quot;single_supported_count&quot;: true
+      }
+    },
+    &quot;second_opinions&quot;: {},
+    &quot;trace&quot;: [
+      {
+        &quot;gate_cross_check&quot;: {
+          &quot;agreed&quot;: 1,
+          &quot;sam_only&quot;: 1,
+          &quot;spark_only&quot;: 0,
+          &quot;doubled&quot;: 0
+        },
+        &quot;at&quot;: &quot;2026-11-03T19:27:25+03:00&quot;
+      }
+    ],
+    &quot;timings&quot;: [
+      {
+        &quot;step&quot;: &quot;Read delivery note&quot;,
+        &quot;seconds&quot;: 5.711,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Inspect camera&quot;,
+        &quot;seconds&quot;: 24.353,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Segment cartons&quot;,
+        &quot;seconds&quot;: 8.937,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Transcribe speaker turns&quot;,
+        &quot;seconds&quot;: 2.303,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Identify receiver count&quot;,
+        &quot;seconds&quot;: 3.454,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Cross-check objects and authorize&quot;,
+        &quot;seconds&quot;: 29.124,
+        &quot;status&quot;: &quot;complete&quot;
+      }
+    ],
+    &quot;seconds&quot;: 73.882,
+    &quot;total_cost_usd&quot;: null,
+    &quot;cost_status&quot;: &quot;Not measured: provider-wide billing required; not agent-token cost.&quot;,
+    &quot;input_sha256&quot;: {
+      &quot;note&quot;: &quot;7a2249d1a465c5fc18bf7a1647daa4d8bc2480e2d1618788ccca4767492edf4c&quot;,
+      &quot;camera&quot;: &quot;7244b6dfc016e752c597546d62c40c4c83dd6e6927ec702c2e6869168fbc98ab&quot;,
+      &quot;audio&quot;: &quot;67f7e5d7944cdd6c16b6287483bcfb725f03fcd016551d4e4b5bf5b75870c65e&quot;
+    }
+  },
+  &quot;action&quot;: &quot;human&quot;,
+  &quot;rule&quot;: &quot;damaged&quot;,
+  &quot;seconds&quot;: 73.914,
+  &quot;exact_target_met&quot;: true,
+  &quot;acceptable_action_met&quot;: true
+}</pre></details><details><summary>scd-278-receiver_uncertain — İnsan incelemesi</summary><p><strong>Önceden belirlenen gerekçe:</strong> Torn/crushed upper rim; damage calls for review.</p><p><strong>Kayıtlı karar:</strong> Cartons are stacked or hidden; the count cannot be verified from the camera.</p><p>İkinci okuyucu ve denetim: bu sonuçta tamamlandığı gösterilmedi.</p><p><a href='img/scd-278-receiver_uncertain-note.png'>Hazırlanmış belgeyi aç</a></p><pre>{
+  &quot;id&quot;: &quot;scd-278-receiver_uncertain&quot;,
+  &quot;source_image_id&quot;: 278,
+  &quot;scenario&quot;: &quot;receiver_uncertain&quot;,
+  &quot;expected_action&quot;: &quot;human&quot;,
+  &quot;acceptable_actions&quot;: [
+    &quot;human&quot;
+  ],
+  &quot;started_at&quot;: &quot;2026-11-03T19:26:24.890487+03:00&quot;,
+  &quot;evidence&quot;: {
+    &quot;mode&quot;: &quot;dry_run&quot;,
+    &quot;erp_written&quot;: false,
+    &quot;result&quot;: {
+      &quot;posted&quot;: false,
+      &quot;gate&quot;: &quot;human&quot;,
+      &quot;reason&quot;: &quot;Cartons are stacked or hidden; the count cannot be verified from the camera.&quot;
+    },
+    &quot;decision&quot;: {
+      &quot;action&quot;: &quot;human&quot;,
+      &quot;quantity&quot;: null,
+      &quot;reasons&quot;: [
+        &quot;Cartons are stacked or hidden; the count cannot be verified from the camera.&quot;
+      ],
+      &quot;evidence&quot;: {
+        &quot;note&quot;: [
+          [
+            1,
+            &quot;WATER FILTER FOR RO Plus&quot;
+          ]
+        ],
+        &quot;sam_sure&quot;: 1,
+        &quot;sam_doubtful&quot;: 1,
+        &quot;spark_count&quot;: 2,
+        &quot;label&quot;: &quot;WATER FILTER FOR RO Plus&quot;,
+        &quot;order&quot;: {
+          &quot;number&quot;: &quot;PO-scd-278-receiver_uncertain&quot;,
+          &quot;product&quot;: &quot;WATER FILTER FOR RO Plus&quot;,
+          &quot;ordered&quot;: 1,
+          &quot;open&quot;: 1
+        }
+      },
+      &quot;rule&quot;: &quot;hidden&quot;
+    },
+    &quot;note&quot;: {
+      &quot;date&quot;: &quot;&quot;,
+      &quot;embedded_instructions&quot;: [],
+      &quot;items&quot;: [
+        {
+          &quot;description&quot;: &quot;WATER FILTER FOR RO Plus&quot;,
+          &quot;legible&quot;: true,
+          &quot;product_identity&quot;: {
+            &quot;brand&quot;: &quot;&quot;,
+            &quot;model&quot;: &quot;&quot;,
+            &quot;product_code&quot;: &quot;&quot;,
+            &quot;variant&quot;: &quot;&quot;
+          },
+          &quot;quantity&quot;: 1,
+          &quot;unit&quot;: &quot;carton&quot;
+        }
+      ],
+      &quot;note_number&quot;: &quot;scd-278-receiver_uncertain&quot;,
+      &quot;supplier&quot;: &quot;Controlled Fixture Supplier&quot;
+    },
+    &quot;camera&quot;: {
+      &quot;all_cartons_visible&quot;: false,
+      &quot;all_labels_identified&quot;: false,
+      &quot;cartons_visible&quot;: 2,
+      &quot;damaged_cartons&quot;: 1,
+      &quot;product_identity&quot;: {
+        &quot;brand&quot;: &quot;QINYUAN&quot;,
+        &quot;model&quot;: &quot;&quot;,
+        &quot;product_code&quot;: &quot;&quot;,
+        &quot;variant&quot;: &quot;&quot;
+      },
+      &quot;product_on_labels&quot;: &quot;WATER FILTER FOR RO Plus&quot;,
+      &quot;stacked&quot;: false
+    },
+    &quot;receiver&quot;: {
+      &quot;certain&quot;: false,
+      &quot;product&quot;: &quot;&quot;,
+      &quot;quantity&quot;: null,
+      &quot;supplier&quot;: &quot;controlled fixture supplier&quot;,
+      &quot;unit&quot;: &quot;cartons&quot;
+    },
+    &quot;speaker_turns&quot;: [
+      {
+        &quot;speaker&quot;: &quot;A&quot;,
+        &quot;transcript&quot;: &quot;I am the receiving clerk. I am not sure how many cartons arrived. I could not complete the count. The supplier is controlled fixture supplier.&quot;
+      }
+    ],
+    &quot;speech_interpretation&quot;: {
+      &quot;count_candidates&quot;: [],
+      &quot;driver_quantity&quot;: null,
+      &quot;receiver&quot;: {
+        &quot;certain&quot;: false,
+        &quot;product&quot;: &quot;&quot;,
+        &quot;quantity&quot;: null,
+        &quot;supplier&quot;: &quot;controlled fixture supplier&quot;,
+        &quot;unit&quot;: &quot;cartons&quot;
+      },
+      &quot;receiver_speaker&quot;: &quot;A&quot;,
+      &quot;receiver_turn&quot;: &quot;I am the receiving clerk. I am not sure how many cartons arrived. I could not complete the count. The supplier is controlled fixture supplier.&quot;,
+      &quot;voice_validation&quot;: {
+        &quot;source_turn_matched&quot;: true,
+        &quot;single_supported_count&quot;: false
+      }
+    },
+    &quot;second_opinions&quot;: {},
+    &quot;trace&quot;: [
+      {
+        &quot;gate_cross_check&quot;: {
+          &quot;agreed&quot;: 1,
+          &quot;sam_only&quot;: 1,
+          &quot;spark_only&quot;: 0,
+          &quot;doubled&quot;: 0
+        },
+        &quot;at&quot;: &quot;2026-11-03T19:27:43+03:00&quot;
+      }
+    ],
+    &quot;timings&quot;: [
+      {
+        &quot;step&quot;: &quot;Read delivery note&quot;,
+        &quot;seconds&quot;: 5.006,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Inspect camera&quot;,
+        &quot;seconds&quot;: 24.839,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Segment cartons&quot;,
+        &quot;seconds&quot;: 8.896,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Transcribe speaker turns&quot;,
+        &quot;seconds&quot;: 3.344,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Identify receiver count&quot;,
+        &quot;seconds&quot;: 6.189,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Cross-check objects and authorize&quot;,
+        &quot;seconds&quot;: 29.854,
+        &quot;status&quot;: &quot;complete&quot;
+      }
+    ],
+    &quot;seconds&quot;: 78.128,
+    &quot;total_cost_usd&quot;: null,
+    &quot;cost_status&quot;: &quot;Not measured: provider-wide billing required; not agent-token cost.&quot;,
+    &quot;input_sha256&quot;: {
+      &quot;note&quot;: &quot;0a99554acb5fc43a48718d135ae119cf9eaf1a7bac30694fc380a137b55de835&quot;,
+      &quot;camera&quot;: &quot;7244b6dfc016e752c597546d62c40c4c83dd6e6927ec702c2e6869168fbc98ab&quot;,
+      &quot;audio&quot;: &quot;9fece24dc92650a0664ca84b80ff0274ea7c502d430c7d840ff499e682de5f59&quot;
+    }
+  },
+  &quot;action&quot;: &quot;human&quot;,
+  &quot;rule&quot;: &quot;hidden&quot;,
+  &quot;seconds&quot;: 78.141,
+  &quot;exact_target_met&quot;: true,
+  &quot;acceptable_action_met&quot;: true
+}</pre></details><details><summary>scd-711-baseline — Kabul</summary><p><strong>Önceden belirlenen gerekçe:</strong> Carton partly obscured by shelf and extends beyond upper/left frame; full extent uncertain.</p><p><strong>Kayıtlı karar:</strong> Note, SAM and Spark agree on 1. Within PO-scd-711-baseline (1 open).</p><p>İkinci okuyucu ve denetim: kayıtta mevcut.</p><p><a href='img/scd-711-baseline-note.png'>Hazırlanmış belgeyi aç</a></p><pre>{
+  &quot;id&quot;: &quot;scd-711-baseline&quot;,
+  &quot;source_image_id&quot;: 711,
+  &quot;scenario&quot;: &quot;baseline&quot;,
+  &quot;expected_action&quot;: &quot;human&quot;,
+  &quot;acceptable_actions&quot;: [
+    &quot;human&quot;
+  ],
+  &quot;started_at&quot;: &quot;2026-11-03T19:27:25.395132+03:00&quot;,
+  &quot;evidence&quot;: {
+    &quot;mode&quot;: &quot;dry_run&quot;,
+    &quot;erp_written&quot;: false,
+    &quot;result&quot;: {
+      &quot;posted&quot;: true,
+      &quot;quantity&quot;: 1,
+      &quot;document&quot;: null
+    },
+    &quot;decision&quot;: {
+      &quot;action&quot;: &quot;post&quot;,
+      &quot;quantity&quot;: 1,
+      &quot;reasons&quot;: [
+        &quot;Note, SAM and Spark agree on 1. Within PO-scd-711-baseline (1 open).&quot;
+      ],
+      &quot;evidence&quot;: {
+        &quot;note&quot;: [
+          [
+            1,
+            &quot;苦参素葡萄糖注射液&quot;
+          ]
+        ],
+        &quot;sam_sure&quot;: 1,
+        &quot;sam_doubtful&quot;: 1,
+        &quot;spark_count&quot;: 1,
+        &quot;label&quot;: &quot;苦参素葡萄糖注射液&quot;,
+        &quot;order&quot;: {
+          &quot;number&quot;: &quot;PO-scd-711-baseline&quot;,
+          &quot;product&quot;: &quot;苦参素葡萄糖注射液&quot;,
+          &quot;ordered&quot;: 1,
+          &quot;open&quot;: 1
+        },
+        &quot;cross&quot;: {
+          &quot;agreed&quot;: 1,
+          &quot;sam_only&quot;: 1,
+          &quot;spark_only&quot;: 0,
+          &quot;doubled&quot;: 0
+        },
+        &quot;spoken&quot;: {
+          &quot;certain&quot;: true,
+          &quot;product&quot;: &quot;&quot;,
+          &quot;quantity&quot;: 1,
+          &quot;supplier&quot;: &quot;controlled fixture supplier&quot;,
+          &quot;unit&quot;: &quot;carton&quot;
+        },
+        &quot;second_reader&quot;: [
+          [
+            1,
+            &quot;苦参素葡萄糖注射液&quot;
+          ]
+        ],
+        &quot;second_supplier&quot;: &quot;Controlled Fixture Supplier&quot;,
+        &quot;audit&quot;: {
+          &quot;ok&quot;: true,
+          &quot;quantity&quot;: true,
+          &quot;product&quot;: true,
+          &quot;instructions&quot;: &quot;&quot;,
+          &quot;quotes&quot;: {
+            &quot;quantity&quot;: &quot;Quantity: 1 carton&quot;,
+            &quot;product&quot;: &quot;Product: 苦参素葡萄糖注射液&quot;,
+            &quot;instructions&quot;: &quot;&quot;
+          }
+        }
+      },
+      &quot;rule&quot;: &quot;match&quot;
+    },
+    &quot;note&quot;: {
+      &quot;date&quot;: &quot;&quot;,
+      &quot;embedded_instructions&quot;: [],
+      &quot;items&quot;: [
+        {
+          &quot;description&quot;: &quot;苦参素葡萄糖注射液&quot;,
+          &quot;legible&quot;: true,
+          &quot;product_identity&quot;: {
+            &quot;brand&quot;: &quot;&quot;,
+            &quot;model&quot;: &quot;&quot;,
+            &quot;product_code&quot;: &quot;&quot;,
+            &quot;variant&quot;: &quot;&quot;
+          },
+          &quot;quantity&quot;: 1,
+          &quot;unit&quot;: &quot;carton&quot;
+        }
+      ],
+      &quot;note_number&quot;: &quot;scd-711-baseline&quot;,
+      &quot;supplier&quot;: &quot;Controlled Fixture Supplier&quot;
+    },
+    &quot;camera&quot;: {
+      &quot;all_cartons_visible&quot;: true,
+      &quot;all_labels_identified&quot;: false,
+      &quot;cartons_visible&quot;: 1,
+      &quot;damaged_cartons&quot;: 0,
+      &quot;product_identity&quot;: {
+        &quot;brand&quot;: &quot;功克&quot;,
+        &quot;model&quot;: &quot;&quot;,
+        &quot;product_code&quot;: &quot;&quot;,
+        &quot;variant&quot;: &quot;100ml 软袋&quot;
+      },
+      &quot;product_on_labels&quot;: &quot;苦参素葡萄糖注射液&quot;,
+      &quot;stacked&quot;: false
+    },
+    &quot;receiver&quot;: {
+      &quot;certain&quot;: true,
+      &quot;product&quot;: &quot;&quot;,
+      &quot;quantity&quot;: 1,
+      &quot;supplier&quot;: &quot;controlled fixture supplier&quot;,
+      &quot;unit&quot;: &quot;carton&quot;
+    },
+    &quot;speaker_turns&quot;: [
+      {
+        &quot;speaker&quot;: &quot;A&quot;,
+        &quot;transcript&quot;: &quot;I am the receiving clerk. I counted one carton. The supplier is controlled fixture supplier.&quot;
+      }
+    ],
+    &quot;speech_interpretation&quot;: {
+      &quot;count_candidates&quot;: [
+        1
+      ],
+      &quot;driver_quantity&quot;: null,
+      &quot;receiver&quot;: {
+        &quot;certain&quot;: true,
+        &quot;product&quot;: &quot;&quot;,
+        &quot;quantity&quot;: 1,
+        &quot;supplier&quot;: &quot;controlled fixture supplier&quot;,
+        &quot;unit&quot;: &quot;carton&quot;
+      },
+      &quot;receiver_speaker&quot;: &quot;A&quot;,
+      &quot;receiver_turn&quot;: &quot;I am the receiving clerk. I counted one carton. The supplier is controlled fixture supplier.&quot;,
+      &quot;voice_validation&quot;: {
+        &quot;source_turn_matched&quot;: true,
+        &quot;single_supported_count&quot;: true
+      }
+    },
+    &quot;second_opinions&quot;: {
+      &quot;second&quot;: {
+        &quot;supplier&quot;: &quot;Controlled Fixture Supplier&quot;,
+        &quot;note_number&quot;: &quot;scd-711-baseline&quot;,
+        &quot;date&quot;: &quot;&quot;,
+        &quot;items&quot;: [
+          {
+            &quot;description&quot;: &quot;苦参素葡萄糖注射液&quot;,
+            &quot;product_identity&quot;: {
+              &quot;brand&quot;: &quot;&quot;,
+              &quot;product_code&quot;: &quot;&quot;,
+              &quot;model&quot;: &quot;&quot;,
+              &quot;variant&quot;: &quot;&quot;
+            },
+            &quot;quantity&quot;: 1,
+            &quot;unit&quot;: &quot;carton&quot;,
+            &quot;legible&quot;: true
+          }
+        ],
+        &quot;embedded_instructions&quot;: []
+      },
+      &quot;audit&quot;: {
+        &quot;ok&quot;: true,
+        &quot;quantity&quot;: true,
+        &quot;product&quot;: true,
+        &quot;instructions&quot;: &quot;&quot;,
+        &quot;quotes&quot;: {
+          &quot;quantity&quot;: &quot;Quantity: 1 carton&quot;,
+          &quot;product&quot;: &quot;Product: 苦参素葡萄糖注射液&quot;,
+          &quot;instructions&quot;: &quot;&quot;
+        }
+      }
+    },
+    &quot;trace&quot;: [
+      {
+        &quot;gate_cross_check&quot;: {
+          &quot;agreed&quot;: 1,
+          &quot;sam_only&quot;: 1,
+          &quot;spark_only&quot;: 0,
+          &quot;doubled&quot;: 0
+        },
+        &quot;at&quot;: &quot;2026-11-03T19:28:30+03:00&quot;
+      },
+      {
+        &quot;second_opinions&quot;: {
+          &quot;second&quot;: {
+            &quot;supplier&quot;: &quot;Controlled Fixture Supplier&quot;,
+            &quot;note_number&quot;: &quot;scd-711-baseline&quot;,
+            &quot;date&quot;: &quot;&quot;,
+            &quot;items&quot;: [
+              {
+                &quot;description&quot;: &quot;苦参素葡萄糖注射液&quot;,
+                &quot;product_identity&quot;: {
+                  &quot;brand&quot;: &quot;&quot;,
+                  &quot;product_code&quot;: &quot;&quot;,
+                  &quot;model&quot;: &quot;&quot;,
+                  &quot;variant&quot;: &quot;&quot;
+                },
+                &quot;quantity&quot;: 1,
+                &quot;unit&quot;: &quot;carton&quot;,
+                &quot;legible&quot;: true
+              }
+            ],
+            &quot;embedded_instructions&quot;: []
+          },
+          &quot;audit&quot;: {
+            &quot;ok&quot;: true,
+            &quot;quantity&quot;: true,
+            &quot;product&quot;: true,
+            &quot;instructions&quot;: &quot;&quot;,
+            &quot;quotes&quot;: {
+              &quot;quantity&quot;: &quot;Quantity: 1 carton&quot;,
+              &quot;product&quot;: &quot;Product: 苦参素葡萄糖注射液&quot;,
+              &quot;instructions&quot;: &quot;&quot;
+            }
+          }
+        },
+        &quot;at&quot;: &quot;2026-11-03T19:28:47+03:00&quot;
+      }
+    ],
+    &quot;timings&quot;: [
+      {
+        &quot;step&quot;: &quot;Read delivery note&quot;,
+        &quot;seconds&quot;: 5.967,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Inspect camera&quot;,
+        &quot;seconds&quot;: 17.831,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Segment cartons&quot;,
+        &quot;seconds&quot;: 4.579,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Transcribe speaker turns&quot;,
+        &quot;seconds&quot;: 2.067,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Identify receiver count&quot;,
+        &quot;seconds&quot;: 3.914,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Cross-check objects and authorize&quot;,
+        &quot;seconds&quot;: 47.844,
+        &quot;status&quot;: &quot;complete&quot;
+      }
+    ],
+    &quot;seconds&quot;: 82.202,
+    &quot;total_cost_usd&quot;: null,
+    &quot;cost_status&quot;: &quot;Not measured: provider-wide billing required; not agent-token cost.&quot;,
+    &quot;input_sha256&quot;: {
+      &quot;note&quot;: &quot;ded15e4d3cf78d231e438194a3496f9e60290970b7f64c8c35e0507b04c6b54c&quot;,
+      &quot;camera&quot;: &quot;e9b6841e22ac05543c0a4e1063395b0a8d086c0416b01e93392c0a9d0801a575&quot;,
+      &quot;audio&quot;: &quot;67f7e5d7944cdd6c16b6287483bcfb725f03fcd016551d4e4b5bf5b75870c65e&quot;
+    }
+  },
+  &quot;action&quot;: &quot;post&quot;,
+  &quot;rule&quot;: &quot;match&quot;,
+  &quot;seconds&quot;: 82.215,
+  &quot;exact_target_met&quot;: false,
+  &quot;acceptable_action_met&quot;: false
+}</pre></details><details><summary>scd-711-quantity_mismatch — Ret</summary><p><strong>Önceden belirlenen gerekçe:</strong> Carton partly obscured by shelf and extends beyond upper/left frame; full extent uncertain.</p><p><strong>Kayıtlı karar:</strong> Not on the order: PO-scd-711-quantity_mismatch is for &#x27;苦参素葡萄糖注射液&#x27;, the note says &#x27;苫参素葡萄糖注射液&#x27;. Refuse it at the dock; the load goes back on the truck.</p><p>İkinci okuyucu ve denetim: bu sonuçta tamamlandığı gösterilmedi.</p><p><a href='img/scd-711-quantity_mismatch-note.png'>Hazırlanmış belgeyi aç</a></p><pre>{
+  &quot;id&quot;: &quot;scd-711-quantity_mismatch&quot;,
+  &quot;source_image_id&quot;: 711,
+  &quot;scenario&quot;: &quot;quantity_mismatch&quot;,
+  &quot;expected_action&quot;: &quot;human&quot;,
+  &quot;acceptable_actions&quot;: [
+    &quot;block&quot;,
+    &quot;human&quot;
+  ],
+  &quot;started_at&quot;: &quot;2026-11-03T19:27:27.203127+03:00&quot;,
+  &quot;evidence&quot;: {
+    &quot;mode&quot;: &quot;dry_run&quot;,
+    &quot;erp_written&quot;: false,
+    &quot;result&quot;: {
+      &quot;posted&quot;: false,
+      &quot;gate&quot;: &quot;block&quot;,
+      &quot;reason&quot;: &quot;Not on the order: PO-scd-711-quantity_mismatch is for &#x27;苦参素葡萄糖注射液&#x27;, the note says &#x27;苫参素葡萄糖注射液&#x27;. Refuse it at the dock; the load goes back on the truck.&quot;
+    },
+    &quot;decision&quot;: {
+      &quot;action&quot;: &quot;block&quot;,
+      &quot;quantity&quot;: null,
+      &quot;reasons&quot;: [
+        &quot;Not on the order: PO-scd-711-quantity_mismatch is for &#x27;苦参素葡萄糖注射液&#x27;, the note says &#x27;苫参素葡萄糖注射液&#x27;. Refuse it at the dock; the load goes back on the truck.&quot;
+      ],
+      &quot;evidence&quot;: {
+        &quot;note&quot;: [
+          [
+            2,
+            &quot;苫参素葡萄糖注射液&quot;
+          ]
+        ],
+        &quot;sam_sure&quot;: 1,
+        &quot;sam_doubtful&quot;: 1,
+        &quot;spark_count&quot;: 1,
+        &quot;label&quot;: &quot;苦参素葡萄糖注射液&quot;,
+        &quot;order&quot;: {
+          &quot;number&quot;: &quot;PO-scd-711-quantity_mismatch&quot;,
+          &quot;product&quot;: &quot;苦参素葡萄糖注射液&quot;,
+          &quot;ordered&quot;: 2,
+          &quot;open&quot;: 2
+        }
+      },
+      &quot;rule&quot;: &quot;not_ordered&quot;
+    },
+    &quot;note&quot;: {
+      &quot;date&quot;: &quot;&quot;,
+      &quot;embedded_instructions&quot;: [],
+      &quot;items&quot;: [
+        {
+          &quot;description&quot;: &quot;苫参素葡萄糖注射液&quot;,
+          &quot;legible&quot;: true,
+          &quot;product_identity&quot;: {
+            &quot;brand&quot;: &quot;&quot;,
+            &quot;model&quot;: &quot;&quot;,
+            &quot;product_code&quot;: &quot;&quot;,
+            &quot;variant&quot;: &quot;&quot;
+          },
+          &quot;quantity&quot;: 2,
+          &quot;unit&quot;: &quot;carton&quot;
+        }
+      ],
+      &quot;note_number&quot;: &quot;scd-711-quantity_mismatch&quot;,
+      &quot;supplier&quot;: &quot;Controlled Fixture Supplier&quot;
+    },
+    &quot;camera&quot;: {
+      &quot;all_cartons_visible&quot;: true,
+      &quot;all_labels_identified&quot;: false,
+      &quot;cartons_visible&quot;: 1,
+      &quot;damaged_cartons&quot;: 0,
+      &quot;product_identity&quot;: {
+        &quot;brand&quot;: &quot;功克&quot;,
+        &quot;model&quot;: &quot;&quot;,
+        &quot;product_code&quot;: &quot;&quot;,
+        &quot;variant&quot;: &quot;100ml 软袋&quot;
+      },
+      &quot;product_on_labels&quot;: &quot;苦参素葡萄糖注射液&quot;,
+      &quot;stacked&quot;: false
+    },
+    &quot;receiver&quot;: {
+      &quot;certain&quot;: true,
+      &quot;product&quot;: &quot;&quot;,
+      &quot;quantity&quot;: 1,
+      &quot;supplier&quot;: &quot;Controlled Fixture Supplier&quot;,
+      &quot;unit&quot;: &quot;carton&quot;
+    },
+    &quot;speaker_turns&quot;: [
+      {
+        &quot;speaker&quot;: &quot;A&quot;,
+        &quot;transcript&quot;: &quot;I am the receiving clerk. I counted one carton. The supplier is Controlled Fixture Supplier.&quot;
+      }
+    ],
+    &quot;speech_interpretation&quot;: {
+      &quot;count_candidates&quot;: [
+        1
+      ],
+      &quot;driver_quantity&quot;: null,
+      &quot;receiver&quot;: {
+        &quot;certain&quot;: true,
+        &quot;product&quot;: &quot;&quot;,
+        &quot;quantity&quot;: 1,
+        &quot;supplier&quot;: &quot;Controlled Fixture Supplier&quot;,
+        &quot;unit&quot;: &quot;carton&quot;
+      },
+      &quot;receiver_speaker&quot;: &quot;A&quot;,
+      &quot;receiver_turn&quot;: &quot;I am the receiving clerk. I counted one carton. The supplier is Controlled Fixture Supplier.&quot;,
+      &quot;voice_validation&quot;: {
+        &quot;source_turn_matched&quot;: true,
+        &quot;single_supported_count&quot;: true
+      }
+    },
+    &quot;second_opinions&quot;: {},
+    &quot;trace&quot;: [
+      {
+        &quot;gate_cross_check&quot;: {
+          &quot;agreed&quot;: 1,
+          &quot;sam_only&quot;: 1,
+          &quot;spark_only&quot;: 0,
+          &quot;doubled&quot;: 0
+        },
+        &quot;at&quot;: &quot;2026-11-03T19:28:25+03:00&quot;
+      }
+    ],
+    &quot;timings&quot;: [
+      {
+        &quot;step&quot;: &quot;Read delivery note&quot;,
+        &quot;seconds&quot;: 5.801,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Inspect camera&quot;,
+        &quot;seconds&quot;: 9.426,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Segment cartons&quot;,
+        &quot;seconds&quot;: 4.145,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Transcribe speaker turns&quot;,
+        &quot;seconds&quot;: 3.292,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Identify receiver count&quot;,
+        &quot;seconds&quot;: 6.027,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Cross-check objects and authorize&quot;,
+        &quot;seconds&quot;: 29.598,
+        &quot;status&quot;: &quot;complete&quot;
+      }
+    ],
+    &quot;seconds&quot;: 58.289,
+    &quot;total_cost_usd&quot;: null,
+    &quot;cost_status&quot;: &quot;Not measured: provider-wide billing required; not agent-token cost.&quot;,
+    &quot;input_sha256&quot;: {
+      &quot;note&quot;: &quot;25d7ecaa1f5a328beef46aabf94ae98210bb497fdcefb10fc212a8a06bf1ece9&quot;,
+      &quot;camera&quot;: &quot;e9b6841e22ac05543c0a4e1063395b0a8d086c0416b01e93392c0a9d0801a575&quot;,
+      &quot;audio&quot;: &quot;67f7e5d7944cdd6c16b6287483bcfb725f03fcd016551d4e4b5bf5b75870c65e&quot;
+    }
+  },
+  &quot;action&quot;: &quot;block&quot;,
+  &quot;rule&quot;: &quot;not_ordered&quot;,
+  &quot;seconds&quot;: 58.324,
+  &quot;exact_target_met&quot;: false,
+  &quot;acceptable_action_met&quot;: true
+}</pre></details><details><summary>scd-711-receiver_uncertain — Ret</summary><p><strong>Önceden belirlenen gerekçe:</strong> Carton partly obscured by shelf and extends beyond upper/left frame; full extent uncertain.</p><p><strong>Kayıtlı karar:</strong> Not on the order: PO-scd-711-receiver_uncertain is for &#x27;苦参素葡萄糖注射液&#x27;, the note says &#x27;苔参素葡萄糖注射液&#x27;. Refuse it at the dock; the load goes back on the truck.</p><p>İkinci okuyucu ve denetim: bu sonuçta tamamlandığı gösterilmedi.</p><p><a href='img/scd-711-receiver_uncertain-note.png'>Hazırlanmış belgeyi aç</a></p><pre>{
+  &quot;id&quot;: &quot;scd-711-receiver_uncertain&quot;,
+  &quot;source_image_id&quot;: 711,
+  &quot;scenario&quot;: &quot;receiver_uncertain&quot;,
+  &quot;expected_action&quot;: &quot;human&quot;,
+  &quot;acceptable_actions&quot;: [
+    &quot;human&quot;
+  ],
+  &quot;started_at&quot;: &quot;2026-11-03T19:27:43.032693+03:00&quot;,
+  &quot;evidence&quot;: {
+    &quot;mode&quot;: &quot;dry_run&quot;,
+    &quot;erp_written&quot;: false,
+    &quot;result&quot;: {
+      &quot;posted&quot;: false,
+      &quot;gate&quot;: &quot;block&quot;,
+      &quot;reason&quot;: &quot;Not on the order: PO-scd-711-receiver_uncertain is for &#x27;苦参素葡萄糖注射液&#x27;, the note says &#x27;苔参素葡萄糖注射液&#x27;. Refuse it at the dock; the load goes back on the truck.&quot;
+    },
+    &quot;decision&quot;: {
+      &quot;action&quot;: &quot;block&quot;,
+      &quot;quantity&quot;: null,
+      &quot;reasons&quot;: [
+        &quot;Not on the order: PO-scd-711-receiver_uncertain is for &#x27;苦参素葡萄糖注射液&#x27;, the note says &#x27;苔参素葡萄糖注射液&#x27;. Refuse it at the dock; the load goes back on the truck.&quot;
+      ],
+      &quot;evidence&quot;: {
+        &quot;note&quot;: [
+          [
+            1,
+            &quot;苔参素葡萄糖注射液&quot;
+          ]
+        ],
+        &quot;sam_sure&quot;: 1,
+        &quot;sam_doubtful&quot;: 1,
+        &quot;spark_count&quot;: 1,
+        &quot;label&quot;: &quot;苦参素葡萄糖注射液&quot;,
+        &quot;order&quot;: {
+          &quot;number&quot;: &quot;PO-scd-711-receiver_uncertain&quot;,
+          &quot;product&quot;: &quot;苦参素葡萄糖注射液&quot;,
+          &quot;ordered&quot;: 1,
+          &quot;open&quot;: 1
+        }
+      },
+      &quot;rule&quot;: &quot;not_ordered&quot;
+    },
+    &quot;note&quot;: {
+      &quot;date&quot;: &quot;&quot;,
+      &quot;embedded_instructions&quot;: [],
+      &quot;items&quot;: [
+        {
+          &quot;description&quot;: &quot;苔参素葡萄糖注射液&quot;,
+          &quot;legible&quot;: true,
+          &quot;product_identity&quot;: {
+            &quot;brand&quot;: &quot;&quot;,
+            &quot;model&quot;: &quot;&quot;,
+            &quot;product_code&quot;: &quot;&quot;,
+            &quot;variant&quot;: &quot;&quot;
+          },
+          &quot;quantity&quot;: 1,
+          &quot;unit&quot;: &quot;carton&quot;
+        }
+      ],
+      &quot;note_number&quot;: &quot;scd-711-receiver_uncertain&quot;,
+      &quot;supplier&quot;: &quot;Controlled Fixture Supplier&quot;
+    },
+    &quot;camera&quot;: {
+      &quot;all_cartons_visible&quot;: true,
+      &quot;all_labels_identified&quot;: false,
+      &quot;cartons_visible&quot;: 1,
+      &quot;damaged_cartons&quot;: 0,
+      &quot;product_identity&quot;: {
+        &quot;brand&quot;: &quot;功克&quot;,
+        &quot;model&quot;: &quot;&quot;,
+        &quot;product_code&quot;: &quot;&quot;,
+        &quot;variant&quot;: &quot;100ml 软袋&quot;
+      },
+      &quot;product_on_labels&quot;: &quot;苦参素葡萄糖注射液&quot;,
+      &quot;stacked&quot;: false
+    },
+    &quot;receiver&quot;: {
+      &quot;certain&quot;: false,
+      &quot;product&quot;: &quot;&quot;,
+      &quot;quantity&quot;: null,
+      &quot;supplier&quot;: &quot;controlled fixture supplier&quot;,
+      &quot;unit&quot;: &quot;cartons&quot;
+    },
+    &quot;speaker_turns&quot;: [
+      {
+        &quot;speaker&quot;: &quot;A&quot;,
+        &quot;transcript&quot;: &quot;I am the receiving clerk. I am not sure how many many cartons arrived. I could not not complete the count, the supplier is controlled fixture supplier&quot;
+      }
+    ],
+    &quot;speech_interpretation&quot;: {
+      &quot;count_candidates&quot;: [],
+      &quot;driver_quantity&quot;: null,
+      &quot;receiver&quot;: {
+        &quot;certain&quot;: false,
+        &quot;product&quot;: &quot;&quot;,
+        &quot;quantity&quot;: null,
+        &quot;supplier&quot;: &quot;controlled fixture supplier&quot;,
+        &quot;unit&quot;: &quot;cartons&quot;
+      },
+      &quot;receiver_speaker&quot;: &quot;A&quot;,
+      &quot;receiver_turn&quot;: &quot;I am the receiving clerk. I am not sure how many many cartons arrived. I could not not complete the count, the supplier is controlled fixture supplier&quot;,
+      &quot;voice_validation&quot;: {
+        &quot;source_turn_matched&quot;: true,
+        &quot;single_supported_count&quot;: false
+      }
+    },
+    &quot;second_opinions&quot;: {},
+    &quot;trace&quot;: [
+      {
+        &quot;gate_cross_check&quot;: {
+          &quot;agreed&quot;: 1,
+          &quot;sam_only&quot;: 1,
+          &quot;spark_only&quot;: 0,
+          &quot;doubled&quot;: 0
+        },
+        &quot;at&quot;: &quot;2026-11-03T19:28:35+03:00&quot;
+      }
+    ],
+    &quot;timings&quot;: [
+      {
+        &quot;step&quot;: &quot;Read delivery note&quot;,
+        &quot;seconds&quot;: 7.88,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Inspect camera&quot;,
+        &quot;seconds&quot;: 11.566,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Segment cartons&quot;,
+        &quot;seconds&quot;: 4.445,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Transcribe speaker turns&quot;,
+        &quot;seconds&quot;: 2.768,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Identify receiver count&quot;,
+        &quot;seconds&quot;: 6.014,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Cross-check objects and authorize&quot;,
+        &quot;seconds&quot;: 19.846,
+        &quot;status&quot;: &quot;complete&quot;
+      }
+    ],
+    &quot;seconds&quot;: 52.519,
+    &quot;total_cost_usd&quot;: null,
+    &quot;cost_status&quot;: &quot;Not measured: provider-wide billing required; not agent-token cost.&quot;,
+    &quot;input_sha256&quot;: {
+      &quot;note&quot;: &quot;26a7b59b9cf70f390240db29fde013a1a3f6bcdcf2224e078a8edd43617da11f&quot;,
+      &quot;camera&quot;: &quot;e9b6841e22ac05543c0a4e1063395b0a8d086c0416b01e93392c0a9d0801a575&quot;,
+      &quot;audio&quot;: &quot;9fece24dc92650a0664ca84b80ff0274ea7c502d430c7d840ff499e682de5f59&quot;
+    }
+  },
+  &quot;action&quot;: &quot;block&quot;,
+  &quot;rule&quot;: &quot;not_ordered&quot;,
+  &quot;seconds&quot;: 52.527,
+  &quot;exact_target_met&quot;: false,
+  &quot;acceptable_action_met&quot;: false
+}</pre></details></main></html>

@@ -6,6 +6,7 @@
   <title>Count Before You Post · Warehouse Simulator</title>
   <link rel="stylesheet" href="./style.css?v=dock-6">
   <script type="importmap">{"imports":{"three":"./vendor/three.module.js"}}</script>
+<script src="../i18n/ui.js" defer data-ui-i18n></script>
 </head>
 <body>
   <div id="world" aria-label="Interactive brick warehouse"></div>
@@ -21,7 +22,7 @@
   <aside id="deliveries" aria-label="Deliveries">
     <p class="caption">RECORDED EVIDENCE LANGUAGE</p>
     <div id="run-lang"><select id="run-language" aria-label="Recorded evidence language"><option value="tr">TR · Turkish</option><option value="en">EN · English</option><option value="de">DE · German</option><option value="zh">ZH · Chinese</option></select></div>
-    <p class="language-note">Interface: English. Choose which recorded run to replay.</p>
+    <p class="language-note">Choose the recorded run independently of the interface language.</p>
     <p class="caption">DELIVERIES</p>
     <select id="case" class="visually-hidden" aria-label="Delivery scenario">
       <option value="ok">01 — Matching delivery</option><option value="eksik">02 — Missing carton</option>

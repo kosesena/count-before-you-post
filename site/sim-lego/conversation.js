@@ -77,7 +77,7 @@ export function openConversation({root,entry,lines,cast,onClose,onEvidence,onLoc
    pic.append(portrait(message.speaker));
    const item=el('article','chat-bubble incoming'),meta=el('div','chat-bubble-meta');
    meta.append(el('strong','',nameOf(message.speaker)||message.speaker),el('time','',message.time));
-   item.append(meta,el('p','',message.text));
+   const body=el('p','',message.text);if(message.speaker==='you')body.dataset.originalEvidence='';item.append(meta,body);
    if(message.source){const details=el('details','chat-source');details.append(el('summary','','Recorded source'),el('small','',message.source));item.append(details);}
    row.append(pic,item);scroll.append(row);
   }
@@ -99,7 +99,7 @@ export function openConversation({root,entry,lines,cast,onClose,onEvidence,onLoc
   const actions=el('div','chat-actions');actions.append(button('▤ Evidence','',onEvidence),button('☷ Workflow','',onWorkflow),button('⌖ Locate','',()=>onLocate?.(id)));head.append(actions);root.append(head);
   const scroll=el('div','chat-bubbles');scroll.tabIndex=0;scroll.setAttribute('aria-label',`${title} messages`);scroll.setAttribute('role','log');scroll.setAttribute('aria-live','polite');root.append(scroll);
   const key=`${entry.id}:${id}`,local=drafts.get(key)||[];
-  function bubble(message,own=false){const item=el('article',`chat-bubble ${own?'outgoing':'incoming'}`),meta=el('div','chat-bubble-meta');meta.append(el('strong','',message.speaker==='you'?'You':nameOf(message.speaker)||message.speaker),el('time','',message.time));item.append(meta,el('p','',message.text));
+  function bubble(message,own=false){const item=el('article',`chat-bubble ${own?'outgoing':'incoming'}`),meta=el('div','chat-bubble-meta');meta.append(el('strong','',message.speaker==='you'?'You':nameOf(message.speaker)||message.speaker),el('time','',message.time));const body=el('p','',message.text);if(message.speaker==='you')body.dataset.originalEvidence='';item.append(meta,body);
    if(message.source){const details=el('details','chat-source');details.append(el('summary','','Recorded source'),el('small','',message.source));item.append(details);}scroll.append(item);
   }
   for(const message of messages.filter(m=>m.speaker===id||m.to===id))bubble(message,message.speaker!==id);

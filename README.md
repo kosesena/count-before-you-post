@@ -848,3 +848,9 @@ headless (`blender -b --factory-startup -P experiments/blender/warehouse.py`; ru
 <sub>Glimmer's farewell: Higgsfield Genjutsu, from our Muse Image Glimmer; motion from a Pixabay clip by videoplasty.</sub>
 
 </div>
+
+### Four-language interface
+
+The site interface and report presentation support Turkish, English, German and Simplified Chinese through `site/i18n/ui.js`. The top selector persists `cbyp-ui-language` locally; `?ui=tr|en|de|zh` opens a chosen interface language. The recorded-evidence selector remains independent. Original documents, audio, JSON and tool traces are not rewritten. The two validation reports retain byte-identical `original-report.html` archives. Timing-study exports use version 3, record interface and evidence languages, and lock the interface language during a study.
+
+Translations are static local assets, with no visitor-side model calls. To regenerate the catalog, install the build-time parser with `npm install --prefix /tmp/cbyp-i18n-tools acorn@8.19.0`, then run `NODE_PATH=/tmp/cbyp-i18n-tools/node_modules .venv/bin/python scripts/build-ui-catalog.py`. Add `--translate` only to send missing public UI strings to the configured Meta translation model. Maintained wording lives in `site/i18n/overrides.json`. Check coverage and placeholder preservation with `node --test tests/ui_i18n.test.mjs tests/time_study*.test.mjs`.

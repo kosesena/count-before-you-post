@@ -718,7 +718,7 @@ function updateIntro(){
  const target=new T.Vector3(...v.target),eye=new T.Vector3(...v.eye).addScaledVector(new T.Vector3(...shot.offset),q);
  if(camera.aspect<1.25)eye.sub(target).multiplyScalar(Math.min(1.6,1.25/camera.aspect)).add(target);
  camera.position.copy(eye);controls.target.copy(target);camera.lookAt(target);
- $('intro-title').textContent=shot.title;$('intro-detail').textContent=shot.detail;
+ $('intro-title').textContent=window.CBYP_I18N?.t(shot.title)||shot.title;$('intro-detail').textContent=window.CBYP_I18N?.t(shot.detail)||shot.detail;
  $('intro-progress').style.transform=`scaleX(${elapsed/20})`;
  $('warehouse-intro').style.setProperty('--cut',String(Math.max(0,1-Math.min(elapsed%5,5-elapsed%5)/.3)));
  document.body.dataset.introShot=shot.view;
@@ -1069,7 +1069,7 @@ $('run-language').onchange=()=>{
  const lang=$('run-language').value;
  if(state.running||$('case').disabled||!recordings[lang]){$('run-language').value=recordingLanguage;return;}
  recordingLanguage=lang;caseData=recordings[lang];reset();refreshDeliveryCards();populateEvidence();
- status(`${recordingNames[lang]} recorded run loaded. Interface and narrated summaries remain English.`);
+ status(`${recordingNames[lang]} recorded run loaded. The original evidence language is unchanged by interface translation.`);
 };
 $('demo').onclick=runDemo;$('case').onchange=()=>{currentCase=$('case').value;reset();buildLoad();};
 $('drive').onclick=()=>{if(state.running)return;if(!dockReady){status('Prepare the dock before driving.');return;}if(state.mode==='drive'){setView('hero');return;}cameraTween=null;state.mode='drive';controls.enabled=false;$('touch').hidden=false;$('drive').innerHTML='Exit driving <span>ESC</span>';$('drive').classList.remove('icon-only');status('Use WASD / arrow keys to drive. E picks up or sets down the load.');document.querySelectorAll('[data-view]').forEach(b=>b.classList.remove('active'));};

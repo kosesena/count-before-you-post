@@ -1,0 +1,1335 @@
+{
+  "manifest_sha256": "1bba2c7ec4059028e94628adc5483d2fb9f6c951c653fb228c670cd443b736cd",
+  "rows": [
+    {
+      "id": "scd-37-baseline",
+      "source_image_id": 37,
+      "scenario": "baseline",
+      "expected_action": "human",
+      "acceptable_actions": [
+        "human"
+      ],
+      "started_at": "2026-11-03T19:34:42.184476+03:00",
+      "evidence": {
+        "mode": "dry_run",
+        "erp_written": false,
+        "result": {
+          "posted": false,
+          "gate": "human",
+          "reason": "A detected carton touches the image boundary guard band; complete carton extent is not verified. Supply a wider view or request human review."
+        },
+        "decision": {
+          "action": "human",
+          "quantity": null,
+          "reasons": [
+            "A detected carton touches the image boundary guard band; complete carton extent is not verified. Supply a wider view or request human review."
+          ],
+          "evidence": {
+            "note": [
+              [
+                1,
+                "关节止痛膏"
+              ]
+            ],
+            "sam_sure": 1,
+            "sam_doubtful": 0,
+            "spark_count": 1,
+            "label": "关节止痛膏",
+            "frame_completeness": {
+              "size": [
+                2488,
+                1940
+              ],
+              "margin_fraction": 0.01,
+              "boundary_objects": [
+                {
+                  "object": "3",
+                  "bounds": [
+                    0,
+                    37,
+                    2488,
+                    1914
+                  ],
+                  "confidence": 0.9375000596046448
+                }
+              ],
+              "requires_review": true,
+              "limitation": "No boundary contact does not prove absence of occlusion or hidden cartons."
+            }
+          },
+          "rule": "frame_boundary"
+        },
+        "note": {
+          "date": "",
+          "embedded_instructions": [],
+          "items": [
+            {
+              "description": "关节止痛膏",
+              "legible": true,
+              "product_identity": {
+                "brand": "",
+                "model": "",
+                "product_code": "",
+                "variant": ""
+              },
+              "quantity": 1,
+              "unit": "carton"
+            }
+          ],
+          "note_number": "scd-37-baseline",
+          "supplier": "Controlled Fixture Supplier"
+        },
+        "camera": {
+          "all_cartons_visible": false,
+          "all_labels_identified": false,
+          "cartons_visible": 1,
+          "damaged_cartons": 0,
+          "product_identity": {
+            "brand": "",
+            "model": "",
+            "product_code": "",
+            "variant": "7厘米 x 10厘米"
+          },
+          "product_on_labels": "关节止痛膏",
+          "stacked": false
+        },
+        "receiver": {
+          "certain": true,
+          "product": "",
+          "quantity": 1,
+          "supplier": "controlled fixture supplier",
+          "unit": "carton"
+        },
+        "speaker_turns": [
+          {
+            "speaker": "A",
+            "transcript": "I am the receiving clerk. I counted one carton. The supplier is controlled fixture supplier."
+          }
+        ],
+        "speech_interpretation": {
+          "count_candidates": [
+            1
+          ],
+          "driver_quantity": null,
+          "receiver": {
+            "certain": true,
+            "product": "",
+            "quantity": 1,
+            "supplier": "controlled fixture supplier",
+            "unit": "carton"
+          },
+          "receiver_speaker": "A",
+          "receiver_turn": "I am the receiving clerk. I counted one carton. The supplier is controlled fixture supplier.",
+          "voice_validation": {
+            "source_turn_matched": true,
+            "single_supported_count": true
+          }
+        },
+        "second_opinions": {},
+        "trace": [
+          {
+            "frame_completeness": {
+              "size": [
+                2488,
+                1940
+              ],
+              "margin_fraction": 0.01,
+              "boundary_objects": [
+                {
+                  "object": "3",
+                  "bounds": [
+                    0,
+                    37,
+                    2488,
+                    1914
+                  ],
+                  "confidence": 0.9375000596046448
+                }
+              ],
+              "requires_review": true,
+              "limitation": "No boundary contact does not prove absence of occlusion or hidden cartons."
+            },
+            "at": "2026-11-03T19:35:33+03:00"
+          },
+          {
+            "gate_cross_check": {
+              "agreed": 1,
+              "sam_only": 0,
+              "spark_only": 0,
+              "doubled": 0
+            },
+            "at": "2026-11-03T19:35:54+03:00"
+          }
+        ],
+        "timings": [
+          {
+            "step": "Read delivery note",
+            "seconds": 5.81,
+            "status": "complete"
+          },
+          {
+            "step": "Inspect camera",
+            "seconds": 31.17,
+            "status": "complete"
+          },
+          {
+            "step": "Segment cartons",
+            "seconds": 6.389,
+            "status": "complete"
+          },
+          {
+            "step": "Transcribe speaker turns",
+            "seconds": 2.638,
+            "status": "complete"
+          },
+          {
+            "step": "Identify receiver count",
+            "seconds": 5.481,
+            "status": "complete"
+          },
+          {
+            "step": "Cross-check objects and authorize",
+            "seconds": 21.28,
+            "status": "complete"
+          }
+        ],
+        "seconds": 72.768,
+        "total_cost_usd": null,
+        "cost_status": "Not measured: provider-wide billing required; not agent-token cost.",
+        "input_sha256": {
+          "note": "9d9c5a63b8482496f03486ddb8eda54bf8f148dcc8f73abb0b204768d2700e7c",
+          "camera": "491bb96ba3075588de24513eb2f3bfa149610c7c2697fc97a48105401985e869",
+          "audio": "67f7e5d7944cdd6c16b6287483bcfb725f03fcd016551d4e4b5bf5b75870c65e"
+        }
+      },
+      "action": "human",
+      "rule": "frame_boundary",
+      "seconds": 72.801,
+      "exact_target_met": true,
+      "acceptable_action_met": true
+    },
+    {
+      "id": "scd-37-quantity_mismatch",
+      "source_image_id": 37,
+      "scenario": "quantity_mismatch",
+      "expected_action": "human",
+      "acceptable_actions": [
+        "block",
+        "human"
+      ],
+      "started_at": "2026-11-03T19:34:42.184597+03:00",
+      "evidence": {
+        "mode": "dry_run",
+        "erp_written": false,
+        "result": {
+          "posted": false,
+          "gate": "human",
+          "reason": "A detected carton touches the image boundary guard band; complete carton extent is not verified. Supply a wider view or request human review."
+        },
+        "decision": {
+          "action": "human",
+          "quantity": null,
+          "reasons": [
+            "A detected carton touches the image boundary guard band; complete carton extent is not verified. Supply a wider view or request human review."
+          ],
+          "evidence": {
+            "note": [
+              [
+                2,
+                "关节止痛膏"
+              ]
+            ],
+            "sam_sure": 1,
+            "sam_doubtful": 0,
+            "spark_count": 1,
+            "label": "关节止痛膏",
+            "frame_completeness": {
+              "size": [
+                2488,
+                1940
+              ],
+              "margin_fraction": 0.01,
+              "boundary_objects": [
+                {
+                  "object": "3",
+                  "bounds": [
+                    0,
+                    37,
+                    2488,
+                    1914
+                  ],
+                  "confidence": 0.9375000596046448
+                }
+              ],
+              "requires_review": true,
+              "limitation": "No boundary contact does not prove absence of occlusion or hidden cartons."
+            }
+          },
+          "rule": "frame_boundary"
+        },
+        "note": {
+          "date": "",
+          "embedded_instructions": [],
+          "items": [
+            {
+              "description": "关节止痛膏",
+              "legible": true,
+              "product_identity": {
+                "brand": "",
+                "model": "",
+                "product_code": "",
+                "variant": ""
+              },
+              "quantity": 2,
+              "unit": "carton"
+            }
+          ],
+          "note_number": "scd-37-quantity_mismatch",
+          "supplier": "Controlled Fixture Supplier"
+        },
+        "camera": {
+          "all_cartons_visible": true,
+          "all_labels_identified": false,
+          "cartons_visible": 1,
+          "damaged_cartons": 0,
+          "product_identity": {
+            "brand": "",
+            "model": "",
+            "product_code": "",
+            "variant": "7cm*10cm*10贴"
+          },
+          "product_on_labels": "关节止痛膏",
+          "stacked": false
+        },
+        "receiver": {
+          "certain": true,
+          "product": "",
+          "quantity": 1,
+          "supplier": "controlled fixture supplier",
+          "unit": "carton"
+        },
+        "speaker_turns": [
+          {
+            "speaker": "A",
+            "transcript": "I am the receiving clerk. I counted one carton. the supplier is controlled fixture supplier"
+          }
+        ],
+        "speech_interpretation": {
+          "count_candidates": [
+            1
+          ],
+          "driver_quantity": null,
+          "receiver": {
+            "certain": true,
+            "product": "",
+            "quantity": 1,
+            "supplier": "controlled fixture supplier",
+            "unit": "carton"
+          },
+          "receiver_speaker": "A",
+          "receiver_turn": "I am the receiving clerk. I counted one carton. the supplier is controlled fixture supplier",
+          "voice_validation": {
+            "source_turn_matched": true,
+            "single_supported_count": true
+          }
+        },
+        "second_opinions": {},
+        "trace": [
+          {
+            "frame_completeness": {
+              "size": [
+                2488,
+                1940
+              ],
+              "margin_fraction": 0.01,
+              "boundary_objects": [
+                {
+                  "object": "3",
+                  "bounds": [
+                    0,
+                    37,
+                    2488,
+                    1914
+                  ],
+                  "confidence": 0.9375000596046448
+                }
+              ],
+              "requires_review": true,
+              "limitation": "No boundary contact does not prove absence of occlusion or hidden cartons."
+            },
+            "at": "2026-11-03T19:35:41+03:00"
+          },
+          {
+            "gate_cross_check": {
+              "agreed": 1,
+              "sam_only": 0,
+              "spark_only": 0,
+              "doubled": 0
+            },
+            "at": "2026-11-03T19:35:52+03:00"
+          }
+        ],
+        "timings": [
+          {
+            "step": "Read delivery note",
+            "seconds": 5.0,
+            "status": "complete"
+          },
+          {
+            "step": "Inspect camera",
+            "seconds": 40.072,
+            "status": "complete"
+          },
+          {
+            "step": "Segment cartons",
+            "seconds": 6.316,
+            "status": "complete"
+          },
+          {
+            "step": "Transcribe speaker turns",
+            "seconds": 2.652,
+            "status": "complete"
+          },
+          {
+            "step": "Identify receiver count",
+            "seconds": 4.761,
+            "status": "complete"
+          },
+          {
+            "step": "Cross-check objects and authorize",
+            "seconds": 11.562,
+            "status": "complete"
+          }
+        ],
+        "seconds": 70.363,
+        "total_cost_usd": null,
+        "cost_status": "Not measured: provider-wide billing required; not agent-token cost.",
+        "input_sha256": {
+          "note": "611e19ab097570bf5cf18b44b8a85d3d828f39e05ecc502fa43fbedcb1c0899d",
+          "camera": "491bb96ba3075588de24513eb2f3bfa149610c7c2697fc97a48105401985e869",
+          "audio": "67f7e5d7944cdd6c16b6287483bcfb725f03fcd016551d4e4b5bf5b75870c65e"
+        }
+      },
+      "action": "human",
+      "rule": "frame_boundary",
+      "seconds": 70.374,
+      "exact_target_met": true,
+      "acceptable_action_met": true
+    },
+    {
+      "id": "scd-37-receiver_uncertain",
+      "source_image_id": 37,
+      "scenario": "receiver_uncertain",
+      "expected_action": "human",
+      "acceptable_actions": [
+        "human"
+      ],
+      "started_at": "2026-11-03T19:34:42.184668+03:00",
+      "evidence": {
+        "mode": "dry_run",
+        "erp_written": false,
+        "result": {
+          "posted": false,
+          "gate": "human",
+          "reason": "A detected carton touches the image boundary guard band; complete carton extent is not verified. Supply a wider view or request human review."
+        },
+        "decision": {
+          "action": "human",
+          "quantity": null,
+          "reasons": [
+            "A detected carton touches the image boundary guard band; complete carton extent is not verified. Supply a wider view or request human review."
+          ],
+          "evidence": {
+            "note": [
+              [
+                1,
+                "关节止痛膏"
+              ]
+            ],
+            "sam_sure": 1,
+            "sam_doubtful": 0,
+            "spark_count": 1,
+            "label": "关节止痛膏",
+            "frame_completeness": {
+              "size": [
+                2488,
+                1940
+              ],
+              "margin_fraction": 0.01,
+              "boundary_objects": [
+                {
+                  "object": "3",
+                  "bounds": [
+                    0,
+                    37,
+                    2488,
+                    1914
+                  ],
+                  "confidence": 0.9375000596046448
+                }
+              ],
+              "requires_review": true,
+              "limitation": "No boundary contact does not prove absence of occlusion or hidden cartons."
+            }
+          },
+          "rule": "frame_boundary"
+        },
+        "note": {
+          "date": "",
+          "embedded_instructions": [],
+          "items": [
+            {
+              "description": "关节止痛膏",
+              "legible": true,
+              "product_identity": {
+                "brand": "",
+                "model": "",
+                "product_code": "",
+                "variant": ""
+              },
+              "quantity": 1,
+              "unit": "carton"
+            }
+          ],
+          "note_number": "scd-37-receiver_uncertain",
+          "supplier": "Controlled Fixture Supplier"
+        },
+        "camera": {
+          "all_cartons_visible": false,
+          "all_labels_identified": false,
+          "cartons_visible": 1,
+          "damaged_cartons": 0,
+          "product_identity": {
+            "brand": "",
+            "model": "",
+            "product_code": "",
+            "variant": "7厘米 x 10厘米"
+          },
+          "product_on_labels": "关节止痛膏",
+          "stacked": false
+        },
+        "receiver": {
+          "certain": false,
+          "product": "",
+          "quantity": null,
+          "supplier": "controlled fixture supplier",
+          "unit": "cartons"
+        },
+        "speaker_turns": [
+          {
+            "speaker": "A",
+            "transcript": "I am the receiving clerk. I am not sure how many cartons arrived. I could not complete the count. The supplier is controlled fixture supplier"
+          }
+        ],
+        "speech_interpretation": {
+          "count_candidates": [],
+          "driver_quantity": null,
+          "receiver": {
+            "certain": false,
+            "product": "",
+            "quantity": null,
+            "supplier": "controlled fixture supplier",
+            "unit": "cartons"
+          },
+          "receiver_speaker": "A",
+          "receiver_turn": "I am the receiving clerk. I am not sure how many cartons arrived. I could not complete the count. The supplier is controlled fixture supplier",
+          "voice_validation": {
+            "source_turn_matched": true,
+            "single_supported_count": false
+          }
+        },
+        "second_opinions": {},
+        "trace": [
+          {
+            "frame_completeness": {
+              "size": [
+                2488,
+                1940
+              ],
+              "margin_fraction": 0.01,
+              "boundary_objects": [
+                {
+                  "object": "3",
+                  "bounds": [
+                    0,
+                    37,
+                    2488,
+                    1914
+                  ],
+                  "confidence": 0.9375000596046448
+                }
+              ],
+              "requires_review": true,
+              "limitation": "No boundary contact does not prove absence of occlusion or hidden cartons."
+            },
+            "at": "2026-11-03T19:35:32+03:00"
+          },
+          {
+            "gate_cross_check": {
+              "agreed": 1,
+              "sam_only": 0,
+              "spark_only": 0,
+              "doubled": 0
+            },
+            "at": "2026-11-03T19:35:51+03:00"
+          }
+        ],
+        "timings": [
+          {
+            "step": "Read delivery note",
+            "seconds": 6.796,
+            "status": "complete"
+          },
+          {
+            "step": "Inspect camera",
+            "seconds": 25.541,
+            "status": "complete"
+          },
+          {
+            "step": "Segment cartons",
+            "seconds": 6.347,
+            "status": "complete"
+          },
+          {
+            "step": "Transcribe speaker turns",
+            "seconds": 4.394,
+            "status": "complete"
+          },
+          {
+            "step": "Identify receiver count",
+            "seconds": 6.705,
+            "status": "complete"
+          },
+          {
+            "step": "Cross-check objects and authorize",
+            "seconds": 19.416,
+            "status": "complete"
+          }
+        ],
+        "seconds": 69.199,
+        "total_cost_usd": null,
+        "cost_status": "Not measured: provider-wide billing required; not agent-token cost.",
+        "input_sha256": {
+          "note": "2bc7c33197d406daccd405557d60f757791c328ea64e55668c9ba2047f7e93d7",
+          "camera": "491bb96ba3075588de24513eb2f3bfa149610c7c2697fc97a48105401985e869",
+          "audio": "9fece24dc92650a0664ca84b80ff0274ea7c502d430c7d840ff499e682de5f59"
+        }
+      },
+      "action": "human",
+      "rule": "frame_boundary",
+      "seconds": 69.266,
+      "exact_target_met": true,
+      "acceptable_action_met": true
+    },
+    {
+      "id": "scd-93-baseline",
+      "source_image_id": 93,
+      "scenario": "baseline",
+      "expected_action": "human",
+      "acceptable_actions": [
+        "human"
+      ],
+      "started_at": "2026-11-03T19:35:51.451593+03:00",
+      "evidence": {
+        "mode": "dry_run",
+        "erp_written": false,
+        "result": {
+          "posted": false,
+          "gate": "human",
+          "reason": "Cartons are stacked or hidden; the count cannot be verified from the camera."
+        },
+        "decision": {
+          "action": "human",
+          "quantity": null,
+          "reasons": [
+            "Cartons are stacked or hidden; the count cannot be verified from the camera."
+          ],
+          "evidence": {
+            "note": [
+              [
+                1,
+                "V88"
+              ]
+            ],
+            "sam_sure": 0,
+            "sam_doubtful": 0,
+            "spark_count": 2,
+            "label": "V88",
+            "frame_completeness": {
+              "size": [
+                4000,
+                3000
+              ],
+              "margin_fraction": 0.01,
+              "boundary_objects": [],
+              "requires_review": false,
+              "limitation": "No boundary contact does not prove absence of occlusion or hidden cartons."
+            },
+            "order": {
+              "number": "PO-scd-93-baseline",
+              "product": "V88",
+              "ordered": 1,
+              "open": 1
+            }
+          },
+          "rule": "hidden"
+        },
+        "note": {
+          "date": "",
+          "embedded_instructions": [],
+          "items": [
+            {
+              "description": "V88",
+              "legible": true,
+              "product_identity": {
+                "brand": "",
+                "model": "",
+                "product_code": "",
+                "variant": ""
+              },
+              "quantity": 1,
+              "unit": "carton"
+            }
+          ],
+          "note_number": "scd-93-baseline",
+          "supplier": "Controlled Fixture Supplier"
+        },
+        "camera": {
+          "all_cartons_visible": false,
+          "all_labels_identified": false,
+          "cartons_visible": 2,
+          "damaged_cartons": 0,
+          "product_identity": {
+            "brand": "V88",
+            "model": "",
+            "product_code": "",
+            "variant": ""
+          },
+          "product_on_labels": "V88",
+          "stacked": true
+        },
+        "receiver": {
+          "certain": true,
+          "product": "",
+          "quantity": 1,
+          "supplier": "controlled fixture supplier",
+          "unit": "carton"
+        },
+        "speaker_turns": [
+          {
+            "speaker": "A",
+            "transcript": "I am the receiving receiving clerk, I counted one carton, the supplier is controlled fixture supplier"
+          }
+        ],
+        "speech_interpretation": {
+          "count_candidates": [
+            1
+          ],
+          "driver_quantity": null,
+          "receiver": {
+            "certain": true,
+            "product": "",
+            "quantity": 1,
+            "supplier": "controlled fixture supplier",
+            "unit": "carton"
+          },
+          "receiver_speaker": "A",
+          "receiver_turn": "I am the receiving receiving clerk, I counted one carton, the supplier is controlled fixture supplier",
+          "voice_validation": {
+            "source_turn_matched": true,
+            "single_supported_count": true
+          }
+        },
+        "second_opinions": {},
+        "trace": [
+          {
+            "frame_completeness": {
+              "size": [
+                4000,
+                3000
+              ],
+              "margin_fraction": 0.01,
+              "boundary_objects": [],
+              "requires_review": false,
+              "limitation": "No boundary contact does not prove absence of occlusion or hidden cartons."
+            },
+            "at": "2026-11-03T19:37:14+03:00"
+          },
+          {
+            "gate_cross_check": {
+              "agreed": 0,
+              "sam_only": 0,
+              "spark_only": 2,
+              "doubled": 0
+            },
+            "at": "2026-11-03T19:37:42+03:00"
+          }
+        ],
+        "timings": [
+          {
+            "step": "Read delivery note",
+            "seconds": 4.957,
+            "status": "complete"
+          },
+          {
+            "step": "Inspect camera",
+            "seconds": 52.522,
+            "status": "complete"
+          },
+          {
+            "step": "Segment cartons",
+            "seconds": 15.108,
+            "status": "complete"
+          },
+          {
+            "step": "Transcribe speaker turns",
+            "seconds": 3.129,
+            "status": "complete"
+          },
+          {
+            "step": "Identify receiver count",
+            "seconds": 7.251,
+            "status": "complete"
+          },
+          {
+            "step": "Cross-check objects and authorize",
+            "seconds": 28.542,
+            "status": "complete"
+          }
+        ],
+        "seconds": 111.509,
+        "total_cost_usd": null,
+        "cost_status": "Not measured: provider-wide billing required; not agent-token cost.",
+        "input_sha256": {
+          "note": "92527c31252d40486c0091d69e80cc5ca868113354933609385c32a02d1191bc",
+          "camera": "a7d85e11979bbed09ea85f138726c9e2bbdc4f8d6d7f48e5af18fc75fac38a84",
+          "audio": "67f7e5d7944cdd6c16b6287483bcfb725f03fcd016551d4e4b5bf5b75870c65e"
+        }
+      },
+      "action": "human",
+      "rule": "hidden",
+      "seconds": 111.523,
+      "exact_target_met": true,
+      "acceptable_action_met": true
+    },
+    {
+      "id": "scd-93-quantity_mismatch",
+      "source_image_id": 93,
+      "scenario": "quantity_mismatch",
+      "expected_action": "human",
+      "acceptable_actions": [
+        "block",
+        "human"
+      ],
+      "started_at": "2026-11-03T19:35:52.560076+03:00",
+      "evidence": {
+        "mode": "dry_run",
+        "erp_written": false,
+        "result": {
+          "posted": false,
+          "gate": "human",
+          "reason": "Cartons are stacked or hidden; the count cannot be verified from the camera."
+        },
+        "decision": {
+          "action": "human",
+          "quantity": null,
+          "reasons": [
+            "Cartons are stacked or hidden; the count cannot be verified from the camera."
+          ],
+          "evidence": {
+            "note": [
+              [
+                2,
+                "V88"
+              ]
+            ],
+            "sam_sure": 0,
+            "sam_doubtful": 0,
+            "spark_count": 2,
+            "label": "V88",
+            "frame_completeness": {
+              "size": [
+                4000,
+                3000
+              ],
+              "margin_fraction": 0.01,
+              "boundary_objects": [],
+              "requires_review": false,
+              "limitation": "No boundary contact does not prove absence of occlusion or hidden cartons."
+            },
+            "order": {
+              "number": "PO-scd-93-quantity_mismatch",
+              "product": "V88",
+              "ordered": 2,
+              "open": 2
+            }
+          },
+          "rule": "hidden"
+        },
+        "note": {
+          "date": "",
+          "embedded_instructions": [],
+          "items": [
+            {
+              "description": "V88",
+              "legible": true,
+              "product_identity": {
+                "brand": "",
+                "model": "",
+                "product_code": "",
+                "variant": ""
+              },
+              "quantity": 2,
+              "unit": "carton"
+            }
+          ],
+          "note_number": "scd-93-quantity_mismatch",
+          "supplier": "Controlled Fixture Supplier"
+        },
+        "camera": {
+          "all_cartons_visible": false,
+          "all_labels_identified": false,
+          "cartons_visible": 2,
+          "damaged_cartons": 0,
+          "product_identity": {
+            "brand": "",
+            "model": "",
+            "product_code": "",
+            "variant": ""
+          },
+          "product_on_labels": "V88",
+          "stacked": true
+        },
+        "receiver": {
+          "certain": true,
+          "product": "",
+          "quantity": 1,
+          "supplier": "controlled fixture supplier",
+          "unit": "carton"
+        },
+        "speaker_turns": [
+          {
+            "speaker": "A",
+            "transcript": "I am the receiving clerk. I counted one carton, the supplier is controlled fixture supplier"
+          }
+        ],
+        "speech_interpretation": {
+          "count_candidates": [
+            1
+          ],
+          "driver_quantity": null,
+          "receiver": {
+            "certain": true,
+            "product": "",
+            "quantity": 1,
+            "supplier": "controlled fixture supplier",
+            "unit": "carton"
+          },
+          "receiver_speaker": "A",
+          "receiver_turn": "I am the receiving clerk. I counted one carton, the supplier is controlled fixture supplier",
+          "voice_validation": {
+            "source_turn_matched": true,
+            "single_supported_count": true
+          }
+        },
+        "second_opinions": {},
+        "trace": [
+          {
+            "frame_completeness": {
+              "size": [
+                4000,
+                3000
+              ],
+              "margin_fraction": 0.01,
+              "boundary_objects": [],
+              "requires_review": false,
+              "limitation": "No boundary contact does not prove absence of occlusion or hidden cartons."
+            },
+            "at": "2026-11-03T19:37:22+03:00"
+          },
+          {
+            "gate_cross_check": {
+              "agreed": 0,
+              "sam_only": 0,
+              "spark_only": 2,
+              "doubled": 0
+            },
+            "at": "2026-11-03T19:37:50+03:00"
+          }
+        ],
+        "timings": [
+          {
+            "step": "Read delivery note",
+            "seconds": 6.005,
+            "status": "complete"
+          },
+          {
+            "step": "Inspect camera",
+            "seconds": 53.772,
+            "status": "complete"
+          },
+          {
+            "step": "Segment cartons",
+            "seconds": 21.602,
+            "status": "complete"
+          },
+          {
+            "step": "Transcribe speaker turns",
+            "seconds": 2.483,
+            "status": "complete"
+          },
+          {
+            "step": "Identify receiver count",
+            "seconds": 6.461,
+            "status": "complete"
+          },
+          {
+            "step": "Cross-check objects and authorize",
+            "seconds": 27.768,
+            "status": "complete"
+          }
+        ],
+        "seconds": 118.091,
+        "total_cost_usd": null,
+        "cost_status": "Not measured: provider-wide billing required; not agent-token cost.",
+        "input_sha256": {
+          "note": "0132208fc15ccf9b291c4d26b4060fbfdb9dbe44f160b9d79e30602b278e90dd",
+          "camera": "a7d85e11979bbed09ea85f138726c9e2bbdc4f8d6d7f48e5af18fc75fac38a84",
+          "audio": "67f7e5d7944cdd6c16b6287483bcfb725f03fcd016551d4e4b5bf5b75870c65e"
+        }
+      },
+      "action": "human",
+      "rule": "hidden",
+      "seconds": 118.129,
+      "exact_target_met": true,
+      "acceptable_action_met": true
+    },
+    {
+      "id": "scd-93-receiver_uncertain",
+      "source_image_id": 93,
+      "scenario": "receiver_uncertain",
+      "expected_action": "human",
+      "acceptable_actions": [
+        "human"
+      ],
+      "started_at": "2026-11-03T19:35:54.987067+03:00",
+      "evidence": {
+        "mode": "dry_run",
+        "erp_written": false,
+        "result": {
+          "posted": false,
+          "gate": "human",
+          "reason": "Cartons are stacked or hidden; the count cannot be verified from the camera."
+        },
+        "decision": {
+          "action": "human",
+          "quantity": null,
+          "reasons": [
+            "Cartons are stacked or hidden; the count cannot be verified from the camera."
+          ],
+          "evidence": {
+            "note": [
+              [
+                1,
+                "V88"
+              ]
+            ],
+            "sam_sure": 0,
+            "sam_doubtful": 0,
+            "spark_count": 2,
+            "label": "V88",
+            "frame_completeness": {
+              "size": [
+                4000,
+                3000
+              ],
+              "margin_fraction": 0.01,
+              "boundary_objects": [],
+              "requires_review": false,
+              "limitation": "No boundary contact does not prove absence of occlusion or hidden cartons."
+            },
+            "order": {
+              "number": "PO-scd-93-receiver_uncertain",
+              "product": "V88",
+              "ordered": 1,
+              "open": 1
+            }
+          },
+          "rule": "hidden"
+        },
+        "note": {
+          "date": "",
+          "embedded_instructions": [],
+          "items": [
+            {
+              "description": "V88",
+              "legible": true,
+              "product_identity": {
+                "brand": "",
+                "model": "",
+                "product_code": "",
+                "variant": ""
+              },
+              "quantity": 1,
+              "unit": "carton"
+            }
+          ],
+          "note_number": "scd-93-receiver_uncertain",
+          "supplier": "Controlled Fixture Supplier"
+        },
+        "camera": {
+          "all_cartons_visible": false,
+          "all_labels_identified": false,
+          "cartons_visible": 2,
+          "damaged_cartons": 0,
+          "product_identity": {
+            "brand": "",
+            "model": "",
+            "product_code": "",
+            "variant": ""
+          },
+          "product_on_labels": "V88",
+          "stacked": true
+        },
+        "receiver": {
+          "certain": false,
+          "product": "",
+          "quantity": null,
+          "supplier": "controlled fixture supplier",
+          "unit": "cartons"
+        },
+        "speaker_turns": [
+          {
+            "speaker": "A",
+            "transcript": "I am the receiving clerk. I am not sure how many cartons arrived. I could not complete the count the supplier is controlled fixture supplier"
+          }
+        ],
+        "speech_interpretation": {
+          "count_candidates": [],
+          "driver_quantity": null,
+          "receiver": {
+            "certain": false,
+            "product": "",
+            "quantity": null,
+            "supplier": "controlled fixture supplier",
+            "unit": "cartons"
+          },
+          "receiver_speaker": "A",
+          "receiver_turn": "I am the receiving clerk. I am not sure how many cartons arrived. I could not complete the count the supplier is controlled fixture supplier",
+          "voice_validation": {
+            "source_turn_matched": true,
+            "single_supported_count": false
+          }
+        },
+        "second_opinions": {},
+        "trace": [
+          {
+            "frame_completeness": {
+              "size": [
+                4000,
+                3000
+              ],
+              "margin_fraction": 0.01,
+              "boundary_objects": [],
+              "requires_review": false,
+              "limitation": "No boundary contact does not prove absence of occlusion or hidden cartons."
+            },
+            "at": "2026-11-03T19:37:26+03:00"
+          },
+          {
+            "gate_cross_check": {
+              "agreed": 0,
+              "sam_only": 0,
+              "spark_only": 2,
+              "doubled": 0
+            },
+            "at": "2026-11-03T19:38:01+03:00"
+          }
+        ],
+        "timings": [
+          {
+            "step": "Read delivery note",
+            "seconds": 9.095,
+            "status": "complete"
+          },
+          {
+            "step": "Inspect camera",
+            "seconds": 47.939,
+            "status": "complete"
+          },
+          {
+            "step": "Segment cartons",
+            "seconds": 22.099,
+            "status": "complete"
+          },
+          {
+            "step": "Transcribe speaker turns",
+            "seconds": 2.844,
+            "status": "complete"
+          },
+          {
+            "step": "Identify receiver count",
+            "seconds": 9.015,
+            "status": "complete"
+          },
+          {
+            "step": "Cross-check objects and authorize",
+            "seconds": 35.895,
+            "status": "complete"
+          }
+        ],
+        "seconds": 126.887,
+        "total_cost_usd": null,
+        "cost_status": "Not measured: provider-wide billing required; not agent-token cost.",
+        "input_sha256": {
+          "note": "f7e9b7734d53b4719374d33a64306fba512e34197b92787c7b1fe8a15f1419b7",
+          "camera": "a7d85e11979bbed09ea85f138726c9e2bbdc4f8d6d7f48e5af18fc75fac38a84",
+          "audio": "9fece24dc92650a0664ca84b80ff0274ea7c502d430c7d840ff499e682de5f59"
+        }
+      },
+      "action": "human",
+      "rule": "hidden",
+      "seconds": 126.9,
+      "exact_target_met": true,
+      "acceptable_action_met": true
+    },
+    {
+      "id": "scd-111-baseline",
+      "source_image_id": 111,
+      "scenario": "baseline",
+      "expected_action": "post",
+      "acceptable_actions": [
+        "post"
+      ],
+      "started_at": "2026-11-03T19:37:42.976216+03:00",
+      "action": "error",
+      "error_type": "ValueError",
+      "seconds": 0.0,
+      "exact_target_met": false,
+      "acceptable_action_met": false
+    },
+    {
+      "id": "scd-111-quantity_mismatch",
+      "source_image_id": 111,
+      "scenario": "quantity_mismatch",
+      "expected_action": "block",
+      "acceptable_actions": [
+        "block",
+        "human"
+      ],
+      "started_at": "2026-11-03T19:37:42.976762+03:00",
+      "action": "error",
+      "error_type": "ValueError",
+      "seconds": 0.0,
+      "exact_target_met": false,
+      "acceptable_action_met": false
+    },
+    {
+      "id": "scd-111-receiver_uncertain",
+      "source_image_id": 111,
+      "scenario": "receiver_uncertain",
+      "expected_action": "human",
+      "acceptable_actions": [
+        "human"
+      ],
+      "started_at": "2026-11-03T19:37:42.976939+03:00",
+      "action": "error",
+      "error_type": "ValueError",
+      "seconds": 0.0,
+      "exact_target_met": false,
+      "acceptable_action_met": false
+    },
+    {
+      "id": "scd-278-baseline",
+      "source_image_id": 278,
+      "scenario": "baseline",
+      "expected_action": "human",
+      "acceptable_actions": [
+        "human"
+      ],
+      "started_at": "2026-11-03T19:37:42.977113+03:00",
+      "action": "error",
+      "error_type": "ValueError",
+      "seconds": 0.0,
+      "exact_target_met": false,
+      "acceptable_action_met": false
+    },
+    {
+      "id": "scd-278-quantity_mismatch",
+      "source_image_id": 278,
+      "scenario": "quantity_mismatch",
+      "expected_action": "human",
+      "acceptable_actions": [
+        "block",
+        "human"
+      ],
+      "started_at": "2026-11-03T19:37:42.977243+03:00",
+      "action": "error",
+      "error_type": "ValueError",
+      "seconds": 0.0,
+      "exact_target_met": false,
+      "acceptable_action_met": false
+    },
+    {
+      "id": "scd-278-receiver_uncertain",
+      "source_image_id": 278,
+      "scenario": "receiver_uncertain",
+      "expected_action": "human",
+      "acceptable_actions": [
+        "human"
+      ],
+      "started_at": "2026-11-03T19:37:42.977390+03:00",
+      "action": "error",
+      "error_type": "ValueError",
+      "seconds": 0.0,
+      "exact_target_met": false,
+      "acceptable_action_met": false
+    },
+    {
+      "id": "scd-711-baseline",
+      "source_image_id": 711,
+      "scenario": "baseline",
+      "expected_action": "human",
+      "acceptable_actions": [
+        "human"
+      ],
+      "started_at": "2026-11-03T19:37:42.977534+03:00",
+      "action": "error",
+      "error_type": "ValueError",
+      "seconds": 0.0,
+      "exact_target_met": false,
+      "acceptable_action_met": false
+    },
+    {
+      "id": "scd-711-quantity_mismatch",
+      "source_image_id": 711,
+      "scenario": "quantity_mismatch",
+      "expected_action": "human",
+      "acceptable_actions": [
+        "block",
+        "human"
+      ],
+      "started_at": "2026-11-03T19:37:42.977664+03:00",
+      "action": "error",
+      "error_type": "ValueError",
+      "seconds": 0.0,
+      "exact_target_met": false,
+      "acceptable_action_met": false
+    },
+    {
+      "id": "scd-711-receiver_uncertain",
+      "source_image_id": 711,
+      "scenario": "receiver_uncertain",
+      "expected_action": "human",
+      "acceptable_actions": [
+        "human"
+      ],
+      "started_at": "2026-11-03T19:37:42.977803+03:00",
+      "action": "error",
+      "error_type": "ValueError",
+      "seconds": 0.0,
+      "exact_target_met": false,
+      "acceptable_action_met": false
+    }
+  ]
+}
