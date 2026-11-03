@@ -9,3 +9,7 @@ Files are processed in an ephemeral temporary directory and deleted on normal su
 This is an access-controlled reviewer demo, not a multi-tenant production service: a shared code has no individual user identity or per-user quota. The code is not embedded in the page, URL, repository, or public test report. Invalid code/origin is rejected before processing; provider error details are suppressed. Four HTTP tests cover unauthorized calls, cross-origin calls, result delivery and error redaction.
 
 References: https://vercel.com/docs/functions/runtimes/python and https://vercel.com/docs/functions/limitations
+
+## Production verification — 3 November 2026
+
+Deployment `4dab8c9` completed successfully. Production GET reported configured; a POST without a code returned 403. An authenticated request with the existing synthetic oil fixture completed in 63.4 seconds: `post`, quantity 12, rule `match`, `erp_written: false`. All 12 objects matched; the second reader and audit completed. Public evidence: `evaluation/hosted-smoke-2026-11-03.json`, also included in `site/validation.json`. This is a connectivity/full-pipeline smoke test, not a new independent accuracy test. The browser showed the hosted access-code form. Four HTTP tests passed.

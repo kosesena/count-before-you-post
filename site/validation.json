@@ -1617,5 +1617,111 @@
     ],
     "conclusion": "Literal extraction retry passed black product identity, then stopped on object disagreement. Wrong-colour control remained blocked. No complete real-photo acceptance established.",
     "total_cost_usd": null
+  },
+  "hosted_smoke": {
+    "date": "2026-11-03",
+    "scope": "One live production HTTP smoke test using an existing synthetic carton image, authored note/order and synthetic receiver speech. Not real-photo or field validation.",
+    "endpoint": "https://count-before-you-post.vercel.app/api/verify",
+    "http_status": 200,
+    "wall_seconds": 63.39,
+    "mode": "dry_run",
+    "erp_written": false,
+    "decision": {
+      "action": "post",
+      "quantity": 12,
+      "reasons": [
+        "Note, SAM and Spark agree on 12. Within PO-CLEAN-synthetic-oil (12 open)."
+      ],
+      "evidence": {
+        "note": [
+          [
+            12,
+            "Ayçiçek yağı 5 L"
+          ]
+        ],
+        "sam_sure": 1,
+        "sam_doubtful": 11,
+        "spark_count": 12,
+        "label": "AYÇIÇEK YAĞI 5 L",
+        "order": {
+          "number": "PO-CLEAN-synthetic-oil",
+          "product": "Ayçiçek yağı 5 L",
+          "ordered": 12,
+          "open": 12
+        },
+        "cross": {
+          "agreed": 12,
+          "sam_only": 0,
+          "spark_only": 0,
+          "doubled": 0
+        },
+        "spoken": {
+          "certain": true,
+          "product": "",
+          "quantity": 12,
+          "supplier": "Controlled Fixture Supplier",
+          "unit": "cartons"
+        },
+        "second_reader": [
+          [
+            12,
+            "Ayçiçek yağı 5 L"
+          ]
+        ],
+        "second_supplier": "Controlled Fixture Supplier",
+        "audit": {
+          "ok": true,
+          "quantity": true,
+          "product": true,
+          "instructions": "",
+          "quotes": {
+            "quantity": "Quantity: 12",
+            "product": "Product: Ayçiçek yağı 5 L",
+            "instructions": ""
+          }
+        }
+      },
+      "rule": "match"
+    },
+    "timings": [
+      {
+        "step": "Read delivery note",
+        "seconds": 6.711,
+        "status": "complete"
+      },
+      {
+        "step": "Inspect camera",
+        "seconds": 12.252,
+        "status": "complete"
+      },
+      {
+        "step": "Segment cartons",
+        "seconds": 4.028,
+        "status": "complete"
+      },
+      {
+        "step": "Transcribe speaker turns",
+        "seconds": 1.623,
+        "status": "complete"
+      },
+      {
+        "step": "Identify receiver count",
+        "seconds": 6.226,
+        "status": "complete"
+      },
+      {
+        "step": "Cross-check objects and authorize",
+        "seconds": 30.376,
+        "status": "complete"
+      }
+    ],
+    "input_sha256": {
+      "note": "0ed32dc8b3cbaf709273c6b5d0d1764408f6f0a7c2c70e8dcc2152bd776d3f95",
+      "camera": "0501e58bad90a837a4aa14574f54a6c17e633950e06802b571f6da4fd4c2d052",
+      "audio": "6b57429bb47573317dc4c719d5dd88f1cbea14c4124559cfe24217e33ae449ed"
+    },
+    "total_cost_usd": null,
+    "cost_status": "Not measured: provider-wide billing required; not agent-token cost.",
+    "unauthenticated_status": 403
   }
 }
