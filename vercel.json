@@ -7,7 +7,7 @@
   "functions": {
     "api/verify.py": {
       "maxDuration": 300,
-      "excludeFiles": "{evaluation/**,experiments/**,tests/**,output/**,.env*,.venv/**,site/img/**,site/audio/**,site/media/**,site/sim/**,site/sim-lego/**}"
+      "excludeFiles": "{assets/**,site/**,evaluation/**,experiments/**,tests/**,docs/**,output/**,.env*,.venv/**,.git/**}"
     }
   }
 }
