@@ -53,38 +53,6 @@ trace, with and without the gate, each step with the time it was recorded.
 Built during the Meta Global AI Developer Hackathon (26 Oct – 4 Nov 2026), theme *Build for
 Your World*. Everything in this repository was written during the event.
 
-<a id="current-verification-workflow-1-nov-hardening"></a>
-
-## ![Current verification workflow (1 Nov hardening)](assets/readme/headings/03-current-verification-workflow-1-nov-hardening.webp)
-
-[Three-decision jury walkthrough](site/jury/index.html) · [Read the evidence first](site/review/index.html) · [New-input verification](site/verify/index.html) · [Validation protocol](docs/VALIDATION.md)
-
-**3 November update:** [Five previously unused photos, all 15 first-run controls](site/unseen-validation/)
-include one expected clean approval and **one unexpected dry-run approval** where the
-predeclared target was human review. No ERP writes occurred. These authored controls use
-product-description matching, not strict SKU validation; their targets come from pre-run
-assistant inspection, not independent field labels. The historical zero-wrong-receipt results
-below do not establish zero incorrect approvals on these new inputs. The current code adds
-a frame-boundary guard and independent confirmation of document/product mismatches.
-The original results remain unchanged; offline regression tests are not new live-model evidence.
-
-Run `.venv/bin/python -m cbyp.verify_server` and open http://127.0.0.1:8768. Supply your own
-trusted order, note, current carton photo and receiver WAV. Pressing **Verify delivery** sends
-the files to Meta/Baseten and may incur API charges. It checks supplier, exact normalized
-product, carton units, physical evidence, voice, PDF text and second opinions. **No ERP writer
-is installed in this UI.** The result and input hashes are saved locally.
-
-The tables below describe **historical core-profile experiments**, not a completed validation
-of the new full-check workflow. A [30-image public-photo benchmark and controlled integration trials](docs/CONTROLLED_VALIDATION.md)
-now document the harder inputs, failures, and fixes. They are not a real-delivery field pilot
-or measured worker time savings. Historical results are preserved, not relabelled as new runs.
-The agent CLI and MCP now require full checks by default; `--legacy-core` on the experiment
-CLI is an explicitly labelled reproduction mode. Supply host-controlled receiver recordings via
-`CBYP_RECEIVER_AUDIO_DIR/<case>.wav`; missing required evidence refuses posting.
-
-A Purchase Receipt updates stock; it does not itself create the supplier payable. That is the
-Purchase Invoice. Reference: [ERPNext Purchase Receipt](https://docs.frappe.io/erpnext/purchase-receipt).
-
 <a id="in-30-seconds"></a>
 
 ## ![In 30 seconds](assets/readme/headings/04-in-30-seconds.webp)
@@ -804,6 +772,19 @@ The first rule that fires decides (`cbyp/gate.py`, offline tests in `tests/`):
   historical result. The order was added on 1 Nov, after the measured runs: the six cases were
   replayed with it (the decisions did not change) and only the ERPNext receipt above was written
   with it.
+- New photos after the measured runs: on [five previously unused photos](site/unseen-validation/)
+  (15 first-run controls, 3 Nov) the gate gave one expected clean approval and **one dry-run
+  approval where human review was the target**. Nothing was written to the ERP. These controls
+  match product descriptions, not strict SKUs, and their targets come from inspection before the
+  run, not from field labels. So the zero-wrong-receipt results above do not carry over to new
+  inputs; the code since adds a frame-boundary guard and an independent check of
+  document/product mismatches. The [30-image public-photo benchmark](docs/CONTROLLED_VALIDATION.md)
+  documents the harder inputs, failures and fixes. None of this is a field pilot or a measured
+  time saving.
+- The tables above are the historical core-profile runs, kept as recorded, not a validation of
+  the current full-check workflow.
+- A Purchase Receipt updates stock; the supplier payable is the Purchase Invoice
+  ([ERPNext Purchase Receipt](https://docs.frappe.io/erpnext/purchase-receipt)).
 
 Every experiment, with its numbers and its failures, is in **[docs/JOURNAL.md](docs/JOURNAL.md)**.
 
@@ -871,6 +852,15 @@ cp .env.example .env   # add your META_API_KEY (ERPNEXT_* for the ERP runs)
 CBYP_MCP_ERP=0 demo/muse-dock/muse-dock.sh              # Muse Code at the dock, behind the gate (dry run)
 .venv/bin/python experiments/build_site.py              # rebuild the demo page's data
 ```
+
+**Verify a delivery of your own** (needs keys; may incur API charges): run
+`.venv/bin/python -m cbyp.verify_server` and open http://127.0.0.1:8768. Supply a trusted order,
+the note, a current carton photo and the receiver's WAV; it checks supplier, exact product,
+carton units, physical evidence, voice, PDF text and second opinions. No ERP writer is installed
+in this UI; the result and input hashes are saved locally. The agent CLI and MCP require these
+full checks by default (`--legacy-core` on the experiment CLI reproduces the historical runs);
+receiver recordings come from `CBYP_RECEIVER_AUDIO_DIR/<case>.wav`, and missing evidence refuses
+posting.
 
 `CBYP_LANG=en|de|zh` runs the same dock in another language. The Blender scenes render
 headless (`blender -b --factory-startup -P experiments/blender/warehouse.py`; run

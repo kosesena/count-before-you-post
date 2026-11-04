@@ -33,3 +33,10 @@ evaluation/results*.json
 # Private field observations and provider billing exports
 evaluation/private/
 .vercel
+
+# Internal production notes, kept local
+docs/JURY_DELIVERY.md
+docs/DEMO_VOICEOVER_EN.md
+docs/PILOT_PLAN.md
+output/
+experiments/video-voice/

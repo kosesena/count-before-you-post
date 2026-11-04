@@ -175,4 +175,4 @@ completion. Narrow-screen Panel controls were also used during the last two scen
 
 ## Pilot preparation — 2 Nov 2026
 
-See [PILOT_PLAN.md](PILOT_PLAN.md) for verified candidate contacts, public-dataset limitations, an unsent outreach draft, field observation protocol and billing requirements. Blank JSON templates are in evaluation/. No partner, fresh real delivery, field benefit or complete billing result is claimed.
+Blank JSON templates for a field pilot are in evaluation/. No partner, fresh real delivery, field benefit or complete billing result is claimed.
