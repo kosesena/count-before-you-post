@@ -183,6 +183,17 @@ Agents Pt. 2, Yash Khare, 28 Oct; the Fireworks workshop, Sinan Ozdemir, 30 Oct)
 | Three-way match: the same readings against other orders, four languages | **16/16** | the expected decision for each order | [`gate_orders.json`](experiments/results/gate_orders.json) (+ `en/`, `de/`, `zh/`) |
 | Receipt against a real Purchase Order in ERPNext | 12 of 12 received | a second delivery on the same order: stopped (`over_order`, 0 open) | [`erp_against_order.json`](experiments/results/erp_against_order.json) |
 
+**What the build used on the Meta Model API** (dev.meta.ai usage dashboard, 29 Oct – 4 Nov; the
+dashboard's window does not reach back to 26–28 Oct):
+
+| Requests | Input tokens | Output tokens | Images segmented (SAM 3.1) | Images drawn (Muse Image) | Audio transcribed |
+|---|---|---|---|---|---|
+| 5.9k | 285.1M (92.5% cache hits) | 6.3M | 861 | 101 | 817 s |
+
+Most of the tokens are Muse Code writing the site and the simulator (`muse-spark-1.3-contributor`
+on 29–30 Oct); the dock runs themselves are `muse-spark-1.3`, `sam-3.1` and `muse-wonder-1.0`. It
+all ran on the hackathon's free API credits.
+
 Six synthetic Blender scenes, synthetic voices and machine-written attacks: this shows that
 the rules do what they say, not how accurate they are on real docks. See
 [Honest limits](#honest-limits).
