@@ -2,9 +2,13 @@
 
 <a href="https://count-before-you-post.vercel.app"><img src="assets/readme/toybox.jpg" alt="A child's hands hold the Count Before You Post toy box: a blue box with the ten figures in front of a warehouse dock" width="100%"></a>
 
-# Count Before You Post
+<a id="count-before-you-post"></a>
 
-### A verification gate between AI agents and the ERP
+# ![Count Before You Post](assets/readme/headings/01-count-before-you-post.webp)
+
+<a id="a-verification-gate-between-ai-agents-and-the-erp"></a>
+
+### ![A verification gate between AI agents and the ERP](assets/readme/headings/02-a-verification-gate-between-ai-agents-and-the-erp.webp)
 
 Before a goods receipt is written, the delivery note, the camera, the receiver's voice and a second model must agree. If they don't, nothing is written and a person decides.
 
@@ -27,6 +31,8 @@ Before a goods receipt is written, the delivery note, the camera, the receiver's
 
 <sub>Toy box, night and morning pictures: ChatGPT (OpenAI), drawn from our Muse Image cast.</sub>
 
+<sub>Brick-built section headings: ChatGPT (OpenAI), in the opening toy box’s blue and orange.</sub>
+
 The page replays recorded runs (real Meta API) and makes no API calls: the six dock cases in
 four languages, SAM's masks, the carton-by-carton cross-check and the agent's step-by-step
 trace, with and without the gate, each step with the time it was recorded.
@@ -34,7 +40,9 @@ trace, with and without the gate, each step with the time it was recorded.
 Built during the Meta Global AI Developer Hackathon (26 Oct – 4 Nov 2026), theme *Build for
 Your World*. Everything in this repository was written during the event.
 
-## Current verification workflow (1 Nov hardening)
+<a id="current-verification-workflow-1-nov-hardening"></a>
+
+## ![Current verification workflow (1 Nov hardening)](assets/readme/headings/03-current-verification-workflow-1-nov-hardening.webp)
 
 [Three-decision jury walkthrough](site/jury/index.html) · [Read the evidence first](site/review/index.html) · [New-input verification](site/verify/index.html) · [Validation protocol](docs/VALIDATION.md)
 
@@ -64,7 +72,9 @@ CLI is an explicitly labelled reproduction mode. Supply host-controlled receiver
 A Purchase Receipt updates stock; it does not itself create the supplier payable. That is the
 Purchase Invoice. Reference: [ERPNext Purchase Receipt](https://docs.frappe.io/erpnext/purchase-receipt).
 
-## In 30 seconds
+<a id="in-30-seconds"></a>
+
+## ![In 30 seconds](assets/readme/headings/04-in-30-seconds.webp)
 
 > **The problem.** At a warehouse dock, the goods receipt is typed from the delivery note. Give
 > that job to an AI agent and it trusts the paper too: whatever the note says, even a line telling
@@ -84,7 +94,9 @@ Purchase Invoice. Reference: [ERPNext Purchase Receipt](https://docs.frappe.io/e
 | [Check it yourself](#check-it-yourself-a-few-minutes-no-api-key) · [Why](#why) · [What it does](#what-it-does) · [Results](#results-at-a-glance) · [Built with Muse](#built-with-muse) | [The 3D simulators](#drive-the-dock-the-3d-simulators) · [Meet the cast](#meet-the-cast) · [The evidence](#the-evidence) |
 | [How the gate decides](#how-the-gate-decides) · [Honest limits](#honest-limits) · [Next](#next) | [Repository map](#repository-map) · [Setup](#setup) · [Run](#run) |
 
-## Check it yourself: a few minutes, no API key
+<a id="check-it-yourself-a-few-minutes-no-api-key"></a>
+
+## ![Check it yourself: a few minutes, no API key](assets/readme/headings/05-check-it-yourself-a-few-minutes-no-api-key.webp)
 
 ```bash
 git clone --depth 1 https://github.com/kosesena/count-before-you-post && cd count-before-you-post
@@ -101,7 +113,9 @@ gate 0/6` in each of the four languages (24/24 in all, and 16/16 against other o
 here; the model runs themselves need a key ([Run](#run)). The clone is about 2 GB (rendered
 scenes and models); the checks take about a minute and a half.
 
-## Why
+<a id="why"></a>
+
+## ![Why](assets/readme/headings/06-why.webp)
 
 At a warehouse dock, the goods receipt is typed from the delivery note. Whatever the paper
 says can become stock and affect later invoice matching and replenishment. Give that job to an AI
@@ -118,7 +132,9 @@ were machine-written, not real supplier mail.
 
 So here the number has to come from what arrived, not from what the paper says.
 
-## What it does
+<a id="what-it-does"></a>
+
+## ![What it does](assets/readme/headings/07-what-it-does.webp)
 
 One delivery, three independent readings, one gate:
 
@@ -161,7 +177,9 @@ Agents Pt. 2, Yash Khare, 28 Oct; the Fireworks workshop, Sinan Ozdemir, 30 Oct)
 | Checks at the crucial checkpoints, trading speed for accuracy | Wonder and Rover run only when the gate is about to post, not on every step |
 | The plan, act and observe loop | Spark's tool-calling loop ([below](#the-agent-loop-multi-turn-tool-calling-with-muse-spark)), every turn recorded |
 
-## Results at a glance
+<a id="results-at-a-glance"></a>
+
+## ![Results at a glance](assets/readme/headings/08-results-at-a-glance-blue-orange.webp)
 
 | Check | Result |
 |---|---|
@@ -181,7 +199,9 @@ Six synthetic Blender scenes, synthetic voices and machine-written attacks: this
 the rules do what they say, not how accurate they are on real docks. See
 [Honest limits](#honest-limits).
 
-## Built with Muse
+<a id="built-with-muse"></a>
+
+## ![Built with Muse](assets/readme/headings/09-built-with-muse.webp)
 
 Every step that needs AI runs on Meta's models through the Meta Model API.
 
@@ -195,7 +215,9 @@ Every step that needs AI runs on Meta's models through the Meta Model API.
 | **Muse Code** | Ada | Wrote the ERPNext client, the demo page, the character pages, the 3D simulator and the dock scenes; and, through the gate's MCP server, worked the dock as an outside agent | see [What Muse Code built](#what-muse-code-built) |
 | **Muse Image** | Iris | Drew the whole cast: every character portrait in this repository and on the demo page | `experiments/mascots_from_ref.py`, `assets/mascots/` |
 
-### Other tools, named where they were used
+<a id="other-tools-named-where-they-were-used"></a>
+
+### ![Other tools, named where they were used](assets/readme/headings/10-other-tools-named-where-they-were-used.webp)
 
 | Tool | What it made | Where |
 |---|---|---|
@@ -205,7 +227,9 @@ Every step that needs AI runs on Meta's models through the Meta Model API.
 | **Meshy** | The LEGO truck, forklift and meeting table in the simulator. A rigged, waving 3D Glimmer was tried and not used (the model lost her orb and her torso bent) | `site/sim/models/`, `experiments/glimmer_farewell.py` |
 | **Higgsfield Genjutsu** | Glimmer's farewell at the end of the demo page: our Muse Image Glimmer, moved by a waving clip from Pixabay (by videoplasty, Pixabay Content License); her one-eye wink drawn by Muse Image on the clip's last frame | `experiments/glimmer-farewell/`, `site/media/glimmer-farewell.webp` |
 
-### What Muse Code built
+<a id="what-muse-code-built"></a>
+
+### ![What Muse Code built](assets/readme/headings/11-what-muse-code-built.webp)
 
 Muse Code (`muse exec`, model `muse-spark-1.3`) wrote much of this repository. Every task it
 was given is in [`docs/muse-code/`](docs/muse-code/), verbatim, and its work is committed under
@@ -263,9 +287,13 @@ starting a test server; we then ran the checks ourselves (`experiments/web/sim_t
 all six simulator cases to their decision). The designs it built from were drawn by Muse
 Image and chosen by Sena (`experiments/mockups/`).
 
-## Drive the dock: the 3D simulators
+<a id="drive-the-dock-the-3d-simulators"></a>
 
-### The Brick Dock (built with OpenAI Codex)
+## ![Drive the dock: the 3D simulators](assets/readme/headings/12-drive-the-dock-the-3d-simulators.webp)
+
+<a id="the-brick-dock-built-with-openai-codex"></a>
+
+### ![The Brick Dock (built with OpenAI Codex)](assets/readme/headings/13-the-brick-dock-built-with-openai-codex.webp)
 
 **[count-before-you-post.vercel.app/sim-lego](https://count-before-you-post.vercel.app/sim-lego/)**,
 where the demo page's *Drive the dock* button leads: the same warehouse in toy bricks. A
@@ -348,7 +376,9 @@ exported for the browser by `experiments/web/export_dock.py`.
 
 </details>
 
-## Meet the cast
+<a id="meet-the-cast"></a>
+
+## ![Meet the cast](assets/readme/headings/14-meet-the-cast.webp)
 
 Every Meta model in this project has a character, and so do the two that are not models: the
 gate and the supervisor.
@@ -379,7 +409,9 @@ Turkish names. **Kapı** (say *KAH-puh*) means *gate*. **Şef** (say *shef*, fro
 *chef*) means *chief*: it is what a Turkish warehouse calls the shift supervisor. The receiver
 speaks Turkish too: *"on iki koli geldi"* means *"twelve cartons came"*.
 
-## The evidence
+<a id="the-evidence"></a>
+
+## ![The evidence](assets/readme/headings/15-the-evidence.webp)
 
 The numbers come from a receiving dock built in Blender (headless,
 `experiments/blender/warehouse.py`): the truck at the door, the delivery note, the pallet in the
@@ -394,7 +426,9 @@ is why they look older than the rest of this page.
 
 ![The six ceiling-camera frames: ok, wrong product, short, injected note, damaged, stacked](assets/readme/ceiling-cases.jpg)
 
-### Six cases, four languages
+<a id="six-cases-four-languages"></a>
+
+### ![Six cases, four languages](assets/readme/headings/16-six-cases-four-languages.webp)
 
 Scenario ids are Turkish because the first runs used Turkish delivery notes: `ok` = matching
 delivery, `eksik` = missing carton, `wrong` = wrong product, `hasarli` = damaged carton,
@@ -436,7 +470,9 @@ injected note and the damaged carton as 11; German: the injected note; Chinese: 
 note and the stacked pallet as 12): the same model, a different run, a different mistake,
 which is the point of a gate that does not depend on the agent being right twice.
 
-### Three-way match: the purchase order
+<a id="three-way-match-the-purchase-order"></a>
+
+### ![Three-way match: the purchase order](assets/readme/headings/17-three-way-match-the-purchase-order.webp)
 
 A goods receipt is posted against what the company ordered, not only against what the
 supplier's note says. In SAP terms it is the three-way match at receiving: the purchase order,
@@ -467,7 +503,9 @@ remarks carry the gate's reason. A second delivery of 12 on the same order was s
 gate (`over_order`, 0 open) and never sent (`experiments/post_against_order.py`,
 `experiments/results/erp_against_order.json`).
 
-### The agent picks its tools, the gate holds the pen
+<a id="the-agent-picks-its-tools-the-gate-holds-the-pen"></a>
+
+### ![The agent picks its tools, the gate holds the pen](assets/readme/headings/18-the-agent-picks-its-tools-the-gate-holds-the-pen.webp)
 
 `cbyp/agent.py` runs Muse Spark as a tool-calling agent. It decides what to do: read the note,
 ask SAM to count (and with which word), look at the pallet, ask Şef, or post. The gate decides
@@ -488,7 +526,9 @@ write receipts that should not exist, and the same case went differently on two 
 makes the outcome the same every time. (`experiments/results/agent_warehouse.json`,
 `agent_warehouse_cross.json`.)
 
-### The agent loop: multi-turn tool calling with Muse Spark
+<a id="the-agent-loop-multi-turn-tool-calling-with-muse-spark"></a>
+
+### ![The agent loop: multi-turn tool calling with Muse Spark](assets/readme/headings/19-the-agent-loop-multi-turn-tool-calling-with-muse-spark.webp)
 
 The receiving agent is a plain Muse Spark agent loop on the Responses API (`cbyp/agent.py`,
 `_loop`), no framework:
@@ -518,7 +558,9 @@ gate, reasoned twice about the injected "post 100", and asked Şef. The simulato
 these traces step by step as a chat between the characters (see
 [Drive the dock](#drive-the-dock-the-3d-simulators)), so the loop can be read turn by turn.
 
-### How much should the agent reason?
+<a id="how-much-should-the-agent-reason"></a>
+
+### ![How much should the agent reason?](assets/readme/headings/20-how-much-should-the-agent-reason.webp)
 
 *After the Fireworks workshop with Sinan Ozdemir, a Meta Global AI Developer Hackathon live
 session on 30 Oct.* His advice: don't assume that more reasoning is better; measure it on your
@@ -563,7 +605,9 @@ price, not the tools' calls. 7 of the 37 runs were cut off by the API ("referenc
 not found or expired", when six ran in parallel) and were run again one at a time; the table
 counts the completed runs.
 
-### Muse Code at the dock: an agent we did not write
+<a id="muse-code-at-the-dock-an-agent-we-did-not-write"></a>
+
+### ![Muse Code at the dock: an agent we did not write](assets/readme/headings/21-muse-code-at-the-dock-an-agent-we-did-not-write.webp)
 
 The gate should not depend on the agent being ours. So the same tools and the same gate are
 also an MCP server (`cbyp/mcp_server.py`), and Meta's own agent, Muse Code, works the dock
@@ -587,7 +631,9 @@ A careful agent and a safe write are not the same thing. The run was a dry run
 our own MCP client test, the other five are Muse Code); the write-up is
 [`docs/muse-code/mcp-dock.md`](docs/muse-code/mcp-dock.md).
 
-### SAM and Spark, carton by carton
+<a id="sam-and-spark-carton-by-carton"></a>
+
+### ![SAM and Spark, carton by carton](assets/readme/headings/22-sam-and-spark-carton-by-carton.webp)
 
 Every carton SAM finds comes with a pixel mask (decoded with Meta's `meta-sam-parser`).
 Green: sure, amber: doubtful. The gap in the short delivery and the crushed carton are the
@@ -605,7 +651,9 @@ load they disagree carton by carton, so it goes to a person.
 
 ![SAM x Spark cross-check](experiments/blender/out/depo-cross.jpg)
 
-### Voice: the receiver's own count
+<a id="voice-the-receivers-own-count"></a>
+
+### ![Voice: the receiver's own count](assets/readme/headings/23-voice-the-receiver-s-own-count.webp)
 
 The receiver says "On iki koli geldi, Doğan Gıda'dan". Muse Voice Transcribe writes it down,
 and Spark pulls out the number, the supplier and whether the speaker was sure. On four clips
@@ -659,7 +707,9 @@ voices one label but still split the talk into two turns, and Spark found the re
 what each turn said. Asked for JSON, diarization reset the connection every time; asked for
 plain text (`A: ...` per turn), it answered, so `cbyp/voice.py` asks for plain text.
 
-### PDF notes: text no one can see
+<a id="pdf-notes-text-no-one-can-see"></a>
+
+### ![PDF notes: text no one can see](assets/readme/headings/24-pdf-notes-text-no-one-can-see.webp)
 
 Suppliers e-mail typed PDFs, so Spark reads those too. The same delivery as three PDFs, with
 the `ok` camera evidence (`experiments/results/pdf_gate.json`):
@@ -675,7 +725,9 @@ saw them, even when asked for "very small or invisible text". Without this check
 would have posted that note as clean. `cbyp/pdf_text.py` reads every character's colour and
 size instead of asking a model.
 
-### Sign-off: the run stops for Şef
+<a id="sign-off-the-run-stops-for-şef"></a>
+
+### ![Sign-off: the run stops for Şef](assets/readme/headings/25-sign-off-the-run-stops-for-ef.webp)
 
 When the gate says *human*, the agent's run stops at `ask_supervisor` and makes no model call
 until Şef answers. `resume()` brings the answer back and the gate checks the evidence again. A
@@ -689,7 +741,9 @@ anyone says. Şef's notes go on the receipt. Live, against ERPNext
 | `hasarli` (crushed carton) | tried to post 11 → refused, asked Şef, **stopped** | "crushed one to quarantine, receive the 11 intact ones" | posted **11**, MAT-PRE-2026-00008 |
 | `belirsiz` (stacked) | tried to post 12 → refused, asked Şef, **stopped** | "unstacked and counted by hand: 12" | posted **12**, MAT-PRE-2026-00009 |
 
-### Two more checks before a write: Wonder and open weights
+<a id="two-more-checks-before-a-write-wonder-and-open-weights"></a>
+
+### ![Two more checks before a write: Wonder and open weights](assets/readme/headings/26-two-more-checks-before-a-write-wonder-and-open-weights.webp)
 
 Everything above trusts Spark's reading of the note. Two more Meta models read it again, only
 when the gate is about to post. Either can stop that post and send it to Şef; neither can post
@@ -736,7 +790,9 @@ that honour the JSON schema and gave Glimmer Meta's recommended sampling. One re
 no single model is trusted: on the Turkish injected note, Spark Open via OpenRouter returned the
 injected sentence as the product name.
 
-## How the gate decides
+<a id="how-the-gate-decides"></a>
+
+## ![How the gate decides](assets/readme/headings/27-how-the-gate-decides.webp)
 
 The first rule that fires decides (`cbyp/gate.py`, offline tests in `tests/`):
 
@@ -757,7 +813,9 @@ The first rule that fires decides (`cbyp/gate.py`, offline tests in `tests/`):
 | `match` | Everything agrees with the note, within the order | **post** |
 | `mismatch` | The evidence agrees, and differs from the note | **block**, dispute drafted |
 
-## Honest limits
+<a id="honest-limits"></a>
+
+## ![Honest limits](assets/readme/headings/28-honest-limits.webp)
 
 - The dock is six synthetic Blender scenes, and the confidence bands were chosen after seeing
   SAM on scenes like these. The numbers show the rules do what they say, not their accuracy.
@@ -774,7 +832,9 @@ The first rule that fires decides (`cbyp/gate.py`, offline tests in `tests/`):
 
 Every experiment, with its numbers and its failures, is in **[docs/JOURNAL.md](docs/JOURNAL.md)**.
 
-## Next
+<a id="next"></a>
+
+## ![Next](assets/readme/headings/29-next.webp)
 
 - Real deliveries: photos, handwriting and voices at a noisy dock.
 - The receiver's glasses as the camera, hands-free at the dock. Not built yet; Sam wears them
@@ -783,7 +843,9 @@ Every experiment, with its numbers and its failures, is in **[docs/JOURNAL.md](d
   that decides which deliveries need the full set of checks). Fireworks offers free Glimmer
   training through November (Fireworks workshop, 30 Oct). Not started.
 
-## Repository map
+<a id="repository-map"></a>
+
+## ![Repository map](assets/readme/headings/30-repository-map.webp)
 
 | Path | What it is |
 |---|---|
@@ -809,7 +871,9 @@ Every experiment, with its numbers and its failures, is in **[docs/JOURNAL.md](d
 | `experiments/web/` | `sim_test.mjs` (plays the six simulator cases), `export_dock.py` (the Blender dock for the browser), page checks |
 | `experiments/room_concepts.py`, `site_mockups.py` | Muse Image design concepts Sena chose from (`experiments/mockups/`) |
 
-## Setup
+<a id="setup"></a>
+
+## ![Setup](assets/readme/headings/31-setup.webp)
 
 ```bash
 python3 -m venv .venv
@@ -817,7 +881,9 @@ python3 -m venv .venv
 cp .env.example .env   # add your META_API_KEY (ERPNEXT_* for the ERP runs)
 ```
 
-## Run
+<a id="run"></a>
+
+## ![Run](assets/readme/headings/32-run.webp)
 
 ```bash
 .venv/bin/python -m unittest discover tests            # offline
@@ -849,7 +915,9 @@ headless (`blender -b --factory-startup -P experiments/blender/warehouse.py`; ru
 
 </div>
 
-### Four-language interface
+<a id="four-language-interface"></a>
+
+### ![Four-language interface](assets/readme/headings/33-four-language-interface.webp)
 
 The site interface and report presentation support Turkish, English, German and Simplified Chinese through `site/i18n/ui.js`. The top selector persists `cbyp-ui-language` locally; `?ui=tr|en|de|zh` opens a chosen interface language. The recorded-evidence selector remains independent. Original documents, audio, JSON and tool traces are not rewritten. The two validation reports retain byte-identical `original-report.html` archives. Timing-study exports use version 3, record interface and evidence languages, and lock the interface language during a study.
 
