@@ -192,7 +192,8 @@ dashboard's window does not reach back to 26–28 Oct):
 
 Most of the tokens are Muse Code writing the site and the simulator (`muse-spark-1.3-contributor`
 on 29–30 Oct); the dock runs themselves are `muse-spark-1.3`, `sam-3.1` and `muse-wonder-1.0`. It
-all ran on the hackathon's free API credits.
+all ran on the hackathon's free API credits: of the $200 granted, $103.54 was left on 5 Nov
+(Billing page), so the whole build cost about **$96**.
 
 Six synthetic Blender scenes, synthetic voices and machine-written attacks: this shows that
 the rules do what they say, not how accurate they are on real docks. See
