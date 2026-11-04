@@ -1,6 +1,7 @@
 <div align="center">
 
 <a href="https://cerebralvalley.ai/e/meta-ai-developer-hackathon"><img alt="Meta Global AI Developer Hackathon 2026" src="https://img.shields.io/badge/Meta_Global_AI_Developer_Hackathon-2026-0866FF?style=for-the-badge&logo=meta&logoColor=white"></a>
+<a href="https://github.com/kosesena/count-before-you-post/actions/workflows/checks.yml"><img alt="Offline checks" src="https://github.com/kosesena/count-before-you-post/actions/workflows/checks.yml/badge.svg"></a>
 <img alt="Indie developer track" src="https://img.shields.io/badge/Indie_developer_track-Build_for_Your_World-1C2B33?style=for-the-badge">
 
 <a href="https://count-before-you-post.vercel.app"><img src="assets/readme/toybox.jpg" alt="A child's hands hold the Count Before You Post toy box: a blue box with the ten figures in front of a warehouse dock" width="100%"></a>

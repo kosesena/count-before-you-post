@@ -26,14 +26,17 @@ from cbyp.sam import segment_image  # noqa: E402
 MASCOTS = Path(__file__).resolve().parent.parent / "assets" / "mascots"
 OUT = MASCOTS / "portraits"
 SIZE = "1080x1920"
-SAVE_SIZE = (1080, 1920)   # cut() output; None keeps the figure's own box
+SAVE_SIZE = (1080, 1920)
+# Redrawn on 5 Nov from their earlier portrait (kept as <name>-v1.png)
+REDRAW = {"sef": [OUT / "sef-v1.png"],
+          "iris": [OUT / "iris-v2.png", OUT / "iris-v1.png"]}   # v2: the bag, v1: the flower charm   # cut() output; None keeps the figure's own box
 
 # hello/<file>.jpg -> a flat backdrop that none of the character's own colours is close to.
 CAST = {"spark": "spark", "sam": "sam", "voice": "voice", "kapi": "kapi", "sef": "sef",
         "wonder": "wonder", "rover": "spark-open", "glimmer": "glimmer", "iris": "iris",
         "ada": "ada"}
 BG = {"spark": "light grey", "sam": "light grey", "voice": "light grey", "kapi": "white",
-      "sef": "light grey", "wonder": "light grey", "rover": "light grey",
+      "sef": "bright chroma green",   # 5 Nov: grey ate his reflective vest stripes "wonder": "light grey", "rover": "light grey",
       "glimmer": "light grey", "iris": "light grey", "ada": "light grey"}
 
 # What each one holds: told to Muse Image (it dropped Sam's tablet once), and
@@ -45,7 +48,12 @@ PROPS = {
     "kapi": ("holding the plain red-and-white striped barrier baton in one hand (red and white "
              "only, no stars, no blue) and waving with the other, as in the reference",
              ["striped baton"]),
-    "sef": ("holding the checklist tablet and giving a thumbs up, as in the reference",
+    # Şef, Sena 5 Nov: the small blue infinity sign the rest of the cast wears, on his vest.
+    "sef": ("giving a thumbs up with one hand and holding the checklist tablet firmly in the other "
+            "yellow hand, the hand clearly visible gripping the tablet's edge; keep his "
+            "yellow minifigure head, blue hard hat, blue work vest and blue trousers exactly; "
+            "the only change: a small light-blue infinity sign printed on the left chest of the "
+            "vest",
             ["tablet"]),
     "wonder": ("holding the fountain pen and the clipboard with a red seal, as in the reference",
                ["pen", "clipboard"]),
@@ -53,7 +61,12 @@ PROPS = {
               ["backpack", "paper"]),
     "glimmer": ("holding the small glowing crystal orb in her hand, as in the reference",
                 ["glowing orb", "crystal ball", "hand"]),
-    "iris": ("holding the paint palette and paintbrush, the shoulder bag on, as in the reference",
+    # Iris, Sena 5 Nov: a proper bag (the first one was an open, hollow frame).
+    "iris": ("holding the paint palette and paintbrush, exactly as in the first reference: the "
+             "same face, hair with the pencil, cream jumper with the pink infinity sign, beige "
+             "trousers, white trainers and the same closed brown leather satchel with its flap "
+             "and buckle; the only addition, from the second reference: a small pink "
+             "five-petal flower charm clearly hanging from the satchel's buckle, easy to see",
              ["paint palette", "paintbrush", "bag"]),
     # Ada, Sena 31 Oct: the blue infinity sign on her hoodie like the rest of the cast, and
     # an open dark grey laptop like Sam's tablet (the earlier pink one with stickers was wrong),
@@ -71,7 +84,7 @@ PROPS = {
 
 # SAM found no mask for Sam's tablet or Voice's microphone under any word we tried. For these
 # two, whatever stands out from the flat backdrop and touches SAM's figure is kept too.
-KEY = {"sam", "voice"}
+KEY = {"sam", "voice", "sef"}
 
 PROMPT = (
     "The same character as in the reference images, exactly the same design: same face, hair, "
@@ -105,6 +118,8 @@ def draw(name):
     refs = [MASCOTS / "hello" / f"{hello}.jpg"]
     if name == "ada":   # her current look first, Sam for the logo and the device
         refs = [OUT / "ada-v2.png", OUT / "ada-v1.png", OUT / "sam.png"]
+    if name in REDRAW:   # its own portrait only (with Sam as a second reference Şef became Sam)
+        refs = REDRAW[name]
     sheet = MASCOTS / "sheets" / f"{hello}.jpg"
     if sheet.exists():
         refs.append(sheet)
