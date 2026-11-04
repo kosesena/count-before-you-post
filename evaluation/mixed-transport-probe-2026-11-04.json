@@ -1,0 +1,14 @@
+{
+  "scope": "Transport-only SAM probe, no goods-receipt decision",
+  "input": "y (20).jpg",
+  "encoding": "lossless WebP",
+  "max_retries": 0,
+  "status": "error",
+  "error_chain": [
+    "APITimeoutError",
+    "WriteTimeout",
+    "WriteTimeout",
+    "TimeoutError"
+  ],
+  "seconds": 61.5
+}

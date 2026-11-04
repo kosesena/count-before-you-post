@@ -1,0 +1,2361 @@
+<!doctype html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Yeni karma test · Count Before You Post</title><style>body{margin:0;background:#f5f4ee;color:#17313e;font:16px/1.6 system-ui}main{max-width:1150px;margin:auto;padding:32px 22px}h1{font-size:clamp(28px,4vw,44px);line-height:1.15}a{color:#175bdb}.notice{padding:20px;background:#e7eef9;border-left:4px solid #345ad7}.photos{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px}figure{margin:0;background:white;padding:12px}img{width:100%;height:190px;object-fit:contain}figcaption{font-size:13px}table{width:100%;border-collapse:collapse;background:white}th,td{padding:12px;border-bottom:1px solid #ddd;text-align:left}.scroll{overflow:auto}pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;background:white;padding:16px}details{margin:12px 0}summary{cursor:pointer}.post{color:#17673f}.block,.error{color:#a22030}</style><script src="../i18n/ui.js" defer data-ui-i18n></script></head><body><main><nav><a href="../jury/">← Jüri demosu</a> · <a href="../unseen-validation/">İlk fotoğraf testi</a> · <a href="../unseen-regression/">Önceki düzeltme testi</a></nav><h1>7 yeni fotoğraf.<br>21 önceden sabitlenmiş kontrol.</h1><p>3 Kasım 2026 · Üretimdeki 39042b9 koduyla yeni girdilerde ilk koşular.</p><section class="notice"><strong>1 kabul · 8 ret · 0 insan incelemesi · 12 teknik hata.</strong><p>Kesin hedef eşleşmesi: 0/21. Temiz kabul adayı: 0/1. Kabul beklenmeyen kontrollerde kabul: 1/20.</p><p>Tüm denemelerde medyan: 51.8 sn. Karar üretenlerde medyan: 76.4 sn. ERP yazımı: 0. Maliyet ve çalışan zamanı ölçülmedi.</p></section><h2>Teknik hataların sınırı</h2><p>Üç kontrol karar aşamasında RuntimeError, dokuz kontrol belge okuma aşamasında APIConnectionError ile durdu. Sonraki erişim kontrolünde GitHub çalışırken Meta HTTPS bağlantısı zaman aşımına uğradı. Karar aşamasındaki üç hatanın kök nedeni kesinleşmedi. Temiz adayın üç kontrolü de bağlantı hatası nedeniyle sonuçsuzdur. Bu hatalar doğru ret veya insan incelemesi sayılmaz.</p><h2>Beklenmeyen kabuller</h2><p>Önceden ret veya inceleme hedeflenen şu kontroller kabul edildi. Bunlar test hedeflerine göre başarısızlıktır; gerçek ERP kaydı veya doğrulanmış fiziksel stok hatası değildir.</p><ul><li><code>scd-train-5183-baseline</code></li></ul><h2>Temiz adayın üç kontrolü</h2><ul><li>Temel belge: Kabul → Teknik hata (<code>APIConnectionError)</code></li><li>Yanlış miktar: Ret → Teknik hata (<code>APIConnectionError)</code></li><li>Kararsız ses: İnsan incelemesi → Teknik hata (<code>APIConnectionError)</code></li></ul><h2>Hedefler sonuçlardan önce belirlendi</h2><p>Canlıdaki kodun sabit kopyası, fotoğraflar, hazırlanmış belgeler, sesler ve karar hedefleri ilk model çağrısından önce SHA-256 özetleriyle kaydedildi. Sonuç sonrası fotoğraf eleme, hedef değiştirme veya uygulama koşusu tekrarı yoktur. SDK aktarım tekrarları mevcut ayarında kaldı. Her hata rapora dahildir.</p><p>Önceki tüm indirilmiş fotoğraf adları dışlandı; seçilen dosyaların özetleri de önceki dosyalardan farklı. SCD train2017 kümesinde tek koli anotasyonlu, kenarlardan uzak beş uygun fotoğrafın tamamı ve hash sırasındaki ilk iki kenar fotoğrafı kullanıldı. Başlangıçtaki altı iç-kadraj hedefi, indirme ve model çağrılarından önce yalnızca beş aday bulunduğu için beşe indirildi. Bu değişiklik seçim kaydında korunur.</p><h2>Temiz, kusurlu ve belirsiz ne demek?</h2><p>3690 numaralı fotoğraf tek temiz kabul adayıdır. Aynı fotoğrafın belgesinde miktar ikiye çıkarılınca hedef ret; teslim alan sesinde sayım belirsizleşince hedef insan incelemesidir. Diğer altı fotoğraf, açık/hasarlı ambalaj, belirsiz ürün veya eksik kadraj nedeniyle temel durumda da insan incelemesi hedefidir. Bunlar temiz teslimat olarak sayılmaz.</p><p>5545, 5199 ve 5623 için okunabilir ürün adı yoktur. Boş veya uydurulmuş bir ürün adı yerine belgede açıkça “Unverified contents” iddiası kullanıldı. Bunlar ürün belirsizliği kontrolleridir; doğru ürün adı okuma başarısını ölçmez. Miktar kusuru belirsiz fotoğraflarda da denenir; erken ret veya inceleme miktar kontrolünü maskeleyebilir. Ret veya insan incelemesi biçimindeki geniş güvenli duruş, kesin hedef eşleşmesi değildir.</p><h2>Yorumlama sınırları</h2><p>Yedi fotoğrafın her birinden üç kontrol üretildi; 21 bağımsız fiziksel teslimat yoktur. Yalnızca bir temiz aday olduğundan genel otomatik kabul oranı çıkarılamaz. Fotoğraflar bu projede yenidir; modellerin eğitiminde görülmediği iddia edilmez. Veri kümesinin train2017 bölümü kullanılmıştır. Hedefler asistanın ön incelemesine dayanır; bağımsız saha doğrusu değildir.</p><p>Gerçek fotoğraflara sentetik belgeler ve sesler eşlik eder. Ürün açıklaması profili kullanıldı; kesin SKU veya içerik doğrulaması değildir. Hiçbir ERP kaydı yazılmadı. Süreler iş gücü tasarrufu değildir. Başka çalışmada tamamlanan 20 fotoğraflık test bu setten ayrıdır ve seçime dahil edilmedi.</p><p>Kaynak: <a href="https://github.com/yancie-yjr/scd.github.io">SCD / LSCD, Jinrong Yang ve diğerleri</a> · CC BY-NC-SA 4.0. Görseller modele değiştirilmeden verildi.</p><h2>Yedi fotoğraf ve önceden verilen hedefler</h2><div class="photos"><figure><a href="img/scd-train-5545.jpg"><img loading="lazy" src="img/scd-train-5545.jpg" alt="SCD train 5545"></a><figcaption><code>5545</code> · İnsan incelemesi<p>Unlabelled brown carton; no defensible product identity. Authored order explicitly claims Unverified contents, not a transcribed product. Not a clean acceptance candidate.</p></figcaption></figure><figure><a href="img/scd-train-5199.jpg"><img loading="lazy" src="img/scd-train-5199.jpg" alt="SCD train 5199"></a><figcaption><code>5199</code> · İnsan incelemesi<p>Top flaps visibly open/crushed; product line covered and unreadable. Authored Unverified contents claim is not a real product transcription. Review required.</p></figcaption></figure><figure><a href="img/scd-train-5183.jpg"><img loading="lazy" src="img/scd-train-5183.jpg" alt="SCD train 5183"></a><figcaption><code>5183</code> · İnsan incelemesi<p>Ronshen refrigerator carton with exposed foam/open end and inverted handling orientation. Complete carton visible but condition and contents require review.</p></figcaption></figure><figure><a href="img/scd-train-3823.jpg"><img loading="lazy" src="img/scd-train-3823.jpg" alt="SCD train 3823"></a><figcaption><code>3823</code> · İnsan incelemesi<p>Durian-labelled carton with pineapples above the open top; possible repurposed packaging or mixed contents. One carton visible, but clean product correspondence is not established.</p></figcaption></figure><figure><a href="img/scd-train-3690.jpg"><img loading="lazy" src="img/scd-train-3690.jpg" alt="SCD train 3690"></a><figcaption><code>3690</code> · Kabul<p>One sealed visually intact carton fully inside frame, isolated on pallet, readable product description. Description-level acceptance candidate only; not physical contents or SKU ground truth.</p></figcaption></figure><figure><a href="img/scd-train-5623.jpg"><img loading="lazy" src="img/scd-train-5623.jpg" alt="SCD train 5623"></a><figcaption><code>5623</code> · İnsan incelemesi<p>Close-up carton extends beyond top and bottom frame; shipping barcode does not establish product identity. Authored Unverified contents claim is explicitly unverified.</p></figcaption></figure><figure><a href="img/scd-train-1281.jpg"><img loading="lazy" src="img/scd-train-1281.jpg" alt="SCD train 1281"></a><figcaption><code>1281</code> · İnsan incelemesi<p>Dell computer carton nearly fills frame and another carton is visible below. Shipment completeness is uncertain despite one dataset annotation; no automatic acceptance target.</p></figcaption></figure></div><h2>21 sonucun tamamı</h2><div class="scroll"><table><thead><tr><th>Fotoğraf</th><th>Kontrol</th><th>Önceden hedef</th><th>Karar</th><th>Kural / hata</th><th>Süre</th><th>Kesin hedef</th></tr></thead><tbody><tr><td><code>5545</code></td><td>Temel belge</td><td>İnsan incelemesi</td><td class="block">Ret</td><td><code>wrong_product</code></td><td>70.9 sn</td><td>✗</td></tr><tr><td><code>5545</code></td><td>Yanlış miktar</td><td>İnsan incelemesi</td><td class="block">Ret</td><td><code>wrong_product</code></td><td>76.4 sn</td><td>✗</td></tr><tr><td><code>5545</code></td><td>Kararsız ses</td><td>İnsan incelemesi</td><td class="block">Ret</td><td><code>wrong_product</code></td><td>77.9 sn</td><td>✗</td></tr><tr><td><code>5199</code></td><td>Temel belge</td><td>İnsan incelemesi</td><td class="block">Ret</td><td><code>wrong_product</code></td><td>56.7 sn</td><td>✗</td></tr><tr><td><code>5199</code></td><td>Yanlış miktar</td><td>İnsan incelemesi</td><td class="block">Ret</td><td><code>wrong_product</code></td><td>47.9 sn</td><td>✗</td></tr><tr><td><code>5199</code></td><td>Kararsız ses</td><td>İnsan incelemesi</td><td class="block">Ret</td><td><code>wrong_product</code></td><td>51.8 sn</td><td>✗</td></tr><tr><td><code>5183</code></td><td>Temel belge</td><td>İnsan incelemesi</td><td class="post">Kabul</td><td><code>match</code></td><td>238.8 sn</td><td>✗</td></tr><tr><td><code>5183</code></td><td>Yanlış miktar</td><td>İnsan incelemesi</td><td class="block">Ret</td><td><code>wrong_product</code></td><td>224.9 sn</td><td>✗</td></tr><tr><td><code>5183</code></td><td>Kararsız ses</td><td>İnsan incelemesi</td><td class="block">Ret</td><td><code>wrong_product</code></td><td>171.5 sn</td><td>✗</td></tr><tr><td><code>3823</code></td><td>Temel belge</td><td>İnsan incelemesi</td><td class="error">Teknik hata</td><td><code>RuntimeError</code></td><td>222.8 sn</td><td>✗</td></tr><tr><td><code>3823</code></td><td>Yanlış miktar</td><td>İnsan incelemesi</td><td class="error">Teknik hata</td><td><code>RuntimeError</code></td><td>162.1 sn</td><td>✗</td></tr><tr><td><code>3823</code></td><td>Kararsız ses</td><td>İnsan incelemesi</td><td class="error">Teknik hata</td><td><code>RuntimeError</code></td><td>158.8 sn</td><td>✗</td></tr><tr><td><code>3690</code></td><td>Temel belge</td><td>Kabul</td><td class="error">Teknik hata</td><td><code>APIConnectionError</code></td><td>1.4 sn</td><td>✗</td></tr><tr><td><code>3690</code></td><td>Yanlış miktar</td><td>Ret</td><td class="error">Teknik hata</td><td><code>APIConnectionError</code></td><td>1.3 sn</td><td>✗</td></tr><tr><td><code>3690</code></td><td>Kararsız ses</td><td>İnsan incelemesi</td><td class="error">Teknik hata</td><td><code>APIConnectionError</code></td><td>1.3 sn</td><td>✗</td></tr><tr><td><code>5623</code></td><td>Temel belge</td><td>İnsan incelemesi</td><td class="error">Teknik hata</td><td><code>APIConnectionError</code></td><td>1.3 sn</td><td>✗</td></tr><tr><td><code>5623</code></td><td>Yanlış miktar</td><td>İnsan incelemesi</td><td class="error">Teknik hata</td><td><code>APIConnectionError</code></td><td>1.4 sn</td><td>✗</td></tr><tr><td><code>5623</code></td><td>Kararsız ses</td><td>İnsan incelemesi</td><td class="error">Teknik hata</td><td><code>APIConnectionError</code></td><td>1.5 sn</td><td>✗</td></tr><tr><td><code>1281</code></td><td>Temel belge</td><td>İnsan incelemesi</td><td class="error">Teknik hata</td><td><code>APIConnectionError</code></td><td>1.3 sn</td><td>✗</td></tr><tr><td><code>1281</code></td><td>Yanlış miktar</td><td>İnsan incelemesi</td><td class="error">Teknik hata</td><td><code>APIConnectionError</code></td><td>1.4 sn</td><td>✗</td></tr><tr><td><code>1281</code></td><td>Kararsız ses</td><td>İnsan incelemesi</td><td class="error">Teknik hata</td><td><code>APIConnectionError</code></td><td>1.4 sn</td><td>✗</td></tr></tbody></table></div><h2>Ham sonuçlar ve sabit manifest</h2><p><a href="results.json">Tüm 21 sonuç ve protokol (JSON)</a></p><p>Manifest SHA-256: <code>d5b1ca1679e71f922199ec073f774ab173e43f8429cd529d12a02939d95e8462</code></p><details><summary><code>scd-train-5545-baseline</code> · Ret</summary><p data-original-evidence>Product identity not verified. Camera read &#x27;&#x27;, note says &#x27;Unverified contents&#x27;. No receipt; check the exact product and model on the labels before deciding whether to return the load.</p><pre>{
+  &quot;id&quot;: &quot;scd-train-5545-baseline&quot;,
+  &quot;source_image_id&quot;: 5545,
+  &quot;scenario&quot;: &quot;baseline&quot;,
+  &quot;expected_action&quot;: &quot;human&quot;,
+  &quot;acceptable_actions&quot;: [
+    &quot;human&quot;,
+    &quot;block&quot;
+  ],
+  &quot;started_at&quot;: &quot;2026-11-03T20:19:50.194118+03:00&quot;,
+  &quot;evidence&quot;: {
+    &quot;mode&quot;: &quot;dry_run&quot;,
+    &quot;erp_written&quot;: false,
+    &quot;result&quot;: {
+      &quot;posted&quot;: false,
+      &quot;gate&quot;: &quot;block&quot;,
+      &quot;reason&quot;: &quot;Product identity not verified. Camera read &#x27;&#x27;, note says &#x27;Unverified contents&#x27;. No receipt; check the exact product and model on the labels before deciding whether to return the load.&quot;
+    },
+    &quot;decision&quot;: {
+      &quot;action&quot;: &quot;block&quot;,
+      &quot;quantity&quot;: null,
+      &quot;reasons&quot;: [
+        &quot;Product identity not verified. Camera read &#x27;&#x27;, note says &#x27;Unverified contents&#x27;. No receipt; check the exact product and model on the labels before deciding whether to return the load.&quot;
+      ],
+      &quot;evidence&quot;: {
+        &quot;note&quot;: [
+          [
+            1,
+            &quot;Unverified contents&quot;
+          ]
+        ],
+        &quot;sam_sure&quot;: 1,
+        &quot;sam_doubtful&quot;: 3,
+        &quot;spark_count&quot;: 1,
+        &quot;label&quot;: &quot;&quot;,
+        &quot;frame_completeness&quot;: {
+          &quot;size&quot;: [
+            3264,
+            2448
+          ],
+          &quot;margin_fraction&quot;: 0.01,
+          &quot;boundary_objects&quot;: [],
+          &quot;requires_review&quot;: false,
+          &quot;limitation&quot;: &quot;No boundary contact does not prove absence of occlusion or hidden cartons.&quot;
+        },
+        &quot;order&quot;: {
+          &quot;number&quot;: &quot;PO-scd-train-5545-baseline&quot;,
+          &quot;product&quot;: &quot;Unverified contents&quot;,
+          &quot;ordered&quot;: 1,
+          &quot;open&quot;: 1
+        }
+      },
+      &quot;rule&quot;: &quot;wrong_product&quot;
+    },
+    &quot;note&quot;: {
+      &quot;date&quot;: &quot;&quot;,
+      &quot;embedded_instructions&quot;: [],
+      &quot;items&quot;: [
+        {
+          &quot;description&quot;: &quot;Unverified contents&quot;,
+          &quot;legible&quot;: true,
+          &quot;product_identity&quot;: {
+            &quot;brand&quot;: &quot;&quot;,
+            &quot;model&quot;: &quot;&quot;,
+            &quot;product_code&quot;: &quot;&quot;,
+            &quot;variant&quot;: &quot;&quot;
+          },
+          &quot;quantity&quot;: 1,
+          &quot;unit&quot;: &quot;carton&quot;
+        }
+      ],
+      &quot;note_number&quot;: &quot;scd-train-5545-baseline&quot;,
+      &quot;supplier&quot;: &quot;Controlled Fixture Supplier&quot;
+    },
+    &quot;camera&quot;: {
+      &quot;all_cartons_visible&quot;: true,
+      &quot;all_labels_identified&quot;: false,
+      &quot;cartons_visible&quot;: 1,
+      &quot;damaged_cartons&quot;: 0,
+      &quot;product_identity&quot;: {
+        &quot;brand&quot;: &quot;&quot;,
+        &quot;model&quot;: &quot;&quot;,
+        &quot;product_code&quot;: &quot;&quot;,
+        &quot;variant&quot;: &quot;&quot;
+      },
+      &quot;product_on_labels&quot;: &quot;&quot;,
+      &quot;stacked&quot;: false
+    },
+    &quot;receiver&quot;: {
+      &quot;certain&quot;: true,
+      &quot;product&quot;: &quot;&quot;,
+      &quot;quantity&quot;: 1,
+      &quot;supplier&quot;: &quot;controlled fixture supplier&quot;,
+      &quot;unit&quot;: &quot;carton&quot;
+    },
+    &quot;speaker_turns&quot;: [
+      {
+        &quot;speaker&quot;: &quot;A&quot;,
+        &quot;transcript&quot;: &quot;I am the receiving receiving clerk. I counted one carton. The supplier is controlled fixture supplier.&quot;
+      }
+    ],
+    &quot;speech_interpretation&quot;: {
+      &quot;count_candidates&quot;: [
+        1
+      ],
+      &quot;driver_quantity&quot;: null,
+      &quot;receiver&quot;: {
+        &quot;certain&quot;: true,
+        &quot;product&quot;: &quot;&quot;,
+        &quot;quantity&quot;: 1,
+        &quot;supplier&quot;: &quot;controlled fixture supplier&quot;,
+        &quot;unit&quot;: &quot;carton&quot;
+      },
+      &quot;receiver_speaker&quot;: &quot;A&quot;,
+      &quot;receiver_turn&quot;: &quot;I am the receiving receiving clerk. I counted one carton. The supplier is controlled fixture supplier.&quot;,
+      &quot;voice_validation&quot;: {
+        &quot;source_turn_matched&quot;: true,
+        &quot;single_supported_count&quot;: true
+      }
+    },
+    &quot;second_opinions&quot;: {},
+    &quot;trace&quot;: [
+      {
+        &quot;frame_completeness&quot;: {
+          &quot;size&quot;: [
+            3264,
+            2448
+          ],
+          &quot;margin_fraction&quot;: 0.01,
+          &quot;boundary_objects&quot;: [],
+          &quot;requires_review&quot;: false,
+          &quot;limitation&quot;: &quot;No boundary contact does not prove absence of occlusion or hidden cartons.&quot;
+        },
+        &quot;at&quot;: &quot;2026-11-03T20:20:41+03:00&quot;
+      },
+      {
+        &quot;gate_cross_check&quot;: {
+          &quot;agreed&quot;: 1,
+          &quot;sam_only&quot;: 3,
+          &quot;spark_only&quot;: 0,
+          &quot;doubled&quot;: 0
+        },
+        &quot;at&quot;: &quot;2026-11-03T20:21:01+03:00&quot;
+      }
+    ],
+    &quot;timings&quot;: [
+      {
+        &quot;step&quot;: &quot;Read delivery note&quot;,
+        &quot;seconds&quot;: 8.034,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Inspect camera&quot;,
+        &quot;seconds&quot;: 22.046,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Segment cartons&quot;,
+        &quot;seconds&quot;: 14.268,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Transcribe speaker turns&quot;,
+        &quot;seconds&quot;: 2.175,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Identify receiver count&quot;,
+        &quot;seconds&quot;: 5.203,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Cross-check objects and authorize&quot;,
+        &quot;seconds&quot;: 19.126,
+        &quot;status&quot;: &quot;complete&quot;
+      }
+    ],
+    &quot;seconds&quot;: 70.852,
+    &quot;total_cost_usd&quot;: null,
+    &quot;cost_status&quot;: &quot;Not measured: provider-wide billing required; not agent-token cost.&quot;,
+    &quot;input_sha256&quot;: {
+      &quot;note&quot;: &quot;20b847f968bc010e3f8e851b7cf54827d8d99bf46f0f954cc392f93e0cff14e5&quot;,
+      &quot;camera&quot;: &quot;3fd3c7a8b27a5bf5a21a5901756eaf3cd223bd1a4fc438fba46dbae2282be9ed&quot;,
+      &quot;audio&quot;: &quot;67f7e5d7944cdd6c16b6287483bcfb725f03fcd016551d4e4b5bf5b75870c65e&quot;
+    }
+  },
+  &quot;action&quot;: &quot;block&quot;,
+  &quot;rule&quot;: &quot;wrong_product&quot;,
+  &quot;seconds&quot;: 70.879,
+  &quot;exact_target_met&quot;: false,
+  &quot;acceptable_action_met&quot;: true
+}</pre></details><details><summary><code>scd-train-5545-quantity_mismatch</code> · Ret</summary><p data-original-evidence>Product identity not verified. Camera read &#x27;&#x27;, note says &#x27;Unverified contents&#x27;. No receipt; check the exact product and model on the labels before deciding whether to return the load.</p><pre>{
+  &quot;id&quot;: &quot;scd-train-5545-quantity_mismatch&quot;,
+  &quot;source_image_id&quot;: 5545,
+  &quot;scenario&quot;: &quot;quantity_mismatch&quot;,
+  &quot;expected_action&quot;: &quot;human&quot;,
+  &quot;acceptable_actions&quot;: [
+    &quot;human&quot;,
+    &quot;block&quot;
+  ],
+  &quot;started_at&quot;: &quot;2026-11-03T20:19:50.194212+03:00&quot;,
+  &quot;evidence&quot;: {
+    &quot;mode&quot;: &quot;dry_run&quot;,
+    &quot;erp_written&quot;: false,
+    &quot;result&quot;: {
+      &quot;posted&quot;: false,
+      &quot;gate&quot;: &quot;block&quot;,
+      &quot;reason&quot;: &quot;Product identity not verified. Camera read &#x27;&#x27;, note says &#x27;Unverified contents&#x27;. No receipt; check the exact product and model on the labels before deciding whether to return the load.&quot;
+    },
+    &quot;decision&quot;: {
+      &quot;action&quot;: &quot;block&quot;,
+      &quot;quantity&quot;: null,
+      &quot;reasons&quot;: [
+        &quot;Product identity not verified. Camera read &#x27;&#x27;, note says &#x27;Unverified contents&#x27;. No receipt; check the exact product and model on the labels before deciding whether to return the load.&quot;
+      ],
+      &quot;evidence&quot;: {
+        &quot;note&quot;: [
+          [
+            2,
+            &quot;Unverified contents&quot;
+          ]
+        ],
+        &quot;sam_sure&quot;: 1,
+        &quot;sam_doubtful&quot;: 3,
+        &quot;spark_count&quot;: 1,
+        &quot;label&quot;: &quot;&quot;,
+        &quot;frame_completeness&quot;: {
+          &quot;size&quot;: [
+            3264,
+            2448
+          ],
+          &quot;margin_fraction&quot;: 0.01,
+          &quot;boundary_objects&quot;: [],
+          &quot;requires_review&quot;: false,
+          &quot;limitation&quot;: &quot;No boundary contact does not prove absence of occlusion or hidden cartons.&quot;
+        },
+        &quot;order&quot;: {
+          &quot;number&quot;: &quot;PO-scd-train-5545-quantity_mismatch&quot;,
+          &quot;product&quot;: &quot;Unverified contents&quot;,
+          &quot;ordered&quot;: 2,
+          &quot;open&quot;: 2
+        }
+      },
+      &quot;rule&quot;: &quot;wrong_product&quot;
+    },
+    &quot;note&quot;: {
+      &quot;date&quot;: &quot;&quot;,
+      &quot;embedded_instructions&quot;: [],
+      &quot;items&quot;: [
+        {
+          &quot;description&quot;: &quot;Unverified contents&quot;,
+          &quot;legible&quot;: true,
+          &quot;product_identity&quot;: {
+            &quot;brand&quot;: &quot;&quot;,
+            &quot;model&quot;: &quot;&quot;,
+            &quot;product_code&quot;: &quot;&quot;,
+            &quot;variant&quot;: &quot;&quot;
+          },
+          &quot;quantity&quot;: 2,
+          &quot;unit&quot;: &quot;carton&quot;
+        }
+      ],
+      &quot;note_number&quot;: &quot;scd-train-5545-quantity_mismatch&quot;,
+      &quot;supplier&quot;: &quot;Controlled Fixture Supplier&quot;
+    },
+    &quot;camera&quot;: {
+      &quot;all_cartons_visible&quot;: true,
+      &quot;all_labels_identified&quot;: false,
+      &quot;cartons_visible&quot;: 1,
+      &quot;damaged_cartons&quot;: 0,
+      &quot;product_identity&quot;: {
+        &quot;brand&quot;: &quot;&quot;,
+        &quot;model&quot;: &quot;&quot;,
+        &quot;product_code&quot;: &quot;&quot;,
+        &quot;variant&quot;: &quot;&quot;
+      },
+      &quot;product_on_labels&quot;: &quot;&quot;,
+      &quot;stacked&quot;: false
+    },
+    &quot;receiver&quot;: {
+      &quot;certain&quot;: true,
+      &quot;product&quot;: &quot;&quot;,
+      &quot;quantity&quot;: 1,
+      &quot;supplier&quot;: &quot;controlled fixture supplier&quot;,
+      &quot;unit&quot;: &quot;carton&quot;
+    },
+    &quot;speaker_turns&quot;: [
+      {
+        &quot;speaker&quot;: &quot;A&quot;,
+        &quot;transcript&quot;: &quot;I am the receiving clerk. I counted one carton. The supplier is controlled fixture supplier.&quot;
+      }
+    ],
+    &quot;speech_interpretation&quot;: {
+      &quot;count_candidates&quot;: [
+        1
+      ],
+      &quot;driver_quantity&quot;: null,
+      &quot;receiver&quot;: {
+        &quot;certain&quot;: true,
+        &quot;product&quot;: &quot;&quot;,
+        &quot;quantity&quot;: 1,
+        &quot;supplier&quot;: &quot;controlled fixture supplier&quot;,
+        &quot;unit&quot;: &quot;carton&quot;
+      },
+      &quot;receiver_speaker&quot;: &quot;A&quot;,
+      &quot;receiver_turn&quot;: &quot;I am the receiving clerk. I counted one carton. The supplier is controlled fixture supplier.&quot;,
+      &quot;voice_validation&quot;: {
+        &quot;source_turn_matched&quot;: true,
+        &quot;single_supported_count&quot;: true
+      }
+    },
+    &quot;second_opinions&quot;: {},
+    &quot;trace&quot;: [
+      {
+        &quot;frame_completeness&quot;: {
+          &quot;size&quot;: [
+            3264,
+            2448
+          ],
+          &quot;margin_fraction&quot;: 0.01,
+          &quot;boundary_objects&quot;: [],
+          &quot;requires_review&quot;: false,
+          &quot;limitation&quot;: &quot;No boundary contact does not prove absence of occlusion or hidden cartons.&quot;
+        },
+        &quot;at&quot;: &quot;2026-11-03T20:20:40+03:00&quot;
+      },
+      {
+        &quot;gate_cross_check&quot;: {
+          &quot;agreed&quot;: 1,
+          &quot;sam_only&quot;: 3,
+          &quot;spark_only&quot;: 0,
+          &quot;doubled&quot;: 0
+        },
+        &quot;at&quot;: &quot;2026-11-03T20:21:06+03:00&quot;
+      }
+    ],
+    &quot;timings&quot;: [
+      {
+        &quot;step&quot;: &quot;Read delivery note&quot;,
+        &quot;seconds&quot;: 5.503,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Inspect camera&quot;,
+        &quot;seconds&quot;: 22.367,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Segment cartons&quot;,
+        &quot;seconds&quot;: 15.505,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Transcribe speaker turns&quot;,
+        &quot;seconds&quot;: 2.524,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Identify receiver count&quot;,
+        &quot;seconds&quot;: 4.575,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Cross-check objects and authorize&quot;,
+        &quot;seconds&quot;: 25.87,
+        &quot;status&quot;: &quot;complete&quot;
+      }
+    ],
+    &quot;seconds&quot;: 76.344,
+    &quot;total_cost_usd&quot;: null,
+    &quot;cost_status&quot;: &quot;Not measured: provider-wide billing required; not agent-token cost.&quot;,
+    &quot;input_sha256&quot;: {
+      &quot;note&quot;: &quot;bf2fd2c875509a6518c35d6e3eb26d088b31fb7b0b782aae60cda1292c0df04d&quot;,
+      &quot;camera&quot;: &quot;3fd3c7a8b27a5bf5a21a5901756eaf3cd223bd1a4fc438fba46dbae2282be9ed&quot;,
+      &quot;audio&quot;: &quot;67f7e5d7944cdd6c16b6287483bcfb725f03fcd016551d4e4b5bf5b75870c65e&quot;
+    }
+  },
+  &quot;action&quot;: &quot;block&quot;,
+  &quot;rule&quot;: &quot;wrong_product&quot;,
+  &quot;seconds&quot;: 76.377,
+  &quot;exact_target_met&quot;: false,
+  &quot;acceptable_action_met&quot;: true
+}</pre></details><details><summary><code>scd-train-5545-receiver_uncertain</code> · Ret</summary><p data-original-evidence>Product identity not verified. Camera read &#x27;&#x27;, note says &#x27;Unverified contents&#x27;. No receipt; check the exact product and model on the labels before deciding whether to return the load.</p><pre>{
+  &quot;id&quot;: &quot;scd-train-5545-receiver_uncertain&quot;,
+  &quot;source_image_id&quot;: 5545,
+  &quot;scenario&quot;: &quot;receiver_uncertain&quot;,
+  &quot;expected_action&quot;: &quot;human&quot;,
+  &quot;acceptable_actions&quot;: [
+    &quot;human&quot;,
+    &quot;block&quot;
+  ],
+  &quot;started_at&quot;: &quot;2026-11-03T20:19:50.194305+03:00&quot;,
+  &quot;evidence&quot;: {
+    &quot;mode&quot;: &quot;dry_run&quot;,
+    &quot;erp_written&quot;: false,
+    &quot;result&quot;: {
+      &quot;posted&quot;: false,
+      &quot;gate&quot;: &quot;block&quot;,
+      &quot;reason&quot;: &quot;Product identity not verified. Camera read &#x27;&#x27;, note says &#x27;Unverified contents&#x27;. No receipt; check the exact product and model on the labels before deciding whether to return the load.&quot;
+    },
+    &quot;decision&quot;: {
+      &quot;action&quot;: &quot;block&quot;,
+      &quot;quantity&quot;: null,
+      &quot;reasons&quot;: [
+        &quot;Product identity not verified. Camera read &#x27;&#x27;, note says &#x27;Unverified contents&#x27;. No receipt; check the exact product and model on the labels before deciding whether to return the load.&quot;
+      ],
+      &quot;evidence&quot;: {
+        &quot;note&quot;: [
+          [
+            1,
+            &quot;Unverified contents&quot;
+          ]
+        ],
+        &quot;sam_sure&quot;: 1,
+        &quot;sam_doubtful&quot;: 3,
+        &quot;spark_count&quot;: 1,
+        &quot;label&quot;: &quot;&quot;,
+        &quot;frame_completeness&quot;: {
+          &quot;size&quot;: [
+            3264,
+            2448
+          ],
+          &quot;margin_fraction&quot;: 0.01,
+          &quot;boundary_objects&quot;: [],
+          &quot;requires_review&quot;: false,
+          &quot;limitation&quot;: &quot;No boundary contact does not prove absence of occlusion or hidden cartons.&quot;
+        },
+        &quot;order&quot;: {
+          &quot;number&quot;: &quot;PO-scd-train-5545-receiver_uncertain&quot;,
+          &quot;product&quot;: &quot;Unverified contents&quot;,
+          &quot;ordered&quot;: 1,
+          &quot;open&quot;: 1
+        }
+      },
+      &quot;rule&quot;: &quot;wrong_product&quot;
+    },
+    &quot;note&quot;: {
+      &quot;date&quot;: &quot;&quot;,
+      &quot;embedded_instructions&quot;: [],
+      &quot;items&quot;: [
+        {
+          &quot;description&quot;: &quot;Unverified contents&quot;,
+          &quot;legible&quot;: true,
+          &quot;product_identity&quot;: {
+            &quot;brand&quot;: &quot;&quot;,
+            &quot;model&quot;: &quot;&quot;,
+            &quot;product_code&quot;: &quot;&quot;,
+            &quot;variant&quot;: &quot;&quot;
+          },
+          &quot;quantity&quot;: 1,
+          &quot;unit&quot;: &quot;carton&quot;
+        }
+      ],
+      &quot;note_number&quot;: &quot;scd-train-5545-receiver_uncertain&quot;,
+      &quot;supplier&quot;: &quot;Controlled Fixture Supplier&quot;
+    },
+    &quot;camera&quot;: {
+      &quot;all_cartons_visible&quot;: false,
+      &quot;all_labels_identified&quot;: false,
+      &quot;cartons_visible&quot;: 1,
+      &quot;damaged_cartons&quot;: 0,
+      &quot;product_identity&quot;: {
+        &quot;brand&quot;: &quot;&quot;,
+        &quot;model&quot;: &quot;&quot;,
+        &quot;product_code&quot;: &quot;&quot;,
+        &quot;variant&quot;: &quot;&quot;
+      },
+      &quot;product_on_labels&quot;: &quot;&quot;,
+      &quot;stacked&quot;: false
+    },
+    &quot;receiver&quot;: {
+      &quot;certain&quot;: false,
+      &quot;product&quot;: &quot;&quot;,
+      &quot;quantity&quot;: null,
+      &quot;supplier&quot;: &quot;controlled fixture supplier&quot;,
+      &quot;unit&quot;: &quot;cartons&quot;
+    },
+    &quot;speaker_turns&quot;: [
+      {
+        &quot;speaker&quot;: &quot;A&quot;,
+        &quot;transcript&quot;: &quot;I am the receiving clerk. I am not sure how many cartons arrived. I could not complete the count. The supplier is controlled fixture supplier.&quot;
+      }
+    ],
+    &quot;speech_interpretation&quot;: {
+      &quot;count_candidates&quot;: [],
+      &quot;driver_quantity&quot;: null,
+      &quot;receiver&quot;: {
+        &quot;certain&quot;: false,
+        &quot;product&quot;: &quot;&quot;,
+        &quot;quantity&quot;: null,
+        &quot;supplier&quot;: &quot;controlled fixture supplier&quot;,
+        &quot;unit&quot;: &quot;cartons&quot;
+      },
+      &quot;receiver_speaker&quot;: &quot;A&quot;,
+      &quot;receiver_turn&quot;: &quot;I am the receiving clerk. I am not sure how many cartons arrived. I could not complete the count. The supplier is controlled fixture supplier.&quot;,
+      &quot;voice_validation&quot;: {
+        &quot;source_turn_matched&quot;: true,
+        &quot;single_supported_count&quot;: false
+      }
+    },
+    &quot;second_opinions&quot;: {},
+    &quot;trace&quot;: [
+      {
+        &quot;frame_completeness&quot;: {
+          &quot;size&quot;: [
+            3264,
+            2448
+          ],
+          &quot;margin_fraction&quot;: 0.01,
+          &quot;boundary_objects&quot;: [],
+          &quot;requires_review&quot;: false,
+          &quot;limitation&quot;: &quot;No boundary contact does not prove absence of occlusion or hidden cartons.&quot;
+        },
+        &quot;at&quot;: &quot;2026-11-03T20:20:41+03:00&quot;
+      },
+      {
+        &quot;gate_cross_check&quot;: {
+          &quot;agreed&quot;: 1,
+          &quot;sam_only&quot;: 3,
+          &quot;spark_only&quot;: 0,
+          &quot;doubled&quot;: 0
+        },
+        &quot;at&quot;: &quot;2026-11-03T20:21:08+03:00&quot;
+      }
+    ],
+    &quot;timings&quot;: [
+      {
+        &quot;step&quot;: &quot;Read delivery note&quot;,
+        &quot;seconds&quot;: 6.568,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Inspect camera&quot;,
+        &quot;seconds&quot;: 18.378,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Segment cartons&quot;,
+        &quot;seconds&quot;: 12.617,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Transcribe speaker turns&quot;,
+        &quot;seconds&quot;: 3.137,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Identify receiver count&quot;,
+        &quot;seconds&quot;: 10.684,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Cross-check objects and authorize&quot;,
+        &quot;seconds&quot;: 26.456,
+        &quot;status&quot;: &quot;complete&quot;
+      }
+    ],
+    &quot;seconds&quot;: 77.84,
+    &quot;total_cost_usd&quot;: null,
+    &quot;cost_status&quot;: &quot;Not measured: provider-wide billing required; not agent-token cost.&quot;,
+    &quot;input_sha256&quot;: {
+      &quot;note&quot;: &quot;7bb0021d85c90d36a68cc5d2d6f9c8596e238705216682feb76063e665c968d3&quot;,
+      &quot;camera&quot;: &quot;3fd3c7a8b27a5bf5a21a5901756eaf3cd223bd1a4fc438fba46dbae2282be9ed&quot;,
+      &quot;audio&quot;: &quot;9fece24dc92650a0664ca84b80ff0274ea7c502d430c7d840ff499e682de5f59&quot;
+    }
+  },
+  &quot;action&quot;: &quot;block&quot;,
+  &quot;rule&quot;: &quot;wrong_product&quot;,
+  &quot;seconds&quot;: 77.924,
+  &quot;exact_target_met&quot;: false,
+  &quot;acceptable_action_met&quot;: true
+}</pre></details><details><summary><code>scd-train-5199-baseline</code> · Ret</summary><p data-original-evidence>Product identity not verified. Camera read &#x27;&#x27;, note says &#x27;Unverified contents&#x27;. No receipt; check the exact product and model on the labels before deciding whether to return the load.</p><pre>{
+  &quot;id&quot;: &quot;scd-train-5199-baseline&quot;,
+  &quot;source_image_id&quot;: 5199,
+  &quot;scenario&quot;: &quot;baseline&quot;,
+  &quot;expected_action&quot;: &quot;human&quot;,
+  &quot;acceptable_actions&quot;: [
+    &quot;human&quot;,
+    &quot;block&quot;
+  ],
+  &quot;started_at&quot;: &quot;2026-11-03T20:21:01.075907+03:00&quot;,
+  &quot;evidence&quot;: {
+    &quot;mode&quot;: &quot;dry_run&quot;,
+    &quot;erp_written&quot;: false,
+    &quot;result&quot;: {
+      &quot;posted&quot;: false,
+      &quot;gate&quot;: &quot;block&quot;,
+      &quot;reason&quot;: &quot;Product identity not verified. Camera read &#x27;&#x27;, note says &#x27;Unverified contents&#x27;. No receipt; check the exact product and model on the labels before deciding whether to return the load.&quot;
+    },
+    &quot;decision&quot;: {
+      &quot;action&quot;: &quot;block&quot;,
+      &quot;quantity&quot;: null,
+      &quot;reasons&quot;: [
+        &quot;Product identity not verified. Camera read &#x27;&#x27;, note says &#x27;Unverified contents&#x27;. No receipt; check the exact product and model on the labels before deciding whether to return the load.&quot;
+      ],
+      &quot;evidence&quot;: {
+        &quot;note&quot;: [
+          [
+            1,
+            &quot;Unverified contents&quot;
+          ]
+        ],
+        &quot;sam_sure&quot;: 1,
+        &quot;sam_doubtful&quot;: 0,
+        &quot;spark_count&quot;: 1,
+        &quot;label&quot;: &quot;&quot;,
+        &quot;frame_completeness&quot;: {
+          &quot;size&quot;: [
+            2496,
+            2317
+          ],
+          &quot;margin_fraction&quot;: 0.01,
+          &quot;boundary_objects&quot;: [],
+          &quot;requires_review&quot;: false,
+          &quot;limitation&quot;: &quot;No boundary contact does not prove absence of occlusion or hidden cartons.&quot;
+        },
+        &quot;order&quot;: {
+          &quot;number&quot;: &quot;PO-scd-train-5199-baseline&quot;,
+          &quot;product&quot;: &quot;Unverified contents&quot;,
+          &quot;ordered&quot;: 1,
+          &quot;open&quot;: 1
+        }
+      },
+      &quot;rule&quot;: &quot;wrong_product&quot;
+    },
+    &quot;note&quot;: {
+      &quot;date&quot;: &quot;&quot;,
+      &quot;embedded_instructions&quot;: [],
+      &quot;items&quot;: [
+        {
+          &quot;description&quot;: &quot;Unverified contents&quot;,
+          &quot;legible&quot;: true,
+          &quot;product_identity&quot;: {
+            &quot;brand&quot;: &quot;&quot;,
+            &quot;model&quot;: &quot;&quot;,
+            &quot;product_code&quot;: &quot;&quot;,
+            &quot;variant&quot;: &quot;&quot;
+          },
+          &quot;quantity&quot;: 1,
+          &quot;unit&quot;: &quot;carton&quot;
+        }
+      ],
+      &quot;note_number&quot;: &quot;scd-train-5199-baseline&quot;,
+      &quot;supplier&quot;: &quot;Controlled Fixture Supplier&quot;
+    },
+    &quot;camera&quot;: {
+      &quot;all_cartons_visible&quot;: true,
+      &quot;all_labels_identified&quot;: false,
+      &quot;cartons_visible&quot;: 1,
+      &quot;damaged_cartons&quot;: 1,
+      &quot;product_identity&quot;: {
+        &quot;brand&quot;: &quot;&quot;,
+        &quot;model&quot;: &quot;&quot;,
+        &quot;product_code&quot;: &quot;&quot;,
+        &quot;variant&quot;: &quot;&quot;
+      },
+      &quot;product_on_labels&quot;: &quot;&quot;,
+      &quot;stacked&quot;: false
+    },
+    &quot;receiver&quot;: {
+      &quot;certain&quot;: true,
+      &quot;product&quot;: &quot;&quot;,
+      &quot;quantity&quot;: 1,
+      &quot;supplier&quot;: &quot;controlled fixture supplier&quot;,
+      &quot;unit&quot;: &quot;carton&quot;
+    },
+    &quot;speaker_turns&quot;: [
+      {
+        &quot;speaker&quot;: &quot;A&quot;,
+        &quot;transcript&quot;: &quot;I am the receiving clerk. I counted one carton the supplier is controlled fixture supplier&quot;
+      }
+    ],
+    &quot;speech_interpretation&quot;: {
+      &quot;count_candidates&quot;: [
+        1
+      ],
+      &quot;driver_quantity&quot;: null,
+      &quot;receiver&quot;: {
+        &quot;certain&quot;: true,
+        &quot;product&quot;: &quot;&quot;,
+        &quot;quantity&quot;: 1,
+        &quot;supplier&quot;: &quot;controlled fixture supplier&quot;,
+        &quot;unit&quot;: &quot;carton&quot;
+      },
+      &quot;receiver_speaker&quot;: &quot;A&quot;,
+      &quot;receiver_turn&quot;: &quot;I am the receiving clerk. I counted one carton the supplier is controlled fixture supplier&quot;,
+      &quot;voice_validation&quot;: {
+        &quot;source_turn_matched&quot;: true,
+        &quot;single_supported_count&quot;: true
+      }
+    },
+    &quot;second_opinions&quot;: {},
+    &quot;trace&quot;: [
+      {
+        &quot;frame_completeness&quot;: {
+          &quot;size&quot;: [
+            2496,
+            2317
+          ],
+          &quot;margin_fraction&quot;: 0.01,
+          &quot;boundary_objects&quot;: [],
+          &quot;requires_review&quot;: false,
+          &quot;limitation&quot;: &quot;No boundary contact does not prove absence of occlusion or hidden cartons.&quot;
+        },
+        &quot;at&quot;: &quot;2026-11-03T20:21:36+03:00&quot;
+      },
+      {
+        &quot;gate_cross_check&quot;: {
+          &quot;agreed&quot;: 0,
+          &quot;sam_only&quot;: 1,
+          &quot;spark_only&quot;: 1,
+          &quot;doubled&quot;: 0
+        },
+        &quot;at&quot;: &quot;2026-11-03T20:21:57+03:00&quot;
+      }
+    ],
+    &quot;timings&quot;: [
+      {
+        &quot;step&quot;: &quot;Read delivery note&quot;,
+        &quot;seconds&quot;: 6.852,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Inspect camera&quot;,
+        &quot;seconds&quot;: 14.169,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Segment cartons&quot;,
+        &quot;seconds&quot;: 6.142,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Transcribe speaker turns&quot;,
+        &quot;seconds&quot;: 3.048,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Identify receiver count&quot;,
+        &quot;seconds&quot;: 4.742,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Cross-check objects and authorize&quot;,
+        &quot;seconds&quot;: 21.676,
+        &quot;status&quot;: &quot;complete&quot;
+      }
+    ],
+    &quot;seconds&quot;: 56.629,
+    &quot;total_cost_usd&quot;: null,
+    &quot;cost_status&quot;: &quot;Not measured: provider-wide billing required; not agent-token cost.&quot;,
+    &quot;input_sha256&quot;: {
+      &quot;note&quot;: &quot;5f9e368a245be65f36b3d034bef84b0e6447eaedf07b21653cc96a4d6fb96e59&quot;,
+      &quot;camera&quot;: &quot;af11213c754582c8bfe429aa812b4e59595adfe9fc3dad1dd34ed1fc24b08387&quot;,
+      &quot;audio&quot;: &quot;67f7e5d7944cdd6c16b6287483bcfb725f03fcd016551d4e4b5bf5b75870c65e&quot;
+    }
+  },
+  &quot;action&quot;: &quot;block&quot;,
+  &quot;rule&quot;: &quot;wrong_product&quot;,
+  &quot;seconds&quot;: 56.71,
+  &quot;exact_target_met&quot;: false,
+  &quot;acceptable_action_met&quot;: true
+}</pre></details><details><summary><code>scd-train-5199-quantity_mismatch</code> · Ret</summary><p data-original-evidence>Product identity not verified. Camera read &#x27;&#x27;, note says &#x27;Unverified contents&#x27;. No receipt; check the exact product and model on the labels before deciding whether to return the load.</p><pre>{
+  &quot;id&quot;: &quot;scd-train-5199-quantity_mismatch&quot;,
+  &quot;source_image_id&quot;: 5199,
+  &quot;scenario&quot;: &quot;quantity_mismatch&quot;,
+  &quot;expected_action&quot;: &quot;human&quot;,
+  &quot;acceptable_actions&quot;: [
+    &quot;human&quot;,
+    &quot;block&quot;
+  ],
+  &quot;started_at&quot;: &quot;2026-11-03T20:21:06.598867+03:00&quot;,
+  &quot;evidence&quot;: {
+    &quot;mode&quot;: &quot;dry_run&quot;,
+    &quot;erp_written&quot;: false,
+    &quot;result&quot;: {
+      &quot;posted&quot;: false,
+      &quot;gate&quot;: &quot;block&quot;,
+      &quot;reason&quot;: &quot;Product identity not verified. Camera read &#x27;&#x27;, note says &#x27;Unverified contents&#x27;. No receipt; check the exact product and model on the labels before deciding whether to return the load.&quot;
+    },
+    &quot;decision&quot;: {
+      &quot;action&quot;: &quot;block&quot;,
+      &quot;quantity&quot;: null,
+      &quot;reasons&quot;: [
+        &quot;Product identity not verified. Camera read &#x27;&#x27;, note says &#x27;Unverified contents&#x27;. No receipt; check the exact product and model on the labels before deciding whether to return the load.&quot;
+      ],
+      &quot;evidence&quot;: {
+        &quot;note&quot;: [
+          [
+            2,
+            &quot;Unverified contents&quot;
+          ]
+        ],
+        &quot;sam_sure&quot;: 1,
+        &quot;sam_doubtful&quot;: 0,
+        &quot;spark_count&quot;: 1,
+        &quot;label&quot;: &quot;&quot;,
+        &quot;frame_completeness&quot;: {
+          &quot;size&quot;: [
+            2496,
+            2317
+          ],
+          &quot;margin_fraction&quot;: 0.01,
+          &quot;boundary_objects&quot;: [],
+          &quot;requires_review&quot;: false,
+          &quot;limitation&quot;: &quot;No boundary contact does not prove absence of occlusion or hidden cartons.&quot;
+        },
+        &quot;order&quot;: {
+          &quot;number&quot;: &quot;PO-scd-train-5199-quantity_mismatch&quot;,
+          &quot;product&quot;: &quot;Unverified contents&quot;,
+          &quot;ordered&quot;: 2,
+          &quot;open&quot;: 2
+        }
+      },
+      &quot;rule&quot;: &quot;wrong_product&quot;
+    },
+    &quot;note&quot;: {
+      &quot;date&quot;: &quot;&quot;,
+      &quot;embedded_instructions&quot;: [],
+      &quot;items&quot;: [
+        {
+          &quot;description&quot;: &quot;Unverified contents&quot;,
+          &quot;legible&quot;: true,
+          &quot;product_identity&quot;: {
+            &quot;brand&quot;: &quot;&quot;,
+            &quot;model&quot;: &quot;&quot;,
+            &quot;product_code&quot;: &quot;&quot;,
+            &quot;variant&quot;: &quot;&quot;
+          },
+          &quot;quantity&quot;: 2,
+          &quot;unit&quot;: &quot;carton&quot;
+        }
+      ],
+      &quot;note_number&quot;: &quot;scd-train-5199-quantity_mismatch&quot;,
+      &quot;supplier&quot;: &quot;Controlled Fixture Supplier&quot;
+    },
+    &quot;camera&quot;: {
+      &quot;all_cartons_visible&quot;: true,
+      &quot;all_labels_identified&quot;: false,
+      &quot;cartons_visible&quot;: 1,
+      &quot;damaged_cartons&quot;: 1,
+      &quot;product_identity&quot;: {
+        &quot;brand&quot;: &quot;&quot;,
+        &quot;model&quot;: &quot;&quot;,
+        &quot;product_code&quot;: &quot;&quot;,
+        &quot;variant&quot;: &quot;&quot;
+      },
+      &quot;product_on_labels&quot;: &quot;&quot;,
+      &quot;stacked&quot;: false
+    },
+    &quot;receiver&quot;: {
+      &quot;certain&quot;: true,
+      &quot;product&quot;: &quot;&quot;,
+      &quot;quantity&quot;: 1,
+      &quot;supplier&quot;: &quot;controlled fixture supplier&quot;,
+      &quot;unit&quot;: &quot;carton&quot;
+    },
+    &quot;speaker_turns&quot;: [
+      {
+        &quot;speaker&quot;: &quot;A&quot;,
+        &quot;transcript&quot;: &quot;I am the receiving clerk. I counted one carton. The supplier is controlled fixture supplier.&quot;
+      }
+    ],
+    &quot;speech_interpretation&quot;: {
+      &quot;count_candidates&quot;: [
+        1
+      ],
+      &quot;driver_quantity&quot;: null,
+      &quot;receiver&quot;: {
+        &quot;certain&quot;: true,
+        &quot;product&quot;: &quot;&quot;,
+        &quot;quantity&quot;: 1,
+        &quot;supplier&quot;: &quot;controlled fixture supplier&quot;,
+        &quot;unit&quot;: &quot;carton&quot;
+      },
+      &quot;receiver_speaker&quot;: &quot;A&quot;,
+      &quot;receiver_turn&quot;: &quot;I am the receiving clerk. I counted one carton. The supplier is controlled fixture supplier.&quot;,
+      &quot;voice_validation&quot;: {
+        &quot;source_turn_matched&quot;: true,
+        &quot;single_supported_count&quot;: true
+      }
+    },
+    &quot;second_opinions&quot;: {},
+    &quot;trace&quot;: [
+      {
+        &quot;frame_completeness&quot;: {
+          &quot;size&quot;: [
+            2496,
+            2317
+          ],
+          &quot;margin_fraction&quot;: 0.01,
+          &quot;boundary_objects&quot;: [],
+          &quot;requires_review&quot;: false,
+          &quot;limitation&quot;: &quot;No boundary contact does not prove absence of occlusion or hidden cartons.&quot;
+        },
+        &quot;at&quot;: &quot;2026-11-03T20:21:43+03:00&quot;
+      },
+      {
+        &quot;gate_cross_check&quot;: {
+          &quot;agreed&quot;: 0,
+          &quot;sam_only&quot;: 1,
+          &quot;spark_only&quot;: 1,
+          &quot;doubled&quot;: 0
+        },
+        &quot;at&quot;: &quot;2026-11-03T20:21:54+03:00&quot;
+      }
+    ],
+    &quot;timings&quot;: [
+      {
+        &quot;step&quot;: &quot;Read delivery note&quot;,
+        &quot;seconds&quot;: 6.992,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Inspect camera&quot;,
+        &quot;seconds&quot;: 13.738,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Segment cartons&quot;,
+        &quot;seconds&quot;: 8.146,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Transcribe speaker turns&quot;,
+        &quot;seconds&quot;: 2.878,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Identify receiver count&quot;,
+        &quot;seconds&quot;: 4.295,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Cross-check objects and authorize&quot;,
+        &quot;seconds&quot;: 11.304,
+        &quot;status&quot;: &quot;complete&quot;
+      }
+    ],
+    &quot;seconds&quot;: 47.353,
+    &quot;total_cost_usd&quot;: null,
+    &quot;cost_status&quot;: &quot;Not measured: provider-wide billing required; not agent-token cost.&quot;,
+    &quot;input_sha256&quot;: {
+      &quot;note&quot;: &quot;714b4eaba92ae4d5fcb475f4903a7addb7c011ea535233b8bfe298542bfff7fd&quot;,
+      &quot;camera&quot;: &quot;af11213c754582c8bfe429aa812b4e59595adfe9fc3dad1dd34ed1fc24b08387&quot;,
+      &quot;audio&quot;: &quot;67f7e5d7944cdd6c16b6287483bcfb725f03fcd016551d4e4b5bf5b75870c65e&quot;
+    }
+  },
+  &quot;action&quot;: &quot;block&quot;,
+  &quot;rule&quot;: &quot;wrong_product&quot;,
+  &quot;seconds&quot;: 47.944,
+  &quot;exact_target_met&quot;: false,
+  &quot;acceptable_action_met&quot;: true
+}</pre></details><details><summary><code>scd-train-5199-receiver_uncertain</code> · Ret</summary><p data-original-evidence>Product identity not verified. Camera read &#x27;&#x27;, note says &#x27;Unverified contents&#x27;. No receipt; check the exact product and model on the labels before deciding whether to return the load.</p><pre>{
+  &quot;id&quot;: &quot;scd-train-5199-receiver_uncertain&quot;,
+  &quot;source_image_id&quot;: 5199,
+  &quot;scenario&quot;: &quot;receiver_uncertain&quot;,
+  &quot;expected_action&quot;: &quot;human&quot;,
+  &quot;acceptable_actions&quot;: [
+    &quot;human&quot;,
+    &quot;block&quot;
+  ],
+  &quot;started_at&quot;: &quot;2026-11-03T20:21:08.120479+03:00&quot;,
+  &quot;evidence&quot;: {
+    &quot;mode&quot;: &quot;dry_run&quot;,
+    &quot;erp_written&quot;: false,
+    &quot;result&quot;: {
+      &quot;posted&quot;: false,
+      &quot;gate&quot;: &quot;block&quot;,
+      &quot;reason&quot;: &quot;Product identity not verified. Camera read &#x27;&#x27;, note says &#x27;Unverified contents&#x27;. No receipt; check the exact product and model on the labels before deciding whether to return the load.&quot;
+    },
+    &quot;decision&quot;: {
+      &quot;action&quot;: &quot;block&quot;,
+      &quot;quantity&quot;: null,
+      &quot;reasons&quot;: [
+        &quot;Product identity not verified. Camera read &#x27;&#x27;, note says &#x27;Unverified contents&#x27;. No receipt; check the exact product and model on the labels before deciding whether to return the load.&quot;
+      ],
+      &quot;evidence&quot;: {
+        &quot;note&quot;: [
+          [
+            1,
+            &quot;Unverified contents&quot;
+          ]
+        ],
+        &quot;sam_sure&quot;: 1,
+        &quot;sam_doubtful&quot;: 0,
+        &quot;spark_count&quot;: 1,
+        &quot;label&quot;: &quot;&quot;,
+        &quot;frame_completeness&quot;: {
+          &quot;size&quot;: [
+            2496,
+            2317
+          ],
+          &quot;margin_fraction&quot;: 0.01,
+          &quot;boundary_objects&quot;: [],
+          &quot;requires_review&quot;: false,
+          &quot;limitation&quot;: &quot;No boundary contact does not prove absence of occlusion or hidden cartons.&quot;
+        },
+        &quot;order&quot;: {
+          &quot;number&quot;: &quot;PO-scd-train-5199-receiver_uncertain&quot;,
+          &quot;product&quot;: &quot;Unverified contents&quot;,
+          &quot;ordered&quot;: 1,
+          &quot;open&quot;: 1
+        }
+      },
+      &quot;rule&quot;: &quot;wrong_product&quot;
+    },
+    &quot;note&quot;: {
+      &quot;date&quot;: &quot;&quot;,
+      &quot;embedded_instructions&quot;: [],
+      &quot;items&quot;: [
+        {
+          &quot;description&quot;: &quot;Unverified contents&quot;,
+          &quot;legible&quot;: true,
+          &quot;product_identity&quot;: {
+            &quot;brand&quot;: &quot;&quot;,
+            &quot;model&quot;: &quot;&quot;,
+            &quot;product_code&quot;: &quot;&quot;,
+            &quot;variant&quot;: &quot;&quot;
+          },
+          &quot;quantity&quot;: 1,
+          &quot;unit&quot;: &quot;carton&quot;
+        }
+      ],
+      &quot;note_number&quot;: &quot;scd-train-5199-receiver_uncertain&quot;,
+      &quot;supplier&quot;: &quot;Controlled Fixture Supplier&quot;
+    },
+    &quot;camera&quot;: {
+      &quot;all_cartons_visible&quot;: true,
+      &quot;all_labels_identified&quot;: false,
+      &quot;cartons_visible&quot;: 1,
+      &quot;damaged_cartons&quot;: 1,
+      &quot;product_identity&quot;: {
+        &quot;brand&quot;: &quot;&quot;,
+        &quot;model&quot;: &quot;&quot;,
+        &quot;product_code&quot;: &quot;&quot;,
+        &quot;variant&quot;: &quot;&quot;
+      },
+      &quot;product_on_labels&quot;: &quot;&quot;,
+      &quot;stacked&quot;: false
+    },
+    &quot;receiver&quot;: {
+      &quot;certain&quot;: false,
+      &quot;product&quot;: &quot;&quot;,
+      &quot;quantity&quot;: null,
+      &quot;supplier&quot;: &quot;Controlled Fixture Supplier&quot;,
+      &quot;unit&quot;: &quot;cartons&quot;
+    },
+    &quot;speaker_turns&quot;: [
+      {
+        &quot;speaker&quot;: &quot;A&quot;,
+        &quot;transcript&quot;: &quot;I am the receiving receiving clerk. I am not sure how many cartons arrived. I could not complete the count. The supplier is Controlled Fixture Supplier.&quot;
+      }
+    ],
+    &quot;speech_interpretation&quot;: {
+      &quot;count_candidates&quot;: [],
+      &quot;driver_quantity&quot;: null,
+      &quot;receiver&quot;: {
+        &quot;certain&quot;: false,
+        &quot;product&quot;: &quot;&quot;,
+        &quot;quantity&quot;: null,
+        &quot;supplier&quot;: &quot;Controlled Fixture Supplier&quot;,
+        &quot;unit&quot;: &quot;cartons&quot;
+      },
+      &quot;receiver_speaker&quot;: &quot;A&quot;,
+      &quot;receiver_turn&quot;: &quot;I am the receiving receiving clerk. I am not sure how many cartons arrived. I could not complete the count. The supplier is Controlled Fixture Supplier.&quot;,
+      &quot;voice_validation&quot;: {
+        &quot;source_turn_matched&quot;: true,
+        &quot;single_supported_count&quot;: false
+      }
+    },
+    &quot;second_opinions&quot;: {},
+    &quot;trace&quot;: [
+      {
+        &quot;frame_completeness&quot;: {
+          &quot;size&quot;: [
+            2496,
+            2317
+          ],
+          &quot;margin_fraction&quot;: 0.01,
+          &quot;boundary_objects&quot;: [],
+          &quot;requires_review&quot;: false,
+          &quot;limitation&quot;: &quot;No boundary contact does not prove absence of occlusion or hidden cartons.&quot;
+        },
+        &quot;at&quot;: &quot;2026-11-03T20:21:45+03:00&quot;
+      },
+      {
+        &quot;gate_cross_check&quot;: {
+          &quot;agreed&quot;: 0,
+          &quot;sam_only&quot;: 1,
+          &quot;spark_only&quot;: 1,
+          &quot;doubled&quot;: 0
+        },
+        &quot;at&quot;: &quot;2026-11-03T20:21:59+03:00&quot;
+      }
+    ],
+    &quot;timings&quot;: [
+      {
+        &quot;step&quot;: &quot;Read delivery note&quot;,
+        &quot;seconds&quot;: 5.535,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Inspect camera&quot;,
+        &quot;seconds&quot;: 12.602,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Segment cartons&quot;,
+        &quot;seconds&quot;: 8.413,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Transcribe speaker turns&quot;,
+        &quot;seconds&quot;: 3.748,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Identify receiver count&quot;,
+        &quot;seconds&quot;: 6.617,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Cross-check objects and authorize&quot;,
+        &quot;seconds&quot;: 14.872,
+        &quot;status&quot;: &quot;complete&quot;
+      }
+    ],
+    &quot;seconds&quot;: 51.787,
+    &quot;total_cost_usd&quot;: null,
+    &quot;cost_status&quot;: &quot;Not measured: provider-wide billing required; not agent-token cost.&quot;,
+    &quot;input_sha256&quot;: {
+      &quot;note&quot;: &quot;672bc75d8f06d54a0f70b2c9c56ce8a0f9230e7929486c0f98dcecf508285693&quot;,
+      &quot;camera&quot;: &quot;af11213c754582c8bfe429aa812b4e59595adfe9fc3dad1dd34ed1fc24b08387&quot;,
+      &quot;audio&quot;: &quot;9fece24dc92650a0664ca84b80ff0274ea7c502d430c7d840ff499e682de5f59&quot;
+    }
+  },
+  &quot;action&quot;: &quot;block&quot;,
+  &quot;rule&quot;: &quot;wrong_product&quot;,
+  &quot;seconds&quot;: 51.842,
+  &quot;exact_target_met&quot;: false,
+  &quot;acceptable_action_met&quot;: true
+}</pre></details><details><summary><code>scd-train-5183-baseline</code> · Kabul</summary><p data-original-evidence>Note, SAM and Spark agree on 1. Within PO-scd-train-5183-baseline (1 open).</p><pre>{
+  &quot;id&quot;: &quot;scd-train-5183-baseline&quot;,
+  &quot;source_image_id&quot;: 5183,
+  &quot;scenario&quot;: &quot;baseline&quot;,
+  &quot;expected_action&quot;: &quot;human&quot;,
+  &quot;acceptable_actions&quot;: [
+    &quot;human&quot;,
+    &quot;block&quot;
+  ],
+  &quot;started_at&quot;: &quot;2026-11-03T20:21:54.576494+03:00&quot;,
+  &quot;evidence&quot;: {
+    &quot;mode&quot;: &quot;dry_run&quot;,
+    &quot;erp_written&quot;: false,
+    &quot;result&quot;: {
+      &quot;posted&quot;: true,
+      &quot;quantity&quot;: 1,
+      &quot;document&quot;: null
+    },
+    &quot;decision&quot;: {
+      &quot;action&quot;: &quot;post&quot;,
+      &quot;quantity&quot;: 1,
+      &quot;reasons&quot;: [
+        &quot;Note, SAM and Spark agree on 1. Within PO-scd-train-5183-baseline (1 open).&quot;
+      ],
+      &quot;evidence&quot;: {
+        &quot;note&quot;: [
+          [
+            1,
+            &quot;容声冰箱&quot;
+          ]
+        ],
+        &quot;sam_sure&quot;: 1,
+        &quot;sam_doubtful&quot;: 0,
+        &quot;spark_count&quot;: 1,
+        &quot;label&quot;: &quot;容声冰箱&quot;,
+        &quot;frame_completeness&quot;: {
+          &quot;size&quot;: [
+            4344,
+            5792
+          ],
+          &quot;margin_fraction&quot;: 0.01,
+          &quot;boundary_objects&quot;: [],
+          &quot;requires_review&quot;: false,
+          &quot;limitation&quot;: &quot;No boundary contact does not prove absence of occlusion or hidden cartons.&quot;
+        },
+        &quot;order&quot;: {
+          &quot;number&quot;: &quot;PO-scd-train-5183-baseline&quot;,
+          &quot;product&quot;: &quot;容声冰箱&quot;,
+          &quot;ordered&quot;: 1,
+          &quot;open&quot;: 1
+        },
+        &quot;cross&quot;: {
+          &quot;agreed&quot;: 1,
+          &quot;sam_only&quot;: 0,
+          &quot;spark_only&quot;: 0,
+          &quot;doubled&quot;: 0
+        },
+        &quot;spoken&quot;: {
+          &quot;certain&quot;: true,
+          &quot;product&quot;: &quot;&quot;,
+          &quot;quantity&quot;: 1,
+          &quot;supplier&quot;: &quot;controlled fixture supplier&quot;,
+          &quot;unit&quot;: &quot;carton&quot;
+        },
+        &quot;second_reader&quot;: [
+          [
+            1,
+            &quot;容声冰箱&quot;
+          ]
+        ],
+        &quot;second_supplier&quot;: &quot;Controlled Fixture Supplier&quot;,
+        &quot;audit&quot;: {
+          &quot;ok&quot;: true,
+          &quot;quantity&quot;: true,
+          &quot;product&quot;: true,
+          &quot;instructions&quot;: &quot;&quot;,
+          &quot;quotes&quot;: {
+            &quot;quantity&quot;: &quot;Quantity: 1 carton&quot;,
+            &quot;product&quot;: &quot;Product: 容声冰箱&quot;,
+            &quot;instructions&quot;: &quot;&quot;
+          }
+        }
+      },
+      &quot;rule&quot;: &quot;match&quot;
+    },
+    &quot;note&quot;: {
+      &quot;date&quot;: &quot;&quot;,
+      &quot;embedded_instructions&quot;: [],
+      &quot;items&quot;: [
+        {
+          &quot;description&quot;: &quot;容声冰箱&quot;,
+          &quot;legible&quot;: true,
+          &quot;product_identity&quot;: {
+            &quot;brand&quot;: &quot;&quot;,
+            &quot;model&quot;: &quot;&quot;,
+            &quot;product_code&quot;: &quot;&quot;,
+            &quot;variant&quot;: &quot;&quot;
+          },
+          &quot;quantity&quot;: 1,
+          &quot;unit&quot;: &quot;carton&quot;
+        }
+      ],
+      &quot;note_number&quot;: &quot;scd-train-5183-baseline&quot;,
+      &quot;supplier&quot;: &quot;Controlled Fixture Supplier&quot;
+    },
+    &quot;camera&quot;: {
+      &quot;all_cartons_visible&quot;: true,
+      &quot;all_labels_identified&quot;: false,
+      &quot;cartons_visible&quot;: 1,
+      &quot;damaged_cartons&quot;: 0,
+      &quot;product_identity&quot;: {
+        &quot;brand&quot;: &quot;Ronshen&quot;,
+        &quot;model&quot;: &quot;&quot;,
+        &quot;product_code&quot;: &quot;&quot;,
+        &quot;variant&quot;: &quot;&quot;
+      },
+      &quot;product_on_labels&quot;: &quot;容声冰箱&quot;,
+      &quot;stacked&quot;: false
+    },
+    &quot;receiver&quot;: {
+      &quot;certain&quot;: true,
+      &quot;product&quot;: &quot;&quot;,
+      &quot;quantity&quot;: 1,
+      &quot;supplier&quot;: &quot;controlled fixture supplier&quot;,
+      &quot;unit&quot;: &quot;carton&quot;
+    },
+    &quot;speaker_turns&quot;: [
+      {
+        &quot;speaker&quot;: &quot;A&quot;,
+        &quot;transcript&quot;: &quot;I am the receiving clerk. I counted one carton. The supplier is controlled fixture supplier.&quot;
+      }
+    ],
+    &quot;speech_interpretation&quot;: {
+      &quot;count_candidates&quot;: [
+        1
+      ],
+      &quot;driver_quantity&quot;: null,
+      &quot;receiver&quot;: {
+        &quot;certain&quot;: true,
+        &quot;product&quot;: &quot;&quot;,
+        &quot;quantity&quot;: 1,
+        &quot;supplier&quot;: &quot;controlled fixture supplier&quot;,
+        &quot;unit&quot;: &quot;carton&quot;
+      },
+      &quot;receiver_speaker&quot;: &quot;A&quot;,
+      &quot;receiver_turn&quot;: &quot;I am the receiving clerk. I counted one carton. The supplier is controlled fixture supplier.&quot;,
+      &quot;voice_validation&quot;: {
+        &quot;source_turn_matched&quot;: true,
+        &quot;single_supported_count&quot;: true
+      }
+    },
+    &quot;second_opinions&quot;: {
+      &quot;second&quot;: {
+        &quot;supplier&quot;: &quot;Controlled Fixture Supplier&quot;,
+        &quot;note_number&quot;: &quot;scd-train-5183-baseline&quot;,
+        &quot;date&quot;: &quot;&quot;,
+        &quot;items&quot;: [
+          {
+            &quot;description&quot;: &quot;容声冰箱&quot;,
+            &quot;product_identity&quot;: {
+              &quot;brand&quot;: &quot;&quot;,
+              &quot;product_code&quot;: &quot;&quot;,
+              &quot;model&quot;: &quot;&quot;,
+              &quot;variant&quot;: &quot;&quot;
+            },
+            &quot;quantity&quot;: 1,
+            &quot;unit&quot;: &quot;carton&quot;,
+            &quot;legible&quot;: true
+          }
+        ],
+        &quot;embedded_instructions&quot;: []
+      },
+      &quot;audit&quot;: {
+        &quot;ok&quot;: true,
+        &quot;quantity&quot;: true,
+        &quot;product&quot;: true,
+        &quot;instructions&quot;: &quot;&quot;,
+        &quot;quotes&quot;: {
+          &quot;quantity&quot;: &quot;Quantity: 1 carton&quot;,
+          &quot;product&quot;: &quot;Product: 容声冰箱&quot;,
+          &quot;instructions&quot;: &quot;&quot;
+        }
+      }
+    },
+    &quot;trace&quot;: [
+      {
+        &quot;frame_completeness&quot;: {
+          &quot;size&quot;: [
+            4344,
+            5792
+          ],
+          &quot;margin_fraction&quot;: 0.01,
+          &quot;boundary_objects&quot;: [],
+          &quot;requires_review&quot;: false,
+          &quot;limitation&quot;: &quot;No boundary contact does not prove absence of occlusion or hidden cartons.&quot;
+        },
+        &quot;at&quot;: &quot;2026-11-03T20:24:20+03:00&quot;
+      },
+      {
+        &quot;gate_cross_check&quot;: {
+          &quot;agreed&quot;: 1,
+          &quot;sam_only&quot;: 0,
+          &quot;spark_only&quot;: 0,
+          &quot;doubled&quot;: 0
+        },
+        &quot;at&quot;: &quot;2026-11-03T20:25:29+03:00&quot;
+      },
+      {
+        &quot;second_opinions&quot;: {
+          &quot;second&quot;: {
+            &quot;supplier&quot;: &quot;Controlled Fixture Supplier&quot;,
+            &quot;note_number&quot;: &quot;scd-train-5183-baseline&quot;,
+            &quot;date&quot;: &quot;&quot;,
+            &quot;items&quot;: [
+              {
+                &quot;description&quot;: &quot;容声冰箱&quot;,
+                &quot;product_identity&quot;: {
+                  &quot;brand&quot;: &quot;&quot;,
+                  &quot;product_code&quot;: &quot;&quot;,
+                  &quot;model&quot;: &quot;&quot;,
+                  &quot;variant&quot;: &quot;&quot;
+                },
+                &quot;quantity&quot;: 1,
+                &quot;unit&quot;: &quot;carton&quot;,
+                &quot;legible&quot;: true
+              }
+            ],
+            &quot;embedded_instructions&quot;: []
+          },
+          &quot;audit&quot;: {
+            &quot;ok&quot;: true,
+            &quot;quantity&quot;: true,
+            &quot;product&quot;: true,
+            &quot;instructions&quot;: &quot;&quot;,
+            &quot;quotes&quot;: {
+              &quot;quantity&quot;: &quot;Quantity: 1 carton&quot;,
+              &quot;product&quot;: &quot;Product: 容声冰箱&quot;,
+              &quot;instructions&quot;: &quot;&quot;
+            }
+          }
+        },
+        &quot;at&quot;: &quot;2026-11-03T20:25:53+03:00&quot;
+      }
+    ],
+    &quot;timings&quot;: [
+      {
+        &quot;step&quot;: &quot;Read delivery note&quot;,
+        &quot;seconds&quot;: 8.594,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Inspect camera&quot;,
+        &quot;seconds&quot;: 70.088,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Segment cartons&quot;,
+        &quot;seconds&quot;: 57.884,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Transcribe speaker turns&quot;,
+        &quot;seconds&quot;: 3.145,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Identify receiver count&quot;,
+        &quot;seconds&quot;: 5.262,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Cross-check objects and authorize&quot;,
+        &quot;seconds&quot;: 92.937,
+        &quot;status&quot;: &quot;complete&quot;
+      }
+    ],
+    &quot;seconds&quot;: 237.91,
+    &quot;total_cost_usd&quot;: null,
+    &quot;cost_status&quot;: &quot;Not measured: provider-wide billing required; not agent-token cost.&quot;,
+    &quot;input_sha256&quot;: {
+      &quot;note&quot;: &quot;7c9fee7f69d5374b92378a9dbdcf21d649d0072d77bd914ad14190f71a2ee21f&quot;,
+      &quot;camera&quot;: &quot;b331bba36f3932af3bf50e64e56bdaa9c092df918cc67790ba2a65317495d009&quot;,
+      &quot;audio&quot;: &quot;67f7e5d7944cdd6c16b6287483bcfb725f03fcd016551d4e4b5bf5b75870c65e&quot;
+    }
+  },
+  &quot;action&quot;: &quot;post&quot;,
+  &quot;rule&quot;: &quot;match&quot;,
+  &quot;seconds&quot;: 238.777,
+  &quot;exact_target_met&quot;: false,
+  &quot;acceptable_action_met&quot;: false
+}</pre></details><details><summary><code>scd-train-5183-quantity_mismatch</code> · Ret</summary><p data-original-evidence>Product identity not verified. Camera read &#x27;Ronshen 容声冰箱&#x27;, note says &#x27;容声冰箱&#x27;. No receipt; check the exact product and model on the labels before deciding whether to return the load.</p><pre>{
+  &quot;id&quot;: &quot;scd-train-5183-quantity_mismatch&quot;,
+  &quot;source_image_id&quot;: 5183,
+  &quot;scenario&quot;: &quot;quantity_mismatch&quot;,
+  &quot;expected_action&quot;: &quot;human&quot;,
+  &quot;acceptable_actions&quot;: [
+    &quot;human&quot;,
+    &quot;block&quot;
+  ],
+  &quot;started_at&quot;: &quot;2026-11-03T20:21:57.816330+03:00&quot;,
+  &quot;evidence&quot;: {
+    &quot;mode&quot;: &quot;dry_run&quot;,
+    &quot;erp_written&quot;: false,
+    &quot;result&quot;: {
+      &quot;posted&quot;: false,
+      &quot;gate&quot;: &quot;block&quot;,
+      &quot;reason&quot;: &quot;Product identity not verified. Camera read &#x27;Ronshen 容声冰箱&#x27;, note says &#x27;容声冰箱&#x27;. No receipt; check the exact product and model on the labels before deciding whether to return the load.&quot;
+    },
+    &quot;decision&quot;: {
+      &quot;action&quot;: &quot;block&quot;,
+      &quot;quantity&quot;: null,
+      &quot;reasons&quot;: [
+        &quot;Product identity not verified. Camera read &#x27;Ronshen 容声冰箱&#x27;, note says &#x27;容声冰箱&#x27;. No receipt; check the exact product and model on the labels before deciding whether to return the load.&quot;
+      ],
+      &quot;evidence&quot;: {
+        &quot;note&quot;: [
+          [
+            2,
+            &quot;容声冰箱&quot;
+          ]
+        ],
+        &quot;sam_sure&quot;: 1,
+        &quot;sam_doubtful&quot;: 0,
+        &quot;spark_count&quot;: 1,
+        &quot;label&quot;: &quot;Ronshen 容声冰箱&quot;,
+        &quot;frame_completeness&quot;: {
+          &quot;size&quot;: [
+            4344,
+            5792
+          ],
+          &quot;margin_fraction&quot;: 0.01,
+          &quot;boundary_objects&quot;: [],
+          &quot;requires_review&quot;: false,
+          &quot;limitation&quot;: &quot;No boundary contact does not prove absence of occlusion or hidden cartons.&quot;
+        },
+        &quot;order&quot;: {
+          &quot;number&quot;: &quot;PO-scd-train-5183-quantity_mismatch&quot;,
+          &quot;product&quot;: &quot;容声冰箱&quot;,
+          &quot;ordered&quot;: 2,
+          &quot;open&quot;: 2
+        }
+      },
+      &quot;rule&quot;: &quot;wrong_product&quot;
+    },
+    &quot;note&quot;: {
+      &quot;date&quot;: &quot;&quot;,
+      &quot;embedded_instructions&quot;: [],
+      &quot;items&quot;: [
+        {
+          &quot;description&quot;: &quot;容声冰箱&quot;,
+          &quot;legible&quot;: true,
+          &quot;product_identity&quot;: {
+            &quot;brand&quot;: &quot;&quot;,
+            &quot;model&quot;: &quot;&quot;,
+            &quot;product_code&quot;: &quot;&quot;,
+            &quot;variant&quot;: &quot;&quot;
+          },
+          &quot;quantity&quot;: 2,
+          &quot;unit&quot;: &quot;carton&quot;
+        }
+      ],
+      &quot;note_number&quot;: &quot;scd-train-5183-quantity_mismatch&quot;,
+      &quot;supplier&quot;: &quot;Controlled Fixture Supplier&quot;
+    },
+    &quot;camera&quot;: {
+      &quot;all_cartons_visible&quot;: true,
+      &quot;all_labels_identified&quot;: false,
+      &quot;cartons_visible&quot;: 1,
+      &quot;damaged_cartons&quot;: 0,
+      &quot;product_identity&quot;: {
+        &quot;brand&quot;: &quot;Ronshen&quot;,
+        &quot;model&quot;: &quot;&quot;,
+        &quot;product_code&quot;: &quot;&quot;,
+        &quot;variant&quot;: &quot;&quot;
+      },
+      &quot;product_on_labels&quot;: &quot;Ronshen 容声冰箱&quot;,
+      &quot;stacked&quot;: false
+    },
+    &quot;receiver&quot;: {
+      &quot;certain&quot;: true,
+      &quot;product&quot;: &quot;&quot;,
+      &quot;quantity&quot;: 1,
+      &quot;supplier&quot;: &quot;controlled fixture supplier&quot;,
+      &quot;unit&quot;: &quot;carton&quot;
+    },
+    &quot;speaker_turns&quot;: [
+      {
+        &quot;speaker&quot;: &quot;A&quot;,
+        &quot;transcript&quot;: &quot;I am the receiving clerk. I counted one carton. The supplier is controlled fixture supplier.&quot;
+      }
+    ],
+    &quot;speech_interpretation&quot;: {
+      &quot;count_candidates&quot;: [
+        1
+      ],
+      &quot;driver_quantity&quot;: null,
+      &quot;receiver&quot;: {
+        &quot;certain&quot;: true,
+        &quot;product&quot;: &quot;&quot;,
+        &quot;quantity&quot;: 1,
+        &quot;supplier&quot;: &quot;controlled fixture supplier&quot;,
+        &quot;unit&quot;: &quot;carton&quot;
+      },
+      &quot;receiver_speaker&quot;: &quot;A&quot;,
+      &quot;receiver_turn&quot;: &quot;I am the receiving clerk. I counted one carton. The supplier is controlled fixture supplier.&quot;,
+      &quot;voice_validation&quot;: {
+        &quot;source_turn_matched&quot;: true,
+        &quot;single_supported_count&quot;: true
+      }
+    },
+    &quot;second_opinions&quot;: {},
+    &quot;trace&quot;: [
+      {
+        &quot;frame_completeness&quot;: {
+          &quot;size&quot;: [
+            4344,
+            5792
+          ],
+          &quot;margin_fraction&quot;: 0.01,
+          &quot;boundary_objects&quot;: [],
+          &quot;requires_review&quot;: false,
+          &quot;limitation&quot;: &quot;No boundary contact does not prove absence of occlusion or hidden cartons.&quot;
+        },
+        &quot;at&quot;: &quot;2026-11-03T20:23:54+03:00&quot;
+      },
+      {
+        &quot;gate_cross_check&quot;: {
+          &quot;agreed&quot;: 1,
+          &quot;sam_only&quot;: 0,
+          &quot;spark_only&quot;: 0,
+          &quot;doubled&quot;: 0
+        },
+        &quot;at&quot;: &quot;2026-11-03T20:25:42+03:00&quot;
+      }
+    ],
+    &quot;timings&quot;: [
+      {
+        &quot;step&quot;: &quot;Read delivery note&quot;,
+        &quot;seconds&quot;: 6.372,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Inspect camera&quot;,
+        &quot;seconds&quot;: 62.028,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Segment cartons&quot;,
+        &quot;seconds&quot;: 37.525,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Transcribe speaker turns&quot;,
+        &quot;seconds&quot;: 4.111,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Identify receiver count&quot;,
+        &quot;seconds&quot;: 5.566,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Cross-check objects and authorize&quot;,
+        &quot;seconds&quot;: 108.697,
+        &quot;status&quot;: &quot;complete&quot;
+      }
+    ],
+    &quot;seconds&quot;: 224.299,
+    &quot;total_cost_usd&quot;: null,
+    &quot;cost_status&quot;: &quot;Not measured: provider-wide billing required; not agent-token cost.&quot;,
+    &quot;input_sha256&quot;: {
+      &quot;note&quot;: &quot;d27bac756559c3c50634f15089f3aee95a055ac5c96f4d754d44004d9d61de40&quot;,
+      &quot;camera&quot;: &quot;b331bba36f3932af3bf50e64e56bdaa9c092df918cc67790ba2a65317495d009&quot;,
+      &quot;audio&quot;: &quot;67f7e5d7944cdd6c16b6287483bcfb725f03fcd016551d4e4b5bf5b75870c65e&quot;
+    }
+  },
+  &quot;action&quot;: &quot;block&quot;,
+  &quot;rule&quot;: &quot;wrong_product&quot;,
+  &quot;seconds&quot;: 224.941,
+  &quot;exact_target_met&quot;: false,
+  &quot;acceptable_action_met&quot;: true
+}</pre></details><details><summary><code>scd-train-5183-receiver_uncertain</code> · Ret</summary><p data-original-evidence>Product identity not verified. Camera read &#x27;Ronshen 容声冰箱&#x27;, note says &#x27;容声冰箱&#x27;. No receipt; check the exact product and model on the labels before deciding whether to return the load.</p><pre>{
+  &quot;id&quot;: &quot;scd-train-5183-receiver_uncertain&quot;,
+  &quot;source_image_id&quot;: 5183,
+  &quot;scenario&quot;: &quot;receiver_uncertain&quot;,
+  &quot;expected_action&quot;: &quot;human&quot;,
+  &quot;acceptable_actions&quot;: [
+    &quot;human&quot;,
+    &quot;block&quot;
+  ],
+  &quot;started_at&quot;: &quot;2026-11-03T20:21:59.964286+03:00&quot;,
+  &quot;evidence&quot;: {
+    &quot;mode&quot;: &quot;dry_run&quot;,
+    &quot;erp_written&quot;: false,
+    &quot;result&quot;: {
+      &quot;posted&quot;: false,
+      &quot;gate&quot;: &quot;block&quot;,
+      &quot;reason&quot;: &quot;Product identity not verified. Camera read &#x27;Ronshen 容声冰箱&#x27;, note says &#x27;容声冰箱&#x27;. No receipt; check the exact product and model on the labels before deciding whether to return the load.&quot;
+    },
+    &quot;decision&quot;: {
+      &quot;action&quot;: &quot;block&quot;,
+      &quot;quantity&quot;: null,
+      &quot;reasons&quot;: [
+        &quot;Product identity not verified. Camera read &#x27;Ronshen 容声冰箱&#x27;, note says &#x27;容声冰箱&#x27;. No receipt; check the exact product and model on the labels before deciding whether to return the load.&quot;
+      ],
+      &quot;evidence&quot;: {
+        &quot;note&quot;: [
+          [
+            1,
+            &quot;容声冰箱&quot;
+          ]
+        ],
+        &quot;sam_sure&quot;: 1,
+        &quot;sam_doubtful&quot;: 0,
+        &quot;spark_count&quot;: 1,
+        &quot;label&quot;: &quot;Ronshen 容声冰箱&quot;,
+        &quot;frame_completeness&quot;: {
+          &quot;size&quot;: [
+            4344,
+            5792
+          ],
+          &quot;margin_fraction&quot;: 0.01,
+          &quot;boundary_objects&quot;: [],
+          &quot;requires_review&quot;: false,
+          &quot;limitation&quot;: &quot;No boundary contact does not prove absence of occlusion or hidden cartons.&quot;
+        },
+        &quot;order&quot;: {
+          &quot;number&quot;: &quot;PO-scd-train-5183-receiver_uncertain&quot;,
+          &quot;product&quot;: &quot;容声冰箱&quot;,
+          &quot;ordered&quot;: 1,
+          &quot;open&quot;: 1
+        }
+      },
+      &quot;rule&quot;: &quot;wrong_product&quot;
+    },
+    &quot;note&quot;: {
+      &quot;date&quot;: &quot;&quot;,
+      &quot;embedded_instructions&quot;: [],
+      &quot;items&quot;: [
+        {
+          &quot;description&quot;: &quot;容声冰箱&quot;,
+          &quot;legible&quot;: true,
+          &quot;product_identity&quot;: {
+            &quot;brand&quot;: &quot;&quot;,
+            &quot;model&quot;: &quot;&quot;,
+            &quot;product_code&quot;: &quot;&quot;,
+            &quot;variant&quot;: &quot;&quot;
+          },
+          &quot;quantity&quot;: 1,
+          &quot;unit&quot;: &quot;carton&quot;
+        }
+      ],
+      &quot;note_number&quot;: &quot;scd-train-5183-receiver_uncertain&quot;,
+      &quot;supplier&quot;: &quot;Controlled Fixture Supplier&quot;
+    },
+    &quot;camera&quot;: {
+      &quot;all_cartons_visible&quot;: true,
+      &quot;all_labels_identified&quot;: false,
+      &quot;cartons_visible&quot;: 1,
+      &quot;damaged_cartons&quot;: 0,
+      &quot;product_identity&quot;: {
+        &quot;brand&quot;: &quot;Ronshen&quot;,
+        &quot;model&quot;: &quot;&quot;,
+        &quot;product_code&quot;: &quot;&quot;,
+        &quot;variant&quot;: &quot;&quot;
+      },
+      &quot;product_on_labels&quot;: &quot;Ronshen 容声冰箱&quot;,
+      &quot;stacked&quot;: false
+    },
+    &quot;receiver&quot;: {
+      &quot;certain&quot;: false,
+      &quot;product&quot;: &quot;&quot;,
+      &quot;quantity&quot;: null,
+      &quot;supplier&quot;: &quot;controlled fixture supplier&quot;,
+      &quot;unit&quot;: &quot;cartons&quot;
+    },
+    &quot;speaker_turns&quot;: [
+      {
+        &quot;speaker&quot;: &quot;A&quot;,
+        &quot;transcript&quot;: &quot;I am the receiving clerk. I am not sure how many cartons arrived. I could not not complete the count. The supplier is controlled fixture supplier.&quot;
+      }
+    ],
+    &quot;speech_interpretation&quot;: {
+      &quot;count_candidates&quot;: [],
+      &quot;driver_quantity&quot;: null,
+      &quot;receiver&quot;: {
+        &quot;certain&quot;: false,
+        &quot;product&quot;: &quot;&quot;,
+        &quot;quantity&quot;: null,
+        &quot;supplier&quot;: &quot;controlled fixture supplier&quot;,
+        &quot;unit&quot;: &quot;cartons&quot;
+      },
+      &quot;receiver_speaker&quot;: &quot;A&quot;,
+      &quot;receiver_turn&quot;: &quot;I am the receiving clerk. I am not sure how many cartons arrived. I could not not complete the count. The supplier is controlled fixture supplier.&quot;,
+      &quot;voice_validation&quot;: {
+        &quot;source_turn_matched&quot;: true,
+        &quot;single_supported_count&quot;: false
+      }
+    },
+    &quot;second_opinions&quot;: {},
+    &quot;trace&quot;: [
+      {
+        &quot;frame_completeness&quot;: {
+          &quot;size&quot;: [
+            4344,
+            5792
+          ],
+          &quot;margin_fraction&quot;: 0.01,
+          &quot;boundary_objects&quot;: [],
+          &quot;requires_review&quot;: false,
+          &quot;limitation&quot;: &quot;No boundary contact does not prove absence of occlusion or hidden cartons.&quot;
+        },
+        &quot;at&quot;: &quot;2026-11-03T20:23:37+03:00&quot;
+      },
+      {
+        &quot;gate_cross_check&quot;: {
+          &quot;agreed&quot;: 1,
+          &quot;sam_only&quot;: 0,
+          &quot;spark_only&quot;: 0,
+          &quot;doubled&quot;: 0
+        },
+        &quot;at&quot;: &quot;2026-11-03T20:24:51+03:00&quot;
+      }
+    ],
+    &quot;timings&quot;: [
+      {
+        &quot;step&quot;: &quot;Read delivery note&quot;,
+        &quot;seconds&quot;: 6.648,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Inspect camera&quot;,
+        &quot;seconds&quot;: 47.093,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Segment cartons&quot;,
+        &quot;seconds&quot;: 30.954,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Transcribe speaker turns&quot;,
+        &quot;seconds&quot;: 4.644,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Identify receiver count&quot;,
+        &quot;seconds&quot;: 7.97,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Cross-check objects and authorize&quot;,
+        &quot;seconds&quot;: 74.165,
+        &quot;status&quot;: &quot;complete&quot;
+      }
+    ],
+    &quot;seconds&quot;: 171.474,
+    &quot;total_cost_usd&quot;: null,
+    &quot;cost_status&quot;: &quot;Not measured: provider-wide billing required; not agent-token cost.&quot;,
+    &quot;input_sha256&quot;: {
+      &quot;note&quot;: &quot;3c6e71c7a5be527c898f8f45e2555b32a6ea6fc77e0b2cb8c58feda2c44105a3&quot;,
+      &quot;camera&quot;: &quot;b331bba36f3932af3bf50e64e56bdaa9c092df918cc67790ba2a65317495d009&quot;,
+      &quot;audio&quot;: &quot;9fece24dc92650a0664ca84b80ff0274ea7c502d430c7d840ff499e682de5f59&quot;
+    }
+  },
+  &quot;action&quot;: &quot;block&quot;,
+  &quot;rule&quot;: &quot;wrong_product&quot;,
+  &quot;seconds&quot;: 171.489,
+  &quot;exact_target_met&quot;: false,
+  &quot;acceptable_action_met&quot;: true
+}</pre></details><details><summary><code>scd-train-3823-baseline</code> · Teknik hata</summary><p data-original-evidence>RuntimeError</p><pre>{
+  &quot;id&quot;: &quot;scd-train-3823-baseline&quot;,
+  &quot;source_image_id&quot;: 3823,
+  &quot;scenario&quot;: &quot;baseline&quot;,
+  &quot;expected_action&quot;: &quot;human&quot;,
+  &quot;acceptable_actions&quot;: [
+    &quot;human&quot;,
+    &quot;block&quot;
+  ],
+  &quot;started_at&quot;: &quot;2026-11-03T20:24:51.460137+03:00&quot;,
+  &quot;action&quot;: &quot;error&quot;,
+  &quot;error_type&quot;: &quot;RuntimeError&quot;,
+  &quot;partial&quot;: {
+    &quot;failed_step&quot;: &quot;Cross-check objects and authorize&quot;,
+    &quot;timings&quot;: [
+      {
+        &quot;step&quot;: &quot;Read delivery note&quot;,
+        &quot;seconds&quot;: 8.994,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Inspect camera&quot;,
+        &quot;seconds&quot;: 62.143,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Segment cartons&quot;,
+        &quot;seconds&quot;: 38.783,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Transcribe speaker turns&quot;,
+        &quot;seconds&quot;: 4.442,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Identify receiver count&quot;,
+        &quot;seconds&quot;: 5.022,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Cross-check objects and authorize&quot;,
+        &quot;seconds&quot;: 103.363,
+        &quot;status&quot;: &quot;error&quot;
+      }
+    ],
+    &quot;note&quot;: {
+      &quot;date&quot;: &quot;&quot;,
+      &quot;embedded_instructions&quot;: [],
+      &quot;items&quot;: [
+        {
+          &quot;description&quot;: &quot;特選泰國金枕&quot;,
+          &quot;legible&quot;: true,
+          &quot;product_identity&quot;: {
+            &quot;brand&quot;: &quot;&quot;,
+            &quot;model&quot;: &quot;&quot;,
+            &quot;product_code&quot;: &quot;&quot;,
+            &quot;variant&quot;: &quot;&quot;
+          },
+          &quot;quantity&quot;: 1,
+          &quot;unit&quot;: &quot;carton&quot;
+        }
+      ],
+      &quot;note_number&quot;: &quot;scd-train-3823-baseline&quot;,
+      &quot;supplier&quot;: &quot;Controlled Fixture Supplier&quot;
+    },
+    &quot;camera&quot;: {
+      &quot;all_cartons_visible&quot;: true,
+      &quot;all_labels_identified&quot;: false,
+      &quot;cartons_visible&quot;: 1,
+      &quot;damaged_cartons&quot;: 0,
+      &quot;product_identity&quot;: {
+        &quot;brand&quot;: &quot;大象&quot;,
+        &quot;model&quot;: &quot;B6&quot;,
+        &quot;product_code&quot;: &quot;&quot;,
+        &quot;variant&quot;: &quot;&quot;
+      },
+      &quot;product_on_labels&quot;: &quot;特選泰國金枕&quot;,
+      &quot;stacked&quot;: false
+    },
+    &quot;trace&quot;: [
+      {
+        &quot;frame_completeness&quot;: {
+          &quot;size&quot;: [
+            5792,
+            4344
+          ],
+          &quot;margin_fraction&quot;: 0.01,
+          &quot;boundary_objects&quot;: [],
+          &quot;requires_review&quot;: false,
+          &quot;limitation&quot;: &quot;No boundary contact does not prove absence of occlusion or hidden cartons.&quot;
+        },
+        &quot;at&quot;: &quot;2026-11-03T20:26:50+03:00&quot;
+      }
+    ]
+  },
+  &quot;seconds&quot;: 222.765,
+  &quot;exact_target_met&quot;: false,
+  &quot;acceptable_action_met&quot;: false
+}</pre></details><details><summary><code>scd-train-3823-quantity_mismatch</code> · Teknik hata</summary><p data-original-evidence>RuntimeError</p><pre>{
+  &quot;id&quot;: &quot;scd-train-3823-quantity_mismatch&quot;,
+  &quot;source_image_id&quot;: 3823,
+  &quot;scenario&quot;: &quot;quantity_mismatch&quot;,
+  &quot;expected_action&quot;: &quot;human&quot;,
+  &quot;acceptable_actions&quot;: [
+    &quot;human&quot;,
+    &quot;block&quot;
+  ],
+  &quot;started_at&quot;: &quot;2026-11-03T20:25:42.765141+03:00&quot;,
+  &quot;action&quot;: &quot;error&quot;,
+  &quot;error_type&quot;: &quot;RuntimeError&quot;,
+  &quot;partial&quot;: {
+    &quot;failed_step&quot;: &quot;Cross-check objects and authorize&quot;,
+    &quot;timings&quot;: [
+      {
+        &quot;step&quot;: &quot;Read delivery note&quot;,
+        &quot;seconds&quot;: 6.063,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Inspect camera&quot;,
+        &quot;seconds&quot;: 54.119,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Segment cartons&quot;,
+        &quot;seconds&quot;: 30.094,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Transcribe speaker turns&quot;,
+        &quot;seconds&quot;: 2.479,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Identify receiver count&quot;,
+        &quot;seconds&quot;: 7.28,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Cross-check objects and authorize&quot;,
+        &quot;seconds&quot;: 62.055,
+        &quot;status&quot;: &quot;error&quot;
+      }
+    ],
+    &quot;note&quot;: {
+      &quot;date&quot;: &quot;&quot;,
+      &quot;embedded_instructions&quot;: [],
+      &quot;items&quot;: [
+        {
+          &quot;description&quot;: &quot;特選泰國金枕&quot;,
+          &quot;legible&quot;: true,
+          &quot;product_identity&quot;: {
+            &quot;brand&quot;: &quot;&quot;,
+            &quot;model&quot;: &quot;&quot;,
+            &quot;product_code&quot;: &quot;&quot;,
+            &quot;variant&quot;: &quot;&quot;
+          },
+          &quot;quantity&quot;: 2,
+          &quot;unit&quot;: &quot;carton&quot;
+        }
+      ],
+      &quot;note_number&quot;: &quot;scd-train-3823-quantity_mismatch&quot;,
+      &quot;supplier&quot;: &quot;Controlled Fixture Supplier&quot;
+    },
+    &quot;camera&quot;: {
+      &quot;all_cartons_visible&quot;: true,
+      &quot;all_labels_identified&quot;: false,
+      &quot;cartons_visible&quot;: 1,
+      &quot;damaged_cartons&quot;: 0,
+      &quot;product_identity&quot;: {
+        &quot;brand&quot;: &quot;大象&quot;,
+        &quot;model&quot;: &quot;B6&quot;,
+        &quot;product_code&quot;: &quot;&quot;,
+        &quot;variant&quot;: &quot;&quot;
+      },
+      &quot;product_on_labels&quot;: &quot;特選泰國金枕&quot;,
+      &quot;stacked&quot;: false
+    },
+    &quot;trace&quot;: [
+      {
+        &quot;frame_completeness&quot;: {
+          &quot;size&quot;: [
+            5792,
+            4344
+          ],
+          &quot;margin_fraction&quot;: 0.01,
+          &quot;boundary_objects&quot;: [],
+          &quot;requires_review&quot;: false,
+          &quot;limitation&quot;: &quot;No boundary contact does not prove absence of occlusion or hidden cartons.&quot;
+        },
+        &quot;at&quot;: &quot;2026-11-03T20:27:24+03:00&quot;
+      }
+    ]
+  },
+  &quot;seconds&quot;: 162.132,
+  &quot;exact_target_met&quot;: false,
+  &quot;acceptable_action_met&quot;: false
+}</pre></details><details><summary><code>scd-train-3823-receiver_uncertain</code> · Teknik hata</summary><p data-original-evidence>RuntimeError</p><pre>{
+  &quot;id&quot;: &quot;scd-train-3823-receiver_uncertain&quot;,
+  &quot;source_image_id&quot;: 3823,
+  &quot;scenario&quot;: &quot;receiver_uncertain&quot;,
+  &quot;expected_action&quot;: &quot;human&quot;,
+  &quot;acceptable_actions&quot;: [
+    &quot;human&quot;,
+    &quot;block&quot;
+  ],
+  &quot;started_at&quot;: &quot;2026-11-03T20:25:53.362169+03:00&quot;,
+  &quot;action&quot;: &quot;error&quot;,
+  &quot;error_type&quot;: &quot;RuntimeError&quot;,
+  &quot;partial&quot;: {
+    &quot;failed_step&quot;: &quot;Cross-check objects and authorize&quot;,
+    &quot;timings&quot;: [
+      {
+        &quot;step&quot;: &quot;Read delivery note&quot;,
+        &quot;seconds&quot;: 7.084,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Inspect camera&quot;,
+        &quot;seconds&quot;: 45.991,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Segment cartons&quot;,
+        &quot;seconds&quot;: 39.694,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Transcribe speaker turns&quot;,
+        &quot;seconds&quot;: 3.448,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Identify receiver count&quot;,
+        &quot;seconds&quot;: 8.14,
+        &quot;status&quot;: &quot;complete&quot;
+      },
+      {
+        &quot;step&quot;: &quot;Cross-check objects and authorize&quot;,
+        &quot;seconds&quot;: 54.467,
+        &quot;status&quot;: &quot;error&quot;
+      }
+    ],
+    &quot;note&quot;: {
+      &quot;date&quot;: &quot;&quot;,
+      &quot;embedded_instructions&quot;: [],
+      &quot;items&quot;: [
+        {
+          &quot;description&quot;: &quot;特選泰國金枕&quot;,
+          &quot;legible&quot;: true,
+          &quot;product_identity&quot;: {
+            &quot;brand&quot;: &quot;&quot;,
+            &quot;model&quot;: &quot;&quot;,
+            &quot;product_code&quot;: &quot;&quot;,
+            &quot;variant&quot;: &quot;&quot;
+          },
+          &quot;quantity&quot;: 1,
+          &quot;unit&quot;: &quot;carton&quot;
+        }
+      ],
+      &quot;note_number&quot;: &quot;scd-train-3823-receiver_uncertain&quot;,
+      &quot;supplier&quot;: &quot;Controlled Fixture Supplier&quot;
+    },
+    &quot;camera&quot;: {
+      &quot;all_cartons_visible&quot;: true,
+      &quot;all_labels_identified&quot;: false,
+      &quot;cartons_visible&quot;: 1,
+      &quot;damaged_cartons&quot;: 0,
+      &quot;product_identity&quot;: {
+        &quot;brand&quot;: &quot;大象&quot;,
+        &quot;model&quot;: &quot;B6&quot;,
+        &quot;product_code&quot;: &quot;&quot;,
+        &quot;variant&quot;: &quot;&quot;
+      },
+      &quot;product_on_labels&quot;: &quot;特選泰國金枕&quot;,
+      &quot;stacked&quot;: false
+    },
+    &quot;trace&quot;: [
+      {
+        &quot;frame_completeness&quot;: {
+          &quot;size&quot;: [
+            5792,
+            4344
+          ],
+          &quot;margin_fraction&quot;: 0.01,
+          &quot;boundary_objects&quot;: [],
+          &quot;requires_review&quot;: false,
+          &quot;limitation&quot;: &quot;No boundary contact does not prove absence of occlusion or hidden cartons.&quot;
+        },
+        &quot;at&quot;: &quot;2026-11-03T20:27:37+03:00&quot;
+      }
+    ]
+  },
+  &quot;seconds&quot;: 158.84,
+  &quot;exact_target_met&quot;: false,
+  &quot;acceptable_action_met&quot;: false
+}</pre></details><details><summary><code>scd-train-3690-baseline</code> · Teknik hata</summary><p data-original-evidence>APIConnectionError</p><pre>{
+  &quot;id&quot;: &quot;scd-train-3690-baseline&quot;,
+  &quot;source_image_id&quot;: 3690,
+  &quot;scenario&quot;: &quot;baseline&quot;,
+  &quot;expected_action&quot;: &quot;post&quot;,
+  &quot;acceptable_actions&quot;: [
+    &quot;post&quot;
+  ],
+  &quot;started_at&quot;: &quot;2026-11-03T20:45:21.960202+03:00&quot;,
+  &quot;action&quot;: &quot;error&quot;,
+  &quot;error_type&quot;: &quot;APIConnectionError&quot;,
+  &quot;partial&quot;: {
+    &quot;failed_step&quot;: &quot;Read delivery note&quot;,
+    &quot;timings&quot;: [
+      {
+        &quot;step&quot;: &quot;Read delivery note&quot;,
+        &quot;seconds&quot;: 1.412,
+        &quot;status&quot;: &quot;error&quot;
+      }
+    ],
+    &quot;note&quot;: null,
+    &quot;camera&quot;: null,
+    &quot;trace&quot;: []
+  },
+  &quot;seconds&quot;: 1.422,
+  &quot;exact_target_met&quot;: false,
+  &quot;acceptable_action_met&quot;: false
+}</pre></details><details><summary><code>scd-train-3690-quantity_mismatch</code> · Teknik hata</summary><p data-original-evidence>APIConnectionError</p><pre>{
+  &quot;id&quot;: &quot;scd-train-3690-quantity_mismatch&quot;,
+  &quot;source_image_id&quot;: 3690,
+  &quot;scenario&quot;: &quot;quantity_mismatch&quot;,
+  &quot;expected_action&quot;: &quot;block&quot;,
+  &quot;acceptable_actions&quot;: [
+    &quot;human&quot;,
+    &quot;block&quot;
+  ],
+  &quot;started_at&quot;: &quot;2026-11-03T20:45:23.383471+03:00&quot;,
+  &quot;action&quot;: &quot;error&quot;,
+  &quot;error_type&quot;: &quot;APIConnectionError&quot;,
+  &quot;partial&quot;: {
+    &quot;failed_step&quot;: &quot;Read delivery note&quot;,
+    &quot;timings&quot;: [
+      {
+        &quot;step&quot;: &quot;Read delivery note&quot;,
+        &quot;seconds&quot;: 1.328,
+        &quot;status&quot;: &quot;error&quot;
+      }
+    ],
+    &quot;note&quot;: null,
+    &quot;camera&quot;: null,
+    &quot;trace&quot;: []
+  },
+  &quot;seconds&quot;: 1.337,
+  &quot;exact_target_met&quot;: false,
+  &quot;acceptable_action_met&quot;: false
+}</pre></details><details><summary><code>scd-train-3690-receiver_uncertain</code> · Teknik hata</summary><p data-original-evidence>APIConnectionError</p><pre>{
+  &quot;id&quot;: &quot;scd-train-3690-receiver_uncertain&quot;,
+  &quot;source_image_id&quot;: 3690,
+  &quot;scenario&quot;: &quot;receiver_uncertain&quot;,
+  &quot;expected_action&quot;: &quot;human&quot;,
+  &quot;acceptable_actions&quot;: [
+    &quot;human&quot;,
+    &quot;block&quot;
+  ],
+  &quot;started_at&quot;: &quot;2026-11-03T20:45:24.722384+03:00&quot;,
+  &quot;action&quot;: &quot;error&quot;,
+  &quot;error_type&quot;: &quot;APIConnectionError&quot;,
+  &quot;partial&quot;: {
+    &quot;failed_step&quot;: &quot;Read delivery note&quot;,
+    &quot;timings&quot;: [
+      {
+        &quot;step&quot;: &quot;Read delivery note&quot;,
+        &quot;seconds&quot;: 1.287,
+        &quot;status&quot;: &quot;error&quot;
+      }
+    ],
+    &quot;note&quot;: null,
+    &quot;camera&quot;: null,
+    &quot;trace&quot;: []
+  },
+  &quot;seconds&quot;: 1.297,
+  &quot;exact_target_met&quot;: false,
+  &quot;acceptable_action_met&quot;: false
+}</pre></details><details><summary><code>scd-train-5623-baseline</code> · Teknik hata</summary><p data-original-evidence>APIConnectionError</p><pre>{
+  &quot;id&quot;: &quot;scd-train-5623-baseline&quot;,
+  &quot;source_image_id&quot;: 5623,
+  &quot;scenario&quot;: &quot;baseline&quot;,
+  &quot;expected_action&quot;: &quot;human&quot;,
+  &quot;acceptable_actions&quot;: [
+    &quot;human&quot;,
+    &quot;block&quot;
+  ],
+  &quot;started_at&quot;: &quot;2026-11-03T20:45:26.020481+03:00&quot;,
+  &quot;action&quot;: &quot;error&quot;,
+  &quot;error_type&quot;: &quot;APIConnectionError&quot;,
+  &quot;partial&quot;: {
+    &quot;failed_step&quot;: &quot;Read delivery note&quot;,
+    &quot;timings&quot;: [
+      {
+        &quot;step&quot;: &quot;Read delivery note&quot;,
+        &quot;seconds&quot;: 1.315,
+        &quot;status&quot;: &quot;error&quot;
+      }
+    ],
+    &quot;note&quot;: null,
+    &quot;camera&quot;: null,
+    &quot;trace&quot;: []
+  },
+  &quot;seconds&quot;: 1.326,
+  &quot;exact_target_met&quot;: false,
+  &quot;acceptable_action_met&quot;: false
+}</pre></details><details><summary><code>scd-train-5623-quantity_mismatch</code> · Teknik hata</summary><p data-original-evidence>APIConnectionError</p><pre>{
+  &quot;id&quot;: &quot;scd-train-5623-quantity_mismatch&quot;,
+  &quot;source_image_id&quot;: 5623,
+  &quot;scenario&quot;: &quot;quantity_mismatch&quot;,
+  &quot;expected_action&quot;: &quot;human&quot;,
+  &quot;acceptable_actions&quot;: [
+    &quot;human&quot;,
+    &quot;block&quot;
+  ],
+  &quot;started_at&quot;: &quot;2026-11-03T20:45:27.347408+03:00&quot;,
+  &quot;action&quot;: &quot;error&quot;,
+  &quot;error_type&quot;: &quot;APIConnectionError&quot;,
+  &quot;partial&quot;: {
+    &quot;failed_step&quot;: &quot;Read delivery note&quot;,
+    &quot;timings&quot;: [
+      {
+        &quot;step&quot;: &quot;Read delivery note&quot;,
+        &quot;seconds&quot;: 1.346,
+        &quot;status&quot;: &quot;error&quot;
+      }
+    ],
+    &quot;note&quot;: null,
+    &quot;camera&quot;: null,
+    &quot;trace&quot;: []
+  },
+  &quot;seconds&quot;: 1.356,
+  &quot;exact_target_met&quot;: false,
+  &quot;acceptable_action_met&quot;: false
+}</pre></details><details><summary><code>scd-train-5623-receiver_uncertain</code> · Teknik hata</summary><p data-original-evidence>APIConnectionError</p><pre>{
+  &quot;id&quot;: &quot;scd-train-5623-receiver_uncertain&quot;,
+  &quot;source_image_id&quot;: 5623,
+  &quot;scenario&quot;: &quot;receiver_uncertain&quot;,
+  &quot;expected_action&quot;: &quot;human&quot;,
+  &quot;acceptable_actions&quot;: [
+    &quot;human&quot;,
+    &quot;block&quot;
+  ],
+  &quot;started_at&quot;: &quot;2026-11-03T21:01:51.213781+03:00&quot;,
+  &quot;action&quot;: &quot;error&quot;,
+  &quot;error_type&quot;: &quot;APIConnectionError&quot;,
+  &quot;partial&quot;: {
+    &quot;failed_step&quot;: &quot;Read delivery note&quot;,
+    &quot;timings&quot;: [
+      {
+        &quot;step&quot;: &quot;Read delivery note&quot;,
+        &quot;seconds&quot;: 1.475,
+        &quot;status&quot;: &quot;error&quot;
+      }
+    ],
+    &quot;note&quot;: null,
+    &quot;camera&quot;: null,
+    &quot;trace&quot;: []
+  },
+  &quot;seconds&quot;: 1.487,
+  &quot;exact_target_met&quot;: false,
+  &quot;acceptable_action_met&quot;: false
+}</pre></details><details><summary><code>scd-train-1281-baseline</code> · Teknik hata</summary><p data-original-evidence>APIConnectionError</p><pre>{
+  &quot;id&quot;: &quot;scd-train-1281-baseline&quot;,
+  &quot;source_image_id&quot;: 1281,
+  &quot;scenario&quot;: &quot;baseline&quot;,
+  &quot;expected_action&quot;: &quot;human&quot;,
+  &quot;acceptable_actions&quot;: [
+    &quot;human&quot;,
+    &quot;block&quot;
+  ],
+  &quot;started_at&quot;: &quot;2026-11-03T21:01:51.775071+03:00&quot;,
+  &quot;action&quot;: &quot;error&quot;,
+  &quot;error_type&quot;: &quot;APIConnectionError&quot;,
+  &quot;partial&quot;: {
+    &quot;failed_step&quot;: &quot;Read delivery note&quot;,
+    &quot;timings&quot;: [
+      {
+        &quot;step&quot;: &quot;Read delivery note&quot;,
+        &quot;seconds&quot;: 1.251,
+        &quot;status&quot;: &quot;error&quot;
+      }
+    ],
+    &quot;note&quot;: null,
+    &quot;camera&quot;: null,
+    &quot;trace&quot;: []
+  },
+  &quot;seconds&quot;: 1.257,
+  &quot;exact_target_met&quot;: false,
+  &quot;acceptable_action_met&quot;: false
+}</pre></details><details><summary><code>scd-train-1281-quantity_mismatch</code> · Teknik hata</summary><p data-original-evidence>APIConnectionError</p><pre>{
+  &quot;id&quot;: &quot;scd-train-1281-quantity_mismatch&quot;,
+  &quot;source_image_id&quot;: 1281,
+  &quot;scenario&quot;: &quot;quantity_mismatch&quot;,
+  &quot;expected_action&quot;: &quot;human&quot;,
+  &quot;acceptable_actions&quot;: [
+    &quot;human&quot;,
+    &quot;block&quot;
+  ],
+  &quot;started_at&quot;: &quot;2026-11-03T21:01:52.701858+03:00&quot;,
+  &quot;action&quot;: &quot;error&quot;,
+  &quot;error_type&quot;: &quot;APIConnectionError&quot;,
+  &quot;partial&quot;: {
+    &quot;failed_step&quot;: &quot;Read delivery note&quot;,
+    &quot;timings&quot;: [
+      {
+        &quot;step&quot;: &quot;Read delivery note&quot;,
+        &quot;seconds&quot;: 1.353,
+        &quot;status&quot;: &quot;error&quot;
+      }
+    ],
+    &quot;note&quot;: null,
+    &quot;camera&quot;: null,
+    &quot;trace&quot;: []
+  },
+  &quot;seconds&quot;: 1.363,
+  &quot;exact_target_met&quot;: false,
+  &quot;acceptable_action_met&quot;: false
+}</pre></details><details><summary><code>scd-train-1281-receiver_uncertain</code> · Teknik hata</summary><p data-original-evidence>APIConnectionError</p><pre>{
+  &quot;id&quot;: &quot;scd-train-1281-receiver_uncertain&quot;,
+  &quot;source_image_id&quot;: 1281,
+  &quot;scenario&quot;: &quot;receiver_uncertain&quot;,
+  &quot;expected_action&quot;: &quot;human&quot;,
+  &quot;acceptable_actions&quot;: [
+    &quot;human&quot;,
+    &quot;block&quot;
+  ],
+  &quot;started_at&quot;: &quot;2026-11-03T21:01:53.032716+03:00&quot;,
+  &quot;action&quot;: &quot;error&quot;,
+  &quot;error_type&quot;: &quot;APIConnectionError&quot;,
+  &quot;partial&quot;: {
+    &quot;failed_step&quot;: &quot;Read delivery note&quot;,
+    &quot;timings&quot;: [
+      {
+        &quot;step&quot;: &quot;Read delivery note&quot;,
+        &quot;seconds&quot;: 1.347,
+        &quot;status&quot;: &quot;error&quot;
+      }
+    ],
+    &quot;note&quot;: null,
+    &quot;camera&quot;: null,
+    &quot;trace&quot;: []
+  },
+  &quot;seconds&quot;: 1.353,
+  &quot;exact_target_met&quot;: false,
+  &quot;acceptable_action_met&quot;: false
+}</pre></details></main></body></html>

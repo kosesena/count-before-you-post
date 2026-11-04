@@ -164,7 +164,7 @@ class Session:
                 frame = {"requires_review": True, "error": "Frame completeness could not be verified."}
             self.log({"frame_completeness": frame})
         cross = self.cross()
-        d = decide(self.note, self.sam, self.look, cross, order=trusted_order, spoken=self.spoken, invisible=hidden, frame=frame)
+        d = decide(self.note, self.sam, self.look, cross, order=trusted_order, spoken=self.spoken, invisible=hidden, frame=frame, require_packaging=self.full_checks)
         # A first-reader mismatch is not yet proof that the physical delivery is wrong.
         verify_rejection = self.full_checks and d.rule == "not_ordered"
         if (d.action == POST or verify_rejection) and (self.second_reader or self.auditor):
@@ -190,7 +190,7 @@ class Session:
                              "second_reader": second, "audit": audit}, "readers_disagree")
                 else:
                     d = decide(self.note, self.sam, self.look, cross, order=trusted_order,
-                               spoken=self.spoken, invisible=hidden, frame=frame, **opinions)
+                               spoken=self.spoken, invisible=hidden, frame=frame, require_packaging=self.full_checks, **opinions)
             except Exception:
                 d = Decision(HUMAN, None, ["Required second opinion failed; no receipt permitted."],
                              {**d.evidence, "required_check_failed": True}, "readers_disagree")
@@ -250,7 +250,12 @@ class Session:
         result = cross_check(self.concept, points, probes)
         self.log({"gate_cross_check": {
             "agreed": len(result.agreed), "sam_only": len(result.sam_only),
-            "spark_only": len(result.spark_only), "doubled": len(result.doubled)}})
+            "spark_only": len(result.spark_only), "doubled": len(result.doubled),
+            "points": [list(p) for p in points], "point_evidence": result.diagnostics,
+            "concept_objects": [{"id": s.obj, "bounds": [s.left,s.top,s.right,s.bottom], "confidence": s.conf}
+                                for s in self.concept],
+            "probe_objects": [{"id": s.obj, "bounds": [s.left,s.top,s.right,s.bottom], "confidence": s.conf}
+                              for s in probes]}})
         return result
 
     def ask_supervisor(self, reason):
@@ -273,7 +278,7 @@ class Session:
         try:
             return getattr(self, name)(**args)
         except Exception as e:  # a failed tool must not kill the loop
-            return {"error": f"{name} failed: {type(e).__name__}: {e}"}
+            return {"error": f"{name} failed: {type(e).__name__}", "error_type": type(e).__name__}
 
 
 REASONING = {"effort": "medium", "summary": "auto"}

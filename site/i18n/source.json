@@ -1982,6 +1982,7 @@
     "sources": [
       "site/unseen-regression/index.html",
       "site/unseen-regression/original-report.html",
+      "site/preregistered-mixed/index.html",
       "site/unseen-validation/index.html",
       "site/unseen-validation/original-report.html"
     ]
@@ -2080,6 +2081,7 @@
     "sources": [
       "site/unseen-regression/index.html",
       "site/unseen-regression/original-report.html",
+      "site/preregistered-mixed/index.html",
       "site/unseen-validation/index.html",
       "site/unseen-validation/original-report.html"
     ]
@@ -2242,6 +2244,7 @@
     "sources": [
       "site/unseen-regression/index.html",
       "site/unseen-regression/original-report.html",
+      "site/preregistered-mixed/index.html",
       "site/unseen-validation/index.html",
       "site/unseen-validation/original-report.html"
     ]
@@ -2252,6 +2255,7 @@
     "sources": [
       "site/unseen-regression/index.html",
       "site/unseen-regression/original-report.html",
+      "site/preregistered-mixed/index.html",
       "site/unseen-validation/index.html",
       "site/unseen-validation/original-report.html"
     ]
@@ -2278,6 +2282,7 @@
     "sources": [
       "site/unseen-regression/index.html",
       "site/unseen-regression/original-report.html",
+      "site/preregistered-mixed/index.html",
       "site/unseen-validation/index.html",
       "site/unseen-validation/original-report.html"
     ]
@@ -2338,6 +2343,7 @@
     "sources": [
       "site/unseen-regression/index.html",
       "site/unseen-regression/original-report.html",
+      "site/preregistered-mixed/index.html",
       "site/unseen-validation/index.html",
       "site/unseen-validation/original-report.html"
     ]
@@ -2468,6 +2474,7 @@
     "sources": [
       "site/unseen-regression/index.html",
       "site/unseen-regression/original-report.html",
+      "site/preregistered-mixed/index.html",
       "site/unseen-validation/index.html",
       "site/unseen-validation/original-report.html"
     ]
@@ -2917,6 +2924,570 @@
     ]
   },
   {
+    "id": "fa0de158d5d91346",
+    "text": "Yeni karma test · Count Before You Post",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "e2d56dd09982f5b5",
+    "text": "İlk fotoğraf testi",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "f4f7f9a7535d48c5",
+    "text": "Önceki düzeltme testi",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "656f6a14ee0d90ba",
+    "text": "7 yeni fotoğraf.",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "de3fe0e0cd5eb4cd",
+    "text": "21 önceden sabitlenmiş kontrol.",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "0f375ec3fccfbc42",
+    "text": "3 Kasım 2026 · Üretimdeki 39042b9 koduyla yeni girdilerde ilk koşular.",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "07742acecc883ea6",
+    "text": "1 kabul · 8 ret · 0 insan incelemesi · 12 teknik hata.",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "4c09b8818a25ff75",
+    "text": "Kesin hedef eşleşmesi: 0/21. Temiz kabul adayı: 0/1. Kabul beklenmeyen kontrollerde kabul: 1/20.",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "0479c297d2b6cd47",
+    "text": "Tüm denemelerde medyan: 51.8 sn. Karar üretenlerde medyan: 76.4 sn. ERP yazımı: 0. Maliyet ve çalışan zamanı ölçülmedi.",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "99decaca81bfe553",
+    "text": "Teknik hataların sınırı",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "3a9827b8ca659996",
+    "text": "Üç kontrol karar aşamasında RuntimeError, dokuz kontrol belge okuma aşamasında APIConnectionError ile durdu. Sonraki erişim kontrolünde GitHub çalışırken Meta HTTPS bağlantısı zaman aşımına uğradı. Karar aşamasındaki üç hatanın kök nedeni kesinleşmedi. Temiz adayın üç kontrolü de bağlantı hatası nedeniyle sonuçsuzdur. Bu hatalar doğru ret veya insan incelemesi sayılmaz.",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "b864ab3801eb383e",
+    "text": "Beklenmeyen kabuller",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "f09772f0fd8d648d",
+    "text": "Önceden ret veya inceleme hedeflenen şu kontroller kabul edildi. Bunlar test hedeflerine göre başarısızlıktır; gerçek ERP kaydı veya doğrulanmış fiziksel stok hatası değildir.",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "95e67207ac984de2",
+    "text": "Temiz adayın üç kontrolü",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "ef51bf0cc8dbae09",
+    "text": "Temel belge: Kabul → Teknik hata (",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "51c692bc5de80383",
+    "text": "Yanlış miktar: Ret → Teknik hata (",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "39ee35c5614a8e05",
+    "text": "Kararsız ses: İnsan incelemesi → Teknik hata (",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "ca744db3f94ea1da",
+    "text": "Hedefler sonuçlardan önce belirlendi",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "6d4d450db518600a",
+    "text": "Canlıdaki kodun sabit kopyası, fotoğraflar, hazırlanmış belgeler, sesler ve karar hedefleri ilk model çağrısından önce SHA-256 özetleriyle kaydedildi. Sonuç sonrası fotoğraf eleme, hedef değiştirme veya uygulama koşusu tekrarı yoktur. SDK aktarım tekrarları mevcut ayarında kaldı. Her hata rapora dahildir.",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "e9c17101e0dda2aa",
+    "text": "Önceki tüm indirilmiş fotoğraf adları dışlandı; seçilen dosyaların özetleri de önceki dosyalardan farklı. SCD train2017 kümesinde tek koli anotasyonlu, kenarlardan uzak beş uygun fotoğrafın tamamı ve hash sırasındaki ilk iki kenar fotoğrafı kullanıldı. Başlangıçtaki altı iç-kadraj hedefi, indirme ve model çağrılarından önce yalnızca beş aday bulunduğu için beşe indirildi. Bu değişiklik seçim kaydında korunur.",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "c4aa15f0fb77327c",
+    "text": "Temiz, kusurlu ve belirsiz ne demek?",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "c340b30c5a531676",
+    "text": "3690 numaralı fotoğraf tek temiz kabul adayıdır. Aynı fotoğrafın belgesinde miktar ikiye çıkarılınca hedef ret; teslim alan sesinde sayım belirsizleşince hedef insan incelemesidir. Diğer altı fotoğraf, açık/hasarlı ambalaj, belirsiz ürün veya eksik kadraj nedeniyle temel durumda da insan incelemesi hedefidir. Bunlar temiz teslimat olarak sayılmaz.",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "b8dcf63751a6861f",
+    "text": "5545, 5199 ve 5623 için okunabilir ürün adı yoktur. Boş veya uydurulmuş bir ürün adı yerine belgede açıkça “Unverified contents” iddiası kullanıldı. Bunlar ürün belirsizliği kontrolleridir; doğru ürün adı okuma başarısını ölçmez. Miktar kusuru belirsiz fotoğraflarda da denenir; erken ret veya inceleme miktar kontrolünü maskeleyebilir. Ret veya insan incelemesi biçimindeki geniş güvenli duruş, kesin hedef eşleşmesi değildir.",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "15ba93aa1775fae4",
+    "text": "Yorumlama sınırları",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "a4fb3952230b014a",
+    "text": "Yedi fotoğrafın her birinden üç kontrol üretildi; 21 bağımsız fiziksel teslimat yoktur. Yalnızca bir temiz aday olduğundan genel otomatik kabul oranı çıkarılamaz. Fotoğraflar bu projede yenidir; modellerin eğitiminde görülmediği iddia edilmez. Veri kümesinin train2017 bölümü kullanılmıştır. Hedefler asistanın ön incelemesine dayanır; bağımsız saha doğrusu değildir.",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "b253b085346c6b73",
+    "text": "Gerçek fotoğraflara sentetik belgeler ve sesler eşlik eder. Ürün açıklaması profili kullanıldı; kesin SKU veya içerik doğrulaması değildir. Hiçbir ERP kaydı yazılmadı. Süreler iş gücü tasarrufu değildir. Başka çalışmada tamamlanan 20 fotoğraflık test bu setten ayrıdır ve seçime dahil edilmedi.",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "849b18d65c5cd3ea",
+    "text": "Kaynak:",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "e7ecbb66a15357ef",
+    "text": "SCD / LSCD, Jinrong Yang ve diğerleri",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "9b7039e9b6de78ce",
+    "text": "· CC BY-NC-SA 4.0. Görseller modele değiştirilmeden verildi.",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "7a9c93e4c57eb57f",
+    "text": "Yedi fotoğraf ve önceden verilen hedefler",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "cca45571ae1a8349",
+    "text": "SCD train 5545",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "868cf723bd6f4248",
+    "text": "· İnsan incelemesi",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "b4d784589ea5b6e2",
+    "text": "Unlabelled brown carton; no defensible product identity. Authored order explicitly claims Unverified contents, not a transcribed product. Not a clean acceptance candidate.",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "510a0503a709de29",
+    "text": "SCD train 5199",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "1ffc33550aa7a6d9",
+    "text": "Top flaps visibly open/crushed; product line covered and unreadable. Authored Unverified contents claim is not a real product transcription. Review required.",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "c1ed44a78882b83a",
+    "text": "SCD train 5183",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "63258a06d722a37c",
+    "text": "Ronshen refrigerator carton with exposed foam/open end and inverted handling orientation. Complete carton visible but condition and contents require review.",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "b9c31b1552f8e121",
+    "text": "SCD train 3823",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "283ebbc8da51cffa",
+    "text": "Durian-labelled carton with pineapples above the open top; possible repurposed packaging or mixed contents. One carton visible, but clean product correspondence is not established.",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "b761744c3cff9661",
+    "text": "SCD train 3690",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "907d1af1f2f6be32",
+    "text": "· Kabul",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "6cba98b372bf7ecb",
+    "text": "One sealed visually intact carton fully inside frame, isolated on pallet, readable product description. Description-level acceptance candidate only; not physical contents or SKU ground truth.",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "ab28d98f89b8e76b",
+    "text": "SCD train 5623",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "70e22f16ca988603",
+    "text": "Close-up carton extends beyond top and bottom frame; shipping barcode does not establish product identity. Authored Unverified contents claim is explicitly unverified.",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "4a3f3e21a4226c7f",
+    "text": "SCD train 1281",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "a40af31f6bb8b326",
+    "text": "Dell computer carton nearly fills frame and another carton is visible below. Shipment completeness is uncertain despite one dataset annotation; no automatic acceptance target.",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "84a58e88e68bac8f",
+    "text": "21 sonucun tamamı",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "fa6b035a5b63ba36",
+    "text": "Fotoğraf",
+    "sources": [
+      "site/preregistered-mixed/index.html",
+      "site/unseen-validation/index.html",
+      "site/unseen-validation/original-report.html"
+    ]
+  },
+  {
+    "id": "779c7177e97ab89b",
+    "text": "Karar",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "e7dad97ef48e191d",
+    "text": "Kural / hata",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "c48cd52ba4f0e79b",
+    "text": "Kesin hedef",
+    "sources": [
+      "site/preregistered-mixed/index.html",
+      "site/unseen-validation/index.html",
+      "site/unseen-validation/original-report.html"
+    ]
+  },
+  {
+    "id": "4ee7a9cbeac2b983",
+    "text": "Temel belge",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "2f449b750f8cda13",
+    "text": "70.9 sn",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "b914d9c9692287b1",
+    "text": "Yanlış miktar",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "398412998c17abd1",
+    "text": "76.4 sn",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "0e42813f62ec1bc5",
+    "text": "Kararsız ses",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "44e616df7213f564",
+    "text": "77.9 sn",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "9e7d8fdf8c0aa245",
+    "text": "56.7 sn",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "650285e5816f0e37",
+    "text": "47.9 sn",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "45f65625e5c6096a",
+    "text": "51.8 sn",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "c5adfa2011a035a0",
+    "text": "238.8 sn",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "d4ac2c6c99f1e876",
+    "text": "224.9 sn",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "503ee70f7f0608ab",
+    "text": "171.5 sn",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "a5458425449ab237",
+    "text": "Teknik hata",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "8a18efa4b5ae6077",
+    "text": "222.8 sn",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "eeed005a4c9e4463",
+    "text": "162.1 sn",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "956492fe7d46c81d",
+    "text": "158.8 sn",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "fba9bf776939c7b6",
+    "text": "1.4 sn",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "1e7de295d202cfcf",
+    "text": "1.3 sn",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "858d8c48132e76cb",
+    "text": "1.5 sn",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "68c1a087362d35e9",
+    "text": "Ham sonuçlar ve sabit manifest",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "04444927a907cf8a",
+    "text": "Tüm 21 sonuç ve protokol (JSON)",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "a63ca2255eed5fe3",
+    "text": "Manifest SHA-256:",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "d672654d8a2b656f",
+    "text": "· Ret",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "960e71549a40ca7c",
+    "text": "Product identity not verified. Camera read '', note says 'Unverified contents'. No receipt; check the exact product and model on the labels before deciding whether to return the load.",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "034d0f9eabe71475",
+    "text": "Note, SAM and Spark agree on 1. Within PO-scd-train-5183-baseline (1 open).",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "f6dc5b89b5d389e3",
+    "text": "Product identity not verified. Camera read 'Ronshen 容声冰箱', note says '容声冰箱'. No receipt; check the exact product and model on the labels before deciding whether to return the load.",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "5b9238a43c7d47ff",
+    "text": "· Teknik hata",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "16a21d770d950531",
+    "text": "RuntimeError",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
+    "id": "854f6a8a76afdf27",
+    "text": "APIConnectionError",
+    "sources": [
+      "site/preregistered-mixed/index.html"
+    ]
+  },
+  {
     "id": "06e4ebe9180e68f1",
     "text": "Yeni fotoğraf testleri · Count Before You Post",
     "sources": [
@@ -3269,14 +3840,6 @@
     ]
   },
   {
-    "id": "fa6b035a5b63ba36",
-    "text": "Fotoğraf",
-    "sources": [
-      "site/unseen-validation/index.html",
-      "site/unseen-validation/original-report.html"
-    ]
-  },
-  {
     "id": "757ca2aebe497971",
     "text": "Gerçek karar",
     "sources": [
@@ -3287,14 +3850,6 @@
   {
     "id": "7b708e063d2053bd",
     "text": "Karar kuralı / hata adımı",
-    "sources": [
-      "site/unseen-validation/index.html",
-      "site/unseen-validation/original-report.html"
-    ]
-  },
-  {
-    "id": "c48cd52ba4f0e79b",
-    "text": "Kesin hedef",
     "sources": [
       "site/unseen-validation/index.html",
       "site/unseen-validation/original-report.html"

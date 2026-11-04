@@ -1,10 +1,10 @@
 """SAM 3.1 calls and output parsing (image and video, concept prompts)."""
-import base64
 import re
 from dataclasses import dataclass
 from pathlib import Path
 
 from .meta import SAM, client
+from .image_input import image_data_url
 
 # One record: "<id><|box;x1=..;y1=..;x2=..;y2=..;w=..;h=..;c=..|><|mask;...|>"
 # '|' never appears in the base85 mask payload, so "<|box;" can't occur inside a mask.
@@ -47,13 +47,12 @@ def parse(text: str) -> list[Detection]:
 def segment_image(path: str | Path, concept: str) -> str:
     """Find every instance of `concept` in an image; return raw output text."""
     path = Path(path)
-    mime = "image/png" if path.suffix.lower() == ".png" else "image/jpeg"
-    data = base64.b64encode(path.read_bytes()).decode()
+    url = image_data_url(path)
     stream = client().responses.create(
         model=SAM,
         input=[{"role": "user", "content": [
             {"type": "input_text", "text": concept},
-            {"type": "input_image", "image_url": f"data:{mime};base64,{data}"},
+            {"type": "input_image", "image_url": url},
         ]}],
         metadata={"include_confidence": "true", "mask_encoding": "one_bit"},
         stream=True,

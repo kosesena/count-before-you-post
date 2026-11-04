@@ -64,6 +64,25 @@ class CrossCheck(unittest.TestCase):
         r = cross_check(ROW[:1], [(3, 3), (7, 7)], [ROW[0], square(2, 0, 0)])
         self.assertEqual((r.doubled, r.count), ([0], None))
 
+    def test_overlapping_cartons_are_not_arbitrarily_assigned(self):
+        cartons = [square(1, 0, 0), square(2, 0, 0)]
+        r = cross_check(cartons, [(5,5)], [square(1,0,0)])
+        self.assertIsNone(r.count)
+        self.assertEqual(r.spark_only, [(5,5)])
+        self.assertEqual(r.diagnostics[0]['supported_cartons'], [0,1])
+
+    def test_duplicate_probe_id_fails_closed(self):
+        r = cross_check(ROW[:1], [(5,5)], [square(1,0,0), square(1,0,0)])
+        self.assertIsNone(r.count)
+        self.assertEqual(r.diagnostics[0]['probe_records'], 2)
+
+    def test_probe_must_cover_its_own_prompt_point(self):
+        # A label-shaped mask elsewhere inside the same box does not confirm this point.
+        label = Segment('1', .95, 0, 0, 2, 2, bytes([1])*4)
+        r = cross_check(ROW[:1], [(5,5)], [label])
+        self.assertIsNone(r.count)
+        self.assertFalse(r.diagnostics[0]['probe_contains_point'])
+
     def test_low_confidence_detections_are_ignored(self):
         r = cross_check(ROW + [square(9, 100, 0, conf=0.5)], CENTRES, ROW)
         self.assertEqual(r.count, 3)

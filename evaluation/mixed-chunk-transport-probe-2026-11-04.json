@@ -1,0 +1,10 @@
+{
+  "scope": "Transport-only SAM probe, no goods-receipt decision",
+  "input": "y (20).jpg",
+  "encoding": "lossless WebP",
+  "upload_chunks": 65536,
+  "max_retries": 0,
+  "status": "passed",
+  "detections": 1,
+  "seconds": 32.84
+}

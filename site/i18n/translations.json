@@ -12031,5 +12031,551 @@
     "tr": "maskeler",
     "de": "Masken",
     "zh": "掩膜"
+  },
+  "fa0de158d5d91346": {
+    "id": "fa0de158d5d91346",
+    "en": "New mixed test · Count Before You Post",
+    "de": "Neuer gemischter Test · Count Before You Post",
+    "zh": "新的混合测试 · Count Before You Post",
+    "tr": "Yeni karma test · Count Before You Post"
+  },
+  "e2d56dd09982f5b5": {
+    "id": "e2d56dd09982f5b5",
+    "en": "First photo test",
+    "de": "Erster Fototest",
+    "zh": "首次照片测试",
+    "tr": "İlk fotoğraf testi"
+  },
+  "f4f7f9a7535d48c5": {
+    "id": "f4f7f9a7535d48c5",
+    "en": "Previous regression test",
+    "de": "Vorheriger Regressionstest",
+    "zh": "先前的回归测试",
+    "tr": "Önceki düzeltme testi"
+  },
+  "656f6a14ee0d90ba": {
+    "id": "656f6a14ee0d90ba",
+    "en": "7 new photos.",
+    "de": "7 neue Fotos.",
+    "zh": "7 张新照片。",
+    "tr": "7 yeni fotoğraf."
+  },
+  "de3fe0e0cd5eb4cd": {
+    "id": "de3fe0e0cd5eb4cd",
+    "en": "21 preregistered controls.",
+    "de": "21 vorab festgelegte Kontrollen.",
+    "zh": "21 项预先确定的测试。",
+    "tr": "21 önceden sabitlenmiş kontrol."
+  },
+  "0f375ec3fccfbc42": {
+    "id": "0f375ec3fccfbc42",
+    "en": "3 November 2026 · First runs on new inputs using production code 39042b9.",
+    "de": "3. November 2026 · Erste Durchläufe mit neuen Eingaben und Produktionscode 39042b9.",
+    "zh": "2026年11月3日 · 使用生产版本 39042b9 对新输入进行首次测试。",
+    "tr": "3 Kasım 2026 · Üretimdeki 39042b9 koduyla yeni girdilerde ilk koşular."
+  },
+  "07742acecc883ea6": {
+    "id": "07742acecc883ea6",
+    "en": "1 approval · 8 rejections · 0 human reviews · 12 technical errors.",
+    "de": "1 Freigabe · 8 Ablehnungen · 0 menschliche Prüfungen · 12 technische Fehler.",
+    "zh": "1 次批准 · 8 次拒绝 · 0 次人工审核 · 12 次技术错误。",
+    "tr": "1 kabul · 8 ret · 0 insan incelemesi · 12 teknik hata."
+  },
+  "4c09b8818a25ff75": {
+    "id": "4c09b8818a25ff75",
+    "en": "Exact target matches: 0/21. Clean acceptance candidate: 0/1. Approvals where approval was not expected: 1/20.",
+    "de": "Exakte Zielübereinstimmung: 0/21. Sauberer Annahmekandidat: 0/1. Freigaben bei nicht erwarteter Freigabe: 1/20.",
+    "zh": "准确符合预定目标：0/21。正常验收候选：0/1。不应批准的测试中获批：1/20。",
+    "tr": "Kesin hedef eşleşmesi: 0/21. Temiz kabul adayı: 0/1. Kabul beklenmeyen kontrollerde kabul: 1/20."
+  },
+  "0479c297d2b6cd47": {
+    "id": "0479c297d2b6cd47",
+    "en": "Median across all attempts: 51.8 s. Median for completed decisions: 76.4 s. ERP writes: 0. Cost and worker time were not measured.",
+    "de": "Median aller Versuche: 51.8 s. Median abgeschlossener Entscheidungen: 76.4 s. ERP-Buchungen: 0. Kosten und Arbeitszeit wurden nicht gemessen.",
+    "zh": "所有尝试的中位用时：51.8 秒。产生决策的测试中位用时：76.4 秒。ERP 写入：0。未测量成本和员工工时。",
+    "tr": "Tüm denemelerde medyan: 51.8 sn. Karar üretenlerde medyan: 76.4 sn. ERP yazımı: 0. Maliyet ve çalışan zamanı ölçülmedi."
+  },
+  "99decaca81bfe553": {
+    "id": "99decaca81bfe553",
+    "en": "Limits caused by technical failures",
+    "de": "Einschränkungen durch technische Fehler",
+    "zh": "技术错误造成的限制",
+    "tr": "Teknik hataların sınırı"
+  },
+  "3a9827b8ca659996": {
+    "id": "3a9827b8ca659996",
+    "en": "Three controls stopped with RuntimeError during authorization; nine stopped with APIConnectionError while reading the document. A later connectivity check reached GitHub, but the Meta HTTPS connection timed out. The root cause of the three authorization errors is unconfirmed. All three controls for the clean candidate lack a result due to connection errors. These failures do not count as correct rejections or human review.",
+    "de": "Drei Kontrollen stoppten bei der Freigabe mit RuntimeError, neun beim Lesen des Belegs mit APIConnectionError. Bei einer späteren Verbindungsprüfung war GitHub erreichbar, während die HTTPS-Verbindung zu Meta das Zeitlimit überschritt. Die Ursache der drei Freigabefehler ist nicht bestätigt. Alle drei Kontrollen des sauberen Kandidaten blieben wegen Verbindungsfehlern ohne Ergebnis. Diese Fehler zählen weder als korrekte Ablehnung noch als menschliche Prüfung.",
+    "zh": "3 项测试在授权阶段因 RuntimeError 停止，9 项在读取单据时因 APIConnectionError 停止。后续连接检查可访问 GitHub，但与 Meta 的 HTTPS 连接超时。3 项授权错误的根本原因尚未确定。正常验收候选的全部 3 项测试均因连接错误未产生结果。这些错误不能算作正确拒绝或人工审核。",
+    "tr": "Üç kontrol karar aşamasında RuntimeError, dokuz kontrol belge okuma aşamasında APIConnectionError ile durdu. Sonraki erişim kontrolünde GitHub çalışırken Meta HTTPS bağlantısı zaman aşımına uğradı. Karar aşamasındaki üç hatanın kök nedeni kesinleşmedi. Temiz adayın üç kontrolü de bağlantı hatası nedeniyle sonuçsuzdur. Bu hatalar doğru ret veya insan incelemesi sayılmaz."
+  },
+  "b864ab3801eb383e": {
+    "id": "b864ab3801eb383e",
+    "en": "Unexpected approvals",
+    "de": "Unerwartete Freigaben",
+    "zh": "意外批准",
+    "tr": "Beklenmeyen kabuller"
+  },
+  "f09772f0fd8d648d": {
+    "id": "f09772f0fd8d648d",
+    "en": "The following controls were approved despite preregistered rejection or review targets. These are failures against the test targets, not actual ERP writes or confirmed physical inventory errors.",
+    "de": "Die folgenden Kontrollen wurden trotz vorab festgelegter Ablehnungs- oder Prüfziele freigegeben. Dies sind Abweichungen von den Testzielen, keine tatsächlichen ERP-Buchungen oder bestätigten physischen Bestandsfehler.",
+    "zh": "以下测试预定为拒绝或人工审核，却被批准。这些结果不符合测试目标，并不代表实际 ERP 写入或已确认的实物库存错误。",
+    "tr": "Önceden ret veya inceleme hedeflenen şu kontroller kabul edildi. Bunlar test hedeflerine göre başarısızlıktır; gerçek ERP kaydı veya doğrulanmış fiziksel stok hatası değildir."
+  },
+  "95e67207ac984de2": {
+    "id": "95e67207ac984de2",
+    "en": "Three controls for the clean candidate",
+    "de": "Drei Kontrollen des sauberen Kandidaten",
+    "zh": "正常验收候选的三项测试",
+    "tr": "Temiz adayın üç kontrolü"
+  },
+  "ef51bf0cc8dbae09": {
+    "id": "ef51bf0cc8dbae09",
+    "en": "Baseline document: Approve → Technical error (",
+    "de": "Basisbeleg: Freigabe → Technischer Fehler (",
+    "zh": "基准单据：批准 → 技术错误（",
+    "tr": "Temel belge: Kabul → Teknik hata ("
+  },
+  "51c692bc5de80383": {
+    "id": "51c692bc5de80383",
+    "en": "Wrong quantity: Reject → Technical error (",
+    "de": "Falsche Menge: Ablehnung → Technischer Fehler (",
+    "zh": "数量错误：拒绝 → 技术错误（",
+    "tr": "Yanlış miktar: Ret → Teknik hata ("
+  },
+  "39ee35c5614a8e05": {
+    "id": "39ee35c5614a8e05",
+    "en": "Uncertain voice: Human review → Technical error (",
+    "de": "Unsichere Sprachangabe: Menschliche Prüfung → Technischer Fehler (",
+    "zh": "不确定的语音：人工审核 → 技术错误（",
+    "tr": "Kararsız ses: İnsan incelemesi → Teknik hata ("
+  },
+  "ca744db3f94ea1da": {
+    "id": "ca744db3f94ea1da",
+    "en": "Targets were fixed before results",
+    "de": "Ziele wurden vor den Ergebnissen festgelegt",
+    "zh": "在结果产生之前确定目标",
+    "tr": "Hedefler sonuçlardan önce belirlendi"
+  },
+  "6d4d450db518600a": {
+    "id": "6d4d450db518600a",
+    "en": "A frozen copy of production code, photos, authored documents, audio and decision targets was recorded with SHA-256 hashes before the first model call. No photos were excluded, targets changed or application runs repeated after results. SDK transport retries kept their existing settings. Every error is included.",
+    "de": "Eine feste Kopie des Produktionscodes, Fotos, erstellte Belege, Audio und Entscheidungsziele wurden vor dem ersten Modellaufruf mit SHA-256-Prüfsummen erfasst. Nach Ergebnissen wurden keine Fotos ausgeschlossen, Ziele geändert oder Anwendungsläufe wiederholt. SDK-Übertragungswiederholungen behielten ihre Einstellungen. Jeder Fehler ist enthalten.",
+    "zh": "在首次模型调用前，已用 SHA-256 哈希固定生产代码副本、照片、编制的单据、音频及决策目标。结果产生后未排除照片、修改目标或重跑应用测试。SDK 传输重试保持原有设置。所有错误均纳入报告。",
+    "tr": "Canlıdaki kodun sabit kopyası, fotoğraflar, hazırlanmış belgeler, sesler ve karar hedefleri ilk model çağrısından önce SHA-256 özetleriyle kaydedildi. Sonuç sonrası fotoğraf eleme, hedef değiştirme veya uygulama koşusu tekrarı yoktur. SDK aktarım tekrarları mevcut ayarında kaldı. Her hata rapora dahildir."
+  },
+  "e9c17101e0dda2aa": {
+    "id": "e9c17101e0dda2aa",
+    "en": "All previously downloaded photo names were excluded; selected files also have different hashes from previous files. We used all five eligible single-carton interior photos in SCD train2017 and the first two boundary photos in hash order. The initial plan for six interior photos was reduced to five when only five candidates were found, before downloads and model calls. This change remains in the selection record.",
+    "de": "Alle zuvor heruntergeladenen Fotonamen wurden ausgeschlossen; auch die Prüfsummen unterscheiden sich von früheren Dateien. Verwendet wurden alle fünf geeigneten innenliegenden Ein-Karton-Fotos aus SCD train2017 und die ersten zwei Randfotos nach Hash-Reihenfolge. Der ursprüngliche Plan mit sechs Innenfotos wurde vor Downloads und Modellaufrufen auf fünf reduziert, da nur fünf Kandidaten vorhanden waren. Diese Änderung bleibt im Auswahlprotokoll.",
+    "zh": "排除了所有此前下载过的照片文件名；所选文件的哈希也与旧文件不同。使用 SCD train2017 中全部 5 张符合条件的画面内部单纸箱照片，以及按哈希排序的前 2 张边界照片。原计划选 6 张内部照片，但在下载及模型调用前发现仅有 5 张，因此改为 5 张。选择记录保留了此变更。",
+    "tr": "Önceki tüm indirilmiş fotoğraf adları dışlandı; seçilen dosyaların özetleri de önceki dosyalardan farklı. SCD train2017 kümesinde tek koli anotasyonlu, kenarlardan uzak beş uygun fotoğrafın tamamı ve hash sırasındaki ilk iki kenar fotoğrafı kullanıldı. Başlangıçtaki altı iç-kadraj hedefi, indirme ve model çağrılarından önce yalnızca beş aday bulunduğu için beşe indirildi. Bu değişiklik seçim kaydında korunur."
+  },
+  "c4aa15f0fb77327c": {
+    "id": "c4aa15f0fb77327c",
+    "en": "What counts as clean, defective or uncertain?",
+    "de": "Was bedeutet sauber, fehlerhaft oder unsicher?",
+    "zh": "正常、缺陷与不确定分别指什么？",
+    "tr": "Temiz, kusurlu ve belirsiz ne demek?"
+  },
+  "c340b30c5a531676": {
+    "id": "c340b30c5a531676",
+    "en": "Photo 3690 is the only clean acceptance candidate. Changing its document quantity to two targets rejection; making the receiver count uncertain in audio targets human review. The other six photos target human review even at baseline because of open/damaged packaging, uncertain products or incomplete framing. They are not counted as clean deliveries.",
+    "de": "Foto 3690 ist der einzige saubere Annahmekandidat. Wird seine Belegmenge auf zwei erhöht, ist Ablehnung das Ziel; bei unsicherer Empfängerzählung im Audio ist menschliche Prüfung das Ziel. Die anderen sechs Fotos haben wegen offener/beschädigter Verpackung, unklarer Produkte oder unvollständigem Bildausschnitt bereits im Basisfall das Ziel menschlicher Prüfung. Sie zählen nicht als saubere Lieferungen.",
+    "zh": "照片 3690 是唯一正常验收候选。将其单据数量改为 2 时，目标为拒绝；将收货人口述数量改为不确定时，目标为人工审核。其他 6 张照片因包装敞开或破损、产品不明确或取景不完整，即使在基准情况下也应人工审核。它们不计作正常交货。",
+    "tr": "3690 numaralı fotoğraf tek temiz kabul adayıdır. Aynı fotoğrafın belgesinde miktar ikiye çıkarılınca hedef ret; teslim alan sesinde sayım belirsizleşince hedef insan incelemesidir. Diğer altı fotoğraf, açık/hasarlı ambalaj, belirsiz ürün veya eksik kadraj nedeniyle temel durumda da insan incelemesi hedefidir. Bunlar temiz teslimat olarak sayılmaz."
+  },
+  "b8dcf63751a6861f": {
+    "id": "b8dcf63751a6861f",
+    "en": "Photos 5545, 5199 and 5623 have no readable product name. Instead of leaving the field empty or inventing a name, documents explicitly claim “Unverified contents”. These test product uncertainty, not accurate name recognition. Quantity defects are also tested on uncertain photos; an earlier rejection or review can mask the quantity check. A broadly safe stop through rejection or review is not an exact target match.",
+    "de": "Auf den Fotos 5545, 5199 und 5623 ist kein Produktname lesbar. Statt eines leeren Feldes oder erfundenen Namens wurde ausdrücklich „Unverified contents“ im Beleg angegeben. Diese Kontrollen prüfen Produktunsicherheit, nicht korrekte Namenserkennung. Mengenfehler werden auch bei unsicheren Fotos geprüft; eine frühere Ablehnung oder Prüfung kann die Mengenkontrolle verdecken. Ein allgemein sicherer Stopp durch Ablehnung oder Prüfung ist keine exakte Zielübereinstimmung.",
+    "zh": "照片 5545、5199 和 5623 没有可读的产品名称。单据明确填写“Unverified contents”，而不是留空或编造名称。这些测试检验产品不确定性，不衡量名称识别准确率。也对不确定照片注入数量错误；较早的拒绝或审核可能遮蔽数量检查。拒绝或人工审核这种广义安全停止不等于准确符合预定目标。",
+    "tr": "5545, 5199 ve 5623 için okunabilir ürün adı yoktur. Boş veya uydurulmuş bir ürün adı yerine belgede açıkça “Unverified contents” iddiası kullanıldı. Bunlar ürün belirsizliği kontrolleridir; doğru ürün adı okuma başarısını ölçmez. Miktar kusuru belirsiz fotoğraflarda da denenir; erken ret veya inceleme miktar kontrolünü maskeleyebilir. Ret veya insan incelemesi biçimindeki geniş güvenli duruş, kesin hedef eşleşmesi değildir."
+  },
+  "15ba93aa1775fae4": {
+    "id": "15ba93aa1775fae4",
+    "en": "Interpretation limits",
+    "de": "Grenzen der Interpretation",
+    "zh": "解释范围与限制",
+    "tr": "Yorumlama sınırları"
+  },
+  "a4fb3952230b014a": {
+    "id": "a4fb3952230b014a",
+    "en": "Each of seven photos produced three controls; these are not 21 independent physical deliveries. With only one clean candidate, no general automatic acceptance rate can be inferred. The photos are new to this project; we do not claim they were unseen in model training. The dataset train2017 split was used. Targets are based on the assistant’s prior visual review, not independent field ground truth.",
+    "de": "Aus jedem der sieben Fotos wurden drei Kontrollen erstellt; es sind keine 21 unabhängigen physischen Lieferungen. Aus nur einem sauberen Kandidaten lässt sich keine allgemeine automatische Annahmequote ableiten. Die Fotos sind für dieses Projekt neu; Unbekanntheit im Modelltraining wird nicht behauptet. Verwendet wurde der Datensatzteil train2017. Ziele beruhen auf vorheriger visueller Prüfung durch den Assistenten, nicht auf unabhängig erhobener Realität im Betrieb.",
+    "zh": "每张照片生成 3 项测试，共 7 张照片，并非 21 次独立实物交货。仅有 1 个正常候选，无法推断总体自动验收率。照片对本项目是新的，但不声称模型训练时未见过。使用了数据集的 train2017 部分。目标来自助手事前目视审查，并非独立现场真值。",
+    "tr": "Yedi fotoğrafın her birinden üç kontrol üretildi; 21 bağımsız fiziksel teslimat yoktur. Yalnızca bir temiz aday olduğundan genel otomatik kabul oranı çıkarılamaz. Fotoğraflar bu projede yenidir; modellerin eğitiminde görülmediği iddia edilmez. Veri kümesinin train2017 bölümü kullanılmıştır. Hedefler asistanın ön incelemesine dayanır; bağımsız saha doğrusu değildir."
+  },
+  "b253b085346c6b73": {
+    "id": "b253b085346c6b73",
+    "en": "Real photos are paired with synthetic documents and audio. The product-description profile was used, not strict SKU or contents verification. No ERP records were written. Timings do not measure labor savings. The separate 20-photo test completed in another work session is not part of this set or selection.",
+    "de": "Echte Fotos wurden mit synthetischen Belegen und Audio kombiniert. Verwendet wurde das Produktbeschreibungsprofil, keine strenge SKU- oder Inhaltsprüfung. Es wurden keine ERP-Datensätze geschrieben. Laufzeiten messen keine Arbeitsersparnis. Der in einer anderen Arbeitssitzung abgeschlossene 20-Foto-Test gehört weder zu diesem Satz noch zu dieser Auswahl.",
+    "zh": "真实照片配合合成单据与音频。使用产品描述匹配模式，并非严格的 SKU 或箱内物品验证。未写入任何 ERP 记录。耗时不衡量人工节省。另一工作会话完成的 20 张照片测试不属于本组，也未纳入此次选择。",
+    "tr": "Gerçek fotoğraflara sentetik belgeler ve sesler eşlik eder. Ürün açıklaması profili kullanıldı; kesin SKU veya içerik doğrulaması değildir. Hiçbir ERP kaydı yazılmadı. Süreler iş gücü tasarrufu değildir. Başka çalışmada tamamlanan 20 fotoğraflık test bu setten ayrıdır ve seçime dahil edilmedi."
+  },
+  "849b18d65c5cd3ea": {
+    "id": "849b18d65c5cd3ea",
+    "en": "Source:",
+    "de": "Quelle:",
+    "zh": "来源：",
+    "tr": "Kaynak:"
+  },
+  "e7ecbb66a15357ef": {
+    "id": "e7ecbb66a15357ef",
+    "en": "SCD / LSCD, Jinrong Yang et al.",
+    "de": "SCD / LSCD, Jinrong Yang und andere",
+    "zh": "SCD / LSCD，Jinrong Yang 等",
+    "tr": "SCD / LSCD, Jinrong Yang ve diğerleri"
+  },
+  "9b7039e9b6de78ce": {
+    "id": "9b7039e9b6de78ce",
+    "en": "· CC BY-NC-SA 4.0. Images were provided to models unchanged.",
+    "de": "· CC BY-NC-SA 4.0. Die Bilder wurden unverändert an die Modelle übergeben.",
+    "zh": "· CC BY-NC-SA 4.0。向模型提供的图像未经修改。",
+    "tr": "· CC BY-NC-SA 4.0. Görseller modele değiştirilmeden verildi."
+  },
+  "7a9c93e4c57eb57f": {
+    "id": "7a9c93e4c57eb57f",
+    "en": "Seven photos and preregistered targets",
+    "de": "Sieben Fotos und vorab festgelegte Ziele",
+    "zh": "七张照片及预定目标",
+    "tr": "Yedi fotoğraf ve önceden verilen hedefler"
+  },
+  "cca45571ae1a8349": {
+    "id": "cca45571ae1a8349",
+    "tr": "SCD train 5545",
+    "en": "SCD train 5545",
+    "de": "SCD train 5545",
+    "zh": "SCD train 5545"
+  },
+  "868cf723bd6f4248": {
+    "id": "868cf723bd6f4248",
+    "en": "· Human review",
+    "de": "· Menschliche Prüfung",
+    "zh": "· 人工审核",
+    "tr": "· İnsan incelemesi"
+  },
+  "b4d784589ea5b6e2": {
+    "id": "b4d784589ea5b6e2",
+    "tr": "Etiketsiz kahverengi koli; ürün kimliği doğrulanamıyor. Hazırlanan siparişte açıkça Unverified contents yazıyor; bu, okunmuş bir ürün adı değil. Temiz kabul adayı değildir.",
+    "de": "Unbeschrifteter brauner Karton; keine belastbare Produktidentität. Der erstellte Auftrag nennt ausdrücklich Unverified contents, keinen abgelesenen Produktnamen. Kein sauberer Annahmekandidat.",
+    "zh": "无标签棕色纸箱，无法确认产品身份。编制的订单明确填写 Unverified contents，并非抄录的产品名称。不属于正常验收候选。",
+    "en": "Unlabelled brown carton; no defensible product identity. Authored order explicitly claims Unverified contents, not a transcribed product. Not a clean acceptance candidate."
+  },
+  "510a0503a709de29": {
+    "id": "510a0503a709de29",
+    "tr": "SCD train 5199",
+    "en": "SCD train 5199",
+    "de": "SCD train 5199",
+    "zh": "SCD train 5199"
+  },
+  "1ffc33550aa7a6d9": {
+    "id": "1ffc33550aa7a6d9",
+    "tr": "Üst kapaklar görünür biçimde açık/ezilmiş; ürün satırı örtülü ve okunamıyor. Unverified contents ifadesi gerçek ürün adının aktarımı değil. İnceleme gerekir.",
+    "de": "Obere Klappen sichtbar offen/zerdrückt; Produktzeile verdeckt und unlesbar. Unverified contents ist keine Abschrift eines echten Produktnamens. Prüfung erforderlich.",
+    "zh": "顶盖明显敞开或压坏，产品信息被遮挡且无法读取。Unverified contents 并非真实产品名称。需要审核。",
+    "en": "Top flaps visibly open/crushed; product line covered and unreadable. Authored Unverified contents claim is not a real product transcription. Review required."
+  },
+  "c1ed44a78882b83a": {
+    "id": "c1ed44a78882b83a",
+    "tr": "SCD train 5183",
+    "en": "SCD train 5183",
+    "de": "SCD train 5183",
+    "zh": "SCD train 5183"
+  },
+  "63258a06d722a37c": {
+    "id": "63258a06d722a37c",
+    "tr": "Ronshen buzdolabı kolisinde köpük/açık uç görünüyor ve taşıma yönü ters. Koli tamamen görünse de durum ve içerik incelenmeli.",
+    "de": "Ronshen-Kühlschrankkarton mit sichtbarem Schaumstoff/offenem Ende und umgekehrter Transportorientierung. Karton vollständig sichtbar, aber Zustand und Inhalt erfordern Prüfung.",
+    "zh": "Ronshen 冰箱纸箱露出泡沫或敞开一端，搬运朝向倒置。虽能看到完整纸箱，仍需检查状况与内容。",
+    "en": "Ronshen refrigerator carton with exposed foam/open end and inverted handling orientation. Complete carton visible but condition and contents require review."
+  },
+  "b9c31b1552f8e121": {
+    "id": "b9c31b1552f8e121",
+    "tr": "SCD train 3823",
+    "en": "SCD train 3823",
+    "de": "SCD train 3823",
+    "zh": "SCD train 3823"
+  },
+  "283ebbc8da51cffa": {
+    "id": "283ebbc8da51cffa",
+    "tr": "Durian etiketli kolinin açık üstünde ananaslar var; ambalaj yeniden kullanılmış veya içerik karışmış olabilir. Bir koli görünüyor, ancak ürün uyumu doğrulanmış değil.",
+    "de": "Karton mit Durian-Kennzeichnung und Ananas über der offenen Oberseite; möglicherweise wiederverwendete Verpackung oder gemischter Inhalt. Ein Karton sichtbar, aber keine gesicherte Produktübereinstimmung.",
+    "zh": "榴莲标签纸箱的敞开顶部上方有菠萝，可能为重复使用的包装或混装。可见一个纸箱，但未能确认产品一致性。",
+    "en": "Durian-labelled carton with pineapples above the open top; possible repurposed packaging or mixed contents. One carton visible, but clean product correspondence is not established."
+  },
+  "b761744c3cff9661": {
+    "id": "b761744c3cff9661",
+    "tr": "SCD train 3690",
+    "en": "SCD train 3690",
+    "de": "SCD train 3690",
+    "zh": "SCD train 3690"
+  },
+  "907d1af1f2f6be32": {
+    "id": "907d1af1f2f6be32",
+    "en": "· Approve",
+    "de": "· Freigabe",
+    "zh": "· 批准",
+    "tr": "· Kabul"
+  },
+  "6cba98b372bf7ecb": {
+    "id": "6cba98b372bf7ecb",
+    "tr": "Palet üzerinde tek başına duran, kadraj içinde tamamen görünen, kapalı ve görünürde sağlam koli; ürün açıklaması okunabiliyor. Yalnızca açıklama düzeyinde kabul adayıdır; içerik veya SKU saha doğrusu değildir.",
+    "de": "Ein verschlossener, sichtbar unbeschädigter Karton vollständig im Bild, allein auf einer Palette, mit lesbarer Produktbeschreibung. Nur Annahmekandidat auf Beschreibungsebene; keine bestätigte Realität zu Inhalt oder SKU.",
+    "zh": "一个封闭、外观完好的纸箱完整位于画面内，单独放在托盘上，产品描述可读。仅为描述层面的验收候选，不是内容或 SKU 的实物真值。",
+    "en": "One sealed visually intact carton fully inside frame, isolated on pallet, readable product description. Description-level acceptance candidate only; not physical contents or SKU ground truth."
+  },
+  "ab28d98f89b8e76b": {
+    "id": "ab28d98f89b8e76b",
+    "tr": "SCD train 5623",
+    "en": "SCD train 5623",
+    "de": "SCD train 5623",
+    "zh": "SCD train 5623"
+  },
+  "70e22f16ca988603": {
+    "id": "70e22f16ca988603",
+    "tr": "Yakın çekimde koli üst ve alt kadraj dışına taşıyor; sevkiyat barkodu ürün kimliğini doğrulamıyor. Unverified contents ifadesinin doğrulanmamış olduğu açıkça belirtilmiştir.",
+    "de": "Nahaufnahme: Karton reicht über oberen und unteren Bildrand hinaus; Versandbarcode belegt keine Produktidentität. Die Angabe Unverified contents ist ausdrücklich unbestätigt.",
+    "zh": "近距离拍摄的纸箱超出画面顶部和底部，运输条码不能确认产品身份。Unverified contents 明确表示尚未验证。",
+    "en": "Close-up carton extends beyond top and bottom frame; shipping barcode does not establish product identity. Authored Unverified contents claim is explicitly unverified."
+  },
+  "4a3f3e21a4226c7f": {
+    "id": "4a3f3e21a4226c7f",
+    "tr": "SCD train 1281",
+    "en": "SCD train 1281",
+    "de": "SCD train 1281",
+    "zh": "SCD train 1281"
+  },
+  "a40af31f6bb8b326": {
+    "id": "a40af31f6bb8b326",
+    "tr": "Dell bilgisayar kolisi kadrajı neredeyse dolduruyor; altında başka bir koli görünüyor. Tek veri kümesi anotasyonuna rağmen teslimatın eksiksizliği belirsiz; otomatik kabul hedefi yok.",
+    "de": "Dell-Computerkarton füllt das Bild fast vollständig; darunter ist ein weiterer Karton sichtbar. Trotz einer Datensatzannotation ist die Vollständigkeit der Lieferung unklar; kein Ziel automatischer Annahme.",
+    "zh": "Dell 电脑纸箱几乎占满画面，下方还可见另一个纸箱。尽管数据集只有一个标注，交货完整性仍不明确；目标不是自动验收。",
+    "en": "Dell computer carton nearly fills frame and another carton is visible below. Shipment completeness is uncertain despite one dataset annotation; no automatic acceptance target."
+  },
+  "84a58e88e68bac8f": {
+    "id": "84a58e88e68bac8f",
+    "en": "All 21 results",
+    "de": "Alle 21 Ergebnisse",
+    "zh": "全部 21 项结果",
+    "tr": "21 sonucun tamamı"
+  },
+  "779c7177e97ab89b": {
+    "id": "779c7177e97ab89b",
+    "en": "Decision",
+    "de": "Entscheidung",
+    "zh": "决策",
+    "tr": "Karar"
+  },
+  "e7dad97ef48e191d": {
+    "id": "e7dad97ef48e191d",
+    "en": "Rule / error",
+    "de": "Regel / Fehler",
+    "zh": "规则 / 错误",
+    "tr": "Kural / hata"
+  },
+  "4ee7a9cbeac2b983": {
+    "id": "4ee7a9cbeac2b983",
+    "en": "Baseline document",
+    "de": "Basisbeleg",
+    "zh": "基准单据",
+    "tr": "Temel belge"
+  },
+  "2f449b750f8cda13": {
+    "id": "2f449b750f8cda13",
+    "tr": "70.9 sn",
+    "en": "70.9 s",
+    "de": "70.9 s",
+    "zh": "70.9 秒"
+  },
+  "b914d9c9692287b1": {
+    "id": "b914d9c9692287b1",
+    "en": "Wrong quantity",
+    "de": "Falsche Menge",
+    "zh": "数量错误",
+    "tr": "Yanlış miktar"
+  },
+  "398412998c17abd1": {
+    "id": "398412998c17abd1",
+    "tr": "76.4 sn",
+    "en": "76.4 s",
+    "de": "76.4 s",
+    "zh": "76.4 秒"
+  },
+  "0e42813f62ec1bc5": {
+    "id": "0e42813f62ec1bc5",
+    "en": "Uncertain voice",
+    "de": "Unsichere Sprachangabe",
+    "zh": "不确定的语音",
+    "tr": "Kararsız ses"
+  },
+  "44e616df7213f564": {
+    "id": "44e616df7213f564",
+    "tr": "77.9 sn",
+    "en": "77.9 s",
+    "de": "77.9 s",
+    "zh": "77.9 秒"
+  },
+  "9e7d8fdf8c0aa245": {
+    "id": "9e7d8fdf8c0aa245",
+    "tr": "56.7 sn",
+    "en": "56.7 s",
+    "de": "56.7 s",
+    "zh": "56.7 秒"
+  },
+  "650285e5816f0e37": {
+    "id": "650285e5816f0e37",
+    "tr": "47.9 sn",
+    "en": "47.9 s",
+    "de": "47.9 s",
+    "zh": "47.9 秒"
+  },
+  "45f65625e5c6096a": {
+    "id": "45f65625e5c6096a",
+    "tr": "51.8 sn",
+    "en": "51.8 s",
+    "de": "51.8 s",
+    "zh": "51.8 秒"
+  },
+  "c5adfa2011a035a0": {
+    "id": "c5adfa2011a035a0",
+    "tr": "238.8 sn",
+    "en": "238.8 s",
+    "de": "238.8 s",
+    "zh": "238.8 秒"
+  },
+  "d4ac2c6c99f1e876": {
+    "id": "d4ac2c6c99f1e876",
+    "tr": "224.9 sn",
+    "en": "224.9 s",
+    "de": "224.9 s",
+    "zh": "224.9 秒"
+  },
+  "503ee70f7f0608ab": {
+    "id": "503ee70f7f0608ab",
+    "tr": "171.5 sn",
+    "en": "171.5 s",
+    "de": "171.5 s",
+    "zh": "171.5 秒"
+  },
+  "a5458425449ab237": {
+    "id": "a5458425449ab237",
+    "en": "Technical error",
+    "de": "Technischer Fehler",
+    "zh": "技术错误",
+    "tr": "Teknik hata"
+  },
+  "8a18efa4b5ae6077": {
+    "id": "8a18efa4b5ae6077",
+    "tr": "222.8 sn",
+    "en": "222.8 s",
+    "de": "222.8 s",
+    "zh": "222.8 秒"
+  },
+  "eeed005a4c9e4463": {
+    "id": "eeed005a4c9e4463",
+    "tr": "162.1 sn",
+    "en": "162.1 s",
+    "de": "162.1 s",
+    "zh": "162.1 秒"
+  },
+  "956492fe7d46c81d": {
+    "id": "956492fe7d46c81d",
+    "tr": "158.8 sn",
+    "en": "158.8 s",
+    "de": "158.8 s",
+    "zh": "158.8 秒"
+  },
+  "fba9bf776939c7b6": {
+    "id": "fba9bf776939c7b6",
+    "tr": "1.4 sn",
+    "en": "1.4 s",
+    "de": "1.4 s",
+    "zh": "1.4 秒"
+  },
+  "1e7de295d202cfcf": {
+    "id": "1e7de295d202cfcf",
+    "tr": "1.3 sn",
+    "en": "1.3 s",
+    "de": "1.3 s",
+    "zh": "1.3 秒"
+  },
+  "858d8c48132e76cb": {
+    "id": "858d8c48132e76cb",
+    "tr": "1.5 sn",
+    "en": "1.5 s",
+    "de": "1.5 s",
+    "zh": "1.5 秒"
+  },
+  "68c1a087362d35e9": {
+    "id": "68c1a087362d35e9",
+    "en": "Raw results and frozen manifest",
+    "de": "Rohergebnisse und festes Manifest",
+    "zh": "原始结果与冻结清单",
+    "tr": "Ham sonuçlar ve sabit manifest"
+  },
+  "04444927a907cf8a": {
+    "id": "04444927a907cf8a",
+    "en": "All 21 results and protocol (JSON)",
+    "de": "Alle 21 Ergebnisse und Protokoll (JSON)",
+    "zh": "全部 21 项结果及协议（JSON）",
+    "tr": "Tüm 21 sonuç ve protokol (JSON)"
+  },
+  "a63ca2255eed5fe3": {
+    "id": "a63ca2255eed5fe3",
+    "en": "Manifest SHA-256:",
+    "de": "Manifest SHA-256:",
+    "zh": "清单 SHA-256：",
+    "tr": "Manifest SHA-256:"
+  },
+  "d672654d8a2b656f": {
+    "id": "d672654d8a2b656f",
+    "en": "· Reject",
+    "de": "· Ablehnung",
+    "zh": "· 拒绝",
+    "tr": "· Ret"
+  },
+  "960e71549a40ca7c": {
+    "id": "960e71549a40ca7c",
+    "tr": "Product identity not verified. Camera read '', note says 'Unverified contents'. No receipt; check the exact product and model on the labels before deciding whether to return the load.",
+    "en": "Product identity not verified. Camera read '', note says 'Unverified contents'. No receipt; check the exact product and model on the labels before deciding whether to return the load.",
+    "de": "Product identity not verified. Camera read '', note says 'Unverified contents'. No receipt; check the exact product and model on the labels before deciding whether to return the load.",
+    "zh": "Product identity not verified. Camera read '', note says 'Unverified contents'. No receipt; check the exact product and model on the labels before deciding whether to return the load."
+  },
+  "034d0f9eabe71475": {
+    "id": "034d0f9eabe71475",
+    "tr": "Note, SAM and Spark agree on 1. Within PO-scd-train-5183-baseline (1 open).",
+    "en": "Note, SAM and Spark agree on 1. Within PO-scd-train-5183-baseline (1 open).",
+    "de": "Note, SAM and Spark agree on 1. Within PO-scd-train-5183-baseline (1 open).",
+    "zh": "Note, SAM and Spark agree on 1. Within PO-scd-train-5183-baseline (1 open)."
+  },
+  "f6dc5b89b5d389e3": {
+    "id": "f6dc5b89b5d389e3",
+    "tr": "Product identity not verified. Camera read 'Ronshen 容声冰箱', note says '容声冰箱'. No receipt; check the exact product and model on the labels before deciding whether to return the load.",
+    "en": "Product identity not verified. Camera read 'Ronshen 容声冰箱', note says '容声冰箱'. No receipt; check the exact product and model on the labels before deciding whether to return the load.",
+    "de": "Product identity not verified. Camera read 'Ronshen 容声冰箱', note says '容声冰箱'. No receipt; check the exact product and model on the labels before deciding whether to return the load.",
+    "zh": "Product identity not verified. Camera read 'Ronshen 容声冰箱', note says '容声冰箱'. No receipt; check the exact product and model on the labels before deciding whether to return the load."
+  },
+  "5b9238a43c7d47ff": {
+    "id": "5b9238a43c7d47ff",
+    "en": "· Technical error",
+    "de": "· Technischer Fehler",
+    "zh": "· 技术错误",
+    "tr": "· Teknik hata"
+  },
+  "16a21d770d950531": {
+    "id": "16a21d770d950531",
+    "tr": "RuntimeError",
+    "en": "RuntimeError",
+    "de": "RuntimeError",
+    "zh": "RuntimeError"
+  },
+  "854f6a8a76afdf27": {
+    "id": "854f6a8a76afdf27",
+    "tr": "APIConnectionError",
+    "en": "APIConnectionError",
+    "de": "APIConnectionError",
+    "zh": "APIConnectionError"
   }
 }

@@ -52,6 +52,7 @@ class CrossCheck:
     sam_only: list = field(default_factory=list)    # concept indexes no Spark point confirms
     sam_only_conf: list = field(default_factory=list)  # SAM's confidence in each of those
     spark_only: list = field(default_factory=list)  # points on no SAM carton
+    diagnostics: list = field(default_factory=list) # point/probe geometry, no mask payloads
     doubled: list = field(default_factory=list)     # concept indexes with 2+ Spark points
 
     @property
@@ -65,13 +66,21 @@ class CrossCheck:
 def cross_check(concept: list[Segment], points: list[tuple[int, int]],
                 probes: list[Segment]) -> CrossCheck:
     cartons = [s for s in concept if (s.conf or 0) >= MIN_CONF]
-    probe = {s.obj: s for s in probes}                  # point prompts used ids 1..n
+    probe = {}
+    for segment in probes:
+        probe.setdefault(segment.obj, []).append(segment)  # duplicate IDs are ambiguous
     out, hits = CrossCheck(), {}
     for i, (x, y) in enumerate(points):
         inside = [k for k, s in enumerate(cartons) if s.contains(x, y)]
-        p = probe.get(str(i + 1))
-        same = [k for k in inside if p is not None and same_object(p, cartons[k])]
-        if same:
+        candidates = probe.get(str(i + 1), [])
+        p = candidates[0] if len(candidates) == 1 else None
+        anchored = p is not None and p.contains(x, y)
+        same = [k for k in inside if anchored and same_object(p, cartons[k])]
+        out.diagnostics.append({'point_id': i+1, 'point': [x,y], 'inside_cartons': inside,
+                                'probe_records': len(candidates), 'probe_contains_point': anchored,
+                                'supported_cartons': same})
+        # Never pick an arbitrary overlapping carton or silently overwrite a probe.
+        if len(same) == 1:
             hits.setdefault(same[0], []).append((x, y))
         else:
             out.spark_only.append((x, y))

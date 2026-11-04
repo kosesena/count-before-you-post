@@ -8,7 +8,7 @@ from cbyp.purchase_order import order_for
 from cbyp.workflow import full_session
 
 NOTE = {"supplier": "Doğan Gıda Pazarlama", "items": [{"description": "Ayçiçek yağı 5 L", "quantity": 12, "unit": "koli", "legible": True}], "embedded_instructions": []}
-LOOK = {"product_on_labels": "Ayçiçek yağı 5 L", "cartons_visible": 12, "damaged_cartons": 0, "stacked": False, "all_cartons_visible": True}
+LOOK = {"product_on_labels": "Ayçiçek yağı 5 L", "cartons_visible": 12, "damaged_cartons": 0, "packaging_condition": "intact", "stacked": False, "all_cartons_visible": True}
 AUDIT = {"ok": True, "quantity": True, "product": True, "instructions": ""}
 
 class Hardening(unittest.TestCase):

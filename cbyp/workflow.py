@@ -74,7 +74,7 @@ class VerificationRun:
         def authorize():
             result = s.call("post_goods_receipt", json.dumps({"quantity": qty, "reason": "New-input verification"}))
             if "error" in result:
-                raise RuntimeError("Object authorization failed; no ERP write.")
+                raise RuntimeError("Object authorization failed; no ERP write. Cause: " + result.get("error_type", "ToolError"))
             return result
         result = step("Cross-check objects and authorize", authorize)
         return {"mode": "dry_run", "erp_written": False, "result": result,
