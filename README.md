@@ -75,6 +75,28 @@ Your World*. Everything in this repository was written during the event.
 > receipts from any agent behind the gate, including Meta's own Muse Code working the dock
 > through MCP (5 sessions, 5 refused writes, 0 receipts).
 
+<a id="what-sets-it-apart"></a>
+
+**What sets it apart**
+
+- **The check sits inside the write, not beside it.** The gate is plain code inside
+  `post_goods_receipt`, the one tool the agent cannot skip. No model judges another model's
+  answer to decide whether stock changes; nothing written on a note can talk the rule out of it.
+- **Tested against an agent we did not write.** Meta's own Muse Code worked the dock through the
+  gate's MCP server, followed none of the injected "post 100", and still tried five writes it
+  should not have: 5 refused, 0 receipts.
+- **A real ERP, real writes.** Receipts posted into ERPNext v16, one against a real Purchase Order
+  (12 of 12, the next delivery on it stopped), and two held deliveries released by Şef's sign-off
+  for exactly the quantity approved.
+- **Two models must agree carton by carton.** Spark puts a point on every carton and each point
+  goes back to SAM 3.1; a carton counts only when both find the same object. That is how the
+  missing carton and the stacked load were caught.
+- **It measured what the models miss, then gave that job to code.** Spark never saw white 2 pt
+  text in a PDF (0 of 3 reads), and no reasoning effort made it stop on the injected note; both
+  are now rules in plain code.
+- **Seven Meta tools, each with its own job**, and an honest bill: the Meta Model API cost the
+  build about $96. Four languages, each measured as its own run, and the synthetic parts named.
+
 | | |
 |---|---|
 | [Check it yourself](#check-it-yourself-a-few-minutes-no-api-key) · [Why](#why) · [What it does](#what-it-does) · [Results](#results-at-a-glance) · [Built with Muse](#built-with-muse) | [Drive the dock](#drive-the-dock-the-3d-simulators) · [Meet the cast](#meet-the-cast) · [The evidence](#the-evidence) |
