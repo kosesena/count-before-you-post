@@ -12,7 +12,7 @@
 
 Before a goods receipt is written, the delivery note, the camera, the receiver's voice and a second model must agree. If they don't, nothing is written and a person decides.
 
-**[Open the toy box: the live demo →](https://count-before-you-post.vercel.app)** &nbsp;·&nbsp; [Drive the dock](https://count-before-you-post.vercel.app/sim-lego/) &nbsp;·&nbsp; [The first simulator](https://count-before-you-post.vercel.app/sim/)
+**[Open the toy box: the live demo →](https://count-before-you-post.vercel.app)** &nbsp;·&nbsp; [Drive the dock](https://count-before-you-post.vercel.app/sim-lego/)
 
 <sub>Built with Muse Spark · SAM 3.1 · Voice · Wonder · Spark Open · Muse Code · Muse Image &nbsp;|&nbsp; Meta Global AI Developer Hackathon, 26 Oct – 4 Nov 2026 &nbsp;|&nbsp; <b>0</b> wrong receipts behind the gate</sub>
 
@@ -329,52 +329,6 @@ where the demo page's *Drive the dock* button leads: the same warehouse in toy b
 - No model calls and no ERP writes. Code and notes: [`site/sim-lego/`](site/sim-lego/README.md).
 
 ![The Brick Dock's chat with Şef on a wrong-product delivery: asked "Count", Şef answers from the recorded evidence, "12 sure, 0 doubtful; the note says 12 cartons; wrong product"](assets/readme/brick-dock-chat.jpg)
-
-<details>
-<summary><b>The first simulator, written by Muse Code</b> (<a href="https://count-before-you-post.vercel.app/sim/">/sim</a>)</summary>
-
-**[count-before-you-post.vercel.app/sim](https://count-before-you-post.vercel.app/sim/)**: pick
-one of the six deliveries, drive the forklift into the trailer, bring the pallet to the yellow
-zone and set it down. Then the recorded run plays out at the dock: Spark reads the note, Sam
-counts, the two compare carton by carton, and Kapı decides, with the light, the barrier and the
-screen. The result shows what the same agent did without the gate, next to what the gate let
-through. Arrows or WASD drive, Space picks up and sets down, C changes the camera (chase,
-driver's seat, overview); on a phone, a touch joystick.
-
-![The gate blocks a wrong-product delivery in the LEGO dock: the recorded agent run as a chat on the left, Spark at the pallet, Sam and Kapı at the barrier, the BLOCK screen, and on the right the result: nothing written, with and without the gate](assets/readme/sim-decision.jpg)
-
-- **Who works the case.** Only the characters a delivery actually needs are on the floor, each
-  at a workstation with a job sign: Spark at the reading lectern, Sam under the ceiling camera,
-  Kapı at the barrier, and, where the recorded run used them, Wonder at her writing desk, Şef at
-  the sign-off podium, Rover at the second-reading table. They work while you drive (pages
-  turn, Wonder writes, Şef stamps, Rover types), turn to follow the forklift, walk to the pallet
-  when it is their turn, and react to the decision: a wave for *post*, a "no" for *block*, everyone
-  turning to Şef for *ask Şef*.
-- **Everyone else is at work in their room.** The warehouse has a room for each character, on
-  two storeys against the front wall, furnished after concepts Muse Image drew and Sena chose
-  (`experiments/room_concepts.py`, `experiments/mockups/room-choices.json`). The intro opens on
-  the rooms before it turns to the dock.
-- **What the agents said to each other.** While the gate decides, a chat panel replays the
-  delivery's recorded agent run turn by turn, with a speech bubble over the speaker and a beam
-  to the one addressed: Spark → Sam "count “carton”", Sam: "0 sure, 12 doubtful", Spark → Kapı
-  "post 12", Kapı: "blocked". Every line is a recorded tool call, result or reasoning summary;
-  nothing is written for the show. A **Without Kapı** tab replays the same agent's run with no
-  gate. Tap a row to see the step exactly as recorded; pause, change speed or step through it.
-- **Şef answers at the table.** When the gate says *ask Şef*, Kapı, Şef and whoever raised the
-  doubt walk to the meeting table, and Şef's recorded sign-off is given there (a separate
-  recorded run, on the Turkish note, labelled so in the panel).
-- **Measured, not eyeballed.** `experiments/web/sim_test.mjs` plays all six cases to the gate's
-  decision in headless Chrome (ALL OK), and the layout was checked from the deciding camera with
-  projected screen boxes, so no character covers the pallet, the gate's screen or another
-  character.
-
-![A damaged delivery goes to Şef: Kapı at the meeting table in front of the character rooms, the agent run on the left, "Sent to Şef" on the right](assets/readme/sim-meeting.jpg)
-
-Written by Muse Code over many rounds (see [What Muse Code built](#what-muse-code-built)); the
-dock and the rooms are Blender scenes (`experiments/blender/warehouse.py`, `CBYP_POLISH=1`)
-exported for the browser by `experiments/web/export_dock.py`.
-
-</details>
 
 <a id="meet-the-cast"></a>
 
