@@ -1,0 +1,37 @@
+name: Offline checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+          cache: pip
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: pip install -r requirements.txt
+      - name: Unit tests (gate, workflow, API; no keys)
+        run: python -m unittest discover tests
+      - name: The gate on the recorded model outputs, four languages
+        run: |
+          for l in tr en de zh; do
+            out=$(CBYP_LANG=$l python experiments/run_gate.py)
+            echo "$out" | grep -E "checks|matches|receipts"
+            echo "$out" | grep -q "order checks: 4/4"
+            echo "$out" | grep -q "gate matches expected: 6/6"
+            echo "$out" | grep -q "without gate 5/6, with gate 0/6"
+          done
+      - name: The Brick Dock's logic
+        run: node --test site/sim-lego/*.test.mjs
