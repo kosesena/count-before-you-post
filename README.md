@@ -292,6 +292,21 @@ starting a test server; we then ran the checks ourselves (`experiments/web/sim_t
 all six simulator cases to their decision). The designs it built from were drawn by Muse
 Image and chosen by Sena (`experiments/mockups/`).
 
+<a id="the-last-three-days"></a>
+
+**The last three days (2–4 Nov), after Muse Code's last task.** Not written by Muse Code:
+
+| Day | What was added | Commit |
+|---|---|---|
+| 2 Nov | Real carton photos: a [30-image public-photo benchmark](docs/CONTROLLED_VALIDATION.md); mask scaling and EXIF coordinates fixed | `960aec7` |
+| 2 Nov | Brand and model checked against the trusted order, article codes kept apart from models | `b32176e`, `35bcf25` |
+| 2 Nov | A [timing study](https://count-before-you-post.vercel.app/time-study/): manual versus assisted review of the six cases | `4c9b2e7` |
+| 3 Nov | [Verify your own delivery](https://count-before-you-post.vercel.app/verify/), hosted as a dry run behind an access code | `cf60fc4` |
+| 3 Nov | Explicit counting areas; [five unseen photos](https://count-before-you-post.vercel.app/unseen-validation/) as controls (see [Honest limits](#honest-limits)) | `e119c1b`, `f55d661` |
+| 3 Nov | The [jury walkthrough](https://count-before-you-post.vercel.app/jury/): three decisions in the toy warehouse | `f55d661`, `f1cb0b1` |
+| 3 Nov | The site in four interface languages | `39042b9` |
+| 4 Nov | A 20-case geometry regression, the brick-built headings, the cast portraits repaired | `19fa190`, `0212d48`, `b955f71` |
+
 <a id="drive-the-dock-the-3d-simulators"></a>
 
 ## ![Drive the dock: the 3D simulators](assets/readme/headings/12-drive-the-dock-the-3d-simulators.webp)
