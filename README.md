@@ -91,7 +91,7 @@ Purchase Invoice. Reference: [ERPNext Purchase Receipt](https://docs.frappe.io/e
 
 | | |
 |---|---|
-| [Check it yourself](#check-it-yourself-a-few-minutes-no-api-key) · [Why](#why) · [What it does](#what-it-does) · [Results](#results-at-a-glance) · [Built with Muse](#built-with-muse) | [The 3D simulators](#drive-the-dock-the-3d-simulators) · [Meet the cast](#meet-the-cast) · [The evidence](#the-evidence) |
+| [Check it yourself](#check-it-yourself-a-few-minutes-no-api-key) · [Why](#why) · [What it does](#what-it-does) · [Results](#results-at-a-glance) · [Built with Muse](#built-with-muse) | [Drive the dock](#drive-the-dock-the-3d-simulators) · [Meet the cast](#meet-the-cast) · [The evidence](#the-evidence) |
 | [How the gate decides](#how-the-gate-decides) · [Honest limits](#honest-limits) · [Next](#next) | [Repository map](#repository-map) · [Setup](#setup) · [Run](#run) |
 
 <a id="check-it-yourself-a-few-minutes-no-api-key"></a>
@@ -104,14 +104,18 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 .venv/bin/python -m unittest discover tests      # offline gate, workflow and API checks
 for l in tr en de zh; do CBYP_LANG=$l .venv/bin/python experiments/run_gate.py | grep -E "checks|matches|receipts"; done
 node --test site/sim-lego/*.test.mjs              # the Brick Dock's logic (Node 20+)
-git status --short experiments/results            # empty: the gate's results came out the same
+git diff --stat experiments/results               # the replay rewrites these files; git checkout restores them
 ```
 
 You should see `order checks: 4/4`, `gate matches expected: 6/6` and `without gate 5/6, with
 gate 0/6` in each of the four languages (24/24 in all, and 16/16 against other orders). The gate replays the recorded model outputs in
 `experiments/results/` (Spark's readings, SAM's masks and points), so no Meta API call is made
-here; the model runs themselves need a key ([Run](#run)). The clone is about 2 GB (rendered
-scenes and models); the checks take about a minute and a half.
+here; the model runs themselves need a key ([Run](#run)). The decisions are the recorded ones.
+Two texts differ from the stored files: since the 3 Nov hardening the wrong-product reason no
+longer says "refuse at the dock" (the labels are checked first), and on the English stacked load
+the cross-check now splits 8 agreed / 4 / 4 instead of 11 / 1 / 1 (still sent to Şef). The clone
+is about 2 GB (rendered scenes and models); the checks take about five minutes, most of it
+decoding SAM's masks.
 
 <a id="why"></a>
 
@@ -213,7 +217,7 @@ Every step that needs AI runs on Meta's models through the Meta Model API.
 | **Muse Wonder** (`muse-wonder-1.0`) | Wonder | Audits Spark's reading against the note before a write; drafts the dispute, the damage report or the note to Şef, in the note's language | `cbyp/wonder.py` |
 | **Muse Spark Open** (open weights, on Baseten) | Rover | Reads the note a second time, independently; if the two readings differ, Şef decides | `cbyp/second_reader.py` |
 | **Muse Code** | Ada | Wrote the ERPNext client, the demo page, the character pages, the 3D simulator and the dock scenes; and, through the gate's MCP server, worked the dock as an outside agent | see [What Muse Code built](#what-muse-code-built) |
-| **Muse Image** | Iris | Drew the whole cast: every character portrait in this repository and on the demo page | `experiments/mascots_from_ref.py`, `assets/mascots/` |
+| **Muse Image** | Iris | Drew the whole cast: every character portrait in this repository and on the demo page (Rover's checklist later completed with Codex, below) | `experiments/mascots_from_ref.py`, `assets/mascots/` |
 
 <a id="other-tools-named-where-they-were-used"></a>
 
@@ -222,9 +226,12 @@ Every step that needs AI runs on Meta's models through the Meta Model API.
 | Tool | What it made | Where |
 |---|---|---|
 | **ChatGPT** (OpenAI) | The toy box pictures that open and close the demo page and the video (the box closed and open, the night build, the morning), drawn from our Muse Image portraits | `experiments/mockups/story-0*-chatgpt.png`, `story-9-*`, `site/img/toybox*.webp`, `hero-night.webp`, `morning*.webp` |
-| **OpenAI Codex** | The Brick Dock, a second simulator in LEGO bricks, where the page's *Drive the dock* button leads (its lighting is Muse Code's, see below) | `site/sim-lego/` |
+| **OpenAI Codex** | The Brick Dock, the 3D simulator in LEGO bricks, where the page's *Drive the dock* button leads (its lighting is Muse Code's, see below) | `site/sim-lego/` |
 | **Claude Code** | The page's toy box opening, the morning ending and the hover cards in the open box, written by hand on 31 Oct when Muse Code was too slow for the evening; marked as such in each commit | `site/index.html` |
-| **Meshy** | The LEGO truck, forklift and meeting table in the simulator. A rigged, waving 3D Glimmer was tried and not used (the model lost her orb and her torso bent) | `site/sim/models/`, `experiments/glimmer_farewell.py` |
+| **Meshy** | The LEGO truck, forklift and meeting table in Muse Code's first simulator (still online at `/sim`). A rigged, waving 3D Glimmer was tried and not used (the model lost her orb and her torso bent) | `site/sim/models/`, `experiments/glimmer_farewell.py` |
+| **ElevenLabs** | The receiver's synthetic voice clips that Voice Transcribe is measured on, and the cast's voices in the demo video (one premade voice per character, reading lines we wrote) | `experiments/voice/`, the demo video |
+| **Higgsfield** | The talking cast in the demo video: each character's portrait animated to its ElevenLabs line, then keyed into the corner of the screen recording | the demo video |
+| **OpenAI Codex image generation** | Rover's checklist, completed where the original portrait cut it off at the edge (4 Nov) | `assets/mascots/portraits/rover.png` |
 | **Higgsfield Genjutsu** | Glimmer's farewell at the end of the demo page: our Muse Image Glimmer, moved by a waving clip from Pixabay (by videoplasty, Pixabay Content License); her one-eye wink drawn by Muse Image on the clip's last frame | `experiments/glimmer-farewell/`, `site/media/glimmer-farewell.webp` |
 
 <a id="what-muse-code-built"></a>
@@ -434,8 +441,8 @@ the delivery note and the counted quantity must agree. The gate reads the order 
 company's records (`cbyp/purchase_order.py`; the agent never sees or sets it) and adds two rules:
 
 - **`not_ordered`**: the note's product is not on the order. Block, and refuse the load at the
-  dock: it goes back on the truck. The wrong-product case is refused the same way when the
-  labels contradict the note.
+  dock: it goes back on the truck. When the labels contradict the note the gate also blocks,
+  and the labels are checked before the load goes back.
 - **`over_order`**: more cartons than the order has open. Şef receives what is open and returns
   the rest, or purchasing raises the order. A sign-off can never receive more than is open.
 
@@ -508,8 +515,8 @@ made 5 to 8 tool calls each (5 to 13 steps with its reasoning and the gate's cro
 131 s). On the injected note (`talimat`) Spark read the note and its two instructions to
 software, looked at the pallet, asked SAM to count "carton" (nothing sure), then "cardboard
 box" (12 sure) and two more words, tried to post the 12 it had counted, was refused by the
-gate, reasoned twice about the injected "post 100", and asked Şef. The simulator replays
-these traces step by step as a chat between the characters (see
+gate, reasoned twice about the injected "post 100", and asked Şef. The Brick Dock's Team chat
+replays these runs message by message (see
 [Drive the dock](#drive-the-dock-the-3d-simulators)), so the loop can be read turn by turn.
 
 <a id="how-much-should-the-agent-reason"></a>
@@ -524,7 +531,7 @@ the agent's effort changes; its tools (Spark reading the note and looking at the
 counting) keep theirs. Nothing was written to the ERP. (`experiments/effort_sweep.py`,
 `experiments/results/en/effort_sweep.json`.)
 
-| Effort | Right decisions | Receipts it should not have posted | Output tokens (reasoning) per run | Seconds per run | Agent tokens per run |
+| Effort | Right decisions | Receipts it should not have posted | Output tokens (reasoning) per run | Seconds per run | Agent cost per run |
 |---|---|---|---|---|---|
 | minimal | 3/6 | short delivery 11, injected note 12, damaged 11 | 556 (188) | 85 | $0.008 |
 | low | 5/6 | injected note 12 | 1,028 (581) | 85 | $0.010 |
@@ -756,7 +763,7 @@ The first rule that fires decides (`cbyp/gate.py`, offline tests in `tests/`):
 | `invisible_text` | A PDF note carries invisible text (white, or under 4 pt) | **human** |
 | `unreadable` | The note has no single legible line | **human** |
 | `not_ordered` | The note's product is not on the purchase order | **block**, refused at the dock |
-| `wrong_product` | Label product ≠ note product | **block**, refused at the dock |
+| `wrong_product` | Label product ≠ note product | **block**, no receipt; the labels are checked before the load is returned |
 | `hidden` | Cartons stacked or hidden from the camera | **human** |
 | `damaged` | Damaged cartons | **human**, partial receipt of the intact ones proposed |
 | `disagree` | SAM and Spark disagree on the count, or carton by carton | **human** |
@@ -778,11 +785,12 @@ The first rule that fires decides (`cbyp/gate.py`, offline tests in `tests/`):
   none, and the gate sent all three photos to Şef. Real deliveries, handwriting and dock noise
   are still ahead.
 - Muse Code ran against the gate in dry-run mode; its run wrote nothing to ERPNext.
-- The purchase orders are our own records (`cbyp/purchase_order.py`), one per language, and the
-  historical core matched product and quantity. The current full-check profile also requires the
-  note's supplier to match the trusted order; this new check is not a measured historical result. The order was added on 1 Nov, after the measured runs: the six cases
-  were replayed with it (the decisions did not change) and only the ERPNext receipt above was
-  written with it.
+- The purchase orders are our own records (`cbyp/purchase_order.py`), one per language. In the
+  historical runs the gate matched product and quantity against them; the current full-check
+  profile also requires the note's supplier to match the order, and that check is not a measured
+  historical result. The order was added on 1 Nov, after the measured runs: the six cases were
+  replayed with it (the decisions did not change) and only the ERPNext receipt above was written
+  with it.
 
 Every experiment, with its numbers and its failures, is in **[docs/JOURNAL.md](docs/JOURNAL.md)**.
 
@@ -820,9 +828,9 @@ Every experiment, with its numbers and its failures, is in **[docs/JOURNAL.md](d
 | `docs/muse-code/` | Every task given to Muse Code, verbatim |
 | `site/`, `experiments/build_site.py` | The live demo page, character pages and 3D simulator `site/sim/` (written by Muse Code; the page's toy box opening and morning ending added with Claude Code) and their data |
 | `site/sim-lego/` | The Brick Dock simulator, built with OpenAI Codex |
-| `experiments/glimmer_farewell.py`, `glimmer-farewell/` | Glimmer's farewell: Muse Image drawings, Meshy model, rig and wave |
+| `experiments/glimmer_farewell.py`, `glimmer-farewell/` | Glimmer's farewell: Muse Image drawings, the Meshy rig that was tried and not used, the Higgsfield Genjutsu wave |
 | `assets/mascots/` | The cast, drawn with Muse Image |
-| `experiments/web/` | `sim_test.mjs` (plays the six simulator cases), `export_dock.py` (the Blender dock for the browser), page checks |
+| `experiments/web/` | `sim_test.mjs` (plays the six cases in the first simulator, `site/sim/`), `export_dock.py` (the Blender dock for the browser), page checks |
 | `experiments/room_concepts.py`, `site_mockups.py` | Muse Image design concepts Sena chose from (`experiments/mockups/`) |
 
 <a id="setup"></a>
@@ -855,6 +863,14 @@ CBYP_MCP_ERP=0 demo/muse-dock/muse-dock.sh              # Muse Code at the dock,
 headless (`blender -b --factory-startup -P experiments/blender/warehouse.py`; run
 `experiments/blender/make_cutouts.py` first).
 
+<a id="four-language-interface"></a>
+
+### ![Four-language interface](assets/readme/headings/33-four-language-interface.webp)
+
+The site interface and report presentation support Turkish, English, German and Simplified Chinese through `site/i18n/ui.js`. The top selector persists `cbyp-ui-language` locally; `?ui=tr|en|de|zh` opens a chosen interface language. The recorded-evidence selector remains independent. Original documents, audio, JSON and tool traces are not rewritten. The two validation reports retain byte-identical `original-report.html` archives. Timing-study exports use version 3, record interface and evidence languages, and lock the interface language during a study.
+
+Translations are static local assets, with no visitor-side model calls. To regenerate the catalog, install the build-time parser with `npm install --prefix /tmp/cbyp-i18n-tools acorn@8.19.0`, then run `NODE_PATH=/tmp/cbyp-i18n-tools/node_modules .venv/bin/python scripts/build-ui-catalog.py`. Add `--translate` only to send missing public UI strings to the configured Meta translation model. Maintained wording lives in `site/i18n/overrides.json`. Check coverage and placeholder preservation with `node --test tests/ui_i18n.test.mjs tests/time_study*.test.mjs`.
+
 ---
 
 <div align="center">
@@ -868,11 +884,3 @@ headless (`blender -b --factory-startup -P experiments/blender/warehouse.py`; ru
 <sub>Glimmer's farewell: Higgsfield Genjutsu, from our Muse Image Glimmer; motion from a Pixabay clip by videoplasty.</sub>
 
 </div>
-
-<a id="four-language-interface"></a>
-
-### ![Four-language interface](assets/readme/headings/33-four-language-interface.webp)
-
-The site interface and report presentation support Turkish, English, German and Simplified Chinese through `site/i18n/ui.js`. The top selector persists `cbyp-ui-language` locally; `?ui=tr|en|de|zh` opens a chosen interface language. The recorded-evidence selector remains independent. Original documents, audio, JSON and tool traces are not rewritten. The two validation reports retain byte-identical `original-report.html` archives. Timing-study exports use version 3, record interface and evidence languages, and lock the interface language during a study.
-
-Translations are static local assets, with no visitor-side model calls. To regenerate the catalog, install the build-time parser with `npm install --prefix /tmp/cbyp-i18n-tools acorn@8.19.0`, then run `NODE_PATH=/tmp/cbyp-i18n-tools/node_modules .venv/bin/python scripts/build-ui-catalog.py`. Add `--translate` only to send missing public UI strings to the configured Meta translation model. Maintained wording lives in `site/i18n/overrides.json`. Check coverage and placeholder preservation with `node --test tests/ui_i18n.test.mjs tests/time_study*.test.mjs`.

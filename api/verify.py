@@ -35,14 +35,19 @@ class handler(BaseHTTPRequestHandler):
     def do_GET(self):
         self.reply(200,{'mode':'hosted_dry_run','requires_access_code':True,'max_body_bytes':MAX_BODY,
                        'configured':all(os.environ.get(k) for k in ('VERIFICATION_ACCESS_CODE','META_API_KEY','BASETEN_API_KEY'))})
+    def drain(self):
+        # Read a rejected request's body first, or the client sees a reset instead of the 403
+        try:length=int(self.headers.get('Content-Length','0'))
+        except ValueError:return
+        if 0<length<=MAX_BODY:self.rfile.read(length)
     def do_POST(self):
         secret=os.environ.get('VERIFICATION_ACCESS_CODE','')
         supplied=self.headers.get('X-Verification-Token','')
         if not secret or not hmac.compare_digest(secret.encode(),supplied.encode()):
-            return self.reply(403,{'error':'Valid demo access code required.'})
+            self.drain();return self.reply(403,{'error':'Valid demo access code required.'})
         origin=self.headers.get('Origin')
         if origin and urlparse(origin).netloc!=self.headers.get('Host'):
-            return self.reply(403,{'error':'Use the verification page on this site.'})
+            self.drain();return self.reply(403,{'error':'Use the verification page on this site.'})
         try:
             length=int(self.headers.get('Content-Length','0'))
             if not 0<length<=MAX_BODY:return self.reply(413,{'error':'Combined upload too large (4 MB encoded limit). Use smaller files or the local workflow.'})
