@@ -84,7 +84,7 @@ PROPS = {
 
 # SAM found no mask for Sam's tablet or Voice's microphone under any word we tried. For these
 # two, whatever stands out from the flat backdrop and touches SAM's figure is kept too.
-KEY = {"sam", "voice", "sef"}
+KEY = {"sam", "voice", "sef", "iris"}
 
 PROMPT = (
     "The same character as in the reference images, exactly the same design: same face, hair, "
