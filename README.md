@@ -1,5 +1,8 @@
 <div align="center">
 
+<a href="https://cerebralvalley.ai/e/meta-ai-developer-hackathon"><img alt="Meta Global AI Developer Hackathon 2026" src="https://img.shields.io/badge/Meta_Global_AI_Developer_Hackathon-2026-0866FF?style=for-the-badge&logo=meta&logoColor=white"></a>
+<img alt="Indie developer track" src="https://img.shields.io/badge/Indie_developer_track-Build_for_Your_World-1C2B33?style=for-the-badge">
+
 <a href="https://count-before-you-post.vercel.app"><img src="assets/readme/toybox.jpg" alt="A child's hands hold the Count Before You Post toy box: a blue box with the ten figures in front of a warehouse dock" width="100%"></a>
 
 <a id="count-before-you-post"></a>
@@ -14,7 +17,9 @@ Before a goods receipt is written, the delivery note, the camera, the receiver's
 
 **[Open the toy box: the live demo →](https://count-before-you-post.vercel.app)** &nbsp;·&nbsp; [Drive the dock](https://count-before-you-post.vercel.app/sim-lego/)
 
-<sub>Built with Muse Spark · SAM 3.1 · Voice · Wonder · Spark Open · Muse Code · Muse Image &nbsp;|&nbsp; Meta Global AI Developer Hackathon, 26 Oct – 4 Nov 2026 &nbsp;|&nbsp; <b>0</b> wrong receipts behind the gate</sub>
+<img alt="Muse Spark" src="https://img.shields.io/badge/Muse_Spark-1.3-0866FF?logo=meta&logoColor=white"> <img alt="SAM 3.1" src="https://img.shields.io/badge/SAM-3.1-0866FF?logo=meta&logoColor=white"> <img alt="Muse Voice Transcribe" src="https://img.shields.io/badge/Muse_Voice-Transcribe-0866FF?logo=meta&logoColor=white"> <img alt="Muse Wonder" src="https://img.shields.io/badge/Muse_Wonder-1.0-0866FF?logo=meta&logoColor=white"> <img alt="Muse Spark Open" src="https://img.shields.io/badge/Muse_Spark_Open-open_weights-0866FF?logo=meta&logoColor=white"> <img alt="Muse Code" src="https://img.shields.io/badge/Muse_Code-MCP-0866FF?logo=meta&logoColor=white"> <img alt="Muse Image" src="https://img.shields.io/badge/Muse_Image-the_cast-0866FF?logo=meta&logoColor=white">
+
+<sub>Built in ten days for the <b>Meta Global AI Developer Hackathon</b> (Meta × Cerebral Valley, 26 Oct – 4 Nov 2026). Every step that needs AI runs on Meta's models. &nbsp;|&nbsp; <b>24/24</b> gate decisions right &nbsp;·&nbsp; <b>0</b> wrong receipts behind the gate</sub>
 
 </div>
 
@@ -166,19 +171,17 @@ Agents Pt. 2, Yash Khare, 28 Oct; the Fireworks workshop, Sinan Ozdemir, 30 Oct)
 
 ## ![Results at a glance](assets/readme/headings/08-results-at-a-glance-blue-orange.webp)
 
-| Check | Result |
-|---|---|
-| Gate decision right, six dock cases × four languages | **24/24** |
-| Wrong receipts that reach the ERP: an agent that posts what the note says | 5/6 |
-| Wrong receipts: the Spark agent on its own | 1/6 to 2/6 per language |
-| Wrong receipts: any agent behind the gate | **0** |
-| Muse Code, Meta's own agent, working the dock through MCP | 5 sessions, 5 refused writes, **0 receipts** |
-| White 2 pt text hidden in a PDF note | Spark saw it in 0 of 3 reads; plain code found it, and the gate sent the note to Şef |
-| Wonder auditing Spark's reading, readings changed on purpose | **36/36 caught** |
-| Receiver's count from a driver-and-receiver conversation | 4/5 from a plain transcript, **5/5** from speaker turns |
-| Supervisor sign-off, live in ERPNext | 2 held deliveries released, each for exactly the quantity Şef approved |
-| Three-way match with the purchase order: the same readings against other orders, four languages | **16/16** |
-| Receipt against a real Purchase Order in ERPNext | received in full (12 of 12); a second delivery on it stopped by the gate |
+| Check | Result | Compared with | Source |
+|---|---|---|---|
+| Gate decision right, six dock cases × four languages | **24/24** | the expected decision for each case | [`gate_warehouse.json`](experiments/results/gate_warehouse.json) (+ `en/`, `de/`, `zh/`) |
+| Wrong receipts behind the gate, any agent | **0** | an agent that posts what the note says: 5/6; the Spark agent alone: 1/6 to 2/6 per language | [`agent_warehouse.json`](experiments/results/agent_warehouse.json), `*/agent_warehouse_cross.json` |
+| Muse Code, Meta's own agent, working the dock through MCP | **0 receipts** in 5 sessions | it tried 5 writes; the gate refused all 5 | [`results/mcp/`](experiments/results/mcp/) |
+| White 2 pt text hidden in a PDF note | plain code found both lines; the gate sent the note to Şef | Spark saw it in 0 of 3 reads | [`pdf_gate.json`](experiments/results/pdf_gate.json) |
+| Wonder auditing Spark's reading, readings changed on purpose | **36/36 caught** | Spark's real readings: 26/27 confirmed, the 27th a real Spark error | [`audit.json`](experiments/results/audit.json) |
+| Receiver's count from a driver-and-receiver conversation | **5/5** from speaker turns | 4/5 from one plain transcript | [`voice_dialogue.json`](experiments/results/voice_dialogue.json) |
+| Supervisor sign-off, live in ERPNext | 2 held deliveries released, each for the quantity Şef approved | before sign-off: both held, nothing posted | [`signoff.json`](experiments/results/signoff.json) |
+| Three-way match: the same readings against other orders, four languages | **16/16** | the expected decision for each order | [`gate_orders.json`](experiments/results/gate_orders.json) (+ `en/`, `de/`, `zh/`) |
+| Receipt against a real Purchase Order in ERPNext | 12 of 12 received | a second delivery on the same order: stopped (`over_order`, 0 open) | [`erp_against_order.json`](experiments/results/erp_against_order.json) |
 
 Six synthetic Blender scenes, synthetic voices and machine-written attacks: this shows that
 the rules do what they say, not how accurate they are on real docks. See
