@@ -18,6 +18,19 @@ Before a goods receipt is written, the delivery note, the camera, the receiver's
 
 </div>
 
+<a id="start-here"></a>
+
+**Start here** (no sign-in, no API key):
+
+| | |
+|---|---|
+| **See it** | [The live demo](https://count-before-you-post.vercel.app): six deliveries, four languages, the gate's decision on each, with and without it |
+| **Judge three decisions** | [Post, block, ask Şef](https://count-before-you-post.vercel.app/jury/), each with the evidence behind it ([evidence first](https://count-before-you-post.vercel.app/review/)) |
+| **Drive the dock** | [The Brick Dock](https://count-before-you-post.vercel.app/sim-lego/): the recorded runs on a 3D warehouse floor |
+| **Check it yourself** | [Six commands](#check-it-yourself-a-few-minutes-no-api-key) replay the recorded model outputs through the gate, offline |
+| **The result** | 24/24 gate decisions right · **0** wrong receipts behind the gate · Muse Code through MCP: 5 sessions, 5 refused writes, 0 receipts · real ERPNext receipts for the matching deliveries |
+| **What is synthetic** | The dock scenes (Blender), the receiver's voices (ElevenLabs) and the attacks. Real: every Meta model call, the ERPNext receipts, a café-table photo test and a [30-image public-photo benchmark](docs/CONTROLLED_VALIDATION.md). See [Honest limits](#honest-limits) |
+
 <table>
 <tr>
 <td width="50%"><img src="assets/readme/toybox-open.jpg" alt="The box opened: the ten figures in their bags, the bricks, the GOODS IN sign, the truck and the traffic light"></td>
