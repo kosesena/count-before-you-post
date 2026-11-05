@@ -16,7 +16,7 @@
 
 Before a goods receipt is written, the delivery note, the camera, the receiver's voice and a second model must agree. If they don't, nothing is written and a person decides.
 
-**[Open the toy box: the live demo →](https://count-before-you-post.vercel.app)** &nbsp;·&nbsp; [Drive the dock](https://count-before-you-post.vercel.app/sim-lego/)
+**[▶ Watch the video (2:54)](https://youtu.be/31GRi_HvDxU)** &nbsp;·&nbsp; **[Open the toy box: the live demo →](https://count-before-you-post.vercel.app)** &nbsp;·&nbsp; [Drive the dock](https://count-before-you-post.vercel.app/sim-lego/)
 
 <img alt="Muse Spark" src="https://img.shields.io/badge/Muse_Spark-1.3-0866FF?logo=meta&logoColor=white"> <img alt="SAM 3.1" src="https://img.shields.io/badge/SAM-3.1-0866FF?logo=meta&logoColor=white"> <img alt="Muse Voice Transcribe" src="https://img.shields.io/badge/Muse_Voice-Transcribe-0866FF?logo=meta&logoColor=white"> <img alt="Muse Wonder" src="https://img.shields.io/badge/Muse_Wonder-1.0-0866FF?logo=meta&logoColor=white"> <img alt="Muse Spark Open" src="https://img.shields.io/badge/Muse_Spark_Open-open_weights-0866FF?logo=meta&logoColor=white"> <img alt="Muse Code" src="https://img.shields.io/badge/Muse_Code-MCP-0866FF?logo=meta&logoColor=white"> <img alt="Muse Image" src="https://img.shields.io/badge/Muse_Image-the_cast-0866FF?logo=meta&logoColor=white">
 
