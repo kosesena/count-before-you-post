@@ -1924,7 +1924,7 @@
    "bg": "#e9cdb2",
    "profile": {
     "tool": "The gate",
-    "model_id": "plain code, 12 rules",
+    "model_id": "plain code, ordered policy checks",
     "where": "cbyp/gate.py",
     "jobs": [
      "Decides post, block or human from the evidence, never from what an agent says",
@@ -2012,7 +2012,7 @@
     "where": "coding agent",
     "jobs": [
      "Wrote the ERPNext client and its tests",
-     "Wrote this page, the simulator and the 3D dock scenes",
+     "Wrote this page, the first simulator (sim/) and the 3D dock scenes",
      "Worked the dock herself, as an outside agent, through Kapı's MCP server"
     ],
     "record": [
